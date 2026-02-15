@@ -1,0 +1,5 @@
+food_slug,fodmap_subtype,source_slug,amount_raw,comparator,amount_g_per_100g,serving_g,low_max_g,moderate_max_g,evidence_tier,confidence_score,valid_from,notes
+ail_cru,fructan,monash_app_manual,"high",missing,,3,0.10,0.30,primary_lab,0.95,2026-02-15,Example values only; replace with validated source data
+ail_cru,gos,monash_app_manual,"0",eq,0.0,3,0.10,0.30,secondary_db,0.60,2026-02-15,Confirmed absent can roll up to none at serving
+riz_blanc_cuit,fructose,ciqual_2025,"< 0,2",lt,0.2,150,0.50,1.50,secondary_db,0.80,2026-02-15,Comparator-preserving CIQUAL style input example
+riz_blanc_cuit,lactose,ciqual_2025,"0",eq,0.0,150,0.50,1.50,secondary_db,0.80,2026-02-15,Confirmed absent can roll up to none instead of low

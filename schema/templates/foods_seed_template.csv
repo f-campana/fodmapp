@@ -1,0 +1,4 @@
+food_slug,canonical_name_fr,canonical_name_en,preparation_state,default_serving_g,ciqual_code,open_food_facts_code,ean13,category_code,roles,flavors,textures,cooking_behaviors,notes
+ail_cru,ail,Garlic,raw,3,11000,,,legumes_et_verdures,"base_aromatique;condiment","piquant;soufre;umami","ferme;fibreux","infuse_dans_huile;brule_facilement",French staple aromatic; often replaced by garlic-infused oil
+riz_blanc_cuit,riz blanc cuit,Cooked white rice,cooked,150,9101,,,cereales_et_feculents,"feculent_base","neutre","tendre","cuisson_longue",Core low-FODMAP base in FR meals
+lait_sans_lactose,lait sans lactose,Lactose-free milk,processed,200,,,3256221234567,alternatives_laitieres,"produit_laitier_texture","doux","liquide;cremeux","fond",Preferred dairy substitute for lactose-sensitive users
