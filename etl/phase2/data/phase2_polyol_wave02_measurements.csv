@@ -1,0 +1,4 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+37,,mannitol,,,75.00,,,,,,,literature,wave=polyol_wave02 rank=37 champignon de paris button mushroom
+38,,mannitol,,,60.00,,,,,,,literature,wave=polyol_wave02 rank=38 shiitake mushroom
+42,,mannitol,,,75.00,,,,,,,literature,wave=polyol_wave02 rank=42 celeri stalk

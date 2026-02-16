@@ -1,0 +1,6 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+11,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=11 farine de ble Type T55
+12,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=12 farine de ble Type T65
+13,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=13 farine de ble Type T80
+16,,fructan,,,75.00,,,,,,,literature,wave=fructan_wave02 rank=16 artichaut globe heart
+17,,fructan,,,30.00,,,,,,,literature,wave=fructan_wave02 rank=17 racine de chicoree root

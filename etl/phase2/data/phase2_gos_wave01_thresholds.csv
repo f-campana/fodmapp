@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
+18,,gos,75.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=18 threshold draft
+19,,gos,100.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=19 threshold draft
+20,,gos,100.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=20 threshold draft
+21,,gos,100.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=21 threshold draft
+22,,gos,90.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=22 threshold draft
+23,,gos,90.00,,,monash_app_v4_reference,,,,,wave=gos_wave01 rank=23 threshold draft

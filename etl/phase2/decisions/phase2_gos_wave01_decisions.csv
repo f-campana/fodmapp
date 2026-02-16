@@ -1,0 +1,7 @@
+priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
+18,pois chiche,canned drained,,,,,,,,,,fabiencampana,
+19,lentille,green cooked,,,,,,,,,,fabiencampana,
+20,lentille,red cooked,,,,,,,,,,fabiencampana,
+21,lentille,brown cooked,,,,,,,,,,fabiencampana,
+22,haricot blanc,cooked,,,,,,,,,,fabiencampana,
+23,haricot rouge,cooked kidney bean,,,,,,,,,,fabiencampana,
