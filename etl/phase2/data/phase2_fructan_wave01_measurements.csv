@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+3,,fructan,,,14.00,,,,,,,literature,wave=fructan_wave01 rank=3 ail infused oil
+6,,fructan,,,2.00,,,,,,,literature,wave=fructan_wave01 rank=6 oignon powder
+7,,fructan,,,15.00,,,,,,,literature,wave=fructan_wave01 rank=7 oignon nouveau white bulb
+8,,fructan,,,30.00,,,,,,,literature,wave=fructan_wave01 rank=8 oignon nouveau green tops
+9,,fructan,,,20.00,,,,,,,literature,wave=fructan_wave01 rank=9 echalote raw bulb
+10,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave01 rank=10 poireau white part

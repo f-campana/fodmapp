@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
+30,,sorbitol,125.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=30 threshold draft
+31,,sorbitol,120.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=31 threshold draft
+32,,sorbitol,80.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=32 threshold draft
+33,,sorbitol,120.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=33 threshold draft
+35,,sorbitol,120.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=35 threshold draft
+36,,sorbitol,30.00,,,monash_app_v4_reference,,,,,wave=polyol_wave01 rank=36 threshold draft

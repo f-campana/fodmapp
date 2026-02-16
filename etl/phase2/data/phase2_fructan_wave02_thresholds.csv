@@ -1,0 +1,6 @@
+priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
+11,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=11 threshold draft
+12,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=12 threshold draft
+13,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=13 threshold draft
+16,,fructan,75.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=16 threshold draft
+17,,fructan,30.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=17 threshold draft

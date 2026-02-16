@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+18,,gos,,,75.00,,,,,,,literature,wave=gos_wave01 rank=18 pois chiche canned drained
+19,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=19 lentille green cooked
+20,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=20 lentille red cooked
+21,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=21 lentille brown cooked
+22,,gos,,,90.00,,,,,,,literature,wave=gos_wave01 rank=22 haricot blanc cooked
+23,,gos,,,90.00,,,,,,,literature,wave=gos_wave01 rank=23 haricot rouge cooked kidney bean

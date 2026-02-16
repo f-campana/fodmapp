@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+24,,gos,,,90.00,,,,,,,literature,wave=gos_wave02 rank=24 haricot noir cooked
+25,,gos,,,90.00,,,,,,,literature,wave=gos_wave02 rank=25 pois casse cooked
+26,,gos,,,75.00,,,,,,,literature,wave=gos_wave02 rank=26 edamame cooked
+27,,gos,,,75.00,,,,,,,literature,wave=gos_wave02 rank=27 soja whole cooked
+28,,gos,,,30.00,,,,,,,literature,wave=gos_wave02 rank=28 noix de cajou raw
+29,,gos,,,30.00,,,,,,,literature,wave=gos_wave02 rank=29 pistache raw

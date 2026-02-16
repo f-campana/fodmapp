@@ -1,0 +1,7 @@
+priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
+3,ail,infused oil,,,,,,,,,,fabiencampana,
+6,oignon,powder,,,,,,,,,,fabiencampana,
+7,oignon nouveau,white bulb,,,,,,,,,,fabiencampana,
+8,oignon nouveau,green tops,,,,,,,,,,fabiencampana,
+9,echalote,raw bulb,,,,,,,,,,fabiencampana,
+10,poireau,white part,,,,,,,,,,fabiencampana,

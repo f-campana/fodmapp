@@ -1,0 +1,7 @@
+priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
+30,pomme,raw,,,,,,,,,,fabiencampana,
+31,poire,raw,,,,,,,,,,fabiencampana,
+32,cerise,sweet raw,,,,,,,,,,fabiencampana,
+33,peche,raw,,,,,,,,,,fabiencampana,
+35,prune,raw,,,,,,,,,,fabiencampana,
+36,pruneau,dried,,,,,,,,,,fabiencampana,

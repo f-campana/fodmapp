@@ -1,0 +1,7 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+30,,sorbitol,,,125.00,,,,,,,literature,wave=polyol_wave01 rank=30 pomme raw
+31,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=31 poire raw
+32,,sorbitol,,,80.00,,,,,,,literature,wave=polyol_wave01 rank=32 cerise sweet raw
+33,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=33 peche raw
+35,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=35 prune raw
+36,,sorbitol,,,30.00,,,,,,,literature,wave=polyol_wave01 rank=36 pruneau dried
