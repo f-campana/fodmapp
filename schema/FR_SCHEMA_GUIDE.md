@@ -330,6 +330,10 @@ Note:
 
 Per-wave artifact contract:
 
+- wave manifest:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_wave_manifest.csv`
+- pod runbook:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/POD_WAVES_RUNBOOK.md`
 - decision ledger:
   `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_<bucket>_wave<nn>_decisions.csv`
 - measurements:
