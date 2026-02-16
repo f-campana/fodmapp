@@ -1,0 +1,31 @@
+priority_rank,food_label,variant_label,top_candidate_food_id,top_candidate_ciqual_code,decision,recommended_method,resolution_notes,reviewed_by,reviewed_at
+2,ail,powder,bb10962e-8571-4195-839a-cbfa40e2fbc3,11023,resolve,name_match,Batch01 conservative manual approval against top candidate CIQUAL 11023,fabiencampana,2026-02-16T19:24:06Z
+3,ail,infused oil,bb10962e-8571-4195-839a-cbfa40e2fbc3,11023,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+4,oignon,raw bulb,ecb2d1ad-bcaf-457b-a4d2-398aa8a2028f,20034,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 20034,fabiencampana,2026-02-16T19:24:06Z
+5,oignon,cooked bulb,b45a2629-dae8-4769-adf9-d44d90b7ab88,20035,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 20035,fabiencampana,2026-02-16T19:24:06Z
+6,oignon,powder,5453fd5d-2388-47d7-83fc-00039e16958c,20323,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+7,oignon nouveau,white bulb,5453fd5d-2388-47d7-83fc-00039e16958c,20323,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+8,oignon nouveau,green tops,5453fd5d-2388-47d7-83fc-00039e16958c,20323,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+10,poireau,white part,58fe7186-1b08-4e5a-ac0f-094a72671322,20135,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+14,seigle,grain or flour,723768b7-0258-4f7e-b292-9f4217fef485,9390,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 9390,fabiencampana,2026-02-16T19:24:06Z
+15,orge,pearled barley,356c4137-25d0-4cb6-a949-43b224a0e467,9322,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 9322,fabiencampana,2026-02-16T19:24:06Z
+16,artichaut,globe heart,f0b5184a-1abb-4272-a269-737c08377ce9,20067,defer_pass3,slug_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+18,pois chiche,canned drained,c9efdf6e-96c3-4de6-a12a-fc15c856ad7b,9580,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+19,lentille,green cooked,1a2f8453-179b-4c76-b009-0a1589622f8d,20588,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+20,lentille,red cooked,1a2f8453-179b-4c76-b009-0a1589622f8d,20588,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+21,lentille,brown cooked,1a2f8453-179b-4c76-b009-0a1589622f8d,20588,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+22,haricot blanc,cooked,eb5b5375-248f-44d6-b075-35bad0ed13f2,20511,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+23,haricot rouge,cooked kidney bean,f79bdd29-6b50-47dd-b241-33429e6fc9cf,20524,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+27,soja,whole cooked,91061105-44b0-48b8-8d9b-aa018af43dfb,25229,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+28,noix de cajou,raw,b3c44ae0-3473-4105-8964-e904fc5b6f28,15055,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+29,pistache,raw,b92aebfb-2332-44ac-b17a-10b24c4641a0,15009,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+30,pomme,raw,7497e48b-b5df-4265-957c-39c8e1e51a2a,13436,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+31,poire,raw,ef09165a-2258-4f8b-af7e-d5af840d3d8a,13734,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+32,cerise,sweet raw,30493354-7367-4e97-bc7e-ebb090cd1f9a,13055,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+34,nectarine,raw,79a57df8-2742-499f-962a-7c3393284103,13149,resolve,name_match,Batch01 conservative manual approval against top candidate CIQUAL 13149,fabiencampana,2026-02-16T19:24:06Z
+35,prune,raw,aea35aa8-d388-43e6-a787-7f76f4e69368,13438,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+36,pruneau,dried,f4f213e4-d9b6-4785-847a-be5953a413ba,11299,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+37,champignon de paris,button mushroom,03e13358-6d11-4071-b3da-befdc15ebd29,20079,defer_pass3,name_match,Batch01 conservative defer to Pass3 due variant mismatch or ambiguous candidate,fabiencampana,2026-02-16T19:24:06Z
+39,pleurote,oyster mushroom,99eb1372-c7c8-4039-931f-6e8fb4618df4,20114,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 20114,fabiencampana,2026-02-16T19:24:06Z
+40,chou-fleur,florets,9b0f08d0-bcb1-4531-913d-bde294d2195b,20017,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 20017,fabiencampana,2026-02-16T19:24:06Z
+41,patate douce,cooked,1489c2db-2807-4389-bc8a-e93cbd1504fc,4102,resolve,slug_match,Batch01 conservative manual approval against top candidate CIQUAL 4102,fabiencampana,2026-02-16T19:24:06Z
