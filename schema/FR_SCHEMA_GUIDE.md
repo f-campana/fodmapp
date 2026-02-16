@@ -6,8 +6,9 @@ This document defines the canonical SQL contract for the FODMAP planner and swap
 
 - Canonical source of truth: `/Users/fabiencampana/Documents/Fodmap/schema/fodmap_fr_schema.sql`
 - JSON payloads are projections derived from SQL, not peer schemas.
-- Scope in v1.1: schema hardening only.
-- Out of scope in v1.1: full CIQUAL ETL implementation, API endpoint implementation, and bulk data population.
+- Scope in v1.1: schema hardening plus a reference CIQUAL ETL implementation.
+- Out of scope in v1.1: API endpoint implementation and bulk data population.
+- Reference ETL path: `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py`
 
 ## 2) Locked modeling decisions
 
@@ -82,6 +83,16 @@ FR remains required for recipe steps and ingredient text.
 `eu_allergens.annex_ii_name_fr` now uses accented official French labels.
 Database and API should preserve UTF-8 without transliteration.
 
+### 3.7 Canonical FR nullability for ingestion
+
+`foods.canonical_name_fr` is nullable in v1.1.
+
+Operational intent:
+
+- CIQUAL ingestion can preserve nutrient observations even when FR labels are unresolved
+- unresolved FR names are handled by a post-load quality gate, not by dropping rows
+- production/CI workflows should fail the ETL command when unresolved FR names remain
+
 ## 4) Source and lookup seeds included in SQL
 
 The SQL file now seeds:
@@ -92,7 +103,7 @@ The SQL file now seeds:
 - `culinary_roles`, `flavor_notes`, `texture_traits`, `cooking_behaviors`, `cuisine_tags`
 - `fodmap_subtypes`
 - `eu_allergens`
-- minimal `nutrient_definitions` for CIQUAL fructose/glucose/lactose/polyols/sugars
+- minimal `nutrient_definitions` for CIQUAL fructose/galactose/glucose/lactose/polyols/sugars
 
 ## 5) CIQUAL ingestion policy (value fidelity)
 
@@ -107,6 +118,14 @@ Typical mappings:
 - `< 0,2` -> `comparator='lt'`, `amount_value=0.2`
 - `traces` -> `comparator='trace'`, `amount_value=NULL`
 - missing/`-` -> `comparator='missing'`, `amount_value=NULL`
+
+Reference implementation details:
+
+- Hybrid ingestion contract: XLSX for nutrient observations, XML for FR identity/hierarchy
+- `load` requires `--alim-xml` and `--alim-grp-xml`
+- Category tree is persisted in `food_categories` with `source_system='ciqual_2025'`
+- Aggregate rows (`alim_grp_code='00'`) are excluded from category membership assignment
+- ETL exits non-zero when CIQUAL-linked foods still have `canonical_name_fr IS NULL`
 
 ## 6) Rollup rule for fructose risk
 

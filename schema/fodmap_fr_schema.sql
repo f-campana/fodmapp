@@ -145,7 +145,7 @@ CREATE TABLE food_categories (
 CREATE TABLE foods (
   food_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   food_slug TEXT NOT NULL UNIQUE,
-  canonical_name_fr TEXT NOT NULL,
+  canonical_name_fr TEXT,
   canonical_name_en TEXT,
   scientific_name TEXT,
   description_fr TEXT,
@@ -909,6 +909,7 @@ INSERT INTO eu_allergens (allergen_code, annex_ii_name_en, annex_ii_name_fr, ann
 
 INSERT INTO nutrient_definitions (nutrient_code, infoods_code, name_fr, name_en, unit, default_basis, is_fodmap_relevant, notes) VALUES
   ('CIQUAL_32210', 'FRUS', 'Fructose', 'Fructose', 'g', 'per_100g', TRUE, 'Ciqual const_code 32210'),
+  ('CIQUAL_32220', 'GALS', 'Galactose (g/100 g)', 'Galactose (g/100g)', 'g/100g', 'per_100g', FALSE, 'Ciqual const_code 32220'),
   ('CIQUAL_32410', 'LACS', 'Lactose', 'Lactose', 'g', 'per_100g', TRUE, 'Ciqual const_code 32410'),
   ('CIQUAL_34000', 'POLYL', 'Polyols totaux', 'Total polyols', 'g', 'per_100g', TRUE, 'Proxy only. Do not map directly to sorbitol+mannitol without assumptions.'),
   ('CIQUAL_32250', 'GLUS', 'Glucose', 'Glucose', 'g', 'per_100g', FALSE, 'Useful for fructose excess heuristics.'),
