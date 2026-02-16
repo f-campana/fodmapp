@@ -270,20 +270,32 @@ Batch10 source strategy:
 
 Batch10 status transitions:
 
-- `threshold_set` if threshold exists for row target subtype from `monash_app_v4_reference`
-- else `measured` if measurement exists for row target subtype from Phase 2 sources
-- else keep prior status
+- `threshold_set` only when BOTH are true:
+  - threshold exists for row target subtype from `monash_app_v4_reference`
+  - current measurement exists (`food_fodmap_measurements.is_current = TRUE`) for row target subtype from Phase 2 sources
+- `measured` when current measurement exists but threshold-set conjunction is not satisfied
+- `resolved` otherwise (for resolved cohort rows with no current target-subtype measurement)
+
+Batch10 quarantine workflow:
+
+- rank 2 garlic powder (`priority_rank=2`) is soft-quarantined in:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_quarantine_rank2_garlic_powder.sql`
+- quarantine marks suspect measurement rows as `is_current = FALSE` and appends a traceable note token
+- quarantined rows remain in DB for audit and provenance
+- readiness and completion logic now excludes non-current measurements
+- dedicated checks are provided in:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_post_quarantine_checks.sql`
 
 Batch10 acceptance gates:
 
 - `phase2_priority_foods` remains `42` rows
 - unresolved rows remain `32`
 - unresolved no-candidate carryover remains `11`
-- cohort measurement coverage = `10/10`
+- cohort current-measurement coverage = `9/10` (rank 2 quarantined)
 - cohort threshold coverage = `10/10`
-- cohort `threshold_set` status = `10/10`
+- cohort `threshold_set` status = `9/10`
 - expected gap completion rows:
-  - `fructan_dominant/fructan completed_rows = 6`
+  - `fructan_dominant/fructan completed_rows = 5`
   - `polyol_split_needed/sorbitol completed_rows = 1`
   - `polyol_split_needed/mannitol completed_rows = 3`
 
@@ -293,6 +305,57 @@ Out of scope in Batch10:
 - no Pass 3 food creation
 - no fuzzy resolver changes
 - no swap-rule authoring
+
+## 10.2) Phase 2.4 Pod Execution Model (Proposal-Only)
+
+Operating model:
+
+- three research pods only: fructan, GOS, polyol
+- no separate validator or integrator agents
+- proposal-only outputs (CSV and SQL drafts) with human approval gate before apply
+- wave size target = 6 foods (last wave can be shorter)
+
+Wave order:
+
+1. fructan wave 1: `3,6,7,8,9,10` (allium variants)
+2. fructan wave 2: `11,12,13,16,17` (grain/artichoke/chicory fructans)
+3. GOS wave 1: `18,19,20,21,22,23`
+4. GOS wave 2: `24,25,26,27,28,29`
+5. polyol wave 1: `30,31,32,33,35,36`
+6. polyol wave 2: `37,38,42`
+
+Note:
+
+- rank `34` is intentionally absent from polyol waves because it is already resolved and ingested.
+
+Per-wave artifact contract:
+
+- decision ledger:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_<bucket>_wave<nn>_decisions.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_thresholds.csv`
+- optional Pass 3 new-food rows:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_new_foods.csv`
+- apply SQL draft:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<bucket>_wave<nn>_apply.sql`
+- post-check SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<bucket>_wave<nn>_checks.sql`
+
+Shared Pass 3 creation rules:
+
+- use `decision=create_new_food` when no safe CIQUAL mapping exists
+- create foods with:
+  - `food_slug`
+  - `canonical_name_fr`
+  - `canonical_name_en` when straightforward
+  - `preparation_state`
+  - `status='draft'`
+- add deterministic custom reference:
+  - `ref_system='CUSTOM'`
+  - `ref_value='phase2_pass3:<priority_rank>'`
+- link back to `phase2_priority_foods` with `resolution_method='new_food'`
 
 ## 11) References
 
