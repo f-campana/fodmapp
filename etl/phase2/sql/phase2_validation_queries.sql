@@ -1,5 +1,15 @@
 -- Phase 2 scaffold validation queries.
--- Run after loading /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql
+-- Run after:
+--   1) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_priority_foods_setup.sql
+--   2) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql
+--   3) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass2_candidates.sql
+
+-- 0) Persistent table sanity
+SELECT
+  COUNT(*) AS priority_rows,
+  COUNT(*) FILTER (WHERE resolved_food_id IS NOT NULL) AS resolved_rows,
+  COUNT(*) FILTER (WHERE resolved_food_id IS NULL) AS unresolved_rows
+FROM phase2_priority_foods;
 
 -- 1) Priority rows still unresolved to a food_id
 SELECT
@@ -10,7 +20,8 @@ SELECT
   variant_label,
   ciqual_code_hint,
   food_slug_hint,
-  resolution_method
+  resolution_method,
+  status
 FROM v_phase2_priority_food_candidates
 WHERE resolved_food_id IS NULL
 ORDER BY priority_rank;
@@ -149,3 +160,33 @@ SELECT
 FROM cohort_measurements
 WHERE resolved_food_id IS NULL OR NOT has_phase2_measurement
 ORDER BY priority_rank;
+
+-- 6) Pass 2 candidate report (read-only): top 10 ranked candidates per unresolved row
+SELECT
+  priority_rank,
+  gap_bucket,
+  target_subtype,
+  food_label,
+  variant_label,
+  candidate_rank,
+  match_score,
+  match_flags,
+  candidate_ciqual_code,
+  candidate_name_fr,
+  candidate_slug,
+  recommended_resolution_method
+FROM v_phase2_resolution_candidates
+ORDER BY priority_rank, candidate_rank;
+
+-- 7) Manual confirmation template UPDATE (example only, do not run blindly)
+-- UPDATE phase2_priority_foods
+-- SET
+--   resolved_food_id = '<candidate_food_id>',
+--   resolution_method = '<name_match|slug_match|manual>',
+--   resolution_notes = 'Confirmed manually from pass2 candidate report',
+--   status = CASE WHEN status = 'pending_research' THEN 'resolved' ELSE status END,
+--   resolved_at = now(),
+--   resolved_by = 'operator_name',
+--   updated_at = now()
+-- WHERE priority_rank = <rank>
+--   AND resolved_food_id IS NULL;

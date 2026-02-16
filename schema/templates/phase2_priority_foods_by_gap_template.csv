@@ -1,45 +1,45 @@
-# Phase 2 scaffold template: provisional serving_g values are starter defaults for research ops only.
-# Keep rows grouped by CIQUAL gap bucket (fructan_dominant, gos_dominant, polyol_split_needed) to align extraction workflows.
-priority_rank,gap_bucket,target_subtype,food_label,variant_label,ciqual_code_hint,food_slug_hint,food_id,serving_g_provisional,source_strategy,status,notes
-1,fructan_dominant,fructan,ail,raw cloves,11000,ail_cru,,3,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Core French aromatic
-2,fructan_dominant,fructan,ail,powder,,ail_poudre,,1,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Concentrated seasoning form
-3,fructan_dominant,fructan,ail,infused oil,,huile_infusee_ail,,14,muir_2007_fructan|monash_app_v4_reference,pending_research,Technique swap baseline
-4,fructan_dominant,fructan,oignon,raw bulb,,oignon_cru,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,High-use aromatic
-5,fructan_dominant,fructan,oignon,cooked bulb,,oignon_cuit,,60,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Thermal behavior variant
-6,fructan_dominant,fructan,oignon,powder,,oignon_poudre,,2,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Seasoning variant
-7,fructan_dominant,fructan,oignon nouveau,white bulb,,cebette_blanc,,15,muir_2007_fructan|monash_app_v4_reference,pending_research,White-vs-green split needed
-8,fructan_dominant,fructan,oignon nouveau,green tops,,cebette_vert,,30,muir_2007_fructan|monash_app_v4_reference,pending_research,Typically better tolerated portion
-9,fructan_dominant,fructan,echalote,raw bulb,,echalote_crue,,20,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,French base aromatic
-10,fructan_dominant,fructan,poireau,white part,,poireau_blanc,,40,muir_2007_fructan|monash_app_v4_reference,pending_research,White section priority
-11,fructan_dominant,fructan,farine de ble,Type T55,,farine_ble_t55,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,French flour grade
-12,fructan_dominant,fructan,farine de ble,Type T65,,farine_ble_t65,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,French flour grade
-13,fructan_dominant,fructan,farine de ble,Type T80,,farine_ble_t80,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,French flour grade
-14,fructan_dominant,fructan,seigle,grain or flour,,seigle,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Common bakery grain
-15,fructan_dominant,fructan,orge,pearled barley,,orge_perle,,75,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,Soup and side usage
-16,fructan_dominant,fructan,artichaut,globe heart,,artichaut,,75,muir_2007_fructan|monash_app_v4_reference,pending_research,Known fructan-heavy vegetable
-17,fructan_dominant,fructan,racine de chicoree,root,,racine_chicoree,,30,muir_2007_fructan|monash_app_v4_reference,pending_research,Inulin-rich reference food
-18,gos_dominant,gos,pois chiche,canned drained,,pois_chiche_conserve,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Legume baseline
-19,gos_dominant,gos,lentille,green cooked,,lentille_verte_cuite,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Variant-specific data needed
-20,gos_dominant,gos,lentille,red cooked,,lentille_rouge_cuite,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Variant-specific data needed
-21,gos_dominant,gos,lentille,brown cooked,,lentille_brune_cuite,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Variant-specific data needed
-22,gos_dominant,gos,haricot blanc,cooked,,haricot_blanc_cuit,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Pulse category anchor
-23,gos_dominant,gos,haricot rouge,cooked kidney bean,,haricot_rouge_cuit,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Pulse category anchor
-24,gos_dominant,gos,haricot noir,cooked,,haricot_noir_cuit,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Pulse category anchor
-25,gos_dominant,gos,pois casse,cooked,,pois_casse_cuit,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Traditional split pea use
-26,gos_dominant,gos,edamame,cooked,,edamame_cuit,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Soy-family variant
-27,gos_dominant,gos,soja,whole cooked,,soja_cuit,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Soy-family variant
-28,gos_dominant,gos,noix de cajou,raw,,cajou_cru,,30,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Nut trigger candidate
-29,gos_dominant,gos,pistache,raw,,pistache_crue,,30,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,Nut trigger candidate
-30,polyol_split_needed,sorbitol,pomme,raw,,pomme_crue,,125,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-31,polyol_split_needed,sorbitol,poire,raw,,poire_crue,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-32,polyol_split_needed,sorbitol,cerise,sweet raw,,cerise_crue,,80,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-33,polyol_split_needed,sorbitol,peche,raw,,peche_crue,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-34,polyol_split_needed,sorbitol,nectarine,raw,,nectarine_crue,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-35,polyol_split_needed,sorbitol,prune,raw,,prune_crue,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,Sorbitol-vs-mannitol split required
-36,polyol_split_needed,sorbitol,pruneau,dried,,pruneau_sec,,30,yao_2005_polyols|monash_app_v4_reference,pending_research,Dried fruit concentration effect
-37,polyol_split_needed,mannitol,champignon de paris,button mushroom,,champignon_paris,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-heavy mushroom family
-38,polyol_split_needed,mannitol,shiitake,mushroom,,shiitake,,60,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-heavy mushroom family
-39,polyol_split_needed,mannitol,pleurote,oyster mushroom,,pleurote,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-heavy mushroom family
-40,polyol_split_needed,mannitol,chou-fleur,florets,,chou_fleur,,90,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-vs-sorbitol split required
-41,polyol_split_needed,mannitol,patate douce,cooked,,patate_douce_cuite,,90,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-vs-sorbitol split required
-42,polyol_split_needed,mannitol,celeri,stalk,,celeri_branche,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,Mannitol-vs-sorbitol split required
+# Phase 2 persistent priority template: resolution fields stay empty until pass1/pass2/manual confirmation.
+# Rows must remain grouped by CIQUAL gap bucket (fructan_dominant, gos_dominant, polyol_split_needed).
+priority_rank,gap_bucket,target_subtype,food_label,variant_label,ciqual_code_hint,food_slug_hint,resolved_food_id,resolution_method,resolution_notes,serving_g_provisional,source_strategy,status,resolved_at,resolved_by
+1,fructan_dominant,fructan,ail,raw cloves,11000,ail_cru,,,,3,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+2,fructan_dominant,fructan,ail,powder,,ail_poudre,,,,1,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+3,fructan_dominant,fructan,ail,infused oil,,huile_infusee_ail,,,,14,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+4,fructan_dominant,fructan,oignon,raw bulb,,oignon_cru,,,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+5,fructan_dominant,fructan,oignon,cooked bulb,,oignon_cuit,,,,60,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+6,fructan_dominant,fructan,oignon,powder,,oignon_poudre,,,,2,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+7,fructan_dominant,fructan,oignon nouveau,white bulb,,cebette_blanc,,,,15,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+8,fructan_dominant,fructan,oignon nouveau,green tops,,cebette_vert,,,,30,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+9,fructan_dominant,fructan,echalote,raw bulb,,echalote_crue,,,,20,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+10,fructan_dominant,fructan,poireau,white part,,poireau_blanc,,,,40,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+11,fructan_dominant,fructan,farine de ble,Type T55,,farine_ble_t55,,,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+12,fructan_dominant,fructan,farine de ble,Type T65,,farine_ble_t65,,,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+13,fructan_dominant,fructan,farine de ble,Type T80,,farine_ble_t80,,,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+14,fructan_dominant,fructan,seigle,grain or flour,,seigle,,,,40,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+15,fructan_dominant,fructan,orge,pearled barley,,orge_perle,,,,75,muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference,pending_research,,
+16,fructan_dominant,fructan,artichaut,globe heart,,artichaut,,,,75,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+17,fructan_dominant,fructan,racine de chicoree,root,,racine_chicoree,,,,30,muir_2007_fructan|monash_app_v4_reference,pending_research,,
+18,gos_dominant,gos,pois chiche,canned drained,,pois_chiche_conserve,,,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+19,gos_dominant,gos,lentille,green cooked,,lentille_verte_cuite,,,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+20,gos_dominant,gos,lentille,red cooked,,lentille_rouge_cuite,,,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+21,gos_dominant,gos,lentille,brown cooked,,lentille_brune_cuite,,,,100,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+22,gos_dominant,gos,haricot blanc,cooked,,haricot_blanc_cuit,,,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+23,gos_dominant,gos,haricot rouge,cooked kidney bean,,haricot_rouge_cuit,,,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+24,gos_dominant,gos,haricot noir,cooked,,haricot_noir_cuit,,,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+25,gos_dominant,gos,pois casse,cooked,,pois_casse_cuit,,,,90,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+26,gos_dominant,gos,edamame,cooked,,edamame_cuit,,,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+27,gos_dominant,gos,soja,whole cooked,,soja_cuit,,,,75,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+28,gos_dominant,gos,noix de cajou,raw,,cajou_cru,,,,30,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+29,gos_dominant,gos,pistache,raw,,pistache_crue,,,,30,dysseler_hoffem_gos|monash_app_v4_reference,pending_research,,
+30,polyol_split_needed,sorbitol,pomme,raw,,pomme_crue,,,,125,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+31,polyol_split_needed,sorbitol,poire,raw,,poire_crue,,,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+32,polyol_split_needed,sorbitol,cerise,sweet raw,,cerise_crue,,,,80,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+33,polyol_split_needed,sorbitol,peche,raw,,peche_crue,,,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+34,polyol_split_needed,sorbitol,nectarine,raw,,nectarine_crue,,,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+35,polyol_split_needed,sorbitol,prune,raw,,prune_crue,,,,120,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+36,polyol_split_needed,sorbitol,pruneau,dried,,pruneau_sec,,,,30,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+37,polyol_split_needed,mannitol,champignon de paris,button mushroom,,champignon_paris,,,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+38,polyol_split_needed,mannitol,shiitake,mushroom,,shiitake,,,,60,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+39,polyol_split_needed,mannitol,pleurote,oyster mushroom,,pleurote,,,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+40,polyol_split_needed,mannitol,chou-fleur,florets,,chou_fleur,,,,90,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+41,polyol_split_needed,mannitol,patate douce,cooked,,patate_douce_cuite,,,,90,yao_2005_polyols|monash_app_v4_reference,pending_research,,
+42,polyol_split_needed,mannitol,celeri,stalk,,celeri_branche,,,,75,yao_2005_polyols|monash_app_v4_reference,pending_research,,

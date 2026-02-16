@@ -271,6 +271,33 @@ CREATE TABLE fodmap_subtypes (
   is_polyol BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+CREATE TABLE phase2_priority_foods (
+  priority_rank INTEGER PRIMARY KEY CHECK (priority_rank > 0),
+  gap_bucket TEXT NOT NULL CHECK (
+    gap_bucket IN ('fructan_dominant', 'gos_dominant', 'polyol_split_needed')
+  ),
+  target_subtype TEXT NOT NULL REFERENCES fodmap_subtypes (code),
+  food_label TEXT NOT NULL,
+  variant_label TEXT NOT NULL,
+  ciqual_code_hint TEXT,
+  food_slug_hint TEXT,
+  resolved_food_id UUID REFERENCES foods (food_id),
+  resolution_method TEXT CHECK (
+    resolution_method IN ('ciqual_code', 'slug_match', 'name_match', 'manual', 'new_food')
+  ),
+  resolution_notes TEXT,
+  serving_g_provisional NUMERIC(8,2) NOT NULL CHECK (serving_g_provisional > 0),
+  source_strategy TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending_research' CHECK (
+    status IN ('pending_research', 'resolved', 'measured', 'threshold_set')
+  ),
+  resolved_at TIMESTAMPTZ,
+  resolved_by TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (food_label, variant_label)
+);
+
 CREATE TABLE food_fodmap_measurements (
   measurement_id BIGSERIAL PRIMARY KEY,
   food_id UUID NOT NULL REFERENCES foods (food_id) ON DELETE CASCADE,
@@ -956,6 +983,66 @@ INSERT INTO fodmap_subtypes (code, family, display_name_fr, display_name_en, is_
   ('gos', 'oligosaccharide', 'GOS', 'GOS', FALSE),
   ('sorbitol', 'polyol', 'Sorbitol', 'Sorbitol', TRUE),
   ('mannitol', 'polyol', 'Mannitol', 'Mannitol', TRUE);
+
+INSERT INTO phase2_priority_foods (
+  priority_rank,
+  gap_bucket,
+  target_subtype,
+  food_label,
+  variant_label,
+  ciqual_code_hint,
+  food_slug_hint,
+  resolved_food_id,
+  resolution_method,
+  resolution_notes,
+  serving_g_provisional,
+  source_strategy,
+  status,
+  resolved_at,
+  resolved_by
+) VALUES
+  (1, 'fructan_dominant', 'fructan', 'ail', 'raw cloves', '11000', 'ail_cru', NULL, NULL, NULL, 3.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (2, 'fructan_dominant', 'fructan', 'ail', 'powder', NULL, 'ail_poudre', NULL, NULL, NULL, 1.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (3, 'fructan_dominant', 'fructan', 'ail', 'infused oil', NULL, 'huile_infusee_ail', NULL, NULL, NULL, 14.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (4, 'fructan_dominant', 'fructan', 'oignon', 'raw bulb', NULL, 'oignon_cru', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (5, 'fructan_dominant', 'fructan', 'oignon', 'cooked bulb', NULL, 'oignon_cuit', NULL, NULL, NULL, 60.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (6, 'fructan_dominant', 'fructan', 'oignon', 'powder', NULL, 'oignon_poudre', NULL, NULL, NULL, 2.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (7, 'fructan_dominant', 'fructan', 'oignon nouveau', 'white bulb', NULL, 'cebette_blanc', NULL, NULL, NULL, 15.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (8, 'fructan_dominant', 'fructan', 'oignon nouveau', 'green tops', NULL, 'cebette_vert', NULL, NULL, NULL, 30.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (9, 'fructan_dominant', 'fructan', 'echalote', 'raw bulb', NULL, 'echalote_crue', NULL, NULL, NULL, 20.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (10, 'fructan_dominant', 'fructan', 'poireau', 'white part', NULL, 'poireau_blanc', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (11, 'fructan_dominant', 'fructan', 'farine de ble', 'Type T55', NULL, 'farine_ble_t55', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (12, 'fructan_dominant', 'fructan', 'farine de ble', 'Type T65', NULL, 'farine_ble_t65', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (13, 'fructan_dominant', 'fructan', 'farine de ble', 'Type T80', NULL, 'farine_ble_t80', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (14, 'fructan_dominant', 'fructan', 'seigle', 'grain or flour', NULL, 'seigle', NULL, NULL, NULL, 40.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (15, 'fructan_dominant', 'fructan', 'orge', 'pearled barley', NULL, 'orge_perle', NULL, NULL, NULL, 75.00, 'muir_2007_fructan|biesiekierski_2011_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (16, 'fructan_dominant', 'fructan', 'artichaut', 'globe heart', NULL, 'artichaut', NULL, NULL, NULL, 75.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (17, 'fructan_dominant', 'fructan', 'racine de chicoree', 'root', NULL, 'racine_chicoree', NULL, NULL, NULL, 30.00, 'muir_2007_fructan|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (18, 'gos_dominant', 'gos', 'pois chiche', 'canned drained', NULL, 'pois_chiche_conserve', NULL, NULL, NULL, 75.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (19, 'gos_dominant', 'gos', 'lentille', 'green cooked', NULL, 'lentille_verte_cuite', NULL, NULL, NULL, 100.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (20, 'gos_dominant', 'gos', 'lentille', 'red cooked', NULL, 'lentille_rouge_cuite', NULL, NULL, NULL, 100.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (21, 'gos_dominant', 'gos', 'lentille', 'brown cooked', NULL, 'lentille_brune_cuite', NULL, NULL, NULL, 100.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (22, 'gos_dominant', 'gos', 'haricot blanc', 'cooked', NULL, 'haricot_blanc_cuit', NULL, NULL, NULL, 90.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (23, 'gos_dominant', 'gos', 'haricot rouge', 'cooked kidney bean', NULL, 'haricot_rouge_cuit', NULL, NULL, NULL, 90.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (24, 'gos_dominant', 'gos', 'haricot noir', 'cooked', NULL, 'haricot_noir_cuit', NULL, NULL, NULL, 90.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (25, 'gos_dominant', 'gos', 'pois casse', 'cooked', NULL, 'pois_casse_cuit', NULL, NULL, NULL, 90.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (26, 'gos_dominant', 'gos', 'edamame', 'cooked', NULL, 'edamame_cuit', NULL, NULL, NULL, 75.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (27, 'gos_dominant', 'gos', 'soja', 'whole cooked', NULL, 'soja_cuit', NULL, NULL, NULL, 75.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (28, 'gos_dominant', 'gos', 'noix de cajou', 'raw', NULL, 'cajou_cru', NULL, NULL, NULL, 30.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (29, 'gos_dominant', 'gos', 'pistache', 'raw', NULL, 'pistache_crue', NULL, NULL, NULL, 30.00, 'dysseler_hoffem_gos|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (30, 'polyol_split_needed', 'sorbitol', 'pomme', 'raw', NULL, 'pomme_crue', NULL, NULL, NULL, 125.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (31, 'polyol_split_needed', 'sorbitol', 'poire', 'raw', NULL, 'poire_crue', NULL, NULL, NULL, 120.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (32, 'polyol_split_needed', 'sorbitol', 'cerise', 'sweet raw', NULL, 'cerise_crue', NULL, NULL, NULL, 80.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (33, 'polyol_split_needed', 'sorbitol', 'peche', 'raw', NULL, 'peche_crue', NULL, NULL, NULL, 120.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (34, 'polyol_split_needed', 'sorbitol', 'nectarine', 'raw', NULL, 'nectarine_crue', NULL, NULL, NULL, 120.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (35, 'polyol_split_needed', 'sorbitol', 'prune', 'raw', NULL, 'prune_crue', NULL, NULL, NULL, 120.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (36, 'polyol_split_needed', 'sorbitol', 'pruneau', 'dried', NULL, 'pruneau_sec', NULL, NULL, NULL, 30.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (37, 'polyol_split_needed', 'mannitol', 'champignon de paris', 'button mushroom', NULL, 'champignon_paris', NULL, NULL, NULL, 75.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (38, 'polyol_split_needed', 'mannitol', 'shiitake', 'mushroom', NULL, 'shiitake', NULL, NULL, NULL, 60.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (39, 'polyol_split_needed', 'mannitol', 'pleurote', 'oyster mushroom', NULL, 'pleurote', NULL, NULL, NULL, 75.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (40, 'polyol_split_needed', 'mannitol', 'chou-fleur', 'florets', NULL, 'chou_fleur', NULL, NULL, NULL, 90.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (41, 'polyol_split_needed', 'mannitol', 'patate douce', 'cooked', NULL, 'patate_douce_cuite', NULL, NULL, NULL, 90.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL),
+  (42, 'polyol_split_needed', 'mannitol', 'celeri', 'stalk', NULL, 'celeri_branche', NULL, NULL, NULL, 75.00, 'yao_2005_polyols|monash_app_v4_reference', 'pending_research', NULL, NULL);
 
 /*
 UTF-8 expected for French regulatory labels.

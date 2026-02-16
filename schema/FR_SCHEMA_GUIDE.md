@@ -189,8 +189,19 @@ Scaffold artifacts:
 
 - Priority template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/phase2_priority_foods_by_gap_template.csv`
 - Measurement template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/fodmap_research_measurements_template.csv`
+- Persistent table: `phase2_priority_foods` (seeded in canonical SQL)
 - Helper views: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql`
+- Existing DB setup/upsert: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_priority_foods_setup.sql`
+- Pass 1 deterministic resolver: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass1.sql`
+- Pass 2 candidate report (read-only): `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass2_candidates.sql`
 - Validation queries: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_validation_queries.sql`
+
+`phase2_priority_foods` workflow fields:
+
+- immutable planning identity: `priority_rank`, `gap_bucket`, `target_subtype`, `food_label`, `variant_label`
+- lookup hints: `ciqual_code_hint`, `food_slug_hint`
+- mutable resolution state: `resolved_food_id`, `resolution_method`, `resolution_notes`, `resolved_at`, `resolved_by`
+- process status: `pending_research -> resolved -> measured -> threshold_set`
 
 Template mapping rules:
 
@@ -218,7 +229,13 @@ Phase 2 source slugs seeded in canonical SQL:
 
 Note:
 
-This branch adds scaffold/governance only. Automated Phase 2 literature ingestion is intentionally not implemented here.
+Pass 2 is intentionally review-gated for safety:
+
+- candidate matching is read-only and ranked (`top 10` per unresolved priority row)
+- no fuzzy auto-resolution is applied
+- final linking uses explicit manual `UPDATE` statements after review
+
+Pass 3 (`new_food` creation for genuine non-CIQUAL variants) is intentionally deferred and not implemented in this phase.
 
 ## 11) References
 
