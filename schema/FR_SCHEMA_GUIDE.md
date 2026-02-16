@@ -6,8 +6,9 @@ This document defines the canonical SQL contract for the FODMAP planner and swap
 
 - Canonical source of truth: `/Users/fabiencampana/Documents/Fodmap/schema/fodmap_fr_schema.sql`
 - JSON payloads are projections derived from SQL, not peer schemas.
-- Scope in v1.1: schema hardening only.
-- Out of scope in v1.1: full CIQUAL ETL implementation, API endpoint implementation, and bulk data population.
+- Scope in v1.1: schema hardening plus a reference CIQUAL ETL implementation.
+- Out of scope in v1.1: API endpoint implementation and bulk data population.
+- Reference ETL path: `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py`
 
 ## 2) Locked modeling decisions
 
@@ -107,6 +108,13 @@ Typical mappings:
 - `< 0,2` -> `comparator='lt'`, `amount_value=0.2`
 - `traces` -> `comparator='trace'`, `amount_value=NULL`
 - missing/`-` -> `comparator='missing'`, `amount_value=NULL`
+
+Reference implementation details:
+
+- Hybrid ingestion contract: XLSX for nutrient observations, XML for FR identity/hierarchy
+- `load` requires `--alim-xml` and `--alim-grp-xml`
+- Category tree is persisted in `food_categories` with `source_system='ciqual_2025'`
+- Aggregate rows (`alim_grp_code='00'`) are excluded from category membership assignment
 
 ## 6) Rollup rule for fructose risk
 
