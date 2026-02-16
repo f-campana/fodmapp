@@ -1,0 +1,11 @@
+priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
+1,2fe985a7-b86a-4ac0-b89a-f4392779df92,fructan,3.00,0.100000,0.300000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=1 threshold_batch10
+2,bb10962e-8571-4195-839a-cbfa40e2fbc3,fructan,1.00,0.050000,0.100000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=2 threshold_batch10
+4,ecb2d1ad-bcaf-457b-a4d2-398aa8a2028f,fructan,40.00,0.200000,0.500000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=4 threshold_batch10
+5,b45a2629-dae8-4769-adf9-d44d90b7ab88,fructan,60.00,0.250000,0.600000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=5 threshold_batch10
+14,723768b7-0258-4f7e-b292-9f4217fef485,fructan,40.00,0.150000,0.300000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=14 threshold_batch10
+15,356c4137-25d0-4cb6-a949-43b224a0e467,fructan,75.00,0.120000,0.240000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=15 threshold_batch10
+34,79a57df8-2742-499f-962a-7c3393284103,sorbitol,120.00,0.100000,0.200000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=34 threshold_batch10
+39,99eb1372-c7c8-4039-931f-6e8fb4618df4,mannitol,75.00,0.050000,0.120000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=39 threshold_batch10
+40,9b0f08d0-bcb1-4531-913d-bde294d2195b,mannitol,90.00,0.080000,0.160000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=40 threshold_batch10
+41,1489c2db-2807-4389-bc8a-e93cbd1504fc,mannitol,90.00,0.070000,0.140000,monash_app_v4_reference,monash_app_v4_batch10_serving_thresholds_2026-02-16,primary_lab,0.900,2026-02-16,priority_rank=41 threshold_batch10

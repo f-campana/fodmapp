@@ -1,0 +1,11 @@
+priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
+1,2fe985a7-b86a-4ac0-b89a-f4392779df92,fructan,17.000000,eq,3.00,0.510000,muir_2007_fructan,muir2007_fructan_table_v1,primary_lab,0.900,2007-01-01,literature,priority_rank=1 raw_cloves mapping_batch10
+2,bb10962e-8571-4195-839a-cbfa40e2fbc3,fructan,12.000000,eq,1.00,0.120000,muir_2007_fructan,muir2007_fructan_table_v1,primary_lab,0.900,2007-01-01,literature,priority_rank=2 powder mapping_batch10
+4,ecb2d1ad-bcaf-457b-a4d2-398aa8a2028f,fructan,1.700000,eq,40.00,0.680000,muir_2007_fructan,muir2007_fructan_table_v1,primary_lab,0.900,2007-01-01,literature,priority_rank=4 raw_bulb mapping_batch10
+5,b45a2629-dae8-4769-adf9-d44d90b7ab88,fructan,1.200000,eq,60.00,0.720000,biesiekierski_2011_fructan,biesiekierski2011_fructan_trial_v1,primary_lab,0.880,2011-01-01,literature,priority_rank=5 cooked_bulb mapping_batch10
+14,723768b7-0258-4f7e-b292-9f4217fef485,fructan,0.800000,eq,40.00,0.320000,muir_2007_fructan,muir2007_fructan_table_v1,primary_lab,0.860,2007-01-01,literature,priority_rank=14 grain_or_flour mapping_batch10
+15,356c4137-25d0-4cb6-a949-43b224a0e467,fructan,0.350000,eq,75.00,0.262500,muir_2007_fructan,muir2007_fructan_table_v1,primary_lab,0.860,2007-01-01,literature,priority_rank=15 pearled_barley mapping_batch10
+34,79a57df8-2742-499f-962a-7c3393284103,sorbitol,0.220000,eq,120.00,0.264000,yao_2005_polyols,yao2005_polyols_table_v1,primary_lab,0.900,2005-01-01,literature,priority_rank=34 raw mapping_batch10
+39,99eb1372-c7c8-4039-931f-6e8fb4618df4,mannitol,0.160000,eq,75.00,0.120000,yao_2005_polyols,yao2005_polyols_table_v1,primary_lab,0.900,2005-01-01,literature,priority_rank=39 oyster_mushroom mapping_batch10
+40,9b0f08d0-bcb1-4531-913d-bde294d2195b,mannitol,0.210000,eq,90.00,0.189000,yao_2005_polyols,yao2005_polyols_table_v1,primary_lab,0.900,2005-01-01,literature,priority_rank=40 florets mapping_batch10
+41,1489c2db-2807-4389-bc8a-e93cbd1504fc,mannitol,0.080000,eq,90.00,0.072000,yao_2005_polyols,yao2005_polyols_table_v1,primary_lab,0.900,2005-01-01,literature,priority_rank=41 cooked mapping_batch10
