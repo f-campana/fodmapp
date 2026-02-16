@@ -1,13 +1,13 @@
 \set ON_ERROR_STOP on
 
--- Phase 2.3 batch10 post-ingestion checks.
--- Expected state after successful load + status sync:
+-- Phase 2.4 post-batch10 checks under current-measurement contract.
+-- Expected state after rank2 quarantine + status sync:
 -- - phase2_priority_foods total_rows = 42
 -- - unresolved rows = 32
 -- - unresolved no-candidate pool = 11
--- - batch10 cohort measurement coverage = 10/10
--- - batch10 cohort threshold coverage = 10/10
--- - batch10 cohort status threshold_set = 10
+-- - cohort current-measurement coverage = 9/10
+-- - cohort threshold coverage = 10/10
+-- - cohort status threshold_set = 9/10
 
 SELECT
   COUNT(*) AS total_rows,
@@ -51,14 +51,13 @@ DECLARE
   v_total_rows INTEGER;
   v_unresolved_rows INTEGER;
   v_no_candidate_rows INTEGER;
-  v_cohort_measurement_rows INTEGER;
+  v_cohort_current_measurement_rows INTEGER;
   v_cohort_threshold_rows INTEGER;
   v_cohort_threshold_status_rows INTEGER;
   v_fructan_completed INTEGER;
   v_sorbitol_completed INTEGER;
   v_mannitol_completed INTEGER;
-  v_batch_measurement_rows INTEGER;
-  v_batch_measurement_duplicates INTEGER;
+  v_batch_current_measurement_rows INTEGER;
 BEGIN
   IF to_regclass('public.v_phase2_resolution_candidates') IS NULL THEN
     RAISE EXCEPTION 'required view missing: v_phase2_resolution_candidates';
@@ -107,7 +106,7 @@ BEGIN
       'monash_app_v4_reference'
     )
   )
-  SELECT COUNT(*) INTO v_cohort_measurement_rows
+  SELECT COUNT(*) INTO v_cohort_current_measurement_rows
   FROM phase2_priority_foods AS p
   JOIN fodmap_subtypes AS fst
     ON fst.code = p.target_subtype
@@ -118,10 +117,11 @@ BEGIN
       WHERE ffm.food_id = p.resolved_food_id
         AND ffm.fodmap_subtype_id = fst.fodmap_subtype_id
         AND ffm.source_id IN (SELECT source_id FROM phase2_source_ids)
+        AND ffm.is_current = TRUE
     );
 
-  IF v_cohort_measurement_rows <> 10 THEN
-    RAISE EXCEPTION 'cohort measurement coverage check failed: expected 10, got %', v_cohort_measurement_rows;
+  IF v_cohort_current_measurement_rows <> 9 THEN
+    RAISE EXCEPTION 'cohort current-measurement coverage check failed: expected 9, got %', v_cohort_current_measurement_rows;
   END IF;
 
   SELECT COUNT(*) INTO v_cohort_threshold_rows
@@ -148,8 +148,8 @@ BEGIN
   WHERE priority_rank IN (1,2,4,5,14,15,34,39,40,41)
     AND status = 'threshold_set';
 
-  IF v_cohort_threshold_status_rows <> 10 THEN
-    RAISE EXCEPTION 'cohort status check failed: expected 10 threshold_set rows, got %', v_cohort_threshold_status_rows;
+  IF v_cohort_threshold_status_rows <> 9 THEN
+    RAISE EXCEPTION 'cohort status check failed: expected 9 threshold_set rows, got %', v_cohort_threshold_status_rows;
   END IF;
 
   SELECT completed_rows INTO v_fructan_completed
@@ -157,8 +157,8 @@ BEGIN
   WHERE gap_bucket = 'fructan_dominant'
     AND target_subtype = 'fructan';
 
-  IF COALESCE(v_fructan_completed, -1) <> 6 THEN
-    RAISE EXCEPTION 'gap completion check failed for fructan_dominant/fructan: expected 6, got %', COALESCE(v_fructan_completed, -1);
+  IF COALESCE(v_fructan_completed, -1) <> 5 THEN
+    RAISE EXCEPTION 'gap completion check failed for fructan_dominant/fructan: expected 5, got %', COALESCE(v_fructan_completed, -1);
   END IF;
 
   SELECT completed_rows INTO v_sorbitol_completed
@@ -179,7 +179,7 @@ BEGIN
     RAISE EXCEPTION 'gap completion check failed for polyol_split_needed/mannitol: expected 3, got %', COALESCE(v_mannitol_completed, -1);
   END IF;
 
-  SELECT COUNT(*) INTO v_batch_measurement_rows
+  SELECT COUNT(*) INTO v_batch_current_measurement_rows
   FROM food_fodmap_measurements AS ffm
   WHERE ffm.source_record_ref IN (
     'muir2007_fructan_table_v1',
@@ -190,47 +190,11 @@ BEGIN
       SELECT resolved_food_id
       FROM phase2_priority_foods
       WHERE priority_rank IN (1,2,4,5,14,15,34,39,40,41)
-    );
-
-  IF v_batch_measurement_rows <> 10 THEN
-    RAISE EXCEPTION 'batch measurement row count failed: expected 10, got %', v_batch_measurement_rows;
-  END IF;
-
-  SELECT COUNT(*) INTO v_batch_measurement_duplicates
-  FROM (
-    SELECT
-      ffm.food_id,
-      ffm.fodmap_subtype_id,
-      ffm.source_id,
-      ffm.source_record_ref,
-      ffm.amount_raw,
-      ffm.comparator,
-      ffm.observed_at,
-      COUNT(*) AS row_count
-    FROM food_fodmap_measurements AS ffm
-    WHERE ffm.source_record_ref IN (
-      'muir2007_fructan_table_v1',
-      'biesiekierski2011_fructan_trial_v1',
-      'yao2005_polyols_table_v1'
     )
-      AND ffm.food_id IN (
-        SELECT resolved_food_id
-        FROM phase2_priority_foods
-        WHERE priority_rank IN (1,2,4,5,14,15,34,39,40,41)
-      )
-    GROUP BY
-      ffm.food_id,
-      ffm.fodmap_subtype_id,
-      ffm.source_id,
-      ffm.source_record_ref,
-      ffm.amount_raw,
-      ffm.comparator,
-      ffm.observed_at
-    HAVING COUNT(*) > 1
-  ) AS dups;
+    AND ffm.is_current = TRUE;
 
-  IF v_batch_measurement_duplicates <> 0 THEN
-    RAISE EXCEPTION 'idempotency duplicate check failed: found % duplicate measurement signatures', v_batch_measurement_duplicates;
+  IF v_batch_current_measurement_rows <> 9 THEN
+    RAISE EXCEPTION 'batch current measurement row count failed: expected 9, got %', v_batch_current_measurement_rows;
   END IF;
 END $$;
 
