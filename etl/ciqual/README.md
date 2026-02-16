@@ -11,23 +11,35 @@ This loader ingests CIQUAL 2025 into the FODMAP SQL schema using a hybrid model:
 What this ETL writes:
 
 - `foods`, `food_external_refs`, `food_names`
-- `food_nutrient_observations` (fructose, glucose, lactose, total polyols, sugars)
+- `food_nutrient_observations` for six CIQUAL nutrients:
+  - `CIQUAL_32210` fructose
+  - `CIQUAL_32220` galactose
+  - `CIQUAL_32250` glucose
+  - `CIQUAL_32410` lactose
+  - `CIQUAL_34000` total polyols
+  - `CIQUAL_32000` sugars
 - `food_categories` (`source_system='ciqual_2025'`) + `food_category_memberships`
 
 What it does not solve:
 
 - Fructans
-- GOS
+- GOS direct concentration values
 - Sorbitol vs. mannitol split
 
-Those require Phase 2 research sources.
+Those require Phase 2 evidence sources.
 
-## FR-first behavior
+## FR-name policy and quality gate
 
-`canonical_name_fr` is resolved from `alim_*.xml` first.
+`canonical_name_fr` is nullable in schema v1.1 and can be null for unresolved rows.
 
-If a food has no French name after XML enrichment, that row is skipped and reported as an error.
-No `CIQUAL <code>` placeholder names are created.
+Load behavior:
+
+- FR name is resolved XML-first.
+- If unresolved, row is still loaded (`canonical_name_fr = NULL`) to preserve nutrient coverage.
+- After load, ETL verifies CIQUAL-linked foods with `canonical_name_fr IS NULL`.
+- If unresolved remain, the command exits non-zero.
+
+This enforces quality while keeping ingestion complete.
 
 ## Requirements
 
@@ -67,15 +79,17 @@ python /Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py load \
 
 ## Post-load checks
 
-### Placeholder FR names should be absent
+### Unresolved FR names gate
 
 ```sql
-SELECT count(*)
-FROM foods
-WHERE canonical_name_fr ~ '^CIQUAL [0-9]+$';
+SELECT count(DISTINCT f.food_id)
+FROM foods f
+JOIN food_external_refs fer ON fer.food_id = f.food_id
+WHERE fer.ref_system = 'CIQUAL'
+  AND f.canonical_name_fr IS NULL;
 ```
 
-### CIQUAL category nodes and memberships should exist
+### CIQUAL category nodes and memberships
 
 ```sql
 SELECT count(*) AS ciqual_categories
@@ -88,7 +102,7 @@ JOIN food_categories fc ON fc.category_id = fcm.category_id
 WHERE fc.source_system = 'ciqual_2025';
 ```
 
-### Excess fructose derivation should be populated
+### Excess fructose derivation
 
 ```sql
 SELECT derivation_status, count(*)
