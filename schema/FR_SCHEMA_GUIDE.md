@@ -237,6 +237,63 @@ Pass 2 is intentionally review-gated for safety:
 
 Pass 3 (`new_food` creation for genuine non-CIQUAL variants) is intentionally deferred and not implemented in this phase.
 
+## 10.1) Phase 2.3 Batch10 Mini-Ingestion (Resolved Cohort Only)
+
+Batch10 proves the end-to-end Phase 2 data path on the currently resolved cohort before scaling additional resolution work.
+
+Locked cohort (10 rows):
+
+- `priority_rank IN (1,2,4,5,14,15,34,39,40,41)`
+- one measurement row per rank for `target_subtype`
+- one threshold row per rank for `target_subtype`
+
+Batch10 artifacts:
+
+- curated measurements CSV:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_measurements.csv`
+- curated thresholds CSV:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_thresholds.csv`
+- ingestion SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_ingest_batch10.sql`
+- status sync SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_status_sync_batch10.sql`
+- post-load checks:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_post_batch10_checks.sql`
+- readiness matrix query:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_swap_readiness_batch10.sql`
+
+Batch10 source strategy:
+
+- fructan measurements: `muir_2007_fructan` (with `biesiekierski_2011_fructan` fallback only when required)
+- sorbitol and mannitol measurements: `yao_2005_polyols`
+- thresholds: `monash_app_v4_reference` with deterministic `valid_from` date
+
+Batch10 status transitions:
+
+- `threshold_set` if threshold exists for row target subtype from `monash_app_v4_reference`
+- else `measured` if measurement exists for row target subtype from Phase 2 sources
+- else keep prior status
+
+Batch10 acceptance gates:
+
+- `phase2_priority_foods` remains `42` rows
+- unresolved rows remain `32`
+- unresolved no-candidate carryover remains `11`
+- cohort measurement coverage = `10/10`
+- cohort threshold coverage = `10/10`
+- cohort `threshold_set` status = `10/10`
+- expected gap completion rows:
+  - `fructan_dominant/fructan completed_rows = 6`
+  - `polyol_split_needed/sorbitol completed_rows = 1`
+  - `polyol_split_needed/mannitol completed_rows = 3`
+
+Out of scope in Batch10:
+
+- no schema DDL changes
+- no Pass 3 food creation
+- no fuzzy resolver changes
+- no swap-rule authoring
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
