@@ -98,7 +98,7 @@ Operational intent:
 The SQL file now seeds:
 
 - `data_licenses`
-- `sources` (including `ciqual_2025`, `open_food_facts`, `monash_app_manual`, `expert_dietitian_panel`, `internal_rules_v1`)
+- `sources` (including `ciqual_2025`, `open_food_facts`, `monash_app_manual`, `expert_dietitian_panel`, `internal_rules_v1`, `muir_2007_fructan`, `biesiekierski_2011_fructan`, `dysseler_hoffem_gos`, `yao_2005_polyols`, `monash_app_v4_reference`)
 - FR-first top-level `food_categories` (15 categories)
 - `culinary_roles`, `flavor_notes`, `texture_traits`, `cooking_behaviors`, `cuisine_tags`
 - `fodmap_subtypes`
@@ -175,7 +175,52 @@ This section maps canonical SQL fields to common JSON payload fields used in app
 6. FR-only and FR+EN recipe writes both succeed.
 7. French allergen labels keep expected diacritics.
 
-## 10) References
+## 10) Phase 2 Scaffold (Gap-Bucket Research Ops)
+
+Phase 2 scaffold is organized by CIQUAL coverage gaps, not alphabetical food lists.
+
+Bucket rationale:
+
+- `fructan_dominant`: CIQUAL cannot directly provide fructan concentrations; prioritize key FR aromatics and grain bases.
+- `gos_dominant`: CIQUAL does not expose direct GOS values; prioritize pulses, soy variants, and trigger nuts.
+- `polyol_split_needed`: CIQUAL `total polyols` does not separate sorbitol vs mannitol; prioritize foods where split drives tolerance.
+
+Scaffold artifacts:
+
+- Priority template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/phase2_priority_foods_by_gap_template.csv`
+- Measurement template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/fodmap_research_measurements_template.csv`
+- Helper views: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql`
+- Validation queries: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_validation_queries.sql`
+
+Template mapping rules:
+
+- `amount_per_100g -> food_fodmap_measurements.amount_g_per_100g`
+- `amount_per_serving -> food_fodmap_measurements.amount_g_per_serving`
+- `citation_ref -> food_fodmap_measurements.source_record_ref`
+- `source_slug -> sources.source_slug` then resolve to `source_id`
+- `confidence_level` dual maps into:
+  - `evidence_tier`
+  - `confidence_score`
+
+Default confidence mapping convention:
+
+- `high -> evidence_tier=primary_lab, confidence_score=0.90`
+- `medium -> evidence_tier=secondary_db, confidence_score=0.70`
+- `low -> evidence_tier=inferred, confidence_score=0.50`
+
+Phase 2 source slugs seeded in canonical SQL:
+
+- `muir_2007_fructan`
+- `biesiekierski_2011_fructan`
+- `dysseler_hoffem_gos`
+- `yao_2005_polyols`
+- `monash_app_v4_reference`
+
+Note:
+
+This branch adds scaffold/governance only. Automated Phase 2 literature ingestion is intentionally not implemented here.
+
+## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
   - https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/RDMHWY

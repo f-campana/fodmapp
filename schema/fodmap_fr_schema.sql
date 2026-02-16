@@ -785,6 +785,76 @@ INSERT INTO sources (
     'inferred',
     FALSE,
     (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Internal')
+  ),
+  (
+    'muir_2007_fructan',
+    'Muir 2007 fructan reference',
+    'research_paper',
+    'Monash University',
+    'AU',
+    'Muir et al. 2007. Reference fructan composition values for foods relevant to low-FODMAP protocols.',
+    NULL,
+    '2007',
+    NULL,
+    'primary_lab',
+    FALSE,
+    (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Internal')
+  ),
+  (
+    'biesiekierski_2011_fructan',
+    'Biesiekierski 2011 fructan reference',
+    'research_paper',
+    'Monash University',
+    'AU',
+    'Biesiekierski et al. 2011. Fructan-focused evidence used for IBS/FODMAP assessment.',
+    NULL,
+    '2011',
+    NULL,
+    'primary_lab',
+    FALSE,
+    (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Internal')
+  ),
+  (
+    'dysseler_hoffem_gos',
+    'Dysseler and Hoffem GOS reference',
+    'research_paper',
+    'Literature extraction',
+    NULL,
+    'Dysseler and Hoffem. GOS composition evidence used for legumes, pulses, and nuts.',
+    NULL,
+    'v1',
+    NULL,
+    'primary_lab',
+    FALSE,
+    (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Internal')
+  ),
+  (
+    'yao_2005_polyols',
+    'Yao 2005 polyol split reference',
+    'research_paper',
+    'Monash University',
+    'AU',
+    'Yao et al. 2005. Sorbitol and mannitol composition values used for polyol split curation.',
+    NULL,
+    '2005',
+    NULL,
+    'primary_lab',
+    FALSE,
+    (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Internal')
+  ),
+  (
+    'monash_app_v4_reference',
+    'Monash FODMAP App v4 reference',
+    'app_vendor',
+    'Monash University',
+    'AU',
+    'Monash Low FODMAP App v4 serving-based ratings and tolerability references.',
+    'https://www.monashfodmap.com/blog/app-how-to/',
+    'v4',
+    NULL,
+    'primary_lab',
+    TRUE,
+    (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Proprietary')
   );
 
 INSERT INTO food_categories (code, parent_category_id, name_fr, name_en, level, source_system) VALUES

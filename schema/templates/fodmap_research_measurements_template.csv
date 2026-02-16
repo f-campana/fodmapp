@@ -1,0 +1,14 @@
+# Mapping contract:
+# - amount_per_100g -> food_fodmap_measurements.amount_g_per_100g
+# - amount_per_serving -> food_fodmap_measurements.amount_g_per_serving
+# - citation_ref -> food_fodmap_measurements.source_record_ref
+# - source_slug -> resolve to source_id in sources
+# confidence_level mapping convention:
+# - high -> evidence_tier=primary_lab, confidence_score=0.90
+# - medium -> evidence_tier=secondary_db, confidence_score=0.70
+# - low -> evidence_tier=inferred, confidence_score=0.50
+food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,source_id,citation_ref,confidence_level,evidence_tier,confidence_score,observed_at,method,notes
+,fructan,1.800000,eq,3.00,0.054000,muir_2007_fructan,,doi_or_app_ref_here,high,primary_lab,0.900,2007-01-01,literature,Example fructan entry for garlic-like aromatic
+,gos,0.950000,eq,75.00,0.712500,dysseler_hoffem_gos,,doi_or_app_ref_here,medium,secondary_db,0.700,2011-01-01,literature,Example GOS entry for legumes
+,sorbitol,0.420000,eq,125.00,0.525000,yao_2005_polyols,,doi_or_app_ref_here,medium,secondary_db,0.700,2005-01-01,literature,Example sorbitol split entry for fruit
+,mannitol,0.780000,eq,75.00,0.585000,yao_2005_polyols,,doi_or_app_ref_here,medium,secondary_db,0.700,2005-01-01,literature,Example mannitol split entry for mushroom
