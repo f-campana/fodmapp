@@ -21,6 +21,7 @@ Requirements:
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 import unicodedata
@@ -82,7 +83,7 @@ IDENTITY_FIELDS = [
 
 HEADER_SCAN_ROWS = 12
 
-DEFAULT_DB_URL = "postgresql://postgres@localhost:5432/fodmap_test"
+DEFAULT_DB_URL = f"postgresql://{os.getenv('USER', 'postgres')}@localhost:5432/fodmap_test"
 CIQUAL_SOURCE_SLUG = "ciqual_2025"
 
 CIQUAL_OBSERVED_AT = date(2025, 11, 3)

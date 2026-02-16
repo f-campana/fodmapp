@@ -74,8 +74,16 @@ python /Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py load \
   "/Users/fabiencampana/Downloads/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx" \
   --alim-xml "/Users/fabiencampana/Downloads/ciqual-data/alim_2025_11_03.xml" \
   --alim-grp-xml "/Users/fabiencampana/Downloads/ciqual-data/alim_grp_2025_11_03.xml" \
-  --db-url "postgresql://postgres@localhost:5432/fodmap_test"
+  --db-url "postgresql://$USER@localhost:5432/fodmap_test"
 ```
+
+If `--db-url` is omitted, the ETL defaults to:
+
+`postgresql://<USER>@localhost:5432/fodmap_test`
+
+where `<USER>` comes from `os.getenv("USER", "postgres")`. This matches common macOS/Homebrew setups where the local role is your system username, not always `postgres`.
+
+`--db-url` remains the authoritative override for CI/CD and non-local environments.
 
 ## Post-load checks
 
