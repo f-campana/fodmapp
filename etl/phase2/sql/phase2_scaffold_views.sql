@@ -26,7 +26,6 @@ SELECT
 FROM phase2_priority_foods AS p
 ORDER BY p.priority_rank;
 
-
 CREATE OR REPLACE VIEW v_phase2_gap_completion AS
 WITH phase2_sources AS (
   SELECT source_id
@@ -56,6 +55,7 @@ row_status AS (
     ON ffm.food_id = c.resolved_food_id
     AND ffm.fodmap_subtype_id = fst.fodmap_subtype_id
     AND ffm.source_id IN (SELECT source_id FROM phase2_sources)
+    AND ffm.is_current = TRUE
   GROUP BY
     c.priority_rank,
     c.gap_bucket,

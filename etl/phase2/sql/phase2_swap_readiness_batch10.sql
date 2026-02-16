@@ -1,7 +1,9 @@
 \set ON_ERROR_STOP on
 
--- Phase 2.3 batch10 swap-readiness matrix.
--- Read-only diagnostic output for the 10 resolved cohort rows.
+-- Phase 2.4 batch10 swap-readiness matrix.
+-- Ready-only output: emits rows that have BOTH
+-- - current target-subtype measurement (is_current = TRUE)
+-- - target-subtype threshold from monash_app_v4_reference
 
 WITH locked_ranks AS (
   SELECT unnest(ARRAY[1,2,4,5,14,15,34,39,40,41]) AS priority_rank
@@ -58,6 +60,7 @@ measurement_ranked AS (
   JOIN food_fodmap_measurements AS ffm
     ON ffm.food_id = c.resolved_food_id
    AND ffm.fodmap_subtype_id = fst.fodmap_subtype_id
+   AND ffm.is_current = TRUE
   JOIN phase2_source_ids AS ps
     ON ps.source_id = ffm.source_id
 ),
@@ -130,14 +133,26 @@ SELECT
   lt.threshold_source_slug,
   lt.valid_from AS threshold_valid_from,
   CASE
-    WHEN lm.amount_g_per_serving IS NULL OR lt.low_max_g IS NULL OR lt.moderate_max_g IS NULL THEN 'unknown'
     WHEN lm.amount_g_per_serving <= lt.low_max_g THEN 'low'
     WHEN lm.amount_g_per_serving <= lt.moderate_max_g THEN 'moderate'
     ELSE 'high'
   END AS inferred_serving_band
 FROM cohort AS c
-LEFT JOIN latest_measurements AS lm
+JOIN latest_measurements AS lm
   ON lm.priority_rank = c.priority_rank
-LEFT JOIN latest_thresholds AS lt
+JOIN latest_thresholds AS lt
   ON lt.priority_rank = c.priority_rank
 ORDER BY c.priority_rank;
+
+-- Optional diagnostic query (uncomment): rows missing readiness prerequisites
+-- SELECT
+--   c.priority_rank,
+--   c.food_label,
+--   c.variant_label,
+--   (lm.priority_rank IS NOT NULL) AS has_current_measurement,
+--   (lt.priority_rank IS NOT NULL) AS has_threshold
+-- FROM cohort AS c
+-- LEFT JOIN latest_measurements AS lm ON lm.priority_rank = c.priority_rank
+-- LEFT JOIN latest_thresholds AS lt ON lt.priority_rank = c.priority_rank
+-- WHERE lm.priority_rank IS NULL OR lt.priority_rank IS NULL
+-- ORDER BY c.priority_rank;
