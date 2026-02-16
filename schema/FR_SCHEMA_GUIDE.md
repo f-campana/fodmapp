@@ -235,6 +235,25 @@ Pass 2 is intentionally review-gated for safety:
 - no fuzzy auto-resolution is applied
 - final linking uses explicit manual `UPDATE` statements after review
 
+Batch 01 conservative manual process (candidate-covered rows only):
+
+- review packet SQL: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass2_review_batch01.sql`
+- decision ledger CSV: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_batch01_decisions.csv`
+- approved updates SQL: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolutions_batch01.sql`
+- post-apply checks: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_post_batch01_checks.sql`
+
+Batch 01 operating rules:
+
+- scope is limited to unresolved rows that already have Pass 2 candidates
+- recommendation is conservative (`resolve` only when top candidate passes compatibility and disqualifier gates)
+- ledger remains auditable and versioned; only `decision=resolve` entries are applied
+- SQL apply statements include `resolved_food_id IS NULL` guardrails and are idempotent on re-run
+
+Batch 01 deferral policy:
+
+- unresolved rows with no candidates are explicitly deferred to Pass 3
+- current deferred no-candidate queue size is expected to remain `11` after Batch 01 apply
+
 Pass 3 (`new_food` creation for genuine non-CIQUAL variants) is intentionally deferred and not implemented in this phase.
 
 ## 11) References
