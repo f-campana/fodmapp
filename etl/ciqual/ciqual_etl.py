@@ -3,7 +3,7 @@
 CIQUAL 2025 -> FODMAP Planner ETL
 =================================
 Hybrid ingestion for FR-first loading:
-- XLSX provides nutrient values (fructose, glucose, lactose, total polyols, sugars)
+- XLSX provides nutrient values (fructose, galactose, glucose, lactose, total polyols, sugars)
 - XML (alim + alim_grp) provides canonical FR names and category hierarchy
 
 Usage:
@@ -33,6 +33,7 @@ import openpyxl
 
 TARGET_CONSTITUENTS = {
     "32210": {"nutrient_code": "CIQUAL_32210", "name": "Fructose", "infoods": "FRUS"},
+    "32220": {"nutrient_code": "CIQUAL_32220", "name": "Galactose", "infoods": "GALS"},
     "32250": {"nutrient_code": "CIQUAL_32250", "name": "Glucose", "infoods": "GLUS"},
     "32410": {"nutrient_code": "CIQUAL_32410", "name": "Lactose", "infoods": "LACS"},
     "34000": {"nutrient_code": "CIQUAL_34000", "name": "Total polyols", "infoods": "POLYL"},
@@ -41,6 +42,7 @@ TARGET_CONSTITUENTS = {
 
 HEADER_PATTERNS = {
     "32210": [r"\b32210\b", r"\bfructose\b"],
+    "32220": [r"\b32220\b", r"\bgalactose\b"],
     "32250": [r"\b32250\b", r"\bglucose\b"],
     "32410": [r"\b32410\b", r"\blactose\b"],
     "34000": [r"\b34000\b", r"\bpolyols\b"],
@@ -89,6 +91,23 @@ CIQUAL_EFFECTIVE_FROM = date(2025, 11, 19)
 PLACEHOLDER_FR_RE = re.compile(r"^CIQUAL\s+\d+$", re.IGNORECASE)
 
 
+class LoadResult:
+    def __init__(self):
+        self.foods_created = 0
+        self.foods_existing = 0
+        self.foods_unresolved_fr = 0
+        self.observations_inserted = 0
+        self.observations_skipped = 0
+        self.categories_assigned = 0
+        self.aggregate_rows_skipped = 0
+        self.categories_created = 0
+        self.categories_updated = 0
+        self.errors = []
+        self.unresolved_examples = []
+        self.unresolved_count = 0
+        self.exit_code = 0
+
+
 def _normalize_header(value):
     text = "" if value is None else str(value)
     text = text.replace("\n", " ").replace("\r", " ")
@@ -109,7 +128,6 @@ def _normalize_code(value, width=None):
     text = _clean_text(value)
     if text is None:
         return None
-    text = text.strip()
     if width is not None and text.isdigit():
         text = text.zfill(width)
     return text
@@ -125,10 +143,7 @@ def _get_cell(row_values, col_idx):
 
 
 def _clean_name(value):
-    name = _clean_text(value)
-    if name in (None, "-"):
-        return None
-    return name
+    return _clean_text(value)
 
 
 def _make_slug(name):
@@ -147,17 +162,19 @@ def _is_placeholder_ciqual_name(name):
     return bool(PLACEHOLDER_FR_RE.match(name.strip()))
 
 
-def _print_mapping(col_map, headers):
-    nutrients_found = {k: v for k, v in col_map.items() if k in TARGET_CONSTITUENTS}
-    print(f"  Header row: {headers['header_row']}")
+def _print_mapping(metadata):
+    col_map = metadata["col_map"]
+    nutrients_found = metadata["nutrients_found"]
+    print(f"  Header row: {metadata['header_row']}")
     print(f"  Food code column: {col_map.get('alim_code')}")
     print(f"  Food name FR column: {col_map.get('alim_nom_fr', 'NOT FOUND')}")
     print(f"  Food name EN column: {col_map.get('alim_nom_eng', 'NOT FOUND')}")
-    print(f"  Target nutrients found: {len(nutrients_found)}/5")
+    print(f"  Target nutrients found: {len(nutrients_found)}/{len(TARGET_CONSTITUENTS)}")
     for const_code, col_idx in nutrients_found.items():
         info = TARGET_CONSTITUENTS[const_code]
-        label = headers["header_texts"].get(col_idx, "")
+        label = metadata["header_texts"].get(col_idx, "")
         print(f"    {info['name']} ({const_code}) -> column {col_idx}: \"{label}\"")
+
     missing = set(TARGET_CONSTITUENTS.keys()) - set(nutrients_found.keys())
     if missing:
         print(f"  WARNING missing nutrients: {', '.join(sorted(missing))}")
@@ -291,11 +308,7 @@ def _select_sheet(wb):
     return wb.worksheets[0]
 
 
-def read_ciqual_xlsx(filepath, verbose=False):
-    """
-    Read CIQUAL XLSX using streaming rows.
-    Returns metadata + parsed records.
-    """
+def open_ciqual_workbook(filepath):
     wb = openpyxl.load_workbook(filepath, read_only=True, data_only=True)
     ws = _select_sheet(wb)
 
@@ -321,11 +334,15 @@ def read_ciqual_xlsx(filepath, verbose=False):
         "col_map": col_map,
         "nutrients_found": nutrients_found,
     }
+    return wb, ws, metadata
 
-    if verbose:
-        _print_mapping(col_map, metadata)
 
-    records = []
+def iter_ciqual_records(ws, metadata):
+    """Yield parsed food records from CIQUAL workbook rows."""
+    col_map = metadata["col_map"]
+    nutrients_found = metadata["nutrients_found"]
+    header_row = metadata["header_row"]
+
     for row_values in ws.iter_rows(min_row=header_row + 1, values_only=True):
         alim_code = _normalize_code(_get_cell(row_values, col_map["alim_code"]))
         if not alim_code:
@@ -348,15 +365,7 @@ def read_ciqual_xlsx(filepath, verbose=False):
                 "nutrient_code": TARGET_CONSTITUENTS[const_code]["nutrient_code"],
             }
 
-        records.append(record)
-
-    wb.close()
-
-    if verbose:
-        print(f"  Total food rows parsed: {len(records)}")
-
-    metadata["records"] = records
-    return metadata
+        yield record
 
 
 def load_alim_xml(filepath):
@@ -436,12 +445,14 @@ def load_alim_grp_xml(filepath):
 def merge_record_identity(record, alim_lookup):
     """XML-first merge for identity and hierarchy fields."""
     xml_rec = alim_lookup.get(record["alim_code"], {})
-    merged = {"alim_code": record["alim_code"], "nutrients": record["nutrients"]}
+    merged = {
+        "alim_code": record["alim_code"],
+        "nutrients": record["nutrients"],
+    }
 
     for field in IDENTITY_FIELDS:
         merged[field] = xml_rec.get(field) or record.get(field)
 
-    # normalize hierarchy codes after merge
     merged["alim_grp_code"] = _normalize_code(merged.get("alim_grp_code"), width=2)
     merged["alim_ssgrp_code"] = _normalize_code(merged.get("alim_ssgrp_code"), width=4)
     merged["alim_ssssgrp_code"] = _normalize_code(merged.get("alim_ssssgrp_code"), width=6)
@@ -469,11 +480,10 @@ def _fallback_category_name(level, code, name_fr, name_en):
 
 
 def _upsert_category(cur, code, parent_category_id, level, name_fr, name_en):
-    existing_id = None
     cur.execute("SELECT category_id FROM food_categories WHERE code = %s", (code,))
     row = cur.fetchone()
     if row:
-        existing_id = row[0]
+        category_id = row[0]
         cur.execute(
             """
             UPDATE food_categories
@@ -484,9 +494,9 @@ def _upsert_category(cur, code, parent_category_id, level, name_fr, name_en):
                 source_system = 'ciqual_2025'
             WHERE category_id = %s
             """,
-            (parent_category_id, name_fr, name_en, level, existing_id),
+            (parent_category_id, name_fr, name_en, level, category_id),
         )
-        return existing_id, False
+        return category_id, False
 
     cur.execute(
         """
@@ -542,18 +552,16 @@ def ensure_category_chain_for_record(cur, category_ids, record):
         category_id, _ = _upsert_category(cur, grp_key, None, 1, fr, en)
         category_ids[grp_key] = category_id
 
-    if ssgrp_key:
-        if ssgrp_key not in category_ids:
-            fr, en = _fallback_category_name(2, ssgrp_code, record.get("alim_ssgrp_nom_fr"), record.get("alim_ssgrp_nom_eng"))
-            category_id, _ = _upsert_category(cur, ssgrp_key, category_ids[grp_key], 2, fr, en)
-            category_ids[ssgrp_key] = category_id
+    if ssgrp_key and ssgrp_key not in category_ids:
+        fr, en = _fallback_category_name(2, ssgrp_code, record.get("alim_ssgrp_nom_fr"), record.get("alim_ssgrp_nom_eng"))
+        category_id, _ = _upsert_category(cur, ssgrp_key, category_ids[grp_key], 2, fr, en)
+        category_ids[ssgrp_key] = category_id
 
-    if ssss_key:
-        if ssss_key not in category_ids:
-            fr, en = _fallback_category_name(3, ssss_code, record.get("alim_ssssgrp_nom_fr"), record.get("alim_ssssgrp_nom_eng"))
-            parent_id = category_ids.get(ssgrp_key) if ssgrp_key else category_ids[grp_key]
-            category_id, _ = _upsert_category(cur, ssss_key, parent_id, 3, fr, en)
-            category_ids[ssss_key] = category_id
+    if ssss_key and ssss_key not in category_ids:
+        fr, en = _fallback_category_name(3, ssss_code, record.get("alim_ssssgrp_nom_fr"), record.get("alim_ssssgrp_nom_eng"))
+        parent_id = category_ids.get(ssgrp_key) if ssgrp_key else category_ids[grp_key]
+        category_id, _ = _upsert_category(cur, ssss_key, parent_id, 3, fr, en)
+        category_ids[ssss_key] = category_id
 
     if ssss_key and ssss_key in category_ids:
         return category_ids[ssss_key]
@@ -562,8 +570,8 @@ def ensure_category_chain_for_record(cur, category_ids, record):
     return category_ids[grp_key]
 
 
-def _ensure_unique_slug(cur, base_name):
-    slug = _make_slug(base_name)
+def _ensure_unique_slug(cur, seed):
+    slug = _make_slug(seed)
     if not slug:
         slug = "ciqual-food"
 
@@ -603,32 +611,37 @@ def cmd_inspect(filepath):
     print(f"File: {filepath}")
     print()
 
-    parsed = read_ciqual_xlsx(filepath, verbose=False)
+    wb, ws, metadata = open_ciqual_workbook(filepath)
+    try:
+        print(f"Sheet: {metadata['sheet']}")
+        print(f"Dimensions: {metadata['max_row']} rows x {metadata['max_column']} columns")
+        print(f"Header row: {metadata['header_row']}")
+        print(f"Total mapped columns: {len(metadata['col_map'])}")
+        print()
 
-    print(f"Sheet: {parsed['sheet']}")
-    print(f"Dimensions: {parsed['max_row']} rows x {parsed['max_column']} columns")
-    print(f"Header row: {parsed['header_row']}")
-    print(f"Total mapped columns: {len(parsed['col_map'])}")
-    print()
+        print("=== Mapped columns ===")
+        for key, col_idx in sorted(metadata["col_map"].items(), key=lambda x: x[1]):
+            label = TARGET_CONSTITUENTS.get(key, {}).get("name", key)
+            raw_header = metadata["header_texts"].get(col_idx, "")
+            print(f"  Column {col_idx:3d}: {label:20s} <- \"{raw_header}\"")
 
-    print("=== Mapped columns ===")
-    for key, col_idx in sorted(parsed["col_map"].items(), key=lambda x: x[1]):
-        label = TARGET_CONSTITUENTS.get(key, {}).get("name", key)
-        raw_header = parsed["header_texts"].get(col_idx, "")
-        print(f"  Column {col_idx:3d}: {label:20s} <- \"{raw_header}\"")
-
-    print()
-    print("=== Sample data (first 5 food rows) ===")
-    sample_rows = parsed["records"][:5]
-    for rec in sample_rows:
-        label = rec.get("alim_nom_eng") or rec.get("alim_nom_fr") or "?"
-        print(f"  [{rec['alim_code']}] {label}")
-        for const_code in TARGET_CONSTITUENTS:
-            if const_code not in rec["nutrients"]:
-                continue
-            obs = rec["nutrients"][const_code]
-            info = TARGET_CONSTITUENTS[const_code]
-            print(f"    {info['name']:15s}: raw={repr(obs['amount_raw']):15s} -> {obs['comparator']}({obs['amount_value']})")
+        print()
+        print("=== Sample data (first 5 food rows) ===")
+        shown = 0
+        for rec in iter_ciqual_records(ws, metadata):
+            label = rec.get("alim_nom_eng") or rec.get("alim_nom_fr") or "?"
+            print(f"  [{rec['alim_code']}] {label}")
+            for const_code in TARGET_CONSTITUENTS:
+                if const_code not in rec["nutrients"]:
+                    continue
+                obs = rec["nutrients"][const_code]
+                info = TARGET_CONSTITUENTS[const_code]
+                print(f"    {info['name']:15s}: raw={repr(obs['amount_raw']):15s} -> {obs['comparator']}({obs['amount_value']})")
+            shown += 1
+            if shown >= 5:
+                break
+    finally:
+        wb.close()
 
 
 def cmd_stats(filepath):
@@ -636,33 +649,280 @@ def cmd_stats(filepath):
     print(f"File: {filepath}")
     print()
 
-    parsed = read_ciqual_xlsx(filepath, verbose=False)
-    counters = {
-        code: {"eq": 0, "lt": 0, "lte": 0, "trace": 0, "missing": 0, "nd": 0, "other": 0}
-        for code in TARGET_CONSTITUENTS
-    }
+    wb, ws, metadata = open_ciqual_workbook(filepath)
+    try:
+        counters = {
+            code: {"eq": 0, "lt": 0, "lte": 0, "trace": 0, "missing": 0, "nd": 0, "other": 0}
+            for code in TARGET_CONSTITUENTS
+        }
 
-    for record in parsed["records"]:
-        for const_code, obs in record["nutrients"].items():
-            comp = obs["comparator"]
-            if comp in counters[const_code]:
-                counters[const_code][comp] += 1
-            else:
-                counters[const_code]["other"] += 1
+        total = 0
+        for record in iter_ciqual_records(ws, metadata):
+            total += 1
+            for const_code, obs in record["nutrients"].items():
+                comp = obs["comparator"]
+                if comp in counters[const_code]:
+                    counters[const_code][comp] += 1
+                else:
+                    counters[const_code]["other"] += 1
 
-    total = len(parsed["records"])
-    print(f"Total foods: {total}")
-    print()
-    print(f"{'Nutrient':<20s} {'numeric':>8s} {'<value':>8s} {'trace':>8s} {'missing':>8s} {'nd':>8s} {'coverage':>10s}")
-    print("-" * 80)
+        print(f"Total foods: {total}")
+        print()
+        print(f"{'Nutrient':<20s} {'numeric':>8s} {'<value':>8s} {'trace':>8s} {'missing':>8s} {'nd':>8s} {'coverage':>10s}")
+        print("-" * 80)
+        for const_code, info in TARGET_CONSTITUENTS.items():
+            c = counters.get(const_code, {})
+            numeric = c.get("eq", 0) + c.get("lt", 0) + c.get("lte", 0)
+            trace = c.get("trace", 0)
+            missing = c.get("missing", 0)
+            nd = c.get("nd", 0)
+            pct = (numeric + trace) / total * 100 if total > 0 else 0
+            print(f"{info['name']:<20s} {numeric:>8d} {c.get('lt', 0):>8d} {trace:>8d} {missing:>8d} {nd:>8d} {pct:>9.1f}%")
+    finally:
+        wb.close()
+
+
+def _resolve_source_and_nutrients(cur):
+    cur.execute("SELECT source_id FROM sources WHERE source_slug = %s", (CIQUAL_SOURCE_SLUG,))
+    row = cur.fetchone()
+    if row is None:
+        raise ValueError(f"Source '{CIQUAL_SOURCE_SLUG}' not found in sources table. Run schema DDL first.")
+    source_id = row[0]
+
+    nutrient_ids = {}
     for const_code, info in TARGET_CONSTITUENTS.items():
-        c = counters.get(const_code, {})
-        numeric = c.get("eq", 0) + c.get("lt", 0) + c.get("lte", 0)
-        trace = c.get("trace", 0)
-        missing = c.get("missing", 0)
-        nd = c.get("nd", 0)
-        pct = (numeric + trace) / total * 100 if total > 0 else 0
-        print(f"{info['name']:<20s} {numeric:>8d} {c.get('lt', 0):>8d} {trace:>8d} {missing:>8d} {nd:>8d} {pct:>9.1f}%")
+        cur.execute("SELECT nutrient_id FROM nutrient_definitions WHERE nutrient_code = %s", (info["nutrient_code"],))
+        row = cur.fetchone()
+        if row is None:
+            print(f"  WARNING nutrient {info['nutrient_code']} not found in DB; skipping")
+            continue
+        nutrient_ids[const_code] = row[0]
+        print(f"  Nutrient {info['name']:15s} ({info['nutrient_code']}) -> ID {row[0]}")
+
+    return source_id, nutrient_ids
+
+
+def _upsert_food(cur, source_id, alim_code, name_fr, name_en, scientific_name):
+    cur.execute(
+        """
+        SELECT food_id
+        FROM food_external_refs
+        WHERE ref_system = 'CIQUAL' AND ref_value = %s
+        ORDER BY food_id
+        LIMIT 1
+        """,
+        (alim_code,),
+    )
+    row = cur.fetchone()
+
+    if row:
+        food_id = row[0]
+        cur.execute(
+            "SELECT canonical_name_fr, canonical_name_en, scientific_name FROM foods WHERE food_id = %s",
+            (food_id,),
+        )
+        current_fr, current_en, current_sci = cur.fetchone()
+
+        next_fr = current_fr
+        next_en = current_en
+        next_sci = current_sci
+
+        if name_fr and (not current_fr or _is_placeholder_ciqual_name(current_fr)):
+            next_fr = name_fr
+        elif current_fr is None and name_fr is None:
+            next_fr = None
+
+        if name_en and not current_en:
+            next_en = name_en
+        if scientific_name and not current_sci:
+            next_sci = scientific_name
+
+        if (next_fr, next_en, next_sci) != (current_fr, current_en, current_sci):
+            cur.execute(
+                """
+                UPDATE foods
+                SET canonical_name_fr = %s,
+                    canonical_name_en = %s,
+                    scientific_name = %s,
+                    updated_at = now()
+                WHERE food_id = %s
+                """,
+                (next_fr, next_en, next_sci, food_id),
+            )
+        return food_id, False
+
+    slug_seed = name_fr or name_en or f"ciqual-{alim_code}"
+    food_slug = _ensure_unique_slug(cur, slug_seed)
+
+    cur.execute(
+        """
+        INSERT INTO foods (food_slug, canonical_name_fr, canonical_name_en, scientific_name, preparation_state, status)
+        VALUES (%s, %s, %s, %s, 'unknown', 'draft')
+        RETURNING food_id
+        """,
+        (food_slug, name_fr, name_en, scientific_name),
+    )
+    food_id = cur.fetchone()[0]
+
+    cur.execute(
+        """
+        INSERT INTO food_external_refs (food_id, ref_system, ref_value, source_id, country_code)
+        VALUES (%s, 'CIQUAL', %s, %s, 'FR')
+        ON CONFLICT DO NOTHING
+        """,
+        (food_id, alim_code, source_id),
+    )
+
+    return food_id, True
+
+
+def _load_record(cur, source_id, nutrient_ids, category_ids, record, result):
+    alim_code = record["alim_code"]
+    name_fr = _clean_name(record.get("alim_nom_fr"))
+    name_en = _clean_name(record.get("alim_nom_eng"))
+    scientific_name = _clean_name(record.get("alim_nom_sci"))
+
+    if name_fr is None:
+        result.foods_unresolved_fr += 1
+        if len(result.unresolved_examples) < 20:
+            result.unresolved_examples.append((alim_code, name_en or ""))
+
+    food_id = None
+
+    cur.execute("SAVEPOINT sp_food")
+    try:
+        food_id, created = _upsert_food(cur, source_id, alim_code, name_fr, name_en, scientific_name)
+        _ensure_food_names(cur, food_id, source_id, name_fr, name_en)
+        cur.execute("RELEASE SAVEPOINT sp_food")
+        if created:
+            result.foods_created += 1
+        else:
+            result.foods_existing += 1
+    except Exception as exc:
+        cur.execute("ROLLBACK TO SAVEPOINT sp_food")
+        cur.execute("RELEASE SAVEPOINT sp_food")
+        result.errors.append(f"Food upsert {alim_code}: {exc}")
+        return
+
+    grp_code = record.get("alim_grp_code")
+    if grp_code == "00":
+        result.aggregate_rows_skipped += 1
+    else:
+        cur.execute("SAVEPOINT sp_category")
+        try:
+            target_category_id = ensure_category_chain_for_record(cur, category_ids, record)
+            if target_category_id is not None:
+                cur.execute(
+                    """
+                    DELETE FROM food_category_memberships fcm
+                    USING food_categories fc
+                    WHERE fcm.food_id = %s
+                      AND fcm.source_id = %s
+                      AND fcm.category_id = fc.category_id
+                      AND fc.source_system = 'ciqual_2025'
+                    """,
+                    (food_id, source_id),
+                )
+                cur.execute(
+                    """
+                    INSERT INTO food_category_memberships (food_id, category_id, source_id, is_primary)
+                    VALUES (%s, %s, %s, TRUE)
+                    ON CONFLICT (food_id, category_id, source_id)
+                    DO UPDATE SET is_primary = EXCLUDED.is_primary
+                    """,
+                    (food_id, target_category_id, source_id),
+                )
+                result.categories_assigned += 1
+            cur.execute("RELEASE SAVEPOINT sp_category")
+        except Exception as exc:
+            cur.execute("ROLLBACK TO SAVEPOINT sp_category")
+            cur.execute("RELEASE SAVEPOINT sp_category")
+            result.errors.append(f"Category assignment {alim_code}: {exc}")
+
+    for const_code, obs in record["nutrients"].items():
+        if const_code not in nutrient_ids:
+            continue
+
+        if obs["comparator"] == "missing" and obs["amount_raw"] in ("", "-"):
+            result.observations_skipped += 1
+            continue
+
+        cur.execute("SAVEPOINT sp_observation")
+        try:
+            source_ref = f"CIQUAL:{alim_code}:{const_code}"
+            cur.execute(
+                """
+                SELECT 1
+                FROM food_nutrient_observations
+                WHERE source_record_ref = %s AND source_id = %s
+                LIMIT 1
+                """,
+                (source_ref, source_id),
+            )
+            if cur.fetchone():
+                result.observations_skipped += 1
+                cur.execute("RELEASE SAVEPOINT sp_observation")
+                continue
+
+            cur.execute(
+                """
+                INSERT INTO food_nutrient_observations
+                  (food_id, nutrient_id, source_id, source_record_ref,
+                   amount_raw, comparator, amount_value,
+                   basis, observed_at, effective_from)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 'per_100g', %s, %s)
+                """,
+                (
+                    food_id,
+                    nutrient_ids[const_code],
+                    source_id,
+                    source_ref,
+                    obs["amount_raw"],
+                    obs["comparator"],
+                    obs["amount_value"],
+                    CIQUAL_OBSERVED_AT,
+                    CIQUAL_EFFECTIVE_FROM,
+                ),
+            )
+            result.observations_inserted += 1
+            cur.execute("RELEASE SAVEPOINT sp_observation")
+        except Exception as exc:
+            cur.execute("ROLLBACK TO SAVEPOINT sp_observation")
+            cur.execute("RELEASE SAVEPOINT sp_observation")
+            result.errors.append(f"Observation {alim_code}/{const_code}: {exc}")
+
+
+def _verify_unresolved_fr(cur, result):
+    cur.execute(
+        """
+        SELECT count(DISTINCT f.food_id)
+        FROM foods f
+        JOIN food_external_refs fer ON fer.food_id = f.food_id
+        WHERE fer.ref_system = 'CIQUAL'
+          AND f.canonical_name_fr IS NULL
+        """
+    )
+    result.unresolved_count = cur.fetchone()[0]
+
+    if result.unresolved_count <= 0:
+        return
+
+    cur.execute(
+        """
+        SELECT fer.ref_value, COALESCE(f.canonical_name_en, '')
+        FROM foods f
+        JOIN food_external_refs fer ON fer.food_id = f.food_id
+        WHERE fer.ref_system = 'CIQUAL'
+          AND f.canonical_name_fr IS NULL
+        ORDER BY fer.ref_value
+        LIMIT 20
+        """
+    )
+    samples = cur.fetchall()
+    for code, name_en in samples:
+        if len(result.unresolved_examples) >= 20:
+            break
+        result.unresolved_examples.append((str(code), name_en))
 
 
 def cmd_load(filepath, alim_xml_path, alim_grp_xml_path, db_url):
@@ -675,243 +935,93 @@ def cmd_load(filepath, alim_xml_path, alim_grp_xml_path, db_url):
     print(f"DB:        {db_url}")
     print()
 
-    parsed = read_ciqual_xlsx(filepath, verbose=True)
-    alim_lookup = load_alim_xml(alim_xml_path)
-    grp_nodes = load_alim_grp_xml(alim_grp_xml_path)
+    wb, ws, metadata = open_ciqual_workbook(filepath)
+    try:
+        _print_mapping(metadata)
+        alim_lookup = load_alim_xml(alim_xml_path)
+        grp_nodes = load_alim_grp_xml(alim_grp_xml_path)
 
-    print(f"Loaded XML identity records: {len(alim_lookup)}")
-    print(f"Loaded XML category nodes:   {len(grp_nodes)}")
-    print()
+        print(f"Loaded XML identity records: {len(alim_lookup)}")
+        print(f"Loaded XML category nodes:   {len(grp_nodes)}")
+        print()
 
-    conn = psycopg2.connect(db_url)
-    conn.autocommit = False
-    cur = conn.cursor()
+        conn = psycopg2.connect(db_url)
+        conn.autocommit = False
+        cur = conn.cursor()
+        result = LoadResult()
 
-    cur.execute("SELECT source_id FROM sources WHERE source_slug = %s", (CIQUAL_SOURCE_SLUG,))
-    row = cur.fetchone()
-    if row is None:
-        raise ValueError(f"Source '{CIQUAL_SOURCE_SLUG}' not found in sources table. Run schema DDL first.")
-    source_id = row[0]
-    print(f"Source ID: {source_id}")
-
-    nutrient_ids = {}
-    for const_code, info in TARGET_CONSTITUENTS.items():
-        cur.execute("SELECT nutrient_id FROM nutrient_definitions WHERE nutrient_code = %s", (info["nutrient_code"],))
-        row = cur.fetchone()
-        if row is None:
-            print(f"  WARNING nutrient {info['nutrient_code']} not found in DB; skipping")
-            continue
-        nutrient_ids[const_code] = row[0]
-        print(f"  Nutrient {info['name']:15s} ({info['nutrient_code']}) -> ID {row[0]}")
-
-    category_ids, categories_created, categories_updated = seed_ciqual_categories(cur, grp_nodes)
-
-    foods_created = 0
-    foods_existing = 0
-    foods_skipped_no_fr = 0
-    observations_inserted = 0
-    observations_skipped = 0
-    categories_assigned = 0
-    aggregate_rows_skipped = 0
-    errors = []
-
-    for raw_record in parsed["records"]:
-        record = merge_record_identity(raw_record, alim_lookup)
-        alim_code = record["alim_code"]
-        name_fr = _clean_name(record.get("alim_nom_fr"))
-        name_en = _clean_name(record.get("alim_nom_eng"))
-        scientific_name = _clean_name(record.get("alim_nom_sci"))
-
-        if not name_fr:
-            foods_skipped_no_fr += 1
-            errors.append(f"Food {alim_code}: missing FR name after XML enrichment")
-            continue
-
-        cur.execute("SAVEPOINT row_load")
         try:
+            source_id, nutrient_ids = _resolve_source_and_nutrients(cur)
+            print(f"Source ID: {source_id}")
+            category_ids, result.categories_created, result.categories_updated = seed_ciqual_categories(cur, grp_nodes)
+
+            processed = 0
+            for raw_record in iter_ciqual_records(ws, metadata):
+                processed += 1
+                record = merge_record_identity(raw_record, alim_lookup)
+                _load_record(cur, source_id, nutrient_ids, category_ids, record, result)
+
+            conn.commit()
+            print(f"Processed food rows:         {processed}")
+
+            _verify_unresolved_fr(cur, result)
+
+            print()
+            print("=== Load Summary ===")
+            print(f"  Foods created:               {result.foods_created}")
+            print(f"  Foods already existing:      {result.foods_existing}")
+            print(f"  Foods unresolved FR:         {result.foods_unresolved_fr}")
+            print(f"  Categories created:          {result.categories_created}")
+            print(f"  Categories updated:          {result.categories_updated}")
+            print(f"  Category memberships set:    {result.categories_assigned}")
+            print(f"  Group-00 rows (no category): {result.aggregate_rows_skipped}")
+            print(f"  Observations inserted:       {result.observations_inserted}")
+            print(f"  Observations skipped:        {result.observations_skipped}")
+            print(f"  Errors:                      {len(result.errors)}")
+            if result.errors:
+                for err in result.errors[:20]:
+                    print(f"    - {err}")
+                if len(result.errors) > 20:
+                    print(f"    ... and {len(result.errors) - 20} more")
+
+            print()
+            print("=== Post-load verification ===")
             cur.execute(
                 """
-                SELECT food_id
-                FROM food_external_refs
-                WHERE ref_system = 'CIQUAL' AND ref_value = %s
-                ORDER BY food_id
-                LIMIT 1
-                """,
-                (alim_code,),
+                SELECT derivation_status, count(*)
+                FROM v_food_excess_fructose_latest
+                GROUP BY derivation_status
+                ORDER BY count(*) DESC
+                """
             )
-            row = cur.fetchone()
+            print("  Excess fructose derivation:")
+            for status, cnt in cur.fetchall():
+                print(f"    {status}: {cnt}")
 
-            if row:
-                food_id = row[0]
-                foods_existing += 1
-
-                cur.execute(
-                    "SELECT canonical_name_fr, canonical_name_en, scientific_name FROM foods WHERE food_id = %s",
-                    (food_id,),
-                )
-                current_fr, current_en, current_sci = cur.fetchone()
-
-                next_fr = current_fr
-                next_en = current_en
-                next_sci = current_sci
-
-                if (not current_fr or _is_placeholder_ciqual_name(current_fr)) and name_fr:
-                    next_fr = name_fr
-                if (not current_en) and name_en:
-                    next_en = name_en
-                if (not current_sci) and scientific_name:
-                    next_sci = scientific_name
-
-                if (next_fr, next_en, next_sci) != (current_fr, current_en, current_sci):
-                    cur.execute(
-                        """
-                        UPDATE foods
-                        SET canonical_name_fr = %s,
-                            canonical_name_en = %s,
-                            scientific_name = %s,
-                            updated_at = now()
-                        WHERE food_id = %s
-                        """,
-                        (next_fr, next_en, next_sci, food_id),
-                    )
+            print()
+            print(f"  Unresolved CIQUAL foods (canonical_name_fr IS NULL): {result.unresolved_count}")
+            if result.unresolved_count > 0:
+                print("  Sample unresolved codes:")
+                for code, name_en in result.unresolved_examples[:20]:
+                    suffix = f" ({name_en})" if name_en else ""
+                    print(f"    - {code}{suffix}")
+                print("  FAIL: unresolved FR names remain after load.")
+                result.exit_code = 2
             else:
-                food_slug = _ensure_unique_slug(cur, name_fr)
-                cur.execute(
-                    """
-                    INSERT INTO foods (food_slug, canonical_name_fr, canonical_name_en, scientific_name, preparation_state, status)
-                    VALUES (%s, %s, %s, %s, 'unknown', 'draft')
-                    RETURNING food_id
-                    """,
-                    (food_slug, name_fr, name_en, scientific_name),
-                )
-                food_id = cur.fetchone()[0]
+                print("  OK: no unresolved FR names in CIQUAL-linked foods.")
 
-                cur.execute(
-                    """
-                    INSERT INTO food_external_refs (food_id, ref_system, ref_value, source_id, country_code)
-                    VALUES (%s, 'CIQUAL', %s, %s, 'FR')
-                    ON CONFLICT DO NOTHING
-                    """,
-                    (food_id, alim_code, source_id),
-                )
-                foods_created += 1
+            cur.close()
+            conn.close()
+            return result.exit_code
 
-            _ensure_food_names(cur, food_id, source_id, name_fr, name_en)
+        except Exception:
+            conn.rollback()
+            cur.close()
+            conn.close()
+            raise
 
-            grp_code = record.get("alim_grp_code")
-            if grp_code == "00":
-                aggregate_rows_skipped += 1
-            else:
-                target_category_id = ensure_category_chain_for_record(cur, category_ids, record)
-                if target_category_id is not None:
-                    cur.execute(
-                        """
-                        DELETE FROM food_category_memberships fcm
-                        USING food_categories fc
-                        WHERE fcm.food_id = %s
-                          AND fcm.source_id = %s
-                          AND fcm.category_id = fc.category_id
-                          AND fc.source_system = 'ciqual_2025'
-                        """,
-                        (food_id, source_id),
-                    )
-                    cur.execute(
-                        """
-                        INSERT INTO food_category_memberships (food_id, category_id, source_id, is_primary)
-                        VALUES (%s, %s, %s, TRUE)
-                        ON CONFLICT (food_id, category_id, source_id)
-                        DO UPDATE SET is_primary = EXCLUDED.is_primary
-                        """,
-                        (food_id, target_category_id, source_id),
-                    )
-                    categories_assigned += 1
-
-            for const_code, obs in record["nutrients"].items():
-                if const_code not in nutrient_ids:
-                    continue
-
-                if obs["comparator"] == "missing" and obs["amount_raw"] in ("", "-"):
-                    observations_skipped += 1
-                    continue
-
-                source_ref = f"CIQUAL:{alim_code}:{const_code}"
-                cur.execute(
-                    """
-                    SELECT 1
-                    FROM food_nutrient_observations
-                    WHERE source_record_ref = %s AND source_id = %s
-                    LIMIT 1
-                    """,
-                    (source_ref, source_id),
-                )
-                if cur.fetchone():
-                    observations_skipped += 1
-                    continue
-
-                cur.execute(
-                    """
-                    INSERT INTO food_nutrient_observations
-                      (food_id, nutrient_id, source_id, source_record_ref,
-                       amount_raw, comparator, amount_value,
-                       basis, observed_at, effective_from)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, 'per_100g', %s, %s)
-                    """,
-                    (
-                        food_id,
-                        nutrient_ids[const_code],
-                        source_id,
-                        source_ref,
-                        obs["amount_raw"],
-                        obs["comparator"],
-                        obs["amount_value"],
-                        CIQUAL_OBSERVED_AT,
-                        CIQUAL_EFFECTIVE_FROM,
-                    ),
-                )
-                observations_inserted += 1
-
-            cur.execute("RELEASE SAVEPOINT row_load")
-
-        except Exception as exc:
-            cur.execute("ROLLBACK TO SAVEPOINT row_load")
-            errors.append(f"Food {alim_code}: {exc}")
-
-    conn.commit()
-
-    print()
-    print("=== Load Summary ===")
-    print(f"  Foods created:               {foods_created}")
-    print(f"  Foods already existing:      {foods_existing}")
-    print(f"  Foods skipped (no FR name):  {foods_skipped_no_fr}")
-    print(f"  Categories created:          {categories_created}")
-    print(f"  Categories updated:          {categories_updated}")
-    print(f"  Category memberships set:    {categories_assigned}")
-    print(f"  Aggregate rows skipped:      {aggregate_rows_skipped}")
-    print(f"  Observations inserted:       {observations_inserted}")
-    print(f"  Observations skipped:        {observations_skipped}")
-    print(f"  Errors:                      {len(errors)}")
-    if errors:
-        for err in errors[:20]:
-            print(f"    - {err}")
-        if len(errors) > 20:
-            print(f"    ... and {len(errors) - 20} more")
-
-    print()
-    print("=== Post-load verification ===")
-    cur.execute(
-        """
-        SELECT derivation_status, count(*)
-        FROM v_food_excess_fructose_latest
-        GROUP BY derivation_status
-        ORDER BY count(*) DESC
-        """
-    )
-    print("  Excess fructose derivation:")
-    for status, cnt in cur.fetchall():
-        print(f"    {status}: {cnt}")
-
-    cur.close()
-    conn.close()
+    finally:
+        wb.close()
 
 
 def main():
@@ -949,8 +1059,8 @@ def main():
         if not args.alim_grp_xml.exists():
             print(f"Error: file not found: {args.alim_grp_xml}")
             sys.exit(1)
-        cmd_load(args.filepath, args.alim_xml, args.alim_grp_xml, args.db_url)
-        return
+        rc = cmd_load(args.filepath, args.alim_xml, args.alim_grp_xml, args.db_url)
+        sys.exit(rc)
 
 
 if __name__ == "__main__":
