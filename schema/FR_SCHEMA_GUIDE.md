@@ -361,6 +361,72 @@ Shared Pass 3 creation rules:
   - `ref_value='phase2_pass3:<priority_rank>'`
 - link back to `phase2_priority_foods` with `resolution_method='new_food'`
 
+## 10.3) Phase 2.5 Fructan Wave 1 (Executed)
+
+Wave:
+
+- `fructan_wave01` ranks `3,6,7,8,9,10`
+- decision mode: all rows `create_new_food`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_fructan_wave01_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave01_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave01_checks.sql`
+
+Wave 1 numeric anchors (fructan):
+
+- rank 3 (`ail`, infused oil): `amount_per_100g=0.050000`, comparator `lt`
+- rank 6 (`oignon`, powder): `4.500000` (proxy metadata downgraded)
+- rank 7 (`oignon nouveau`, white bulb): `6.300000`
+- rank 8 (`oignon nouveau`, green tops): `0.150000`
+- rank 9 (`échalote`, raw bulb): `8.900000`
+- rank 10 (`poireau`, white part): `7.100000`
+
+Rank 6 provenance policy (locked):
+
+- keep `source_slug='muir_2007_fructan'`
+- set `evidence_tier='secondary_db'`
+- set `confidence_score=0.700`
+- set `citation_ref='muir2007_fructan_onion_powder_proxy'`
+- include explicit note:
+  - secondary Muir-derived proxy chain
+  - not confirmed as direct Muir assay row
+  - Monash app does not expose onion powder composition value
+
+Dynamic candidate-pool gate:
+
+- apply SQL snapshots baseline unresolved pools before mutation
+- post-apply expected values are derived from:
+  - baseline totals
+  - how many wave ranks were unresolved with/without candidates at baseline
+- this avoids brittle hardcoding when pool composition evolves between waves
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `16`
+- unresolved rows: `26`
+- unresolved with candidates: `16`
+- unresolved without candidates: `10`
+- fructan completion row: `resolved_rows=12`, `completed_rows=11`, `pending_measurement_rows=1`
+
+Safety continuity:
+
+- rank 2 garlic powder remains soft-quarantined (`is_current=FALSE`)
+- readiness/completion logic continues to exclude non-current measurements
+- status contract remains conjunctive (`threshold_set` requires both current measurement and threshold)
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
