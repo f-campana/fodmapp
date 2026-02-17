@@ -35,14 +35,16 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 - Checks SQL:
   `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<wave_key>_checks.sql`
 
-## Wave 1/2 execution contract (active)
-- `fructan_wave01` is execution-ready and mutating.
-- `fructan_wave02` is execution-ready and mutating.
-- Decision policy for this wave is locked to `create_new_food` for all 6 ranks.
-- Decision policy for wave 2 is locked to `create_new_food` for all 5 ranks.
+## Wave execution contract (active)
+- `fructan_wave01` executed (mutating, all rows `create_new_food`).
+- `fructan_wave02` executed (mutating, all rows `create_new_food`).
+- `gos_wave01` executed (mutating, mixed mode):
+  - `resolve_existing`: ranks `18,19,20,22,23`
+  - `create_new_food`: rank `21`
 - Apply script enforces:
   - exact rank-set lock
   - source/enum/category validation
+  - mixed-path decision integrity (`resolve_existing` candidate checks + `create_new_food` scaffold checks)
   - measurement arithmetic and threshold ordering
   - dynamic candidate-pool delta checks from pre-apply baseline
   - out-of-scope row immutability
@@ -50,10 +52,13 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - `42` total priority rows
   - post-wave01: `16` resolved links, `26` unresolved rows
   - post-wave02: `21` resolved links, `21` unresolved rows
+  - post-gos-wave01: `27` resolved links, `15` unresolved rows
   - wave rows all `threshold_set` for each executed wave
   - fructan completion row:
     - post-wave01: `resolved=12`, `completed=11`, `pending=1`
     - post-wave02: `resolved=17`, `completed=16`, `pending=1`
+  - GOS completion row:
+    - post-gos-wave01: `resolved=6`, `completed=6`, `unresolved=6`, `pending=0`
   - rank2 quarantine safety (`is_current=FALSE` remains operational)
 
 ## Required review gates per wave

@@ -480,6 +480,80 @@ Observed post-wave checkpoints:
 - fructan completion row: `resolved_rows=17`, `completed_rows=16`, `pending_measurement_rows=1`
 - rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
 
+## 10.5) Phase 2.6 GOS Wave 1 (Executed)
+
+Wave:
+
+- `gos_wave01` ranks `18,19,20,21,22,23`
+- decision mode: mixed path
+  - `resolve_existing`: `18,19,20,22,23`
+  - `create_new_food`: `21`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_gos_wave01_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave01_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave01_checks.sql`
+
+Selected `resolve_existing` mappings:
+
+- rank 18 -> CIQUAL `20532` (`Pois chiche, appertisé, égoutté`)
+- rank 19 -> CIQUAL `20587` (`Lentille verte, bouillie/cuite à l'eau`)
+- rank 20 -> CIQUAL `20589` (`Lentille corail, bouillie/cuite à l'eau`)
+- rank 22 -> CIQUAL `20502` (`Haricot blanc, bouilli/cuit à l'eau`)
+- rank 23 -> CIQUAL `20503` (`Haricot rouge, bouilli/cuit à l'eau`)
+
+Wave 1 numeric anchors (GOS):
+
+- rank 18 (`pois chiche`, canned drained): `1.000000`
+- rank 19 (`lentille`, green cooked): `0.900000`
+- rank 20 (`lentille`, red cooked): `0.700000`
+- rank 21 (`lentille`, brown cooked): `0.900000`
+- rank 22 (`haricot blanc`, cooked): `2.000000`
+- rank 23 (`haricot rouge`, cooked kidney bean): `1.700000`
+
+Wave 1 evidence policy:
+
+- all measurements use `source_slug='dysseler_hoffem_gos'` with:
+  - `evidence_tier='secondary_db'`
+  - `confidence_score=0.700`
+- all thresholds use `source_slug='monash_app_v4_reference'` with:
+  - `evidence_tier='primary_lab'`
+  - `confidence_score=0.900`
+  - `valid_from='2026-02-17'`
+
+Status and readiness contract:
+
+- `threshold_set` requires both:
+  - current measurement (`food_fodmap_measurements.is_current = TRUE`) for target subtype
+  - threshold for target subtype
+- rows missing either requirement do not get promoted to `threshold_set`.
+
+Dynamic candidate-pool gate:
+
+- apply SQL snapshots baseline unresolved pools (`with_candidates`/`without_candidates`) before mutation and enforces computed deltas post-apply.
+- this keeps validation stable even if candidate availability changes between waves.
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `27`
+- unresolved rows: `15`
+- unresolved with candidates: `9`
+- unresolved without candidates: `6`
+- GOS completion row: `resolved_rows=6`, `completed_rows=6`, `unresolved_rows=6`, `pending_measurement_rows=0`
+- rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):

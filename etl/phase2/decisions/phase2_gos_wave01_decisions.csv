@@ -1,7 +1,7 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-18,pois chiche,canned drained,,,,,,,,,,fabiencampana,
-19,lentille,green cooked,,,,,,,,,,fabiencampana,
-20,lentille,red cooked,,,,,,,,,,fabiencampana,
-21,lentille,brown cooked,,,,,,,,,,fabiencampana,
-22,haricot blanc,cooked,,,,,,,,,,fabiencampana,
-23,haricot rouge,cooked kidney bean,,,,,,,,,,fabiencampana,
+18,pois chiche,canned drained,resolve_existing,name_match,88140bcc-93b3-4de9-bb15-3d214d89a822,20532,,,,,"matched CIQUAL canned drained chickpea",fabiencampana,2026-02-17T00:00:00Z
+19,lentille,green cooked,resolve_existing,name_match,66b23915-7576-4f42-92ea-213a25fb62e1,20587,,,,,"matched CIQUAL cooked green lentil",fabiencampana,2026-02-17T00:00:00Z
+20,lentille,red cooked,resolve_existing,name_match,3b0e8161-b5c8-429e-a449-90a3e8c22f31,20589,,,,,"matched CIQUAL cooked red lentil (corail)",fabiencampana,2026-02-17T00:00:00Z
+21,lentille,brown cooked,create_new_food,new_food,,,phase2-lentille-brune-cuite,"Lentille brune, cuite","Brown lentils, cooked",cooked,"no safe CIQUAL equivalent for brown cooked lentil variant",fabiencampana,2026-02-17T00:00:00Z
+22,haricot blanc,cooked,resolve_existing,name_match,c30deea8-45ab-4044-9a4a-ead1b22a8278,20502,,,,,"matched CIQUAL cooked white bean",fabiencampana,2026-02-17T00:00:00Z
+23,haricot rouge,cooked kidney bean,resolve_existing,name_match,6c53e1a6-f801-42ae-b5e2-a5101c29a007,20503,,,,,"matched CIQUAL cooked kidney bean",fabiencampana,2026-02-17T00:00:00Z
