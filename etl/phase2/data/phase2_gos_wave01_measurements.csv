@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
-18,,gos,,,75.00,,,,,,,literature,wave=gos_wave01 rank=18 pois chiche canned drained
-19,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=19 lentille green cooked
-20,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=20 lentille red cooked
-21,,gos,,,100.00,,,,,,,literature,wave=gos_wave01 rank=21 lentille brown cooked
-22,,gos,,,90.00,,,,,,,literature,wave=gos_wave01 rank=22 haricot blanc cooked
-23,,gos,,,90.00,,,,,,,literature,wave=gos_wave01 rank=23 haricot rouge cooked kidney bean
+18,,gos,1.000000,eq,75.00,0.750000,dysseler_hoffem_gos,dysseler_hoffem_gos_chickpea_canned_drained_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=18 canned drained chickpea GOS proxy"
+19,,gos,0.900000,eq,100.00,0.900000,dysseler_hoffem_gos,dysseler_hoffem_gos_lentil_green_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=19 green lentil cooked GOS proxy"
+20,,gos,0.700000,eq,100.00,0.700000,dysseler_hoffem_gos,dysseler_hoffem_gos_lentil_red_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=20 red lentil cooked GOS proxy"
+21,,gos,0.900000,eq,100.00,0.900000,dysseler_hoffem_gos,dysseler_hoffem_gos_lentil_brown_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=21 brown lentil cooked GOS proxy"
+22,,gos,2.000000,eq,90.00,1.800000,dysseler_hoffem_gos,dysseler_hoffem_gos_white_bean_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=22 white bean cooked GOS proxy"
+23,,gos,1.700000,eq,90.00,1.530000,dysseler_hoffem_gos,dysseler_hoffem_gos_kidney_bean_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=23 kidney bean cooked GOS proxy"
