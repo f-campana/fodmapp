@@ -35,9 +35,11 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 - Checks SQL:
   `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<wave_key>_checks.sql`
 
-## Wave 1 execution contract (active)
+## Wave 1/2 execution contract (active)
 - `fructan_wave01` is execution-ready and mutating.
+- `fructan_wave02` is execution-ready and mutating.
 - Decision policy for this wave is locked to `create_new_food` for all 6 ranks.
+- Decision policy for wave 2 is locked to `create_new_food` for all 5 ranks.
 - Apply script enforces:
   - exact rank-set lock
   - source/enum/category validation
@@ -46,9 +48,12 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - out-of-scope row immutability
 - Checks script enforces:
   - `42` total priority rows
-  - `16` resolved links, `26` unresolved rows
-  - wave rows all `threshold_set`
-  - fructan completion row (`resolved=12`, `completed=11`, `pending=1`)
+  - post-wave01: `16` resolved links, `26` unresolved rows
+  - post-wave02: `21` resolved links, `21` unresolved rows
+  - wave rows all `threshold_set` for each executed wave
+  - fructan completion row:
+    - post-wave01: `resolved=12`, `completed=11`, `pending=1`
+    - post-wave02: `resolved=17`, `completed=16`, `pending=1`
   - rank2 quarantine safety (`is_current=FALSE` remains operational)
 
 ## Required review gates per wave

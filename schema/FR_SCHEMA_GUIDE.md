@@ -427,6 +427,59 @@ Safety continuity:
 - readiness/completion logic continues to exclude non-current measurements
 - status contract remains conjunctive (`threshold_set` requires both current measurement and threshold)
 
+## 10.4) Phase 2.5 Fructan Wave 2 (Executed)
+
+Wave:
+
+- `fructan_wave02` ranks `11,12,13,16,17`
+- decision mode: all rows `create_new_food`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_fructan_wave02_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave02_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave02_checks.sql`
+
+Wave 2 numeric anchors (fructan):
+
+- rank 11 (`farine de blé`, T55): `0.550000`
+- rank 12 (`farine de blé`, T65): `0.700000`
+- rank 13 (`farine de blé`, T80): `1.100000`
+- rank 16 (`artichaut`, globe heart): `2.840000`
+- rank 17 (`racine de chicorée`, root): `20.000000`
+
+Wave 2 evidence policy:
+
+- wheat flour grades and chicory root are stored as proxy literature rows with:
+  - `evidence_tier='secondary_db'`
+  - `confidence_score=0.700`
+- threshold rows use `source_slug='monash_app_v4_reference'` and remain `primary_lab`.
+
+Dynamic candidate-pool gate:
+
+- apply SQL snapshots baseline unresolved pools before mutation and derives post-wave expectations from baseline minus wave contribution.
+- observed run:
+  - baseline unresolved pools: `26/16/10` (total/with/without candidates)
+  - post-wave unresolved pools: `21/15/6`
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `21`
+- unresolved rows: `21`
+- fructan completion row: `resolved_rows=17`, `completed_rows=16`, `pending_measurement_rows=1`
+- rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
