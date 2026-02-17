@@ -1,7 +1,7 @@
-priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,notes
-3,,,,,draft,phase2_pass3:3,wave=fructan_wave01 pass3 candidate for ail infused oil
-6,,,,,draft,phase2_pass3:6,wave=fructan_wave01 pass3 candidate for oignon powder
-7,,,,,draft,phase2_pass3:7,wave=fructan_wave01 pass3 candidate for oignon nouveau white bulb
-8,,,,,draft,phase2_pass3:8,wave=fructan_wave01 pass3 candidate for oignon nouveau green tops
-9,,,,,draft,phase2_pass3:9,wave=fructan_wave01 pass3 candidate for echalote raw bulb
-10,,,,,draft,phase2_pass3:10,wave=fructan_wave01 pass3 candidate for poireau white part
+priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes
+3,phase2-ail-infuse-huile,"Huile infusée à l'ail (sans morceaux)","Garlic-infused oil (strained)",processed,draft,phase2_pass3:3,matieres_grasses,"wave=fructan_wave01 rank=3 technique-safe infused oil"
+6,phase2-oignon-poudre,"Oignon en poudre",Onion powder,processed,draft,phase2_pass3:6,herbes_et_epices,"wave=fructan_wave01 rank=6 powder variant"
+7,phase2-oignon-nouveau-bulbe-blanc,"Oignon nouveau, bulbe blanc","Spring onion, white bulb",raw,draft,phase2_pass3:7,legumes_et_verdures,"wave=fructan_wave01 rank=7 anatomical white bulb"
+8,phase2-oignon-nouveau-tiges-vertes,"Oignon nouveau, tiges vertes","Spring onion, green tops",raw,draft,phase2_pass3:8,legumes_et_verdures,"wave=fructan_wave01 rank=8 anatomical green tops"
+9,phase2-echalote-bulbe-cru,"Échalote, bulbe cru","Shallot, raw bulb",raw,draft,phase2_pass3:9,legumes_et_verdures,"wave=fructan_wave01 rank=9 raw bulb variant"
+10,phase2-poireau-partie-blanche-crue,"Poireau, partie blanche crue","Leek, white part raw",raw,draft,phase2_pass3:10,legumes_et_verdures,"wave=fructan_wave01 rank=10 anatomical white part"

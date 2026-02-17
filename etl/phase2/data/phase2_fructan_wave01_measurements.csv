@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
-3,,fructan,,,14.00,,,,,,,literature,wave=fructan_wave01 rank=3 ail infused oil
-6,,fructan,,,2.00,,,,,,,literature,wave=fructan_wave01 rank=6 oignon powder
-7,,fructan,,,15.00,,,,,,,literature,wave=fructan_wave01 rank=7 oignon nouveau white bulb
-8,,fructan,,,30.00,,,,,,,literature,wave=fructan_wave01 rank=8 oignon nouveau green tops
-9,,fructan,,,20.00,,,,,,,literature,wave=fructan_wave01 rank=9 echalote raw bulb
-10,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave01 rank=10 poireau white part
+3,,fructan,0.050000,lt,14.00,0.007000,monash_app_v4_reference,monash_app_garlic_infused_oil_technique_proxy_v1,inferred,0.500,2026-02-16,expert_estimate,"priority_rank=3 garlic-infused oil proxy; fructans are not oil-soluble when solids are removed"
+6,,fructan,4.500000,eq,2.00,0.090000,muir_2007_fructan,muir2007_fructan_onion_powder_proxy,secondary_db,0.700,2026-02-16,literature,"priority_rank=6 onion powder; secondary Muir-derived proxy (FoodIntolerances); not confirmed direct Muir assay; Monash app composition not exposed"
+7,,fructan,6.300000,eq,15.00,0.945000,muir_2007_fructan,muir2007_fructan_spring_onion_bulb,primary_lab,0.900,2026-02-16,literature,"priority_rank=7 spring onion white bulb mapping"
+8,,fructan,0.150000,eq,30.00,0.045000,monash_app_v4_reference,monash_app_spring_onion_green_proxy_v1,secondary_db,0.700,2026-02-16,expert_estimate,"priority_rank=8 spring onion green tops proxy from Monash serving behavior"
+9,,fructan,8.900000,eq,20.00,1.780000,muir_2007_fructan,muir2007_fructan_shallot_bulb,primary_lab,0.900,2026-02-16,literature,"priority_rank=9 shallot bulb mapping"
+10,,fructan,7.100000,eq,40.00,2.840000,muir_2007_fructan,muir2007_fructan_leek_white_part,primary_lab,0.900,2026-02-16,literature,"priority_rank=10 leek white part mapping"

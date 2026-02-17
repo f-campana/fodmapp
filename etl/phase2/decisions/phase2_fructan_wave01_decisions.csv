@@ -1,7 +1,7 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-3,ail,infused oil,,,,,,,,,,fabiencampana,
-6,oignon,powder,,,,,,,,,,fabiencampana,
-7,oignon nouveau,white bulb,,,,,,,,,,fabiencampana,
-8,oignon nouveau,green tops,,,,,,,,,,fabiencampana,
-9,echalote,raw bulb,,,,,,,,,,fabiencampana,
-10,poireau,white part,,,,,,,,,,fabiencampana,
+3,ail,infused oil,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for technique product (infused oil)",fabiencampana,2026-02-16T00:00:00Z
+6,oignon,powder,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for powder variant",fabiencampana,2026-02-16T00:00:00Z
+7,oignon nouveau,white bulb,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for anatomical split (white bulb)",fabiencampana,2026-02-16T00:00:00Z
+8,oignon nouveau,green tops,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for anatomical split (green tops)",fabiencampana,2026-02-16T00:00:00Z
+9,echalote,raw bulb,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for variant form (raw bulb)",fabiencampana,2026-02-16T00:00:00Z
+10,poireau,white part,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for anatomical split (white part)",fabiencampana,2026-02-16T00:00:00Z

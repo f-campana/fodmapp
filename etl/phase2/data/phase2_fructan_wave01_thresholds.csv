@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
-3,,fructan,14.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=3 threshold draft
-6,,fructan,2.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=6 threshold draft
-7,,fructan,15.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=7 threshold draft
-8,,fructan,30.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=8 threshold draft
-9,,fructan,20.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=9 threshold draft
-10,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave01 rank=10 threshold draft
+3,,fructan,14.00,0.050000,0.100000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=3 garlic-infused oil threshold"
+6,,fructan,2.00,0.060000,0.120000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=6 onion powder threshold"
+7,,fructan,15.00,0.120000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=7 spring onion white bulb threshold"
+8,,fructan,30.00,0.150000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=8 spring onion green tops threshold"
+9,,fructan,20.00,0.120000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=9 shallot threshold"
+10,,fructan,40.00,0.150000,0.350000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave01,primary_lab,0.900,2026-02-16,"wave=fructan_wave01 rank=10 leek white part threshold"
