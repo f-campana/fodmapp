@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
-24,,gos,90.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=24 threshold draft
-25,,gos,90.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=25 threshold draft
-26,,gos,75.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=26 threshold draft
-27,,gos,75.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=27 threshold draft
-28,,gos,30.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=28 threshold draft
-29,,gos,30.00,,,monash_app_v4_reference,,,,,wave=gos_wave02 rank=29 threshold draft
+24,,gos,90.00,0.350000,0.700000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=24 black bean cooked threshold"
+25,,gos,90.00,0.350000,0.700000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=25 split pea cooked threshold"
+26,,gos,75.00,0.300000,0.600000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=26 edamame cooked threshold"
+27,,gos,75.00,0.300000,0.600000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=27 whole cooked soybean threshold"
+28,,gos,30.00,0.200000,0.400000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=28 raw cashew threshold"
+29,,gos,30.00,0.200000,0.400000,monash_app_v4_reference,monash_app_v4_gos_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=gos_wave02 rank=29 raw pistachio threshold"
