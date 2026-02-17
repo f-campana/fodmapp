@@ -1,6 +1,6 @@
-priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,notes
-11,,,,,draft,phase2_pass3:11,wave=fructan_wave02 pass3 candidate for farine de ble Type T55
-12,,,,,draft,phase2_pass3:12,wave=fructan_wave02 pass3 candidate for farine de ble Type T65
-13,,,,,draft,phase2_pass3:13,wave=fructan_wave02 pass3 candidate for farine de ble Type T80
-16,,,,,draft,phase2_pass3:16,wave=fructan_wave02 pass3 candidate for artichaut globe heart
-17,,,,,draft,phase2_pass3:17,wave=fructan_wave02 pass3 candidate for racine de chicoree root
+priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes
+11,phase2-farine-ble-t55,"Farine de blé T55","Wheat flour T55",processed,draft,phase2_pass3:11,cereales_et_feculents,"wave=fructan_wave02 rank=11 flour grade variant"
+12,phase2-farine-ble-t65,"Farine de blé T65","Wheat flour T65",processed,draft,phase2_pass3:12,cereales_et_feculents,"wave=fructan_wave02 rank=12 flour grade variant"
+13,phase2-farine-ble-t80,"Farine de blé T80","Wheat flour T80",processed,draft,phase2_pass3:13,cereales_et_feculents,"wave=fructan_wave02 rank=13 flour grade variant"
+16,phase2-artichaut-coeur,"Artichaut, coeur","Artichoke, globe heart",raw,draft,phase2_pass3:16,legumes_et_verdures,"wave=fructan_wave02 rank=16 globe heart variant"
+17,phase2-racine-chicoree,"Racine de chicorée","Chicory root",raw,draft,phase2_pass3:17,legumes_et_verdures,"wave=fructan_wave02 rank=17 root ingredient variant"

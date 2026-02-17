@@ -1,6 +1,6 @@
 priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
-11,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=11 threshold draft
-12,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=12 threshold draft
-13,,fructan,40.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=13 threshold draft
-16,,fructan,75.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=16 threshold draft
-17,,fructan,30.00,,,monash_app_v4_reference,,,,,wave=fructan_wave02 rank=17 threshold draft
+11,,fructan,40.00,0.150000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=fructan_wave02 rank=11 flour T55 threshold"
+12,,fructan,40.00,0.150000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=fructan_wave02 rank=12 flour T65 threshold"
+13,,fructan,40.00,0.150000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=fructan_wave02 rank=13 flour T80 threshold"
+16,,fructan,75.00,0.120000,0.300000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=fructan_wave02 rank=16 artichoke heart threshold"
+17,,fructan,30.00,0.050000,0.120000,monash_app_v4_reference,monash_app_v4_fructan_thresholds_wave02,primary_lab,0.900,2026-02-17,"wave=fructan_wave02 rank=17 chicory root threshold"

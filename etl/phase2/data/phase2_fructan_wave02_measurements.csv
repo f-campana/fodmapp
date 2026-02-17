@@ -1,6 +1,6 @@
 priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
-11,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=11 farine de ble Type T55
-12,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=12 farine de ble Type T65
-13,,fructan,,,40.00,,,,,,,literature,wave=fructan_wave02 rank=13 farine de ble Type T80
-16,,fructan,,,75.00,,,,,,,literature,wave=fructan_wave02 rank=16 artichaut globe heart
-17,,fructan,,,30.00,,,,,,,literature,wave=fructan_wave02 rank=17 racine de chicoree root
+11,,fructan,0.550000,eq,40.00,0.220000,biesiekierski_2011_fructan,biesiekierski2011_fructan_wheat_t55_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=11 flour T55 proxy aligned to fructan literature range"
+12,,fructan,0.700000,eq,40.00,0.280000,biesiekierski_2011_fructan,biesiekierski2011_fructan_wheat_t65_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=12 flour T65 proxy aligned to fructan literature range"
+13,,fructan,1.100000,eq,40.00,0.440000,biesiekierski_2011_fructan,biesiekierski2011_fructan_wheat_t80_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=13 flour T80 proxy aligned to fructan literature range"
+16,,fructan,2.840000,eq,75.00,2.130000,muir_2007_fructan,muir2007_fructan_artichoke_heart_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=16 globe heart mapping from Muir-linked fructan references"
+17,,fructan,20.000000,eq,30.00,6.000000,muir_2007_fructan,muir2007_fructan_chicory_root_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=17 chicory root high-inulin proxy; verify against direct lab table before user-facing release"
