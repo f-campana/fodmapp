@@ -1,7 +1,7 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-24,haricot noir,cooked,,,,,,,,,,fabiencampana,
-25,pois casse,cooked,,,,,,,,,,fabiencampana,
-26,edamame,cooked,,,,,,,,,,fabiencampana,
-27,soja,whole cooked,,,,,,,,,,fabiencampana,
-28,noix de cajou,raw,,,,,,,,,,fabiencampana,
-29,pistache,raw,,,,,,,,,,fabiencampana,
+24,haricot noir,cooked,create_new_food,new_food,,,phase2-haricot-noir-cuit,"Haricot noir, cuit","Black beans, cooked",cooked,"no safe CIQUAL equivalent for black bean cooked variant",fabiencampana,2026-02-17T00:00:00Z
+25,pois casse,cooked,resolve_existing,name_match,964927b2-39e1-43c6-800d-7ac64d4f8a55,20506,,,,,"matched CIQUAL cooked split pea",fabiencampana,2026-02-17T00:00:00Z
+26,edamame,cooked,create_new_food,new_food,,,phase2-edamame-cuit,"Edamame, cuit","Edamame, cooked",cooked,"no safe CIQUAL equivalent for cooked edamame variant",fabiencampana,2026-02-17T00:00:00Z
+27,soja,whole cooked,create_new_food,new_food,,,phase2-soja-graine-entiere-cuite,"Soja, graine entiere cuite","Soybeans, whole cooked",cooked,"no safe CIQUAL equivalent for whole cooked soybean variant",fabiencampana,2026-02-17T00:00:00Z
+28,noix de cajou,raw,create_new_food,new_food,,,phase2-noix-cajou-crue,"Noix de cajou, crue","Cashew nuts, raw",raw,"no safe CIQUAL equivalent for raw cashew variant",fabiencampana,2026-02-17T00:00:00Z
+29,pistache,raw,create_new_food,new_food,,,phase2-pistache-crue,"Pistache, crue","Pistachio, raw",raw,"no safe CIQUAL equivalent for raw pistachio variant",fabiencampana,2026-02-17T00:00:00Z

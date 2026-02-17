@@ -41,6 +41,12 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 - `gos_wave01` executed (mutating, mixed mode):
   - `resolve_existing`: ranks `18,19,20,22,23`
   - `create_new_food`: rank `21`
+- `gos_wave02` executed (mutating, mixed mode):
+  - `resolve_existing`: rank `25`
+  - `create_new_food`: ranks `24,26,27,28,29`
+  - category split on create rows:
+    - `24,26,27 -> legumineuses`
+    - `28,29 -> noix_et_graines`
 - Apply script enforces:
   - exact rank-set lock
   - source/enum/category validation
@@ -53,12 +59,14 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - post-wave01: `16` resolved links, `26` unresolved rows
   - post-wave02: `21` resolved links, `21` unresolved rows
   - post-gos-wave01: `27` resolved links, `15` unresolved rows
+  - post-gos-wave02: `33` resolved links, `9` unresolved rows
   - wave rows all `threshold_set` for each executed wave
   - fructan completion row:
     - post-wave01: `resolved=12`, `completed=11`, `pending=1`
     - post-wave02: `resolved=17`, `completed=16`, `pending=1`
   - GOS completion row:
     - post-gos-wave01: `resolved=6`, `completed=6`, `unresolved=6`, `pending=0`
+    - post-gos-wave02: `resolved=12`, `completed=12`, `unresolved=0`, `pending=0`
   - rank2 quarantine safety (`is_current=FALSE` remains operational)
 
 ## Required review gates per wave

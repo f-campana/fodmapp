@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
-24,,gos,,,90.00,,,,,,,literature,wave=gos_wave02 rank=24 haricot noir cooked
-25,,gos,,,90.00,,,,,,,literature,wave=gos_wave02 rank=25 pois casse cooked
-26,,gos,,,75.00,,,,,,,literature,wave=gos_wave02 rank=26 edamame cooked
-27,,gos,,,75.00,,,,,,,literature,wave=gos_wave02 rank=27 soja whole cooked
-28,,gos,,,30.00,,,,,,,literature,wave=gos_wave02 rank=28 noix de cajou raw
-29,,gos,,,30.00,,,,,,,literature,wave=gos_wave02 rank=29 pistache raw
+24,,gos,1.900000,eq,90.00,1.710000,dysseler_hoffem_gos,dysseler_hoffem_gos_black_bean_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=24 black bean cooked GOS proxy"
+25,,gos,1.600000,eq,90.00,1.440000,dysseler_hoffem_gos,dysseler_hoffem_gos_split_pea_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=25 split pea cooked GOS proxy"
+26,,gos,0.800000,eq,75.00,0.600000,dysseler_hoffem_gos,dysseler_hoffem_gos_edamame_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=26 edamame cooked GOS proxy"
+27,,gos,2.400000,eq,75.00,1.800000,dysseler_hoffem_gos,dysseler_hoffem_gos_soybean_whole_cooked_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=27 whole cooked soybean GOS proxy"
+28,,gos,2.000000,eq,30.00,0.600000,dysseler_hoffem_gos,dysseler_hoffem_gos_cashew_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=28 raw cashew GOS proxy; uncertainty: secondary proxy, nut matrix variability, pending direct verification"
+29,,gos,0.900000,eq,30.00,0.270000,dysseler_hoffem_gos,dysseler_hoffem_gos_pistachio_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=29 raw pistachio GOS proxy; uncertainty: secondary proxy, nut matrix variability, pending direct verification"

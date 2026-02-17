@@ -1,7 +1,7 @@
-priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,notes
-24,,,,,draft,phase2_pass3:24,wave=gos_wave02 pass3 candidate for haricot noir cooked
-25,,,,,draft,phase2_pass3:25,wave=gos_wave02 pass3 candidate for pois casse cooked
-26,,,,,draft,phase2_pass3:26,wave=gos_wave02 pass3 candidate for edamame cooked
-27,,,,,draft,phase2_pass3:27,wave=gos_wave02 pass3 candidate for soja whole cooked
-28,,,,,draft,phase2_pass3:28,wave=gos_wave02 pass3 candidate for noix de cajou raw
-29,,,,,draft,phase2_pass3:29,wave=gos_wave02 pass3 candidate for pistache raw
+priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes
+24,phase2-haricot-noir-cuit,"Haricot noir, cuit","Black beans, cooked",cooked,draft,phase2_pass3:24,legumineuses,"wave=gos_wave02 create_new_food row"
+25,,,,,draft,phase2_pass3:25,,"wave=gos_wave02 resolve_existing row"
+26,phase2-edamame-cuit,"Edamame, cuit","Edamame, cooked",cooked,draft,phase2_pass3:26,legumineuses,"wave=gos_wave02 create_new_food row"
+27,phase2-soja-graine-entiere-cuite,"Soja, graine entiere cuite","Soybeans, whole cooked",cooked,draft,phase2_pass3:27,legumineuses,"wave=gos_wave02 create_new_food row"
+28,phase2-noix-cajou-crue,"Noix de cajou, crue","Cashew nuts, raw",raw,draft,phase2_pass3:28,noix_et_graines,"wave=gos_wave02 create_new_food row"
+29,phase2-pistache-crue,"Pistache, crue","Pistachio, raw",raw,draft,phase2_pass3:29,noix_et_graines,"wave=gos_wave02 create_new_food row"

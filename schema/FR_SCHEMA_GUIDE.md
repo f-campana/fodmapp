@@ -554,6 +554,79 @@ Observed post-wave checkpoints:
 - GOS completion row: `resolved_rows=6`, `completed_rows=6`, `unresolved_rows=6`, `pending_measurement_rows=0`
 - rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
 
+## 10.6) Phase 2.6 GOS Wave 2 (Executed)
+
+Wave:
+
+- `gos_wave02` ranks `24,25,26,27,28,29`
+- decision mode: mixed path
+  - `resolve_existing`: `25`
+  - `create_new_food`: `24,26,27,28,29`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_gos_wave02_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave02_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave02_checks.sql`
+
+Selected `resolve_existing` mapping:
+
+- rank 25 -> CIQUAL `20506` (`Pois cassé, bouilli/cuit à l'eau`)
+
+Create-row category split:
+
+- `24,26,27 -> legumineuses`
+- `28,29 -> noix_et_graines`
+
+Wave 2 numeric anchors (GOS):
+
+- rank 24 (`haricot noir`, cooked): `1.900000`
+- rank 25 (`pois casse`, cooked): `1.600000`
+- rank 26 (`edamame`, cooked): `0.800000`
+- rank 27 (`soja`, whole cooked): `2.400000`
+- rank 28 (`noix de cajou`, raw): `2.000000`
+- rank 29 (`pistache`, raw): `0.900000`
+
+Wave 2 evidence policy:
+
+- all measurements use `source_slug='dysseler_hoffem_gos'` with:
+  - `evidence_tier='secondary_db'`
+  - `confidence_score=0.700`
+- rank 28/29 include explicit proxy uncertainty notes (nut matrix variability, pending direct verification)
+- all thresholds use `source_slug='monash_app_v4_reference'` with:
+  - `evidence_tier='primary_lab'`
+  - `confidence_score=0.900`
+  - `valid_from='2026-02-17'`
+
+Serving-band readout at wave serving sizes:
+
+- rank 24: `high`
+- rank 25: `high`
+- rank 26: `moderate` (at `moderate_max` boundary)
+- rank 27: `high`
+- rank 28: `high`
+- rank 29: `moderate`
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `33`
+- unresolved rows: `9`
+- unresolved with candidates: `6`
+- unresolved without candidates: `3`
+- GOS completion row: `resolved_rows=12`, `completed_rows=12`, `unresolved_rows=0`, `pending_measurement_rows=0`
+- rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
