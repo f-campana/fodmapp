@@ -1,6 +1,6 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-11,farine de ble,Type T55,,,,,,,,,,fabiencampana,
-12,farine de ble,Type T65,,,,,,,,,,fabiencampana,
-13,farine de ble,Type T80,,,,,,,,,,fabiencampana,
-16,artichaut,globe heart,,,,,,,,,,fabiencampana,
-17,racine de chicoree,root,,,,,,,,,,fabiencampana,
+11,farine de ble,Type T55,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for flour grade T55",fabiencampana,2026-02-17T00:00:00Z
+12,farine de ble,Type T65,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for flour grade T65",fabiencampana,2026-02-17T00:00:00Z
+13,farine de ble,Type T80,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for flour grade T80",fabiencampana,2026-02-17T00:00:00Z
+16,artichaut,globe heart,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for globe-heart specific variant",fabiencampana,2026-02-17T00:00:00Z
+17,racine de chicoree,root,create_new_food,new_food,,,,,,,"no safe CIQUAL equivalent for chicory root ingredient variant",fabiencampana,2026-02-17T00:00:00Z
