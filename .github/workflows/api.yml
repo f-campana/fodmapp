@@ -103,6 +103,12 @@ jobs:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
 
+      - name: Cache CIQUAL data
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/ciqual-data
+          key: ciqual-2025-5555c572-e0b1de25-e216928b
+
       - name: Fetch CIQUAL files (pinned + checksum-verified)
         run: |
           while IFS= read -r line; do
