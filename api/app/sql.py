@@ -153,7 +153,7 @@ active_rules AS (
     p_to.priority_rank AS to_priority_rank,
     COALESCE(vrf.overall_level::text, 'unknown') AS from_overall_level,
     COALESCE(vrt.overall_level::text, 'unknown') AS to_overall_level,
-    COALESCE(vrt.driver_subtype_code, vrf.driver_subtype_code, 'unknown') AS driver_subtype,
+    vrt.driver_subtype_code AS driver_subtype,
     COALESCE(vrt.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
     COALESCE(vrt.computed_at, vrf.computed_at) AS rollup_computed_at
   FROM swap_rules r

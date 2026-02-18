@@ -78,7 +78,7 @@ class SwapItem(BaseModel):
     instruction_en: str
     from_overall_level: FoodLevel
     to_overall_level: FoodLevel
-    driver_subtype: str
+    driver_subtype: Optional[str] = None
     from_burden_ratio: Optional[float] = None
     to_burden_ratio: Optional[float] = None
     coverage_ratio: float

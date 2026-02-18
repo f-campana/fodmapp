@@ -17,7 +17,7 @@ def test_health_ok(client) -> None:
 
 
 def test_openapi_contract_parity(app_instance) -> None:
-    spec_path = Path("/Users/fabiencampana/Documents/Fodmap/api/openapi/v0.yaml")
+    spec_path = Path(__file__).resolve().parent.parent / "openapi" / "v0.yaml"
     spec = yaml.safe_load(spec_path.read_text(encoding="utf-8"))
 
     expected_paths = {
