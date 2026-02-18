@@ -1,0 +1,13 @@
+rule_key,from_priority_rank,to_priority_rank,scoring_version_snapshot,fodmap_safety_score_snapshot,from_level,to_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,auto_eligible,review_decision,review_notes,reviewed_by,reviewed_at
+R01,1,3,v2_full_rollup_2026_02_18,0.879,high,low,1.700000,0.070000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R02,4,8,v2_full_rollup_2026_02_18,0.868,high,low,1.360000,0.150000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R03,5,8,v2_full_rollup_2026_02_18,0.866,high,low,1.200000,0.150000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R04,6,8,v2_full_rollup_2026_02_18,0.750,moderate,low,0.750000,0.150000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R05,9,8,v2_full_rollup_2026_02_18,0.881,high,low,5.933333,0.150000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R06,10,8,v2_full_rollup_2026_02_18,0.882,high,low,8.114286,0.150000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R07,13,11,v2_full_rollup_2026_02_18,0.705,high,moderate,1.466667,0.733333,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R08,12,11,v2_full_rollup_2026_02_18,0.522,moderate,moderate,0.933333,0.733333,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R09,27,26,v2_full_rollup_2026_02_18,0.730,high,moderate,3.000000,1.000000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R10,28,29,v2_full_rollup_2026_02_18,0.713,high,moderate,1.500000,0.675000,0.166700,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R11,36,35,v2_full_rollup_2026_02_18,0.672,high,high,24.000000,2.800000,0.500000,t,approve,"approved_3_1b_review","fabiencampana","2026-02-18T20:30:00Z"
+R12,32,33,v2_full_rollup_2026_02_18,0.390,high,high,2.933333,7.200000,0.666700,f,reject,"rejected_non_regressive_gate","fabiencampana","2026-02-18T20:30:00Z"
