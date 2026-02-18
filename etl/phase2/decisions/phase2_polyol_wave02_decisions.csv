@@ -1,4 +1,4 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-37,champignon de paris,button mushroom,,,,,,,,,,fabiencampana,
-38,shiitake,mushroom,,,,,,,,,,fabiencampana,
-42,celeri,stalk,,,,,,,,,,fabiencampana,
+37,champignon de paris,button mushroom,resolve_existing,name_match,71d980af-1f55-4836-bed7-38f9bad425f5,20056,,,,,"matched CIQUAL button mushroom raw entry",fabiencampana,2026-02-18T00:00:00Z
+38,shiitake,mushroom,create_new_food,new_food,,,phase2-shiitake-cru,"Shiitake, cru","Shiitake mushroom, raw",raw,"no safe CIQUAL equivalent for shiitake mushroom variant",fabiencampana,2026-02-18T00:00:00Z
+42,celeri,stalk,resolve_existing,manual,7f39bf8e-5c6e-42dc-99fe-ffa205c381fa,20023,,,,,"matched CIQUAL celery stalk raw entry",fabiencampana,2026-02-18T00:00:00Z
