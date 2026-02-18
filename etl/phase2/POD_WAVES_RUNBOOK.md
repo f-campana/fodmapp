@@ -47,6 +47,16 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - category split on create rows:
     - `24,26,27 -> legumineuses`
     - `28,29 -> noix_et_graines`
+- `polyol_wave01` executed (mutating, mixed mode):
+  - `resolve_existing`: `30,31,33,35,36`
+  - `create_new_food`: `32`
+  - locked CIQUAL mappings:
+    - `30 -> 13039` (pomme crue)
+    - `31 -> 13037` (poire crue)
+    - `33 -> 13043` (pêche crue)
+    - `35 -> 13100` (prune crue, fresh plum semantic)
+    - `36 -> 13042` (pruneau sec, dried prune semantic)
+  - rank `32` created as `phase2-cerise-douce-crue` in category `fruits`
 - Apply script enforces:
   - exact rank-set lock
   - source/enum/category validation
@@ -60,6 +70,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - post-wave02: `21` resolved links, `21` unresolved rows
   - post-gos-wave01: `27` resolved links, `15` unresolved rows
   - post-gos-wave02: `33` resolved links, `9` unresolved rows
+  - post-polyol-wave01: `39` resolved links, `3` unresolved rows
   - wave rows all `threshold_set` for each executed wave
   - fructan completion row:
     - post-wave01: `resolved=12`, `completed=11`, `pending=1`
@@ -67,7 +78,13 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - GOS completion row:
     - post-gos-wave01: `resolved=6`, `completed=6`, `unresolved=6`, `pending=0`
     - post-gos-wave02: `resolved=12`, `completed=12`, `unresolved=0`, `pending=0`
+  - polyol sorbitol completion row:
+    - post-polyol-wave01: `priority=7`, `resolved=7`, `completed=7`, `unresolved=0`, `pending=0`
+  - unresolved candidate pools:
+    - post-gos-wave02: `with=6`, `without=3`
+    - post-polyol-wave01: `with=1`, `without=2`
   - rank2 quarantine safety (`is_current=FALSE` remains operational)
+  - replay-gap remediation remains deferred and is scheduled immediately after Phase 2 completion (after `polyol_wave02`)
 
 ## Required review gates per wave
 1. Every rank in wave has a decision: `resolve_existing`, `create_new_food`, or `blocked`.
