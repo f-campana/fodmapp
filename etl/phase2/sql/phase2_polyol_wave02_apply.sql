@@ -186,25 +186,24 @@ BEGIN
   SELECT COUNT(*) INTO bad_count
   FROM wave_decisions_stg
   WHERE decision = 'resolve_existing'
-    AND (NULLIF(candidate_food_id, '') IS NULL OR NULLIF(candidate_ciqual_code, '') IS NULL);
+    AND NULLIF(candidate_ciqual_code, '') IS NULL;
 
   IF bad_count > 0 THEN
-    RAISE EXCEPTION 'resolve_existing rows must include candidate_food_id and candidate_ciqual_code';
+    RAISE EXCEPTION 'resolve_existing rows must include candidate_ciqual_code';
   END IF;
 
   SELECT COUNT(*) INTO bad_count
   FROM wave_decisions_stg AS d
-  LEFT JOIN foods AS f
-    ON f.food_id = NULLIF(d.candidate_food_id, '')::UUID
-  LEFT JOIN food_external_refs AS fer
-    ON fer.food_id = NULLIF(d.candidate_food_id, '')::UUID
-   AND fer.ref_system = 'CIQUAL'
-   AND fer.ref_value = d.candidate_ciqual_code
   WHERE d.decision = 'resolve_existing'
-    AND (f.food_id IS NULL OR fer.food_id IS NULL);
+    AND (
+      SELECT COUNT(DISTINCT fer.food_id)
+      FROM food_external_refs AS fer
+      WHERE fer.ref_system = 'CIQUAL'
+        AND fer.ref_value = d.candidate_ciqual_code
+    ) <> 1;
 
   IF bad_count > 0 THEN
-    RAISE EXCEPTION 'resolve_existing rows must map to existing foods with matching CIQUAL ref';
+    RAISE EXCEPTION 'resolve_existing rows must map to exactly one CIQUAL food_id';
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -496,7 +495,7 @@ ON CONFLICT (food_id, category_id, source_id) DO NOTHING;
 
 UPDATE phase2_priority_foods AS p
 SET
-  resolved_food_id = d.candidate_food_id::UUID,
+  resolved_food_id = fer.food_id,
   resolution_method = d.resolution_method,
   resolution_notes = d.resolution_notes,
   status = CASE WHEN p.status = 'pending_research' THEN 'resolved' ELSE p.status END,
@@ -504,10 +503,18 @@ SET
   resolved_by = COALESCE(NULLIF(d.reviewed_by, ''), 'wave_polyol02_apply'),
   updated_at = now()
 FROM wave_decisions_stg AS d
+JOIN LATERAL (
+  SELECT fer.food_id
+  FROM food_external_refs AS fer
+  WHERE fer.ref_system = 'CIQUAL'
+    AND fer.ref_value = d.candidate_ciqual_code
+  ORDER BY fer.food_id
+  LIMIT 1
+) AS fer ON TRUE
 WHERE d.decision = 'resolve_existing'
   AND p.priority_rank = d.priority_rank
   AND (
-    p.resolved_food_id IS DISTINCT FROM d.candidate_food_id::UUID
+    p.resolved_food_id IS DISTINCT FROM fer.food_id
     OR p.resolution_method IS DISTINCT FROM d.resolution_method
     OR p.resolution_notes IS DISTINCT FROM d.resolution_notes
     OR p.resolved_by IS DISTINCT FROM COALESCE(NULLIF(d.reviewed_by, ''), 'wave_polyol02_apply')

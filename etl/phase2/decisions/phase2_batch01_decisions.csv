@@ -1,0 +1,10 @@
+priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
+2,ail,powder,resolve_existing,name_match,,11023,,,,,"batch01 approved mapping to CIQUAL garlic powder",fabiencampana,2026-02-17T00:00:00Z
+4,oignon,raw bulb,resolve_existing,name_match,,20034,,,,,"batch01 approved mapping to CIQUAL raw onion bulb",fabiencampana,2026-02-17T00:00:00Z
+5,oignon,cooked bulb,resolve_existing,name_match,,20035,,,,,"batch01 approved mapping to CIQUAL cooked onion bulb",fabiencampana,2026-02-17T00:00:00Z
+14,seigle,grain or flour,resolve_existing,name_match,,9390,,,,,"batch01 approved mapping to CIQUAL rye grain/flour",fabiencampana,2026-02-17T00:00:00Z
+15,orge,pearled barley,resolve_existing,name_match,,9322,,,,,"batch01 approved mapping to CIQUAL pearled barley",fabiencampana,2026-02-17T00:00:00Z
+34,nectarine,raw,resolve_existing,name_match,,13149,,,,,"batch01 approved mapping to CIQUAL raw nectarine",fabiencampana,2026-02-17T00:00:00Z
+39,pleurote,oyster mushroom,resolve_existing,name_match,,20114,,,,,"batch01 approved mapping to CIQUAL oyster mushroom",fabiencampana,2026-02-17T00:00:00Z
+40,chou-fleur,florets,resolve_existing,name_match,,20017,,,,,"batch01 approved mapping to CIQUAL cauliflower florets",fabiencampana,2026-02-17T00:00:00Z
+41,patate douce,cooked,resolve_existing,name_match,,4102,,,,,"batch01 approved mapping to CIQUAL cooked sweet potato",fabiencampana,2026-02-17T00:00:00Z

@@ -99,7 +99,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 
 ## Required review gates per wave
 1. Every rank in wave has a decision: `resolve_existing`, `create_new_food`, or `blocked`.
-2. `resolve_existing`: candidate IDs/codes and notes are present.
+2. `resolve_existing`: `candidate_ciqual_code` and notes are present (`candidate_food_id` is optional metadata only).
 3. `create_new_food`: slug, FR name, EN name (when straightforward), preparation state are present.
 4. `blocked`: explicit blocker and remediation note.
 5. Current measurement + threshold for non-blocked rows before promotion.
@@ -111,3 +111,38 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 4. Re-run `phase2_<wave_key>_apply.sql` to validate idempotency.
 5. Re-run `phase2_<wave_key>_checks.sql`.
 6. Capture outputs in PR and proceed to next wave (or replay-gap remediation once all waves are complete).
+
+## Replay-gap remediation workflow (from-zero deterministic replay)
+
+Replay runner:
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+
+Replay sequence (locked):
+1. Drop/create replay DB.
+2. Apply canonical schema.
+3. Run CIQUAL ETL load.
+4. Apply Phase 2 setup (`phase2_priority_foods_setup.sql`).
+5. Create scaffold views (`phase2_scaffold_views.sql`).
+6. Create pass2 candidates view (`phase2_resolver_pass2_candidates.sql`).
+7. Run deterministic pass1 resolver (`phase2_resolver_pass1.sql`).
+8. Apply/check Batch01 backfill (`phase2_batch01_apply.sql`, `phase2_batch01_checks.sql`).
+9. Run Batch10 ingest/quarantine/status/check chain.
+10. Run all wave apply/check scripts in historical order.
+11. Run final deterministic gate (`phase2_replay_final_checks.sql`).
+
+Replay determinism contract:
+- Functional invariants must match expected final state.
+- UUID identity equality across fresh databases is not required.
+- `resolve_existing` is CIQUAL-code-led with uniqueness guard (`COUNT(DISTINCT food_id)=1`).
+- Batch10 is rank-authoritative (`food_id` column can be blank in CSV).
+
+Final invariant highlights:
+- `phase2_priority_foods`: `42` total, `42` resolved, `0` unresolved.
+- gap completion:
+  - fructan `17/17/16/0/1`
+  - gos `12/12/12/0/0`
+  - sorbitol `7/7/7/0/0`
+  - mannitol `6/6/6/0/0`
+- candidate pools: unresolved with candidates `0`, without candidates `0`.
+- rank2 quarantine preserved (`0` current target-subtype measurements).
+- `phase2_pass3:*` custom refs: count `19`, distinct count `19`.

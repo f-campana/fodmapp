@@ -262,6 +262,13 @@ Batch10 artifacts:
 - readiness matrix query:
   `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_swap_readiness_batch10.sql`
 
+Batch10 replay portability contract:
+
+- `priority_rank` is authoritative.
+- `food_id` column in Batch10 CSVs may be blank.
+- ingest resolves `food_id` from `phase2_priority_foods.resolved_food_id` by `priority_rank`.
+- if `food_id` is provided, ingest validates it matches the resolved rank mapping.
+
 Batch10 source strategy:
 
 - fructan measurements: `muir_2007_fructan` (with `biesiekierski_2011_fructan` fallback only when required)
@@ -802,6 +809,69 @@ Phase 2 completion status:
 
 - all 42 priority ranks are resolved, measured, and thresholded under current-measurement contract
 - next mandatory track: replay-gap remediation (from-zero deterministic replay and artifact hardening)
+
+## 10.9) Replay-gap remediation (From-zero deterministic replay)
+
+Goal:
+
+- guarantee replay reproducibility from a fresh database using durable SQL/CSV artifacts
+- preserve historical Batch10 path and wave sequence
+- enforce functional deterministic invariants rather than UUID identity equality
+
+Replay artifacts:
+
+- Batch01 decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_batch01_decisions.csv`
+- Batch01 apply:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_batch01_apply.sql`
+- Batch01 checks:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_batch01_checks.sql`
+- Final replay invariants:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_replay_final_checks.sql`
+- Replay runner:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+
+Resolve-existing replay contract:
+
+- `candidate_ciqual_code` is authoritative.
+- `candidate_food_id` is optional metadata only.
+- apply scripts resolve runtime target from `food_external_refs` where `ref_system='CIQUAL'`.
+- uniqueness guard is mandatory: each `candidate_ciqual_code` must resolve to exactly one `food_id`
+  (`COUNT(DISTINCT food_id)=1`) or preflight fails.
+
+Replay sequence (locked):
+
+1. drop/create replay database
+2. apply canonical schema
+3. run CIQUAL ETL load
+4. apply `phase2_priority_foods_setup.sql`
+5. apply `phase2_scaffold_views.sql`
+6. apply `phase2_resolver_pass2_candidates.sql`
+7. apply `phase2_resolver_pass1.sql`
+8. apply/check Batch01
+9. apply Batch10 ingest + quarantine + status + post-batch10 checks
+10. apply/check all six waves in historical order
+11. apply `phase2_replay_final_checks.sql`
+
+Final deterministic invariants:
+
+- priority state: total `42`, resolved `42`, unresolved `0`
+- gap completion:
+  - fructan `17/17/16/0/1` (`priority/resolved/completed/unresolved/pending`)
+  - gos `12/12/12/0/0`
+  - sorbitol `7/7/7/0/0`
+  - mannitol `6/6/6/0/0`
+- unresolved candidate pools: with candidates `0`, without candidates `0`
+- rank2 quarantine continuity: `0` current target-subtype measurements
+- no duplicate phase2 measurement signatures
+- `phase2_pass3:*` custom refs:
+  - count `19`
+  - distinct count `19`
+
+Current backlog marker:
+
+- replay-gap remediation is now implemented as runnable artifacts
+- any CI dataset-version drift should be handled by updating expected pool baselines/check thresholds in dedicated follow-up PRs
 
 ## 11) References
 

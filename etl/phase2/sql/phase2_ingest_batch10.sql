@@ -10,7 +10,7 @@ BEGIN;
 
 CREATE TEMP TABLE phase2_batch10_measurements_stg (
   priority_rank INTEGER PRIMARY KEY,
-  food_id UUID NOT NULL,
+  food_id TEXT,
   fodmap_subtype TEXT NOT NULL,
   amount_per_100g NUMERIC(12,6) NOT NULL,
   comparator comparator_code NOT NULL,
@@ -27,7 +27,7 @@ CREATE TEMP TABLE phase2_batch10_measurements_stg (
 
 CREATE TEMP TABLE phase2_batch10_thresholds_stg (
   priority_rank INTEGER PRIMARY KEY,
-  food_id UUID NOT NULL,
+  food_id TEXT,
   fodmap_subtype TEXT NOT NULL,
   serving_g NUMERIC(8,2) NOT NULL,
   low_max_g NUMERIC(12,6) NOT NULL,
@@ -132,8 +132,11 @@ BEGIN
       ON p.priority_rank = m.priority_rank
     WHERE p.priority_rank IS NULL
        OR p.resolved_food_id IS NULL
-       OR p.resolved_food_id <> m.food_id
        OR p.target_subtype <> m.fodmap_subtype
+       OR (
+         NULLIF(m.food_id, '') IS NOT NULL
+         AND p.resolved_food_id::TEXT <> m.food_id
+       )
   ) THEN
     RAISE EXCEPTION 'batch10 measurements failed priority_rank/food_id/target_subtype lock checks';
   END IF;
@@ -145,8 +148,11 @@ BEGIN
       ON p.priority_rank = t.priority_rank
     WHERE p.priority_rank IS NULL
        OR p.resolved_food_id IS NULL
-       OR p.resolved_food_id <> t.food_id
        OR p.target_subtype <> t.fodmap_subtype
+       OR (
+         NULLIF(t.food_id, '') IS NOT NULL
+         AND p.resolved_food_id::TEXT <> t.food_id
+       )
   ) THEN
     RAISE EXCEPTION 'batch10 thresholds failed priority_rank/food_id/target_subtype lock checks';
   END IF;
@@ -175,7 +181,7 @@ END $$;
 WITH resolved_measurements AS (
   SELECT
     m.priority_rank,
-    m.food_id,
+    p.resolved_food_id AS food_id,
     fst.fodmap_subtype_id,
     s.source_id,
     m.citation_ref,
@@ -194,6 +200,8 @@ WITH resolved_measurements AS (
     m.observed_at,
     m.notes
   FROM phase2_batch10_measurements_stg AS m
+  JOIN phase2_priority_foods AS p
+    ON p.priority_rank = m.priority_rank
   JOIN fodmap_subtypes AS fst
     ON fst.code = m.fodmap_subtype
   JOIN sources AS s
@@ -253,7 +261,7 @@ FROM inserted_measurements;
 WITH resolved_thresholds AS (
   SELECT
     t.priority_rank,
-    t.food_id,
+    p.resolved_food_id AS food_id,
     fst.fodmap_subtype_id,
     s.source_id,
     t.serving_g,
@@ -264,6 +272,8 @@ WITH resolved_thresholds AS (
     t.valid_from,
     t.notes
   FROM phase2_batch10_thresholds_stg AS t
+  JOIN phase2_priority_foods AS p
+    ON p.priority_rank = t.priority_rank
   JOIN fodmap_subtypes AS fst
     ON fst.code = t.fodmap_subtype
   JOIN sources AS s
