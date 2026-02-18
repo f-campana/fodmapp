@@ -4,15 +4,17 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 
 ## Scope
 
-Phase 3.0 MVP includes:
+Phase 3.0/3.1a includes:
 - culinary trait curation for priority ranks `1..42`
-- source-scoped rollups in `food_fodmap_rollups`
+- full 6-subtype source-scoped rollups in `food_fodmap_rollups`
+- latest rollup interfaces with coverage metadata
 - initial 12 `draft` swap rules with contexts and scores
 
 Out of scope:
 - API endpoints
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
+- 3.1b swap activation workflow (post-3.1a)
 
 ## Artifacts
 
@@ -24,12 +26,14 @@ Data files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 
 SQL files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
 ## Execution Order
 
@@ -37,15 +41,17 @@ Run against `fodmap_test` in this exact order:
 
 1. `phase3_traits_apply.sql`
 2. `phase3_rollups_compute.sql`
-3. `phase3_swap_rules_apply.sql`
-4. `phase3_mvp_checks.sql`
+3. `phase3_rollups_6subtype_checks.sql`
+4. `phase3_swap_rules_apply.sql`
+5. `phase3_mvp_checks.sql`
 
 Idempotency pass (same order, second run):
 
 1. `phase3_traits_apply.sql`
 2. `phase3_rollups_compute.sql`
-3. `phase3_swap_rules_apply.sql`
-4. `phase3_mvp_checks.sql`
+3. `phase3_rollups_6subtype_checks.sql`
+4. `phase3_swap_rules_apply.sql`
+5. `phase3_mvp_checks.sql`
 
 ## MVP Locks
 
@@ -55,12 +61,23 @@ Idempotency pass (same order, second run):
 - 12 initial swap rules are all `draft`
 - rank 2 is excluded from all swap rules
 
-## Rollup Semantics (MVP)
+## Rollup Semantics (3.1a Full Rollups)
 
-Rollups are target-subtype-only and do not represent full 6-subtype overall risk yet:
-- driver subtype = `phase2_priority_foods.target_subtype`
-- serving from threshold for target subtype (fallback: provisional serving)
-- `unknown` if no current target-subtype measurement or no threshold
+Rollups evaluate all six subtypes (`fructan`, `gos`, `sorbitol`, `mannitol`, `fructose` excess, `lactose`) with worst-known severity semantics:
+- coverage metrics are explicit: `known_subtypes_count`, `coverage_ratio`
+- `none` is only allowed with full 6/6 coverage and all subtype levels `none`
+- partial coverage + all-known-none is coerced to `unknown`
+- sorbitol/mannitol may use CIQUAL total-polyols fallback only when explicit subtype measurements are missing
+- threshold precedence: food-specific first, then global defaults (`phase3_rollup_default_thresholds_v1.csv`)
+
+Read interfaces:
+- `v_phase3_rollup_subtype_levels_latest`
+- `v_phase3_rollups_latest_full`
+
+Coverage baseline note:
+- snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic
+- post-compute coverage can increase when CIQUAL-derived lactose/excess-fructose joins are active
+- baseline buckets are diagnostic only, not hard assertions
 
 ## Rollback Strategy
 
