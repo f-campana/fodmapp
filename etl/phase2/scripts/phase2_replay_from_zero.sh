@@ -11,6 +11,7 @@ PGHOST_NAME="${PGHOST:-localhost}"
 PGPORT_NAME="${PGPORT:-5432}"
 PGUSER_NAME="${PGUSER:-${USER:-postgres}}"
 ADMIN_DB="${ADMIN_DB:-template1}"
+PSQL_BIN="${PSQL_BIN:-}"
 
 ADMIN_DB_URL="${ADMIN_DB_URL:-postgresql://${PGUSER_NAME}@${PGHOST_NAME}:${PGPORT_NAME}/${ADMIN_DB}}"
 REPLAY_DB_URL="${REPLAY_DB_URL:-postgresql://${PGUSER_NAME}@${PGHOST_NAME}:${PGPORT_NAME}/${REPLAY_DB}}"
@@ -52,11 +53,11 @@ require_file() {
 
 run_psql_file() {
   local file_path="$1"
-  psql "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$file_path"
+  "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$file_path"
 }
 
 recreate_db() {
-  psql "$ADMIN_DB_URL" -v ON_ERROR_STOP=1 -v replay_db="$REPLAY_DB" <<'SQL'
+  "$PSQL_BIN" "$ADMIN_DB_URL" -v ON_ERROR_STOP=1 -v replay_db="$REPLAY_DB" <<'SQL'
 SELECT pg_terminate_backend(pid)
 FROM pg_stat_activity
 WHERE datname = :'replay_db'
@@ -74,11 +75,39 @@ run_ciqual_load() {
     --db-url "$REPLAY_DB_URL"
 }
 
+resolve_psql_bin() {
+  if [[ -n "${PSQL_BIN}" ]]; then
+    return
+  fi
+
+  if command -v psql >/dev/null 2>&1; then
+    PSQL_BIN="$(command -v psql)"
+    return
+  fi
+
+  for candidate in \
+    /opt/homebrew/opt/postgresql@16/bin/psql \
+    /opt/homebrew/opt/postgresql@15/bin/psql \
+    /opt/homebrew/Cellar/postgresql@16/*/bin/psql \
+    /opt/homebrew/Cellar/postgresql@15/*/bin/psql \
+    /usr/local/opt/postgresql@16/bin/psql \
+    /usr/local/opt/postgresql@15/bin/psql; do
+    if [[ -x "${candidate}" ]]; then
+      PSQL_BIN="${candidate}"
+      return
+    fi
+  done
+
+  printf '[FAIL] psql not found. Set PSQL_BIN or add psql to PATH.\n' >&2
+  exit 1
+}
+
 require_file "$SCHEMA_FILE"
 require_file "$CIQUAL_ETL"
 require_file "$CIQUAL_XLSX"
 require_file "$CIQUAL_ALIM_XML"
 require_file "$CIQUAL_GRP_XML"
+resolve_psql_bin
 
 for sql_file in \
   "$PHASE2_SQL_DIR/phase2_priority_foods_setup.sql" \
@@ -109,12 +138,13 @@ do
 done
 
 printf '[INFO] Replay DB URL: %s\n' "$REPLAY_DB_URL"
+printf '[INFO] psql binary: %s\n' "$PSQL_BIN"
 printf '[INFO] CIQUAL XLSX: %s\n' "$CIQUAL_XLSX"
 printf '[INFO] CIQUAL ALIM XML: %s\n' "$CIQUAL_ALIM_XML"
 printf '[INFO] CIQUAL ALIM_GRP XML: %s\n' "$CIQUAL_GRP_XML"
 
 run_stage "Drop/create replay database" recreate_db
-run_stage "Apply canonical schema" psql "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$SCHEMA_FILE"
+run_stage "Apply canonical schema" "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$SCHEMA_FILE"
 run_stage "CIQUAL ETL load" run_ciqual_load
 
 run_stage "Phase2 setup table seed" run_psql_file "$PHASE2_SQL_DIR/phase2_priority_foods_setup.sql"
