@@ -59,6 +59,27 @@ BEGIN
     RAISE EXCEPTION 'none-gate failed: partial all-none foods must be unknown';
   END IF;
 
+  -- Explicit precedence (all six subtypes): when explicit current signal exists
+  -- in food_fodmap_measurements (joined via fodmap_subtypes), view source must be explicit_measurement.
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollup_subtype_levels_latest d
+  WHERE EXISTS (
+      SELECT 1
+      FROM food_fodmap_measurements ffm
+      JOIN fodmap_subtypes fs ON fs.fodmap_subtype_id = ffm.fodmap_subtype_id
+      WHERE ffm.food_id = d.food_id
+        AND ffm.is_current = TRUE
+        AND fs.code = d.subtype_code
+        AND (
+          ffm.amount_g_per_100g IS NOT NULL
+          OR ffm.amount_g_per_serving IS NOT NULL
+        )
+    )
+    AND d.signal_source_kind <> 'explicit_measurement';
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'explicit precedence failed: found non-explicit signal source where explicit subtype signal exists';
+  END IF;
+
   -- Proxy precedence: explicit subtype signal must win over total-polyols proxy.
   SELECT COUNT(*) INTO bad_count
   FROM v_phase3_rollup_subtype_levels_latest d
@@ -71,6 +92,10 @@ BEGIN
       WHERE ffm.food_id = d.food_id
         AND ffm.is_current = TRUE
         AND fs.code = d.subtype_code
+        AND (
+          ffm.amount_g_per_100g IS NOT NULL
+          OR ffm.amount_g_per_serving IS NOT NULL
+        )
     );
   IF bad_count > 0 THEN
     RAISE EXCEPTION 'proxy precedence failed: found proxy rows where explicit subtype signals exist';
