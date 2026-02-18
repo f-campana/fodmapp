@@ -1,7 +1,7 @@
 priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes
-30,,sorbitol,,,125.00,,,,,,,literature,wave=polyol_wave01 rank=30 pomme raw
-31,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=31 poire raw
-32,,sorbitol,,,80.00,,,,,,,literature,wave=polyol_wave01 rank=32 cerise sweet raw
-33,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=33 peche raw
-35,,sorbitol,,,120.00,,,,,,,literature,wave=polyol_wave01 rank=35 prune raw
-36,,sorbitol,,,30.00,,,,,,,literature,wave=polyol_wave01 rank=36 pruneau dried
+30,,sorbitol,0.700000,eq,125.00,0.875000,yao_2005_polyols,yao2005_polyols_apple_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=30 apple raw sorbitol proxy"
+31,,sorbitol,2.000000,eq,120.00,2.400000,yao_2005_polyols,yao2005_polyols_pear_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=31 pear raw sorbitol proxy"
+32,,sorbitol,2.200000,eq,80.00,1.760000,yao_2005_polyols,yao2005_polyols_sweet_cherry_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=32 sweet cherry raw sorbitol proxy"
+33,,sorbitol,0.800000,eq,120.00,0.960000,yao_2005_polyols,yao2005_polyols_peach_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=33 peach raw sorbitol proxy"
+35,,sorbitol,1.400000,eq,120.00,1.680000,yao_2005_polyols,yao2005_polyols_plum_raw_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=35 plum raw sorbitol proxy"
+36,,sorbitol,8.000000,eq,30.00,2.400000,yao_2005_polyols,yao2005_polyols_prune_dried_proxy,secondary_db,0.700,2026-02-17,literature,"priority_rank=36 prune dried sorbitol proxy"

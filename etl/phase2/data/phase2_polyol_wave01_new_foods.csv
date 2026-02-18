@@ -1,7 +1,7 @@
-priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,notes
-30,,,,,draft,phase2_pass3:30,wave=polyol_wave01 pass3 candidate for pomme raw
-31,,,,,draft,phase2_pass3:31,wave=polyol_wave01 pass3 candidate for poire raw
-32,,,,,draft,phase2_pass3:32,wave=polyol_wave01 pass3 candidate for cerise sweet raw
-33,,,,,draft,phase2_pass3:33,wave=polyol_wave01 pass3 candidate for peche raw
-35,,,,,draft,phase2_pass3:35,wave=polyol_wave01 pass3 candidate for prune raw
-36,,,,,draft,phase2_pass3:36,wave=polyol_wave01 pass3 candidate for pruneau dried
+priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes
+30,,,,,draft,phase2_pass3:30,,"wave=polyol_wave01 resolve_existing row"
+31,,,,,draft,phase2_pass3:31,,"wave=polyol_wave01 resolve_existing row"
+32,phase2-cerise-douce-crue,"Cerise douce, crue","Sweet cherry, raw",raw,draft,phase2_pass3:32,fruits,"wave=polyol_wave01 create_new_food row"
+33,,,,,draft,phase2_pass3:33,,"wave=polyol_wave01 resolve_existing row"
+35,,,,,draft,phase2_pass3:35,,"wave=polyol_wave01 resolve_existing row"
+36,,,,,draft,phase2_pass3:36,,"wave=polyol_wave01 resolve_existing row"

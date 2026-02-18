@@ -627,6 +627,96 @@ Observed post-wave checkpoints:
 - GOS completion row: `resolved_rows=12`, `completed_rows=12`, `unresolved_rows=0`, `pending_measurement_rows=0`
 - rank 2 quarantine invariant preserved (`is_current=FALSE` on suspect measurement path)
 
+## 10.7) Phase 2.7 Polyol Wave 1 (Executed)
+
+Wave:
+
+- `polyol_wave01` ranks `30,31,32,33,35,36`
+- decision mode: mixed path
+  - `resolve_existing`: `30,31,33,35,36`
+  - `create_new_food`: `32`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_polyol_wave01_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave01_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave01_checks.sql`
+
+Selected `resolve_existing` mappings:
+
+- rank 30 -> CIQUAL `13039` (`Pomme, chair et peau, crue`)
+- rank 31 -> CIQUAL `13037` (`Poire, chair et peau, crue`)
+- rank 33 -> CIQUAL `13043` (`Pêche, chair et peau, sans noyau, crue`)
+- rank 35 -> CIQUAL `13100` (`Prune, sans noyau, crue`) [fresh plum semantic verified]
+- rank 36 -> CIQUAL `13042` (`Pruneau, sans noyau, sec`) [dried prune semantic verified]
+
+Create-row contract:
+
+- rank 32 created as `phase2-cerise-douce-crue`
+- FR name: `Cerise douce, crue`
+- EN name: `Sweet cherry, raw`
+- preparation state: `raw`
+- category: `fruits`
+- deterministic custom reference: `phase2_pass3:32`
+
+Wave 1 numeric anchors (sorbitol):
+
+- rank 30 (`pomme`, raw): `0.700000`
+- rank 31 (`poire`, raw): `2.000000`
+- rank 32 (`cerise`, sweet raw): `2.200000`
+- rank 33 (`peche`, raw): `0.800000`
+- rank 35 (`prune`, raw): `1.400000`
+- rank 36 (`pruneau`, dried): `8.000000`
+
+Wave 1 threshold set (`source_slug='monash_app_v4_reference'`, `valid_from='2026-02-17'`):
+
+- rank 30: `low=0.200000`, `moderate=0.500000`
+- rank 31: `low=0.250000`, `moderate=0.600000`
+- rank 32: `low=0.250000`, `moderate=0.600000`
+- rank 33: `low=0.200000`, `moderate=0.500000`
+- rank 35: `low=0.250000`, `moderate=0.600000`
+- rank 36: `low=0.250000`, `moderate=0.600000`
+
+Wave 1 evidence policy:
+
+- measurements use `source_slug='yao_2005_polyols'` with:
+  - `evidence_tier='secondary_db'`
+  - `confidence_score=0.700`
+- thresholds use `source_slug='monash_app_v4_reference'` with:
+  - `evidence_tier='primary_lab'`
+  - `confidence_score=0.900`
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `39`
+- unresolved rows: `3`
+- unresolved with candidates: `1`
+- unresolved without candidates: `2`
+- polyol sorbitol completion row:
+  - `priority_rows=7`, `resolved_rows=7`, `completed_rows=7`, `unresolved_rows=0`, `pending_measurement_rows=0`
+- wave serving-band readout (at wave serving sizes): all six rows classify `high`
+
+Safety continuity:
+
+- rank 2 garlic powder remains soft-quarantined (`is_current=FALSE`)
+- status and readiness remain conjunctive (`threshold_set` requires current measurement and threshold)
+
+Next queue and backlog tracking:
+
+- remaining unresolved ranks: `37,38,42` (Polyol Wave 2 scope)
+- replay-gap remediation remains deferred and is scheduled immediately after Phase 2 completion
+
 ## 11) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
