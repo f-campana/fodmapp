@@ -1,4 +1,4 @@
 priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes
-37,,mannitol,75.00,,,monash_app_v4_reference,,,,,wave=polyol_wave02 rank=37 threshold draft
-38,,mannitol,60.00,,,monash_app_v4_reference,,,,,wave=polyol_wave02 rank=38 threshold draft
-42,,mannitol,75.00,,,monash_app_v4_reference,,,,,wave=polyol_wave02 rank=42 threshold draft
+37,,mannitol,75.00,0.050000,0.120000,monash_app_v4_reference,monash_app_v4_mannitol_thresholds_wave02,primary_lab,0.900,2026-02-18,"wave=polyol_wave02 rank=37 button mushroom threshold"
+38,,mannitol,60.00,0.050000,0.120000,monash_app_v4_reference,monash_app_v4_mannitol_thresholds_wave02,primary_lab,0.900,2026-02-18,"wave=polyol_wave02 rank=38 shiitake threshold"
+42,,mannitol,75.00,0.060000,0.120000,monash_app_v4_reference,monash_app_v4_mannitol_thresholds_wave02,primary_lab,0.900,2026-02-18,"wave=polyol_wave02 rank=42 celery stalk threshold"

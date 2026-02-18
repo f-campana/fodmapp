@@ -57,6 +57,13 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
     - `35 -> 13100` (prune crue, fresh plum semantic)
     - `36 -> 13042` (pruneau sec, dried prune semantic)
   - rank `32` created as `phase2-cerise-douce-crue` in category `fruits`
+- `polyol_wave02` executed (mutating, mixed mode):
+  - `resolve_existing`: `37,42`
+  - `create_new_food`: `38`
+  - locked CIQUAL mappings:
+    - `37 -> 20056` (champignon de Paris, cru)
+    - `42 -> 20023` (céleri branche, cru)
+  - rank `38` created as `phase2-shiitake-cru` in category `legumes_et_verdures`
 - Apply script enforces:
   - exact rank-set lock
   - source/enum/category validation
@@ -71,6 +78,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - post-gos-wave01: `27` resolved links, `15` unresolved rows
   - post-gos-wave02: `33` resolved links, `9` unresolved rows
   - post-polyol-wave01: `39` resolved links, `3` unresolved rows
+  - post-polyol-wave02: `42` resolved links, `0` unresolved rows
   - wave rows all `threshold_set` for each executed wave
   - fructan completion row:
     - post-wave01: `resolved=12`, `completed=11`, `pending=1`
@@ -80,11 +88,14 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
     - post-gos-wave02: `resolved=12`, `completed=12`, `unresolved=0`, `pending=0`
   - polyol sorbitol completion row:
     - post-polyol-wave01: `priority=7`, `resolved=7`, `completed=7`, `unresolved=0`, `pending=0`
+  - polyol mannitol completion row:
+    - post-polyol-wave02: `priority=6`, `resolved=6`, `completed=6`, `unresolved=0`, `pending=0`
   - unresolved candidate pools:
     - post-gos-wave02: `with=6`, `without=3`
     - post-polyol-wave01: `with=1`, `without=2`
+    - post-polyol-wave02: `with=0`, `without=0`
   - rank2 quarantine safety (`is_current=FALSE` remains operational)
-  - replay-gap remediation remains deferred and is scheduled immediately after Phase 2 completion (after `polyol_wave02`)
+  - replay-gap remediation is now the immediate follow-up sprint after Phase 2 completion
 
 ## Required review gates per wave
 1. Every rank in wave has a decision: `resolve_existing`, `create_new_food`, or `blocked`.
@@ -99,4 +110,4 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 3. Run `phase2_<wave_key>_checks.sql`.
 4. Re-run `phase2_<wave_key>_apply.sql` to validate idempotency.
 5. Re-run `phase2_<wave_key>_checks.sql`.
-6. Capture outputs in PR and proceed to next wave.
+6. Capture outputs in PR and proceed to next wave (or replay-gap remediation once all waves are complete).

@@ -714,8 +714,94 @@ Safety continuity:
 
 Next queue and backlog tracking:
 
-- remaining unresolved ranks: `37,38,42` (Polyol Wave 2 scope)
-- replay-gap remediation remains deferred and is scheduled immediately after Phase 2 completion
+- remaining unresolved ranks at this checkpoint: `37,38,42` (Polyol Wave 2 scope)
+- replay-gap remediation scheduled immediately after Phase 2 completion
+
+## 10.8) Phase 2.7 Polyol Wave 2 (Executed)
+
+Wave:
+
+- `polyol_wave02` ranks `37,38,42`
+- decision mode: mixed path
+  - `resolve_existing`: `37,42`
+  - `create_new_food`: `38`
+- wave branch contract: no canonical schema migration
+
+Execution artifacts:
+
+- decisions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_polyol_wave02_decisions.csv`
+- new-food definitions:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_new_foods.csv`
+- measurements:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_measurements.csv`
+- thresholds:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_thresholds.csv`
+- apply SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave02_apply.sql`
+- checks SQL:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave02_checks.sql`
+
+Selected `resolve_existing` mappings:
+
+- rank 37 -> CIQUAL `20056` (`Champignon de Paris ou champignon de couche, cru`)
+- rank 42 -> CIQUAL `20023` (`Céleri branche, cru`)
+
+Create-row contract:
+
+- rank 38 created as `phase2-shiitake-cru`
+- FR name: `Shiitake, cru`
+- EN name: `Shiitake mushroom, raw`
+- preparation state: `raw`
+- category: `legumes_et_verdures`
+- deterministic custom reference: `phase2_pass3:38`
+
+Wave 2 numeric anchors (mannitol):
+
+- rank 37 (`champignon de paris`, button mushroom): `0.180000`
+- rank 38 (`shiitake`, mushroom): `0.300000`
+- rank 42 (`celeri`, stalk): `0.120000`
+
+Wave 2 threshold set (`source_slug='monash_app_v4_reference'`, `valid_from='2026-02-18'`):
+
+- rank 37: `low=0.050000`, `moderate=0.120000`
+- rank 38: `low=0.050000`, `moderate=0.120000`
+- rank 42: `low=0.060000`, `moderate=0.120000`
+
+Wave 2 evidence policy:
+
+- measurements use `source_slug='yao_2005_polyols'` with:
+  - `evidence_tier='secondary_db'`
+  - `confidence_score=0.700`
+- thresholds use `source_slug='monash_app_v4_reference'` with:
+  - `evidence_tier='primary_lab'`
+  - `confidence_score=0.900`
+
+Serving-band readout at wave serving sizes:
+
+- rank 37: `high`
+- rank 38: `high`
+- rank 42: `moderate`
+
+Observed post-wave checkpoints:
+
+- priority rows: `42`
+- resolved links: `42`
+- unresolved rows: `0`
+- unresolved with candidates: `0`
+- unresolved without candidates: `0`
+- polyol mannitol completion row:
+  - `priority_rows=6`, `resolved_rows=6`, `completed_rows=6`, `unresolved_rows=0`, `pending_measurement_rows=0`
+
+Safety continuity:
+
+- rank 2 garlic powder remains soft-quarantined (`is_current=FALSE`)
+- status and readiness remain conjunctive (`threshold_set` requires current measurement and threshold)
+
+Phase 2 completion status:
+
+- all 42 priority ranks are resolved, measured, and thresholded under current-measurement contract
+- next mandatory track: replay-gap remediation (from-zero deterministic replay and artifact hardening)
 
 ## 11) References
 
