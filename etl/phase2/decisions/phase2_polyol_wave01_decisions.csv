@@ -1,7 +1,7 @@
 priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at
-30,pomme,raw,,,,,,,,,,fabiencampana,
-31,poire,raw,,,,,,,,,,fabiencampana,
-32,cerise,sweet raw,,,,,,,,,,fabiencampana,
-33,peche,raw,,,,,,,,,,fabiencampana,
-35,prune,raw,,,,,,,,,,fabiencampana,
-36,pruneau,dried,,,,,,,,,,fabiencampana,
+30,pomme,raw,resolve_existing,name_match,be357070-90b3-49af-af59-59f1a88d88e0,13039,,,,,"matched CIQUAL fresh apple raw entry",fabiencampana,2026-02-18T00:00:00Z
+31,poire,raw,resolve_existing,name_match,c4b3c6a0-df04-4c4e-bd14-6eb746e94fd0,13037,,,,,"matched CIQUAL fresh pear raw entry",fabiencampana,2026-02-18T00:00:00Z
+32,cerise,sweet raw,create_new_food,new_food,,,phase2-cerise-douce-crue,"Cerise douce, crue","Sweet cherry, raw",raw,"no safe CIQUAL equivalent for sweet cherry raw variant",fabiencampana,2026-02-18T00:00:00Z
+33,peche,raw,resolve_existing,name_match,c10ed1f0-8d53-464d-97e4-83b0ccc0c84e,13043,,,,,"matched CIQUAL fresh peach raw entry",fabiencampana,2026-02-18T00:00:00Z
+35,prune,raw,resolve_existing,name_match,c50d15d1-c671-4350-976e-8f90089cb74c,13100,,,,,"matched CIQUAL fresh plum raw entry (prune, sans noyau, crue)",fabiencampana,2026-02-18T00:00:00Z
+36,pruneau,dried,resolve_existing,name_match,741248ce-8a39-479e-ade6-12b56546adcc,13042,,,,,"matched CIQUAL dried prune entry (pruneau, sans noyau, sec)",fabiencampana,2026-02-18T00:00:00Z
