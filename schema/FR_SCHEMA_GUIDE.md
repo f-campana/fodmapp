@@ -902,7 +902,12 @@ Artifacts:
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_rescore.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_apply.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
+- review packet:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
 
 ### 11.1 Rollup semantics (Phase 3.1a full 6-subtype)
 
@@ -965,12 +970,51 @@ MVP lock:
 - exemption file must stay empty (`0` rows)
 - neutral/default assignments are used instead of exemptions
 
-### 11.3 Swap-rule MVP policy (unchanged in 3.1a)
+### 11.3 Swap-rule MVP policy
 
 - initial batch = `12` rules
-- all rules inserted as `draft`
+- initial insertion status = `draft` for all rules
 - rank 2 (`ail`, powder) is excluded from from/to rule graph until measurement re-verification
 - rule contexts and scores are seeded alongside rules for deterministic downstream projection
+
+### 11.4 Swap activation workflow (Phase 3.1b)
+
+Phase 3.1b activates a reviewed subset of the 12 MVP rules in two gates:
+
+1. Gate A (`phase3_swap_rules_rescore.sql`):
+   - recompute `swap_rule_scores.fodmap_safety_score` from full rollups
+   - set `scoring_version='v2_full_rollup_2026_02_18'`
+   - export reviewer packet via
+     `\copy (SELECT ...) TO '/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv'`
+
+2. Gate B (`phase3_swap_activation_apply.sql`):
+   - load reviewed CSV via `\copy ... FROM`
+   - enforce score/version snapshot lock
+   - enforce conservative eligibility before activation
+   - apply status transitions:
+     - `approve -> active`
+     - `reject -> draft`
+
+Unknown endpoint handling (locked):
+
+- if either endpoint rollup level is `unknown`, recomputed `fodmap_safety_score` is short-circuited to `0.000`
+- unknown endpoint rows are never auto-eligible
+
+Conservative eligibility rule:
+
+- endpoints must be non-unknown
+- `to` severity must be non-worsening (`to <= from`)
+- `to_burden_ratio <= from_burden_ratio`
+- recomputed safety score `>= 0.500`
+
+Human review fields required in the activation CSV:
+
+- `review_decision` (`approve` or `reject`)
+- `review_notes`
+- `reviewed_by`
+- `reviewed_at`
+
+Rows not approved remain `draft`.
 
 ## 12) References
 

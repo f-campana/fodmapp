@@ -4,17 +4,17 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 
 ## Scope
 
-Phase 3.0/3.1a includes:
+Phase 3.0/3.1a/3.1b includes:
 - culinary trait curation for priority ranks `1..42`
 - full 6-subtype source-scoped rollups in `food_fodmap_rollups`
 - latest rollup interfaces with coverage metadata
-- initial 12 `draft` swap rules with contexts and scores
+- initial 12 swap rules with contexts and scores
+- 3.1b re-scoring and activation workflow (`draft` -> reviewed subset `active`)
 
 Out of scope:
 - API endpoints
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
-- 3.1b swap activation workflow (post-3.1a)
 
 ## Artifacts
 
@@ -27,11 +27,15 @@ Data files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
 
 SQL files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_rescore.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_apply.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
@@ -44,6 +48,10 @@ Run against `fodmap_test` in this exact order:
 3. `phase3_rollups_6subtype_checks.sql`
 4. `phase3_swap_rules_apply.sql`
 5. `phase3_mvp_checks.sql`
+6. `phase3_swap_rules_rescore.sql` (Gate A: recompute + export review CSV)
+7. human review/update `phase3_swap_activation_review_v1.csv`
+8. `phase3_swap_activation_apply.sql` (Gate B: apply reviewed activation decisions)
+9. `phase3_swap_activation_checks.sql`
 
 Idempotency pass (same order, second run):
 
@@ -52,13 +60,16 @@ Idempotency pass (same order, second run):
 3. `phase3_rollups_6subtype_checks.sql`
 4. `phase3_swap_rules_apply.sql`
 5. `phase3_mvp_checks.sql`
+6. `phase3_swap_rules_rescore.sql`
+7. `phase3_swap_activation_apply.sql`
+8. `phase3_swap_activation_checks.sql`
 
 ## MVP Locks
 
 - ranks are resolved by `priority_rank -> phase2_priority_foods.resolved_food_id`
 - source for curated product-layer data is `internal_rules_v1`
 - trait exemption manifest exists but is empty (`0 rows`) for MVP
-- 12 initial swap rules are all `draft`
+- 12 initial swap rules remain the MVP activation scope
 - rank 2 is excluded from all swap rules
 
 ## Rollup Semantics (3.1a Full Rollups)
@@ -78,6 +89,32 @@ Coverage baseline note:
 - snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic
 - post-compute coverage can increase when CIQUAL-derived lactose/excess-fructose joins are active
 - baseline buckets are diagnostic only, not hard assertions
+
+## 3.1b Swap Activation
+
+3.1b is a two-gate process:
+- Gate A (`phase3_swap_rules_rescore.sql`): recompute `fodmap_safety_score` for the 12 MVP rules from full rollups and export a review packet CSV.
+- Gate B (`phase3_swap_activation_apply.sql`): apply human-reviewed `approve/reject` decisions and activate only eligible rules.
+
+Scoring/eligibility specifics:
+- unknown rollup endpoint (`from` or `to`) short-circuits recomputed `fodmap_safety_score` to `0.000`
+- unknown endpoint rows are always `auto_eligible=false`
+- conservative eligibility requires:
+  - non-unknown endpoints
+  - non-worsening overall severity (`to <= from`)
+  - non-worsening burden ratio (`to_burden <= from_burden`)
+  - recomputed score `>= 0.500`
+
+CSV handoff contract:
+- Gate A writes:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
+  via `\copy (SELECT ...) TO ... CSV HEADER`
+- reviewer updates in place:
+  - `review_decision` (`approve` or `reject`)
+  - `review_notes`
+  - `reviewed_by`
+  - `reviewed_at`
+- Gate B reads via `\copy ... FROM` and enforces snapshot lock against current score/version.
 
 ## Rollback Strategy
 
