@@ -16,9 +16,9 @@ PSQL_BIN="${PSQL_BIN:-}"
 ADMIN_DB_URL="${ADMIN_DB_URL:-postgresql://${PGUSER_NAME}@${PGHOST_NAME}:${PGPORT_NAME}/${ADMIN_DB}}"
 REPLAY_DB_URL="${REPLAY_DB_URL:-postgresql://${PGUSER_NAME}@${PGHOST_NAME}:${PGPORT_NAME}/${REPLAY_DB}}"
 
-CIQUAL_XLSX="${CIQUAL_XLSX:-/Users/fabiencampana/Downloads/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx}"
-CIQUAL_ALIM_XML="${CIQUAL_ALIM_XML:-/Users/fabiencampana/Downloads/ciqual-data/alim_2025_11_03.xml}"
-CIQUAL_GRP_XML="${CIQUAL_GRP_XML:-/Users/fabiencampana/Downloads/ciqual-data/alim_grp_2025_11_03.xml}"
+CIQUAL_XLSX="${CIQUAL_XLSX:-/Users/fabiencampana/Documents/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx}"
+CIQUAL_ALIM_XML="${CIQUAL_ALIM_XML:-/Users/fabiencampana/Documents/ciqual-data/alim_2025_11_03.xml}"
+CIQUAL_GRP_XML="${CIQUAL_GRP_XML:-/Users/fabiencampana/Documents/ciqual-data/alim_grp_2025_11_03.xml}"
 
 CURRENT_STAGE=""
 
