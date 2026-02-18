@@ -926,11 +926,18 @@ Read interfaces:
 - `v_phase3_rollup_subtype_levels_latest` (food x subtype detail)
 - `v_phase3_rollups_latest_full` (one row per food with coverage + driver)
 
+Pipeline-managed snapshot artifacts:
+
+- `phase3_subtype_levels_snapshot`
+- `phase3_rollups_snapshot`
+- both are internal artifacts rebuilt by `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+- do not edit directly; rerun rollup compute after upstream data changes to refresh them
+
 Signal precedence by subtype:
 
 1. explicit current subtype measurements (`food_fodmap_measurements`, `is_current=TRUE`)
-2. fructose excess from `v_food_excess_fructose_latest`
-3. lactose from CIQUAL nutrient `CIQUAL_32410`
+2. fructose excess from `v_food_excess_fructose_latest` only when explicit fructose signal is absent
+3. lactose from CIQUAL nutrient `CIQUAL_32410` only when explicit lactose signal is absent
 4. sorbitol/mannitol fallback from CIQUAL total polyols `CIQUAL_34000` only when explicit subtype signal is missing
 
 Threshold precedence:
@@ -948,7 +955,8 @@ Fallback threshold citation policy:
 Coverage baseline note:
 
 - snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic from linked signals before full rollup wiring
-- post-compute coverage can increase where CIQUAL-derived lactose/excess-fructose joins become active
+- unchanged inputs keep coverage distribution unchanged
+- coverage increases only when new linked signals are introduced (additional subtype measurements and/or nutrient linkage)
 - these buckets are diagnostic outputs, not hard assertions
 
 ### 11.2 Trait coverage and exemption policy

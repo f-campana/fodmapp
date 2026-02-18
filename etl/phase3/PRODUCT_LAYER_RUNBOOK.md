@@ -78,16 +78,26 @@ Rollups evaluate all six subtypes (`fructan`, `gos`, `sorbitol`, `mannitol`, `fr
 - coverage metrics are explicit: `known_subtypes_count`, `coverage_ratio`
 - `none` is only allowed with full 6/6 coverage and all subtype levels `none`
 - partial coverage + all-known-none is coerced to `unknown`
-- sorbitol/mannitol may use CIQUAL total-polyols fallback only when explicit subtype measurements are missing
+- explicit current subtype measurements have highest precedence for all six subtype codes
+- fructose excess and CIQUAL lactose are fallback paths only when explicit subtype signals are absent
+- sorbitol/mannitol may use CIQUAL total-polyols fallback only when explicit subtype signals are missing
 - threshold precedence: food-specific first, then global defaults (`phase3_rollup_default_thresholds_v1.csv`)
 
 Read interfaces:
 - `v_phase3_rollup_subtype_levels_latest`
 - `v_phase3_rollups_latest_full`
 
+Pipeline-managed snapshot artifacts:
+- `phase3_subtype_levels_snapshot`
+- `phase3_rollups_snapshot`
+- both tables are rebuilt by `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+- do not edit manually; treat as internal pipeline artifacts
+- if upstream measurements/thresholds/nutrient links change, rerun rollup compute to avoid stale reads
+
 Coverage baseline note:
 - snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic
-- post-compute coverage can increase when CIQUAL-derived lactose/excess-fructose joins are active
+- unchanged inputs keep coverage distribution unchanged
+- coverage increases only when new linked signals are added (new subtype measurements and/or nutrient linkage)
 - baseline buckets are diagnostic only, not hard assertions
 
 ## 3.1b Swap Activation

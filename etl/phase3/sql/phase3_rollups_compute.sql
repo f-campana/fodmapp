@@ -231,7 +231,7 @@ food_threshold_latest AS (
   FROM food_fodmap_thresholds t
   JOIN fodmap_subtypes fs ON fs.fodmap_subtype_id = t.fodmap_subtype_id
 ),
-signals AS (
+signals_raw AS (
   SELECT
     f.priority_rank,
     f.food_id,
@@ -239,90 +239,41 @@ signals AS (
     f.fodmap_subtype_id,
     f.rollup_serving_g,
     CASE
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
+      WHEN lm.rn = 1
            AND lm.amount_g_per_100g IS NOT NULL
         THEN lm.amount_g_per_100g * f.rollup_serving_g / 100.0
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
+      WHEN lm.rn = 1
            AND lm.amount_g_per_serving IS NOT NULL
            AND lm.serving_g IS NOT NULL
            AND lm.serving_g > 0
         THEN lm.amount_g_per_serving * f.rollup_serving_g / lm.serving_g
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
+      WHEN lm.rn = 1
            AND lm.amount_g_per_serving IS NOT NULL
         THEN lm.amount_g_per_serving
-      WHEN f.subtype_code = 'fructose'
-           AND fx.excess_fructose_g_per_100g IS NOT NULL
-        THEN fx.excess_fructose_g_per_100g * f.rollup_serving_g / 100.0
-      WHEN f.subtype_code = 'lactose'
-           AND lac.amount_value IS NOT NULL
-        THEN lac.amount_value * f.rollup_serving_g / 100.0
-      WHEN f.subtype_code IN ('sorbitol','mannitol')
-           AND lm.rn IS NULL
-           AND pol.amount_value IS NOT NULL
-        THEN pol.amount_value * f.rollup_serving_g / 100.0
       ELSE NULL
-    END AS amount_g_per_serving,
+    END AS explicit_amount_g_per_serving,
     CASE
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
+      WHEN lm.rn = 1
+           AND (lm.amount_g_per_100g IS NOT NULL OR lm.amount_g_per_serving IS NOT NULL)
         THEN lm.comparator
-      WHEN f.subtype_code = 'fructose'
-           AND fx.excess_fructose_g_per_100g IS NOT NULL
-        THEN CASE
-          WHEN fx.fructose_comparator = 'eq' AND fx.glucose_comparator = 'eq' THEN 'eq'::comparator_code
-          ELSE 'lte'::comparator_code
-        END
-      WHEN f.subtype_code = 'lactose'
-           AND lac.amount_value IS NOT NULL
-        THEN lac.comparator
-      WHEN f.subtype_code IN ('sorbitol','mannitol')
-           AND lm.rn IS NULL
-           AND pol.amount_value IS NOT NULL
-        THEN pol.comparator
       ELSE NULL
-    END AS comparator,
+    END AS explicit_comparator,
     CASE
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
+      WHEN lm.rn = 1
+           AND (lm.amount_g_per_100g IS NOT NULL OR lm.amount_g_per_serving IS NOT NULL)
         THEN lm.source_id
-      WHEN f.subtype_code = 'fructose'
-           AND fx.excess_fructose_g_per_100g IS NOT NULL
-        THEN fx.source_id
-      WHEN f.subtype_code = 'lactose'
-           AND lac.amount_value IS NOT NULL
-        THEN lac.source_id
-      WHEN f.subtype_code IN ('sorbitol','mannitol')
-           AND lm.rn IS NULL
-           AND pol.amount_value IS NOT NULL
-        THEN pol.source_id
       ELSE NULL
-    END AS signal_source_id,
-    CASE
-      WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-           AND lm.rn = 1
-        THEN 'explicit_measurement'
-      WHEN f.subtype_code = 'fructose'
-           AND fx.excess_fructose_g_per_100g IS NOT NULL
-        THEN 'excess_fructose_derived'
-      WHEN f.subtype_code = 'lactose'
-           AND lac.amount_value IS NOT NULL
-        THEN 'ciqual_lactose'
-      WHEN f.subtype_code IN ('sorbitol','mannitol')
-           AND lm.rn IS NULL
-           AND pol.amount_value IS NOT NULL
-        THEN 'ciqual_total_polyols_proxy'
-      ELSE 'none'
-    END AS signal_source_kind,
-    CASE
-      WHEN f.subtype_code IN ('sorbitol','mannitol')
-           AND lm.rn IS NULL
-           AND pol.amount_value IS NOT NULL
-        THEN TRUE
-      ELSE FALSE
-    END AS is_polyol_proxy,
+    END AS explicit_source_id,
+    fx.excess_fructose_g_per_100g,
+    fx.fructose_comparator,
+    fx.glucose_comparator,
+    fx.source_id AS fructose_source_id,
+    lac.amount_value AS lactose_amount_value,
+    lac.comparator AS lactose_comparator,
+    lac.source_id AS lactose_source_id,
+    pol.amount_value AS polyols_amount_value,
+    pol.comparator AS polyols_comparator,
+    pol.source_id AS polyols_source_id,
     COALESCE(ft.low_max_g, dt.low_max_g) AS low_max_g,
     COALESCE(ft.moderate_max_g, dt.moderate_max_g) AS moderate_max_g,
     CASE
@@ -335,151 +286,7 @@ signals AS (
     END AS is_default_threshold,
     COALESCE(ft.source_id, src.source_id) AS threshold_source_id,
     dt.citation_ref AS default_threshold_citation_ref,
-    dt.derivation_method AS default_threshold_derivation_method,
-    CASE
-      WHEN (
-        CASE
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_100g IS NOT NULL
-            THEN lm.amount_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-               AND lm.serving_g IS NOT NULL
-               AND lm.serving_g > 0
-            THEN lm.amount_g_per_serving * f.rollup_serving_g / lm.serving_g
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-            THEN lm.amount_g_per_serving
-          WHEN f.subtype_code = 'fructose'
-               AND fx.excess_fructose_g_per_100g IS NOT NULL
-            THEN fx.excess_fructose_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code = 'lactose'
-               AND lac.amount_value IS NOT NULL
-            THEN lac.amount_value * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('sorbitol','mannitol')
-               AND lm.rn IS NULL
-               AND pol.amount_value IS NOT NULL
-            THEN pol.amount_value * f.rollup_serving_g / 100.0
-          ELSE NULL
-        END
-      ) IS NULL
-        THEN 'unknown'::fodmap_level
-      WHEN (
-        CASE
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-            THEN lm.comparator
-          WHEN f.subtype_code = 'fructose'
-               AND fx.excess_fructose_g_per_100g IS NOT NULL
-            THEN CASE
-              WHEN fx.fructose_comparator = 'eq' AND fx.glucose_comparator = 'eq' THEN 'eq'::comparator_code
-              ELSE 'lte'::comparator_code
-            END
-          WHEN f.subtype_code = 'lactose'
-               AND lac.amount_value IS NOT NULL
-            THEN lac.comparator
-          WHEN f.subtype_code IN ('sorbitol','mannitol')
-               AND lm.rn IS NULL
-               AND pol.amount_value IS NOT NULL
-            THEN pol.comparator
-          ELSE NULL
-        END
-      ) = 'eq'::comparator_code
-       AND (
-        CASE
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_100g IS NOT NULL
-            THEN lm.amount_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-               AND lm.serving_g IS NOT NULL
-               AND lm.serving_g > 0
-            THEN lm.amount_g_per_serving * f.rollup_serving_g / lm.serving_g
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-            THEN lm.amount_g_per_serving
-          WHEN f.subtype_code = 'fructose'
-               AND fx.excess_fructose_g_per_100g IS NOT NULL
-            THEN fx.excess_fructose_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code = 'lactose'
-               AND lac.amount_value IS NOT NULL
-            THEN lac.amount_value * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('sorbitol','mannitol')
-               AND lm.rn IS NULL
-               AND pol.amount_value IS NOT NULL
-            THEN pol.amount_value * f.rollup_serving_g / 100.0
-          ELSE NULL
-        END
-      ) = 0
-        THEN 'none'::fodmap_level
-      WHEN (
-        CASE
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_100g IS NOT NULL
-            THEN lm.amount_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-               AND lm.serving_g IS NOT NULL
-               AND lm.serving_g > 0
-            THEN lm.amount_g_per_serving * f.rollup_serving_g / lm.serving_g
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-            THEN lm.amount_g_per_serving
-          WHEN f.subtype_code = 'fructose'
-               AND fx.excess_fructose_g_per_100g IS NOT NULL
-            THEN fx.excess_fructose_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code = 'lactose'
-               AND lac.amount_value IS NOT NULL
-            THEN lac.amount_value * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('sorbitol','mannitol')
-               AND lm.rn IS NULL
-               AND pol.amount_value IS NOT NULL
-            THEN pol.amount_value * f.rollup_serving_g / 100.0
-          ELSE NULL
-        END
-      ) <= COALESCE(ft.low_max_g, dt.low_max_g)
-        THEN 'low'::fodmap_level
-      WHEN (
-        CASE
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_100g IS NOT NULL
-            THEN lm.amount_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-               AND lm.serving_g IS NOT NULL
-               AND lm.serving_g > 0
-            THEN lm.amount_g_per_serving * f.rollup_serving_g / lm.serving_g
-          WHEN f.subtype_code IN ('fructan','gos','sorbitol','mannitol')
-               AND lm.rn = 1
-               AND lm.amount_g_per_serving IS NOT NULL
-            THEN lm.amount_g_per_serving
-          WHEN f.subtype_code = 'fructose'
-               AND fx.excess_fructose_g_per_100g IS NOT NULL
-            THEN fx.excess_fructose_g_per_100g * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code = 'lactose'
-               AND lac.amount_value IS NOT NULL
-            THEN lac.amount_value * f.rollup_serving_g / 100.0
-          WHEN f.subtype_code IN ('sorbitol','mannitol')
-               AND lm.rn IS NULL
-               AND pol.amount_value IS NOT NULL
-            THEN pol.amount_value * f.rollup_serving_g / 100.0
-          ELSE NULL
-        END
-      ) <= COALESCE(ft.moderate_max_g, dt.moderate_max_g)
-        THEN 'moderate'::fodmap_level
-      ELSE 'high'::fodmap_level
-    END AS subtype_level
+    dt.derivation_method AS default_threshold_derivation_method
   FROM food_subtypes f
   LEFT JOIN latest_measurements lm
     ON lm.food_id = f.food_id
@@ -502,6 +309,105 @@ signals AS (
     ON dt.subtype_code = f.subtype_code
   CROSS JOIN phase3_source src
 ),
+signals AS (
+  SELECT
+    r.priority_rank,
+    r.food_id,
+    r.subtype_code,
+    r.fodmap_subtype_id,
+    r.rollup_serving_g,
+    CASE
+      WHEN r.explicit_amount_g_per_serving IS NOT NULL
+        THEN r.explicit_amount_g_per_serving
+      WHEN r.subtype_code = 'fructose'
+           AND r.excess_fructose_g_per_100g IS NOT NULL
+        THEN r.excess_fructose_g_per_100g * r.rollup_serving_g / 100.0
+      WHEN r.subtype_code = 'lactose'
+           AND r.lactose_amount_value IS NOT NULL
+        THEN r.lactose_amount_value * r.rollup_serving_g / 100.0
+      WHEN r.subtype_code IN ('sorbitol','mannitol')
+           AND r.polyols_amount_value IS NOT NULL
+        THEN r.polyols_amount_value * r.rollup_serving_g / 100.0
+      ELSE NULL
+    END AS amount_g_per_serving,
+    CASE
+      WHEN r.explicit_amount_g_per_serving IS NOT NULL
+        THEN r.explicit_comparator
+      WHEN r.subtype_code = 'fructose'
+           AND r.excess_fructose_g_per_100g IS NOT NULL
+        THEN CASE
+          WHEN r.fructose_comparator = 'eq' AND r.glucose_comparator = 'eq' THEN 'eq'::comparator_code
+          ELSE 'lte'::comparator_code
+        END
+      WHEN r.subtype_code = 'lactose'
+           AND r.lactose_amount_value IS NOT NULL
+        THEN r.lactose_comparator
+      WHEN r.subtype_code IN ('sorbitol','mannitol')
+           AND r.polyols_amount_value IS NOT NULL
+        THEN r.polyols_comparator
+      ELSE NULL
+    END AS comparator,
+    CASE
+      WHEN r.explicit_amount_g_per_serving IS NOT NULL
+        THEN r.explicit_source_id
+      WHEN r.subtype_code = 'fructose'
+           AND r.excess_fructose_g_per_100g IS NOT NULL
+        THEN r.fructose_source_id
+      WHEN r.subtype_code = 'lactose'
+           AND r.lactose_amount_value IS NOT NULL
+        THEN r.lactose_source_id
+      WHEN r.subtype_code IN ('sorbitol','mannitol')
+           AND r.polyols_amount_value IS NOT NULL
+        THEN r.polyols_source_id
+      ELSE NULL
+    END AS signal_source_id,
+    CASE
+      WHEN r.explicit_amount_g_per_serving IS NOT NULL
+        THEN 'explicit_measurement'
+      WHEN r.subtype_code = 'fructose'
+           AND r.excess_fructose_g_per_100g IS NOT NULL
+        THEN 'excess_fructose_derived'
+      WHEN r.subtype_code = 'lactose'
+           AND r.lactose_amount_value IS NOT NULL
+        THEN 'ciqual_lactose'
+      WHEN r.subtype_code IN ('sorbitol','mannitol')
+           AND r.polyols_amount_value IS NOT NULL
+        THEN 'ciqual_total_polyols_proxy'
+      ELSE 'none'
+    END AS signal_source_kind,
+    CASE
+      WHEN r.subtype_code IN ('sorbitol','mannitol')
+           AND r.explicit_amount_g_per_serving IS NULL
+           AND r.polyols_amount_value IS NOT NULL
+        THEN TRUE
+      ELSE FALSE
+    END AS is_polyol_proxy,
+    r.low_max_g,
+    r.moderate_max_g,
+    r.threshold_source,
+    r.is_default_threshold,
+    r.threshold_source_id,
+    r.default_threshold_citation_ref,
+    r.default_threshold_derivation_method
+  FROM signals_raw r
+),
+signals_with_levels AS (
+  SELECT
+    s.*,
+    CASE
+      WHEN s.amount_g_per_serving IS NULL
+        THEN 'unknown'::fodmap_level
+      WHEN s.comparator = 'eq'::comparator_code
+           AND s.amount_g_per_serving = 0
+        THEN 'none'::fodmap_level
+      WHEN s.amount_g_per_serving <= s.low_max_g
+        THEN 'low'::fodmap_level
+      WHEN s.amount_g_per_serving <= s.moderate_max_g
+        THEN 'moderate'::fodmap_level
+      ELSE 'high'::fodmap_level
+    END AS subtype_level
+  FROM signals s
+),
 ranked AS (
   SELECT
     s.*,
@@ -516,7 +422,7 @@ ranked AS (
       WHEN s.amount_g_per_serving IS NULL OR s.moderate_max_g IS NULL OR s.moderate_max_g = 0 THEN NULL
       ELSE s.amount_g_per_serving / s.moderate_max_g
     END AS burden_ratio
-  FROM signals s
+  FROM signals_with_levels s
 )
 SELECT * FROM ranked;
 
@@ -664,8 +570,8 @@ ORDER BY p.priority_rank, r.computed_at DESC;
 
 -- Diagnostic outputs (non-blocking):
 -- Pre-3.1a baseline diagnostics were 1/6:21, 3/6:6, 4/6:10, 5/6:5 from linked signals
--- before full rollup wiring. Post-compute coverage can increase where CIQUAL lactose/
--- excess-fructose joins become active in this pipeline.
+-- before full rollup wiring. Coverage only increases when new linked signals
+-- (additional subtype measurements and/or nutrient linkage) are available.
 SELECT
   overall_level,
   COUNT(*) AS row_count

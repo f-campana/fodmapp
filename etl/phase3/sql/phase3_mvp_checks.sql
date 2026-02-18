@@ -67,6 +67,7 @@ DECLARE
   bad_count INTEGER;
   source_internal UUID;
   mvp_rules_count INTEGER;
+  mvp_active_count INTEGER;
   mvp_draft_count INTEGER;
   mvp_context_count INTEGER;
   mvp_score_count INTEGER;
@@ -160,7 +161,7 @@ BEGIN
     RAISE EXCEPTION 'none-gate failed in MVP checks: partial coverage rows cannot be none';
   END IF;
 
-  -- Swap rule checks (MVP batch = 12, all draft).
+  -- Swap rule checks (MVP batch = 12; post-3.1b canonical split is 11 active / 1 draft).
   SELECT COUNT(*) INTO mvp_rules_count
   FROM swap_rules
   WHERE source_id = source_internal
@@ -170,14 +171,24 @@ BEGIN
     RAISE EXCEPTION 'MVP swap rule count failed: expected 12, got %', mvp_rules_count;
   END IF;
 
+  SELECT COUNT(*) INTO mvp_active_count
+  FROM swap_rules
+  WHERE source_id = source_internal
+    AND notes = 'phase3_mvp_rule'
+    AND status = 'active';
+
+  IF mvp_active_count <> 11 THEN
+    RAISE EXCEPTION 'MVP active status count failed: expected 11, got %', mvp_active_count;
+  END IF;
+
   SELECT COUNT(*) INTO mvp_draft_count
   FROM swap_rules
   WHERE source_id = source_internal
     AND notes = 'phase3_mvp_rule'
     AND status = 'draft';
 
-  IF mvp_draft_count <> 12 THEN
-    RAISE EXCEPTION 'MVP draft status count failed: expected 12, got %', mvp_draft_count;
+  IF mvp_draft_count <> 1 THEN
+    RAISE EXCEPTION 'MVP draft status count failed: expected 1, got %', mvp_draft_count;
   END IF;
 
   SELECT COUNT(*) INTO mvp_context_count
