@@ -61,6 +61,35 @@ run_sql "${PHASE3_SQL_DIR}/phase3_rollups_compute.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_rollups_6subtype_checks.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_rules_apply.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_rules_rescore.sql"
+
+# Gate A exports a review packet with blank reviewer fields. In CI we need the
+# committed reviewed packet for Gate B, and snapshot lock will enforce freshness.
+git checkout HEAD -- "${REVIEW_CSV}"
+
+python3 - "${REVIEW_CSV}" <<'PY'
+import csv
+import sys
+from pathlib import Path
+
+p = Path(sys.argv[1])
+rows = list(csv.DictReader(p.open()))
+approve = sum(1 for r in rows if r.get("review_decision") == "approve")
+reject = sum(1 for r in rows if r.get("review_decision") == "reject")
+missing_meta = sum(
+    1 for r in rows if not (r.get("reviewed_by") or "").strip() or not (r.get("reviewed_at") or "").strip()
+)
+
+if len(rows) != 12:
+    raise SystemExit(f"[FAIL] phase3 review CSV row count must be 12, got {len(rows)}")
+if approve != 11 or reject != 1:
+    raise SystemExit(
+        f"[FAIL] phase3 review CSV must be 11 approve / 1 reject, got {approve} / {reject}"
+    )
+if missing_meta != 0:
+    raise SystemExit(f"[FAIL] phase3 review CSV has {missing_meta} rows missing reviewed_by/reviewed_at")
+print("[INFO] phase3 reviewed CSV restored from git and validated")
+PY
+
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_activation_apply.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_activation_checks.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_mvp_checks.sql"

@@ -70,6 +70,8 @@ download_and_verify "${XLSX_URL}" "${XLSX_PATH}" "${XLSX_SHA256}"
 download_and_verify "${ALIM_XML_URL}" "${ALIM_XML_PATH}" "${ALIM_XML_SHA256}"
 download_and_verify "${ALIM_GRP_XML_URL}" "${ALIM_GRP_XML_PATH}" "${ALIM_GRP_XML_SHA256}"
 
+# IMPORTANT: stdout is machine-parsed by CI into $GITHUB_ENV.
+# Keep diagnostics on stderr and emit only CIQUAL_*=... lines below.
 printf 'CIQUAL_XLSX=%s\n' "${XLSX_PATH}"
 printf 'CIQUAL_ALIM_XML=%s\n' "${ALIM_XML_PATH}"
 printf 'CIQUAL_GRP_XML=%s\n' "${ALIM_GRP_XML_PATH}"
