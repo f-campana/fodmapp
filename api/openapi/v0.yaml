@@ -1,0 +1,428 @@
+openapi: 3.1.0
+info:
+  title: Fodmap Swap API (v0 Review Draft)
+  version: 0.1.0-review
+  summary: SQL-backed read API for food rollups, traits, and active swaps.
+  description: |
+    Review artifact only (not implemented yet).
+
+    v0 contracts:
+    - Public identity is `food_slug` (priority rank remains internal/debug only).
+    - Responses include both FR/EN fields (no locale negotiation in v0).
+    - Swap results include only active rules.
+    - Rollup data originates from `v_phase3_rollups_latest_full`.
+
+    Data freshness note:
+    `v_phase3_rollups_latest_full` depends on pipeline-managed snapshot tables
+    (`phase3_subtype_levels_snapshot`, `phase3_rollups_snapshot`) rebuilt by
+    `phase3_rollups_compute.sql`. Consumers should inspect `rollup_computed_at`
+    and `source_slug` to evaluate freshness.
+servers:
+  - url: https://api.fodmap.local
+    description: Placeholder
+
+tags:
+  - name: health
+  - name: foods
+  - name: swaps
+
+paths:
+  /v0/health:
+    get:
+      tags: [health]
+      summary: Liveness/metadata probe
+      operationId: getHealth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /v0/foods/{food_slug}:
+    get:
+      tags: [foods]
+      summary: Food metadata by slug
+      operationId: getFoodBySlug
+      parameters:
+        - $ref: '#/components/parameters/FoodSlugPath'
+      responses:
+        '200':
+          description: Food found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v0/foods/{food_slug}/rollup:
+    get:
+      tags: [foods]
+      summary: Latest full 6-subtype rollup by food slug
+      operationId: getFoodRollupBySlug
+      description: |
+        Returns latest full rollup projection from `v_phase3_rollups_latest_full`.
+        Includes coverage and provenance fields.
+      parameters:
+        - $ref: '#/components/parameters/FoodSlugPath'
+      responses:
+        '200':
+          description: Rollup found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodRollupResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v0/foods/{food_slug}/traits:
+    get:
+      tags: [foods]
+      summary: Culinary trait profile for a food
+      operationId: getFoodTraitsBySlug
+      parameters:
+        - $ref: '#/components/parameters/FoodSlugPath'
+      responses:
+        '200':
+          description: Traits found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodTraitsResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v0/swaps:
+    get:
+      tags: [swaps]
+      summary: Active swap recommendations for a source food
+      operationId: listSwaps
+      description: |
+        Filters:
+        - active rules only
+        - `from` slug is required
+        - optional score floor (`min_safety_score`)
+
+        Sort order (deterministic):
+        1) `fodmap_safety_score` DESC
+        2) `overall_score` DESC
+        3) `to_overall_level` ASC severity (`none`, `low`, `moderate`, `high`, `unknown`)
+        4) `coverage_ratio` DESC
+        5) `to_food_slug` ASC
+      parameters:
+        - $ref: '#/components/parameters/FromSlugQuery'
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/MinSafetyScoreQuery'
+      responses:
+        '200':
+          description: Swap results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapListResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    FoodSlugPath:
+      name: food_slug
+      in: path
+      required: true
+      description: Stable unique food slug (`foods.food_slug`).
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 160
+    FromSlugQuery:
+      name: from
+      in: query
+      required: true
+      description: Source food slug.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 160
+    LimitQuery:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 10
+    MinSafetyScoreQuery:
+      name: min_safety_score
+      in: query
+      required: false
+      description: Lower bound for `fodmap_safety_score`.
+      schema:
+        type: number
+        minimum: 0
+        maximum: 1
+        default: 0
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    FoodLevel:
+      type: string
+      enum: [none, low, moderate, high, unknown]
+
+    RuleStatus:
+      type: string
+      enum: [active, draft]
+
+    HealthResponse:
+      type: object
+      required: [status, service, version]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        service:
+          type: string
+          example: fodmap-api
+        version:
+          type: string
+          example: v0
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              example: not_found
+            message:
+              type: string
+
+    FoodIdentity:
+      type: object
+      required:
+        [food_slug, canonical_name_fr, canonical_name_en]
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+
+    FoodResponse:
+      allOf:
+        - $ref: '#/components/schemas/FoodIdentity'
+        - type: object
+          properties:
+            preparation_state:
+              type: string
+              nullable: true
+            status:
+              type: string
+              nullable: true
+            source_slug:
+              type: string
+              nullable: true
+
+    FoodRollupResponse:
+      type: object
+      required:
+        - food_slug
+        - canonical_name_fr
+        - canonical_name_en
+        - overall_level
+        - known_subtypes_count
+        - coverage_ratio
+        - source_slug
+        - rollup_computed_at
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        rollup_serving_g:
+          type: number
+          nullable: true
+        overall_level:
+          $ref: '#/components/schemas/FoodLevel'
+        driver_subtype:
+          type: string
+          nullable: true
+          description: Driver subtype code when applicable.
+        known_subtypes_count:
+          type: integer
+          minimum: 0
+          maximum: 6
+        coverage_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+        source_slug:
+          type: string
+          description: Rollup source slug.
+        rollup_computed_at:
+          type: string
+          format: date-time
+        scoring_version:
+          type: string
+          nullable: true
+          description: Included when relevant to downstream swap scoring context.
+
+    TraitLabel:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+        label_fr:
+          type: string
+          nullable: true
+        label_en:
+          type: string
+          nullable: true
+
+    FoodTraitsResponse:
+      type: object
+      required: [food_slug, canonical_name_fr, canonical_name_en, source_slug]
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        source_slug:
+          type: string
+        culinary_roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitLabel'
+        flavor_profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitLabel'
+        texture_profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitLabel'
+        cooking_behaviors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitLabel'
+        cuisine_affinities:
+          type: array
+          items:
+            $ref: '#/components/schemas/TraitLabel'
+
+    SwapItem:
+      type: object
+      required:
+        - from_food_slug
+        - to_food_slug
+        - instruction_fr
+        - instruction_en
+        - from_overall_level
+        - to_overall_level
+        - driver_subtype
+        - from_burden_ratio
+        - to_burden_ratio
+        - coverage_ratio
+        - fodmap_safety_score
+        - overall_score
+        - rule_status
+        - scoring_version
+        - rollup_computed_at
+      properties:
+        from_food_slug:
+          type: string
+        to_food_slug:
+          type: string
+        from_food_name_fr:
+          type: string
+          nullable: true
+        from_food_name_en:
+          type: string
+          nullable: true
+        to_food_name_fr:
+          type: string
+          nullable: true
+        to_food_name_en:
+          type: string
+          nullable: true
+        instruction_fr:
+          type: string
+        instruction_en:
+          type: string
+        from_overall_level:
+          $ref: '#/components/schemas/FoodLevel'
+        to_overall_level:
+          $ref: '#/components/schemas/FoodLevel'
+        driver_subtype:
+          type: string
+          nullable: true
+        from_burden_ratio:
+          type: number
+          nullable: true
+        to_burden_ratio:
+          type: number
+          nullable: true
+        coverage_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+        fodmap_safety_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        overall_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        rule_status:
+          $ref: '#/components/schemas/RuleStatus'
+        scoring_version:
+          type: string
+        source_slug:
+          type: string
+        rollup_computed_at:
+          type: string
+          format: date-time
+
+    SwapListResponse:
+      type: object
+      required: [from_food_slug, items, total]
+      properties:
+        from_food_slug:
+          type: string
+        applied_filters:
+          type: object
+          properties:
+            limit:
+              type: integer
+            min_safety_score:
+              type: number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SwapItem'
+        total:
+          type: integer
+          minimum: 0

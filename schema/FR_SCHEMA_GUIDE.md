@@ -1024,6 +1024,44 @@ Human review fields required in the activation CSV:
 
 Rows not approved remain `draft`.
 
+### 11.5 API v0 read layer (Phase 3.2a)
+
+Phase 3.2a adds a read-only FastAPI surface over existing SQL contracts.
+
+Endpoint set:
+
+- `GET /v0/health`
+- `GET /v0/foods/{food_slug}`
+- `GET /v0/foods/{food_slug}/rollup`
+- `GET /v0/foods/{food_slug}/traits`
+- `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
+
+Public API contracts:
+
+- public identity is `food_slug` (priority ranks remain internal)
+- responses include both `*_fr` and `*_en` fields
+- no locale negotiation in v0
+- swaps return only `active` rules
+- rank2 exclusion remains inherited from activation state and safety checks
+
+Swap sorting contract:
+
+1. `fodmap_safety_score DESC`
+2. `overall_score DESC`
+3. `to_overall_level` severity ASC (`none`, `low`, `moderate`, `high`, `unknown`)
+4. `coverage_ratio DESC`
+5. `to_food_slug ASC`
+
+Rollup freshness contract:
+
+- API rollup projections come from `v_phase3_rollups_latest_full`
+- this depends on pipeline-managed snapshots rebuilt by:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+- API responses expose freshness/provenance fields:
+  - `rollup_computed_at`
+  - `scoring_version`
+  - `source_slug`
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):

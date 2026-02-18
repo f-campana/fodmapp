@@ -4,3 +4,6 @@
 .vscode/
 etl/ciqual/data/
 etl/ciqual/__pycache__/
+api/.venv/
+api/.pytest_cache/
+api/**/__pycache__/
