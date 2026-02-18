@@ -873,7 +873,75 @@ Current backlog marker:
 - replay-gap remediation is now implemented as runnable artifacts
 - any CI dataset-version drift should be handled by updating expected pool baselines/check thresholds in dedicated follow-up PRs
 
-## 11) References
+## 11) Phase 3 SQL Product Layer MVP
+
+Phase 3.0 introduces SQL-first product-layer curation on top of completed Phase 2 food resolution and measurements.
+
+Scope:
+
+- culinary trait assignments for all `42` priority foods
+- source-scoped serving rollups in `food_fodmap_rollups`
+- initial `12` swap rules with contexts and scores
+
+Artifacts:
+
+- runbook:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
+- trait files:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_culinary_roles_v1.csv`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_texture_profiles_v1.csv`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cooking_behaviors_v1.csv`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
+- rule file:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+- SQL pipeline:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
+
+### 11.1 Rollup semantics limitation (explicit MVP note)
+
+Phase 3 MVP rollups are intentionally **target-subtype-only**:
+
+- driver subtype = `phase2_priority_foods.target_subtype`
+- this is **not** a full 6-subtype overall risk assessment yet
+- `overall_level` in this MVP represents target-subtype risk only
+
+Future backlog:
+
+- compute full `overall_level` across all available subtype signals (Phase 2 + CIQUAL-derived)
+- include excess-fructose and additional subtype interplay in driver selection
+
+### 11.2 Trait coverage and exemption policy
+
+MVP trait checks enforce minimum coverage for each of the 42 foods:
+
+- `>=1` culinary role
+- `>=2` flavor notes
+- `>=1` texture
+- `>=1` cooking behavior
+- `>=1` cuisine affinity
+
+An exemption mechanism is present via:
+
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
+
+MVP lock:
+
+- exemption file must stay empty (`0` rows)
+- neutral/default assignments are used instead of exemptions
+
+### 11.3 Swap-rule MVP policy
+
+- initial batch = `12` rules
+- all rules inserted as `draft`
+- rank 2 (`ail`, powder) is excluded from from/to rule graph until measurement re-verification
+- rule contexts and scores are seeded alongside rules for deterministic downstream projection
+
+## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
   - https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/RDMHWY

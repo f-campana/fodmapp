@@ -146,3 +146,13 @@ Final invariant highlights:
 - candidate pools: unresolved with candidates `0`, without candidates `0`.
 - rank2 quarantine preserved (`0` current target-subtype measurements).
 - `phase2_pass3:*` custom refs: count `19`, distinct count `19`.
+
+## Product-layer handoff
+
+Phase 2 data foundation now feeds Phase 3 SQL product-layer work:
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
+
+Phase 3 executes:
+- culinary trait curation for priority ranks `1..42`
+- target-subtype rollups (MVP, partial overall semantics)
+- initial draft swap rules with contexts and scores
