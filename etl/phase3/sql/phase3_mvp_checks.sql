@@ -66,9 +66,6 @@ DO $$
 DECLARE
   bad_count INTEGER;
   source_internal UUID;
-  rank2_food UUID;
-  unknown_count INTEGER;
-  unknown_other_count INTEGER;
   mvp_rules_count INTEGER;
   mvp_draft_count INTEGER;
   mvp_context_count INTEGER;
@@ -139,38 +136,28 @@ BEGIN
     RAISE EXCEPTION 'trait coverage minima failed for % foods', bad_count;
   END IF;
 
-  -- Rollup checks (source-scoped, target-subtype-only MVP behavior).
+  -- Full-rollup checks (3.1a): use latest full-rollup interface with coverage semantics.
   SELECT COUNT(*) INTO bad_count
-  FROM food_fodmap_rollups r
-  JOIN phase2_priority_foods p ON p.resolved_food_id = r.food_id
-  WHERE p.priority_rank BETWEEN 1 AND 42
-    AND r.source_id = source_internal;
-
+  FROM v_phase3_rollups_latest_full;
   IF bad_count <> 42 THEN
-    RAISE EXCEPTION 'rollup row count failed: expected 42, got %', bad_count;
+    RAISE EXCEPTION 'full rollup row count failed: expected 42, got %', bad_count;
   END IF;
 
-  SELECT resolved_food_id INTO rank2_food
-  FROM phase2_priority_foods
-  WHERE priority_rank = 2;
-
-  SELECT COUNT(*) INTO unknown_count
-  FROM food_fodmap_rollups
-  WHERE source_id = source_internal
-    AND overall_level = 'unknown';
-
-  IF unknown_count <> 1 THEN
-    RAISE EXCEPTION 'unknown rollup count failed: expected 1, got %', unknown_count;
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollups_latest_full
+  WHERE known_subtypes_count < 0
+     OR known_subtypes_count > 6
+     OR ABS(coverage_ratio - (known_subtypes_count::NUMERIC / 6.0)) > 0.0001;
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'full rollup coverage fields invalid on % rows', bad_count;
   END IF;
 
-  SELECT COUNT(*) INTO unknown_other_count
-  FROM food_fodmap_rollups
-  WHERE source_id = source_internal
-    AND overall_level = 'unknown'
-    AND food_id <> rank2_food;
-
-  IF unknown_other_count <> 0 THEN
-    RAISE EXCEPTION 'unknown rollup scope failed: only rank2 may be unknown';
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollups_latest_full
+  WHERE overall_level = 'none'
+    AND known_subtypes_count <> 6;
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'none-gate failed in MVP checks: partial coverage rows cannot be none';
   END IF;
 
   -- Swap rule checks (MVP batch = 12, all draft).

@@ -881,7 +881,7 @@ Scope:
 
 - culinary trait assignments for all `42` priority foods
 - source-scoped serving rollups in `food_fodmap_rollups`
-- initial `12` swap rules with contexts and scores
+- initial `12` swap rules with contexts and scores (still `draft` in 3.1a)
 
 Artifacts:
 
@@ -896,24 +896,55 @@ Artifacts:
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
 - rule file:
   `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+- rollup defaults:
+  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 - SQL pipeline:
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
 
-### 11.1 Rollup semantics limitation (explicit MVP note)
+### 11.1 Rollup semantics (Phase 3.1a full 6-subtype)
 
-Phase 3 MVP rollups are intentionally **target-subtype-only**:
+Phase 3.1a upgrades rollups from target-subtype-only to full six-subtype evaluation:
 
-- driver subtype = `phase2_priority_foods.target_subtype`
-- this is **not** a full 6-subtype overall risk assessment yet
-- `overall_level` in this MVP represents target-subtype risk only
+- subtype set: `fructan`, `gos`, `sorbitol`, `mannitol`, `fructose` (excess), `lactose`
+- overall rollup = worst-known subtype severity
+- coverage is explicit per food:
+  - `known_subtypes_count`
+  - `coverage_ratio`
+- `none` is only valid when coverage is full (`6/6`) and all subtype levels are `none`
+- partial coverage + all-known-none is coerced to `unknown`
 
-Future backlog:
+Read interfaces:
 
-- compute full `overall_level` across all available subtype signals (Phase 2 + CIQUAL-derived)
-- include excess-fructose and additional subtype interplay in driver selection
+- `v_phase3_rollup_subtype_levels_latest` (food x subtype detail)
+- `v_phase3_rollups_latest_full` (one row per food with coverage + driver)
+
+Signal precedence by subtype:
+
+1. explicit current subtype measurements (`food_fodmap_measurements`, `is_current=TRUE`)
+2. fructose excess from `v_food_excess_fructose_latest`
+3. lactose from CIQUAL nutrient `CIQUAL_32410`
+4. sorbitol/mannitol fallback from CIQUAL total polyols `CIQUAL_34000` only when explicit subtype signal is missing
+
+Threshold precedence:
+
+- food-specific threshold first (`food_fodmap_thresholds`)
+- then global fallback defaults from:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
+
+Fallback threshold citation policy:
+
+- `source_slug=internal_rules_v1`
+- `citation_ref=monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18`
+- `derivation_method=median_template_pack_v1`
+
+Coverage baseline note:
+
+- snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic from linked signals before full rollup wiring
+- post-compute coverage can increase where CIQUAL-derived lactose/excess-fructose joins become active
+- these buckets are diagnostic outputs, not hard assertions
 
 ### 11.2 Trait coverage and exemption policy
 
@@ -934,7 +965,7 @@ MVP lock:
 - exemption file must stay empty (`0` rows)
 - neutral/default assignments are used instead of exemptions
 
-### 11.3 Swap-rule MVP policy
+### 11.3 Swap-rule MVP policy (unchanged in 3.1a)
 
 - initial batch = `12` rules
 - all rules inserted as `draft`

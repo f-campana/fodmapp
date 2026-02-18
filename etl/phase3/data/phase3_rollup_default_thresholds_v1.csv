@@ -1,0 +1,7 @@
+subtype_code,low_max_g,moderate_max_g,source_slug,citation_ref,derivation_method,valid_from,notes
+fructan,0.120000,0.300000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Fallback-only default; use food-specific threshold when available"
+gos,0.300000,0.600000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Fallback-only default; use food-specific threshold when available"
+sorbitol,0.250000,0.600000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Fallback-only default; use food-specific threshold when available"
+mannitol,0.060000,0.120000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Fallback-only default; use food-specific threshold when available"
+fructose,0.500000,1.500000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Applies to excess fructose signal (fructose-glucose)"
+lactose,0.500000,1.500000,internal_rules_v1,"monash_app_v4_reference + phase2_threshold_median_pack_2026-02-18",median_template_pack_v1,2026-02-18,"Fallback-only default; use food-specific threshold when available"
