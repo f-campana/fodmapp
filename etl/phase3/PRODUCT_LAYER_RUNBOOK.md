@@ -4,15 +4,15 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 
 ## Scope
 
-Phase 3.0/3.1a/3.1b includes:
+Phase 3.0/3.1a/3.1b/3.2a includes:
 - culinary trait curation for priority ranks `1..42`
 - full 6-subtype source-scoped rollups in `food_fodmap_rollups`
 - latest rollup interfaces with coverage metadata
 - initial 12 swap rules with contexts and scores
 - 3.1b re-scoring and activation workflow (`draft` -> reviewed subset `active`)
+- 3.2a read-only FastAPI v0 endpoints using slug-based contracts
 
 Out of scope:
-- API endpoints
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
 
@@ -38,6 +38,13 @@ SQL files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+
+API files:
+- `/Users/fabiencampana/Documents/Fodmap/api/openapi/v0.yaml`
+- `/Users/fabiencampana/Documents/Fodmap/api/app/main.py`
+- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/health.py`
+- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/foods.py`
+- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/swaps.py`
 
 ## Execution Order
 
@@ -125,6 +132,35 @@ CSV handoff contract:
   - `reviewed_by`
   - `reviewed_at`
 - Gate B reads via `\copy ... FROM` and enforces snapshot lock against current score/version.
+
+## 3.2a API Read Layer
+
+v0 endpoints:
+- `GET /v0/health`
+- `GET /v0/foods/{food_slug}`
+- `GET /v0/foods/{food_slug}/rollup`
+- `GET /v0/foods/{food_slug}/traits`
+- `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
+
+v0 API contracts:
+- public identity uses `food_slug` only
+- responses return both FR/EN fields; no locale negotiation
+- swaps return only `active` rules
+- swap ordering is deterministic:
+  - `fodmap_safety_score DESC`
+  - `overall_score DESC`
+  - `to_overall_level` severity ASC (`none`, `low`, `moderate`, `high`, `unknown`)
+  - `coverage_ratio DESC`
+  - `to_food_slug ASC`
+
+Data freshness / dependency note:
+- API rollup fields read from `v_phase3_rollups_latest_full`
+- this view depends on pipeline-managed snapshots:
+  - `phase3_subtype_levels_snapshot`
+  - `phase3_rollups_snapshot`
+- preflight before serving refreshed API data:
+  - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+  - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
 ## Rollback Strategy
 
