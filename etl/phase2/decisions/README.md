@@ -9,6 +9,6 @@ Decision values:
 
 Required review gates before apply:
 1. Every rank in the wave has one non-empty decision.
-2. `resolve_existing` rows include candidate IDs/codes.
+2. `resolve_existing` rows include `candidate_ciqual_code` (candidate UUID is optional metadata).
 3. `create_new_food` rows include slug, FR name, EN name (when straightforward), preparation state.
 4. `blocked` rows include explicit blocker notes and remediation path.
