@@ -48,3 +48,94 @@ jobs:
       - name: Run API contract/unit tests
         run: |
           pytest -m "not integration" api/tests
+
+  api-integration-seeded:
+    name: api-integration-seeded
+    needs:
+      - api-tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fodmap_api_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fodmap_api_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Install dependencies for seed + API tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./api[dev] openpyxl psycopg2-binary
+
+      - name: Fetch CIQUAL files (pinned + checksum-verified)
+        run: |
+          while IFS= read -r line; do
+            echo "$line" >> "$GITHUB_ENV"
+          done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
+
+      - name: Create CI path shim for absolute SQL paths
+        run: |
+          sudo mkdir -p /Users/fabiencampana/Documents
+          sudo ln -sfn "$GITHUB_WORKSPACE" /Users/fabiencampana/Documents/Fodmap
+
+      - name: Validate replay script syntax
+        run: |
+          bash -n /Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh
+
+      - name: Seed Phase2 via full replay
+        env:
+          REPLAY_DB: fodmap_api_ci
+          ADMIN_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+          PGUSER: postgres
+          PGHOST: localhost
+          PGPORT: 5432
+          PSQL_BIN: psql
+        run: |
+          /Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh
+
+      - name: Seed Phase3 product layer
+        env:
+          SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+          PSQL_BIN: psql
+        run: |
+          /Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_seed_for_api_ci.sh
+
+      - name: Sanity assert seeded state via psql
+        run: |
+          rollup_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM v_phase3_rollups_latest_full;")"
+          test "$rollup_count" = "42"
+
+          active_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules r JOIN sources s ON s.source_id = r.source_id WHERE s.source_slug = 'internal_rules_v1' AND r.notes = 'phase3_mvp_rule' AND r.status = 'active';")"
+          test "$active_count" = "11"
+
+          draft_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules r JOIN sources s ON s.source_id = r.source_id WHERE s.source_slug = 'internal_rules_v1' AND r.notes = 'phase3_mvp_rule' AND r.status = 'draft';")"
+          test "$draft_count" = "1"
+
+      - name: Run API integration tests
+        run: |
+          pytest -m integration api/tests
