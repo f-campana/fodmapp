@@ -1030,9 +1030,11 @@ Phase 3.2a adds a read-only FastAPI surface over existing SQL contracts.
 
 Endpoint set:
 
+- `GET /v0/foods?q={text}&limit={1..50}`
 - `GET /v0/health`
 - `GET /v0/foods/{food_slug}`
 - `GET /v0/foods/{food_slug}/rollup`
+- `GET /v0/foods/{food_slug}/subtypes`
 - `GET /v0/foods/{food_slug}/traits`
 - `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
 
@@ -1061,6 +1063,87 @@ Rollup freshness contract:
   - `rollup_computed_at`
   - `scoring_version`
   - `source_slug`
+
+Subtype informative contract (`/v0/foods/{food_slug}/subtypes`):
+
+- one row per subtype from `v_phase3_rollup_subtype_levels_latest`
+- required analysis fields:
+  - `subtype_code`, `subtype_level`
+  - `amount_g_per_serving`, `comparator`
+  - `low_max_g`, `moderate_max_g`
+  - `burden_ratio`
+- provenance fields:
+  - `signal_source_kind`, `signal_source_slug`
+  - `threshold_source_slug`, `is_default_threshold`, `is_polyol_proxy`
+- freshness/context:
+  - `rollup_serving_g`
+  - `computed_at`
+
+### 11.6 Systematic swap expansion Batch01 (Phase 3.3)
+
+Batch01 introduces additive rule expansion on top of the MVP swap set.
+
+Locked scope:
+
+- candidate universe restricted to priority ranks `1..42`
+- rank 2 remains excluded from both `from` and `to`
+- no schema migration; existing swap tables and constraints reused
+
+Batch01 artifacts:
+
+- generated candidates:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
+- allergen gate mapping:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv`
+- review packet:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
+- SQL flow:
+  - `phase3_swap_rules_batch01_generate.sql`
+  - `phase3_swap_rules_batch01_apply.sql`
+  - `phase3_swap_rules_batch01_rescore.sql`
+  - `phase3_swap_rules_batch01_activation_apply.sql`
+  - `phase3_swap_rules_batch01_checks.sql`
+
+Generation and selection policy:
+
+- conservative pre-filter:
+  - known endpoint levels
+  - non-worsening level (`to <= from`)
+  - non-worsening burden (`to_burden_ratio <= from_burden_ratio`)
+- ranking score:
+  - `0.75 * fodmap_safety_score`
+  - `0.15 * flavor_match_score`
+  - `0.05 * texture_match_score`
+  - `0.05 * method_match_score`
+- selection:
+  - provisional global top 40
+  - post-top40 per-source cap (`<=5` per `from_rank`)
+  - ranked waitlist backfill
+  - final selected count bounded to `1..40`
+
+Batch01 review/activation policy:
+
+- decisions allowed: `approve`, `reject`, `defer`
+- snapshot lock enforced on:
+  - `scoring_version_snapshot`
+  - `fodmap_safety_score_snapshot`
+- conservative gate re-evaluated at activation time; ineligible `approve` fails fast
+- status transitions:
+  - `approve -> active`
+  - `reject|defer -> draft`
+
+Strict second-review trigger:
+
+- `to_coverage_ratio < 0.50`
+- OR `fodmap_safety_score < 0.60`
+- OR cross-category substitution
+- OR allergen-family change (`from` set != `to` set, excluding `none`)
+
+When `second_review_required=true` and final decision is `approve`:
+
+- `second_review_decision='approve'`
+- `second_reviewed_by` required
+- `second_reviewed_at` required and valid timestamptz
 
 ## 12) References
 

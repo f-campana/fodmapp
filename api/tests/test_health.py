@@ -22,8 +22,10 @@ def test_openapi_contract_parity(app_instance) -> None:
 
     expected_paths = {
         "/v0/health",
+        "/v0/foods",
         "/v0/foods/{food_slug}",
         "/v0/foods/{food_slug}/rollup",
+        "/v0/foods/{food_slug}/subtypes",
         "/v0/foods/{food_slug}/traits",
         "/v0/swaps",
     }

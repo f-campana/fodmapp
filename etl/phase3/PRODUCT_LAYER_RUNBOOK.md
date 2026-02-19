@@ -4,12 +4,13 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 
 ## Scope
 
-Phase 3.0/3.1a/3.1b/3.2a includes:
+Phase 3.0/3.1a/3.1b/3.2a/3.3 includes:
 - culinary trait curation for priority ranks `1..42`
 - full 6-subtype source-scoped rollups in `food_fodmap_rollups`
 - latest rollup interfaces with coverage metadata
 - initial 12 swap rules with contexts and scores
 - 3.1b re-scoring and activation workflow (`draft` -> reviewed subset `active`)
+- 3.3 systematic batch expansion workflow (`phase3_batch01_rule`)
 - 3.2a read-only FastAPI v0 endpoints using slug-based contracts
 
 Out of scope:
@@ -26,8 +27,11 @@ Data files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
 
 SQL files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
@@ -36,8 +40,14 @@ SQL files:
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_rescore.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_apply.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_generate.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_apply.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_rescore.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_activation_apply.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
 - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_swap_batch01_draft_instructions.py`
 
 API files:
 - `/Users/fabiencampana/Documents/Fodmap/api/openapi/v0.yaml`
@@ -71,6 +81,19 @@ Idempotency pass (same order, second run):
 7. `phase3_swap_activation_apply.sql`
 8. `phase3_swap_activation_checks.sql`
 
+Batch01 execution (after MVP is stable):
+
+1. `phase3_rollups_compute.sql`
+2. `phase3_rollups_6subtype_checks.sql`
+3. `phase3_swap_rules_batch01_generate.sql`
+4. `phase3_swap_batch01_draft_instructions.py`
+5. `phase3_swap_rules_batch01_apply.sql`
+6. `phase3_swap_rules_batch01_rescore.sql`
+7. human review/update `phase3_swap_batch01_review_v1.csv`
+8. `phase3_swap_rules_batch01_activation_apply.sql`
+9. `phase3_swap_rules_batch01_checks.sql`
+10. rerun 8 and 9 for idempotency
+
 ## MVP Locks
 
 - ranks are resolved by `priority_rank -> phase2_priority_foods.resolved_food_id`
@@ -78,6 +101,8 @@ Idempotency pass (same order, second run):
 - trait exemption manifest exists but is empty (`0 rows`) for MVP
 - 12 initial swap rules remain the MVP activation scope
 - rank 2 is excluded from all swap rules
+- batch01 generation is constrained to ranks `1..42` with rank2 exclusion
+- batch01 selected count is bounded (`1..40`) with post-top40 anti-domination cap
 
 ## Rollup Semantics (3.1a Full Rollups)
 
@@ -136,9 +161,11 @@ CSV handoff contract:
 ## 3.2a API Read Layer
 
 v0 endpoints:
+- `GET /v0/foods?q={text}&limit={1..50}`
 - `GET /v0/health`
 - `GET /v0/foods/{food_slug}`
 - `GET /v0/foods/{food_slug}/rollup`
+- `GET /v0/foods/{food_slug}/subtypes`
 - `GET /v0/foods/{food_slug}/traits`
 - `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
 
@@ -161,6 +188,44 @@ Data freshness / dependency note:
 - preflight before serving refreshed API data:
   - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
   - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+
+Subtype endpoint payload contract:
+- `subtype_code`, `subtype_level`
+- `amount_g_per_serving`, `comparator`
+- `low_max_g`, `moderate_max_g`
+- `burden_ratio`
+- signal/threshold provenance fields (`signal_source_kind`, `signal_source_slug`, `threshold_source_slug`)
+- `is_default_threshold`, `is_polyol_proxy`
+- `rollup_serving_g`, `computed_at`
+
+## 3.3 Batch01 Systematic Expansion
+
+Batch01 introduces systematic candidate generation over the locked 42-food universe:
+- pair scope = ranks `1..42` excluding rank `2`
+- conservative pre-filter:
+  - endpoints known
+  - non-worsening level
+  - non-worsening burden
+- ranking score:
+  - `0.75 * fodmap_safety_score`
+  - `0.15 * flavor_match_score`
+  - `0.05 * texture_match_score`
+  - `0.05 * method_match_score`
+
+Selection policy:
+- provisional global top 40
+- post-selection per-source cap `<= 5`
+- ranked waitlist backfill while preserving cap
+- final selected count `1..40`
+
+Review policy:
+- strict two-tier gate (`second_review_required`) when:
+  - `to_coverage_ratio < 0.50`, or
+  - `fodmap_safety_score < 0.60`, or
+  - cross-category substitution, or
+  - allergen-family change
+- approved rows flagged `second_review_required` must contain second-review metadata
+- activation uses snapshot lock and conservative gate re-evaluation
 
 ## 3.2b.1 CI Seeded Integration Pipeline
 
