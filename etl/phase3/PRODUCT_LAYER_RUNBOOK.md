@@ -227,6 +227,39 @@ Review policy:
 - approved rows flagged `second_review_required` must contain second-review metadata
 - activation uses snapshot lock and conservative gate re-evaluation
 
+## 3.4 Batch02 Systematic Expansion (Pre-Activation)
+
+Batch02 extends systematic generation with an additional hard safety contract for direct swaps:
+- `from_driver_subtype = to_driver_subtype` (no penalty fallback, hard exclusion)
+
+Batch02 generation scope:
+- candidate universe restricted to ranks `1..42`, excluding rank `2`
+- pair exclusions applied before ranking:
+  - exact open direct-swap pair already exists
+  - reverse open direct-swap pair already exists
+  - culinary compatibility gate (role overlap required + at least one sensory/behavior overlap)
+- selection remains bounded `1..40` with post-top40 per-from and per-to caps (`<=5`) and deterministic backfill
+
+Batch02 artifacts:
+- generated CSV:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
+- review CSV:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
+- SQL flow:
+  - `phase3_swap_rules_batch02_generate.sql`
+  - `phase3_swap_rules_batch02_apply.sql`
+  - `phase3_swap_rules_batch02_rescore.sql`
+  - `phase3_swap_rules_batch02_activation_apply.sql` (deferred in this issue)
+  - `phase3_swap_rules_batch02_checks.sql`
+
+Audit columns exported for review and checks:
+- `from_driver_subtype`
+- `to_driver_subtype`
+
+Execution stop gate for Phase 3.4:
+- run generate -> apply -> rescore -> checks
+- stop before activation and hand off the review packet for human decisions
+
 ## 3.2b.1 CI Seeded Integration Pipeline
 
 CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:

@@ -1145,6 +1145,47 @@ When `second_review_required=true` and final decision is `approve`:
 - `second_reviewed_by` required
 - `second_reviewed_at` required and valid timestamptz
 
+### 11.7 Systematic swap expansion Batch02 delta (Phase 3.4)
+
+Batch02 is additive to MVP + Batch01 and keeps the same 42-food universe.
+
+Locked Batch02 delta:
+
+- `rule_kind='direct_swap'` only
+- same-subtype hard gate for all generated rows:
+  - `from_driver_subtype = to_driver_subtype`
+- existing open direct-swap exclusions apply in both directions:
+  - exact `(from,to)`
+  - reverse `(to,from)`
+- selection contract unchanged:
+  - final count bounded to `1..40`
+  - per-from cap `<=5`
+  - per-to cap `<=5`
+  - deterministic backfill after cap trimming
+
+Batch02 artifacts:
+
+- generated candidates:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
+- review packet:
+  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
+- SQL flow:
+  - `phase3_swap_rules_batch02_generate.sql`
+  - `phase3_swap_rules_batch02_apply.sql`
+  - `phase3_swap_rules_batch02_rescore.sql`
+  - `phase3_swap_rules_batch02_activation_apply.sql`
+  - `phase3_swap_rules_batch02_checks.sql`
+
+Batch02 generated/review packets include explicit subtype audit columns:
+
+- `from_driver_subtype`
+- `to_driver_subtype`
+
+Issue #25 execution contract:
+
+- run through generate/apply/rescore/checks only
+- activation is deferred to a later human-reviewed pass by design
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
