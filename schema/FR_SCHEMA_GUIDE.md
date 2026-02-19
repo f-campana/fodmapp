@@ -853,6 +853,11 @@ Replay sequence (locked):
 10. apply/check all six waves in historical order
 11. apply `phase2_replay_final_checks.sql`
 
+Path portability note:
+
+- Phase 2/3 SQL `\copy` paths are repo-relative (`etl/...`) and no longer hardcoded to a machine-local absolute root.
+- Replay/seed scripts resolve `ROOT_DIR` from script location and execute from repo root, so runs are portable across local and CI environments.
+
 Final deterministic invariants:
 
 - priority state: total `42`, resolved `42`, unresolved `0`

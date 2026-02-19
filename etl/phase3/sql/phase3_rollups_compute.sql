@@ -65,7 +65,7 @@ CREATE TEMP TABLE stg_default_thresholds (
   notes TEXT
 ) ON COMMIT DROP;
 
-\copy stg_default_thresholds (subtype_code,low_max_g,moderate_max_g,source_slug,citation_ref,derivation_method,valid_from,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_default_thresholds (subtype_code,low_max_g,moderate_max_g,source_slug,citation_ref,derivation_method,valid_from,notes) FROM 'etl/phase3/data/phase3_rollup_default_thresholds_v1.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

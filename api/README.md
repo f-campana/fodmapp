@@ -10,7 +10,7 @@ Read-only FastAPI service exposing Phase 3 product-layer data:
 ## Local setup
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap/api
+cd api
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .[dev]
@@ -28,14 +28,14 @@ uvicorn app.main:app --reload --port 8000
 Contract/unit tests:
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap/api
+cd api
 pytest -m "not integration"
 ```
 
 Integration tests (requires seeded `fodmap_test`):
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap/api
+cd api
 API_DB_URL="postgresql://$USER@localhost:5432/fodmap_test" pytest -m integration
 ```
 
@@ -49,7 +49,7 @@ GitHub Actions now runs integration tests against a fully seeded Postgres databa
 
 CIQUAL inputs are downloaded from official public endpoints and validated by SHA-256 via:
 
-- `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/fetch_ciqual_data.sh`
+- `etl/ciqual/fetch_ciqual_data.sh`
 
 If checksums drift, CI fails fast before seeding.
 
@@ -57,6 +57,6 @@ If checksums drift, CI fails fast before seeding.
 
 Canonical v0 review contract is committed at:
 
-- `/Users/fabiencampana/Documents/Fodmap/api/openapi/v0.yaml`
+- `api/openapi/v0.yaml`
 
 v0 is slug-based, returns both FR/EN fields, and has no locale negotiation.

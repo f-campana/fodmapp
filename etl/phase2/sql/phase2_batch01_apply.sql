@@ -41,7 +41,7 @@ CREATE TEMP TABLE batch01_decisions_stg (
   reviewed_at TIMESTAMPTZ
 ) ON COMMIT DROP;
 
-\copy batch01_decisions_stg (priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_batch01_decisions.csv' WITH (FORMAT csv, HEADER true)
+\copy batch01_decisions_stg (priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at) FROM 'etl/phase2/decisions/phase2_batch01_decisions.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

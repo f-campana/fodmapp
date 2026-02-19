@@ -265,23 +265,19 @@ Execution stop gate for Phase 3.4:
 CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:
 
 1. Fetch pinned CIQUAL files with checksum verification:
-   - `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/fetch_ciqual_data.sh`
+   - `etl/ciqual/fetch_ciqual_data.sh`
 2. Phase 2 from-zero replay:
-   - `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+   - `etl/phase2/scripts/phase2_replay_from_zero.sh`
 3. Phase 3 seed for API integration:
-   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_seed_for_api_ci.sh`
+   - `etl/phase3/scripts/phase3_seed_for_api_ci.sh`
 4. API integration tests:
    - `pytest -m integration api/tests`
 
-CI compatibility shim:
+Path contract:
 
-- existing Phase 2/3 SQL uses absolute `\copy` paths rooted at:
-  `/Users/fabiencampana/Documents/Fodmap`
-- CI creates a symlink from workspace to that path to keep current SQL stable.
-
-Deferred follow-up:
-
-- refactor Phase 2/3 SQL `\copy` paths to repo-relative/env-driven references in a dedicated PR.
+- Phase 2/3 SQL `\copy` file inputs are repo-relative (`etl/...`).
+- Replay/seed scripts resolve `ROOT_DIR` from script location and execute from repo root.
+- CI no longer requires a `/Users/...` symlink shim for seeded integration runs.
 
 ## Rollback Strategy
 

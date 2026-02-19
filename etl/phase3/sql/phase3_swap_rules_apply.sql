@@ -53,7 +53,7 @@ CREATE TEMP TABLE stg_rules (
   cost_fr_score NUMERIC(4,3)
 ) ON COMMIT DROP;
 
-\copy stg_rules (rule_key,from_priority_rank,to_priority_rank,rule_kind,instruction_fr,instruction_en,min_ratio,max_ratio,default_ratio,evidence_tier,confidence_score,valid_from,status,notes,context_cooking_methods,context_dish_roles,context_cuisines,excluded_priority_ranks,fodmap_safety_score,flavor_match_score,texture_match_score,method_match_score,availability_fr_score,cost_fr_score) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_rules (rule_key,from_priority_rank,to_priority_rank,rule_kind,instruction_fr,instruction_en,min_ratio,max_ratio,default_ratio,evidence_tier,confidence_score,valid_from,status,notes,context_cooking_methods,context_dish_roles,context_cuisines,excluded_priority_ranks,fodmap_safety_score,flavor_match_score,texture_match_score,method_match_score,availability_fr_score,cost_fr_score) FROM 'etl/phase3/data/phase3_swap_rules_mvp_v1.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

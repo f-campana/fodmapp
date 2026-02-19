@@ -11,7 +11,7 @@ CREATE TEMP TABLE stg_allergens (
   allergen_family_code TEXT
 ) ON COMMIT DROP;
 
-\copy stg_allergens (priority_rank,food_slug,allergen_family_code) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_allergens (priority_rank,food_slug,allergen_family_code) FROM 'etl/phase3/data/phase3_food_allergen_families_v1.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE
@@ -521,7 +521,7 @@ BEGIN
   END IF;
 END $$;
 
-\copy generated_batch01 TO '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy generated_batch01 TO 'etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv' WITH (FORMAT csv, HEADER true)
 
 SELECT
   COUNT(*) AS generated_rows,

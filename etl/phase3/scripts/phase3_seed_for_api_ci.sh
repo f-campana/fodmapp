@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/Users/fabiencampana/Documents/Fodmap"
+ROOT_DIR="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 PHASE3_SQL_DIR="${ROOT_DIR}/etl/phase3/sql"
 REVIEW_CSV="${ROOT_DIR}/etl/phase3/decisions/phase3_swap_activation_review_v1.csv"
 
@@ -12,6 +12,8 @@ if [[ -z "${SEED_DB_URL}" ]]; then
   echo "[FAIL] SEED_DB_URL is required (or pass DB URL as first arg)." >&2
   exit 1
 fi
+
+cd "${ROOT_DIR}"
 
 require_file() {
   local file_path="$1"

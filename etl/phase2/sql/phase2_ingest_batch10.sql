@@ -3,8 +3,8 @@
 -- Phase 2.3 batch10 mini-ingestion.
 -- Scope-locked to priority ranks: 1,2,4,5,14,15,34,39,40,41
 -- Data files:
---   /Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_measurements.csv
---   /Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_thresholds.csv
+--   etl/phase2/data/phase2_batch10_measurements.csv
+--   etl/phase2/data/phase2_batch10_thresholds.csv
 
 BEGIN;
 
@@ -40,8 +40,8 @@ CREATE TEMP TABLE phase2_batch10_thresholds_stg (
   notes TEXT
 ) ON COMMIT DROP;
 
-\copy phase2_batch10_measurements_stg (priority_rank, food_id, fodmap_subtype, amount_per_100g, comparator, serving_g, amount_per_serving, source_slug, citation_ref, evidence_tier, confidence_score, observed_at, method, notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_measurements.csv' WITH (FORMAT csv, HEADER true)
-\copy phase2_batch10_thresholds_stg (priority_rank, food_id, fodmap_subtype, serving_g, low_max_g, moderate_max_g, source_slug, citation_ref, evidence_tier, confidence_score, valid_from, notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_thresholds.csv' WITH (FORMAT csv, HEADER true)
+\copy phase2_batch10_measurements_stg (priority_rank, food_id, fodmap_subtype, amount_per_100g, comparator, serving_g, amount_per_serving, source_slug, citation_ref, evidence_tier, confidence_score, observed_at, method, notes) FROM 'etl/phase2/data/phase2_batch10_measurements.csv' WITH (FORMAT csv, HEADER true)
+\copy phase2_batch10_thresholds_stg (priority_rank, food_id, fodmap_subtype, serving_g, low_max_g, moderate_max_g, source_slug, citation_ref, evidence_tier, confidence_score, valid_from, notes) FROM 'etl/phase2/data/phase2_batch10_thresholds.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

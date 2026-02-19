@@ -1,8 +1,8 @@
 -- Phase 2 scaffold validation queries.
 -- Run after:
---   1) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_priority_foods_setup.sql
---   2) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql
---   3) /Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass2_candidates.sql
+--   1) etl/phase2/sql/phase2_priority_foods_setup.sql
+--   2) etl/phase2/sql/phase2_scaffold_views.sql
+--   3) etl/phase2/sql/phase2_resolver_pass2_candidates.sql
 
 -- 0) Persistent table sanity
 SELECT

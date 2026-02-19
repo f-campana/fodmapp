@@ -117,10 +117,10 @@ CREATE TEMP TABLE wave_thresholds_stg (
   notes TEXT
 ) ON COMMIT DROP;
 
-\copy wave_decisions_stg (priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_polyol_wave01_decisions.csv' WITH (FORMAT csv, HEADER true)
-\copy wave_new_foods_stg (priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_new_foods.csv' WITH (FORMAT csv, HEADER true)
-\copy wave_measurements_stg (priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_measurements.csv' WITH (FORMAT csv, HEADER true)
-\copy wave_thresholds_stg (priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_thresholds.csv' WITH (FORMAT csv, HEADER true)
+\copy wave_decisions_stg (priority_rank,food_label,variant_label,decision,resolution_method,candidate_food_id,candidate_ciqual_code,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,resolution_notes,reviewed_by,reviewed_at) FROM 'etl/phase2/decisions/phase2_polyol_wave01_decisions.csv' WITH (FORMAT csv, HEADER true)
+\copy wave_new_foods_stg (priority_rank,new_food_slug,new_food_name_fr,new_food_name_en,new_food_preparation_state,status,custom_ref_value,category_code,notes) FROM 'etl/phase2/data/phase2_polyol_wave01_new_foods.csv' WITH (FORMAT csv, HEADER true)
+\copy wave_measurements_stg (priority_rank,food_id,fodmap_subtype,amount_per_100g,comparator,serving_g,amount_per_serving,source_slug,citation_ref,evidence_tier,confidence_score,observed_at,method,notes) FROM 'etl/phase2/data/phase2_polyol_wave01_measurements.csv' WITH (FORMAT csv, HEADER true)
+\copy wave_thresholds_stg (priority_rank,food_id,fodmap_subtype,serving_g,low_max_g,moderate_max_g,source_slug,citation_ref,evidence_tier,confidence_score,valid_from,notes) FROM 'etl/phase2/data/phase2_polyol_wave01_thresholds.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

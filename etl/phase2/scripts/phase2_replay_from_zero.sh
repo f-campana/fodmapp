@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/Users/fabiencampana/Documents/Fodmap"
+ROOT_DIR="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 SCHEMA_FILE="$ROOT_DIR/schema/fodmap_fr_schema.sql"
 CIQUAL_ETL="$ROOT_DIR/etl/ciqual/ciqual_etl.py"
 PHASE2_SQL_DIR="$ROOT_DIR/etl/phase2/sql"
@@ -108,6 +108,7 @@ require_file "$CIQUAL_XLSX"
 require_file "$CIQUAL_ALIM_XML"
 require_file "$CIQUAL_GRP_XML"
 resolve_psql_bin
+cd "$ROOT_DIR"
 
 for sql_file in \
   "$PHASE2_SQL_DIR/phase2_priority_foods_setup.sql" \
