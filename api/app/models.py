@@ -35,6 +35,23 @@ class FoodResponse(BaseModel):
     source_slug: Optional[str] = None
 
 
+class FoodSearchItem(BaseModel):
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    overall_level: Optional[FoodLevel] = None
+    driver_subtype: Optional[str] = None
+    coverage_ratio: Optional[float] = None
+    rollup_computed_at: Optional[datetime] = None
+
+
+class FoodSearchResponse(BaseModel):
+    query: str
+    limit: int
+    items: list[FoodSearchItem]
+    total: int
+
+
 class FoodRollupResponse(BaseModel):
     food_slug: str
     canonical_name_fr: str
@@ -53,6 +70,31 @@ class TraitLabel(BaseModel):
     code: str
     label_fr: Optional[str] = None
     label_en: Optional[str] = None
+
+
+class FoodSubtypeItem(BaseModel):
+    subtype_code: str
+    subtype_level: FoodLevel
+    amount_g_per_serving: Optional[float] = None
+    comparator: Optional[str] = None
+    low_max_g: Optional[float] = None
+    moderate_max_g: Optional[float] = None
+    burden_ratio: Optional[float] = None
+    signal_source_kind: Optional[str] = None
+    signal_source_slug: Optional[str] = None
+    threshold_source_slug: Optional[str] = None
+    is_default_threshold: bool
+    is_polyol_proxy: bool
+    rollup_serving_g: Optional[float] = None
+    computed_at: datetime
+
+
+class FoodSubtypeListResponse(BaseModel):
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    items: list[FoodSubtypeItem]
+    total: int
 
 
 class FoodTraitsResponse(BaseModel):

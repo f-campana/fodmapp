@@ -1,10 +1,19 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Query, Request
 
 from app.db import Database
 from app.errors import not_found, rollup_not_available
-from app.models import FoodResponse, FoodRollupResponse, FoodTraitsResponse, TraitLabel
+from app.models import (
+    FoodResponse,
+    FoodRollupResponse,
+    FoodSearchItem,
+    FoodSearchResponse,
+    FoodSubtypeItem,
+    FoodSubtypeListResponse,
+    FoodTraitsResponse,
+    TraitLabel,
+)
 from app import sql
 
 router = APIRouter(prefix="/v0/foods", tags=["foods"])
@@ -20,6 +29,29 @@ def _normalize_names(row: dict) -> dict:
     row["canonical_name_fr"] = canonical_name_fr
     row["canonical_name_en"] = canonical_name_en
     return row
+
+
+@router.get("", response_model=FoodSearchResponse)
+def search_foods(
+    request: Request,
+    q: str = Query(..., min_length=1),
+    limit: int = Query(20, ge=1, le=50),
+) -> FoodSearchResponse:
+    db = _get_db(request)
+    with db.readonly_connection() as conn:
+        rows = sql.fetch_all(
+            conn,
+            sql.SQL_SEARCH_FOODS,
+            {
+                "q": q,
+                "pattern": f"%{q}%",
+                "prefix_pattern": f"{q}%",
+                "limit": limit,
+            },
+        )
+
+    items = [FoodSearchItem(**_normalize_names(row)) for row in rows]
+    return FoodSearchResponse(query=q, limit=limit, items=items, total=len(items))
 
 
 @router.get("/{food_slug}", response_model=FoodResponse)
@@ -49,6 +81,30 @@ def get_food_rollup(food_slug: str, request: Request) -> FoodRollupResponse:
     payload = _normalize_names(row)
     payload["source_slug"] = payload.get("source_slug") or "internal_rules_v1"
     return FoodRollupResponse(**payload)
+
+
+@router.get("/{food_slug}/subtypes", response_model=FoodSubtypeListResponse)
+def get_food_subtypes(food_slug: str, request: Request) -> FoodSubtypeListResponse:
+    db = _get_db(request)
+    with db.readonly_connection() as conn:
+        food = sql.fetch_one(conn, sql.SQL_GET_FOOD_IDENTITY, {"food_slug": food_slug})
+        if food is None:
+            raise not_found("Food not found")
+
+        food = _normalize_names(food)
+        rows = sql.fetch_all(conn, sql.SQL_GET_FOOD_SUBTYPES, {"food_id": food["food_id"]})
+
+    if not rows:
+        raise rollup_not_available("Subtype rollups are not available for this food")
+
+    items = [FoodSubtypeItem(**row) for row in rows]
+    return FoodSubtypeListResponse(
+        food_slug=food["food_slug"],
+        canonical_name_fr=food["canonical_name_fr"],
+        canonical_name_en=food["canonical_name_en"],
+        items=items,
+        total=len(items),
+    )
 
 
 @router.get("/{food_slug}/traits", response_model=FoodTraitsResponse)

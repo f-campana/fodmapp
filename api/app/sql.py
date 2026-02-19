@@ -66,6 +66,72 @@ FROM foods f
 WHERE f.food_slug = %(food_slug)s
 """
 
+SQL_SEARCH_FOODS = """
+SELECT
+  f.food_slug,
+  f.canonical_name_fr,
+  f.canonical_name_en,
+  r.overall_level::text AS overall_level,
+  r.driver_subtype_code AS driver_subtype,
+  r.coverage_ratio,
+  r.computed_at AS rollup_computed_at
+FROM foods f
+LEFT JOIN LATERAL (
+  SELECT
+    rr.overall_level,
+    rr.driver_subtype_code,
+    rr.coverage_ratio,
+    rr.computed_at
+  FROM v_phase3_rollups_latest_full rr
+  WHERE rr.food_id = f.food_id
+  ORDER BY rr.computed_at DESC
+  LIMIT 1
+) r ON TRUE
+WHERE f.food_slug ILIKE %(pattern)s
+   OR COALESCE(f.canonical_name_fr, '') ILIKE %(pattern)s
+   OR COALESCE(f.canonical_name_en, '') ILIKE %(pattern)s
+ORDER BY
+  CASE
+    WHEN f.food_slug = %(q)s THEN 0
+    WHEN f.food_slug ILIKE %(prefix_pattern)s THEN 1
+    WHEN COALESCE(f.canonical_name_fr, '') ILIKE %(prefix_pattern)s THEN 2
+    WHEN COALESCE(f.canonical_name_en, '') ILIKE %(prefix_pattern)s THEN 3
+    ELSE 4
+  END,
+  f.food_slug ASC
+LIMIT %(limit)s
+"""
+
+SQL_GET_FOOD_SUBTYPES = """
+SELECT
+  v.subtype_code,
+  v.subtype_level::text AS subtype_level,
+  v.amount_g_per_serving,
+  v.comparator::text AS comparator,
+  v.low_max_g,
+  v.moderate_max_g,
+  v.burden_ratio,
+  v.signal_source_kind,
+  v.signal_source_slug,
+  v.threshold_source_slug,
+  v.is_default_threshold,
+  v.is_polyol_proxy,
+  v.rollup_serving_g,
+  v.computed_at
+FROM v_phase3_rollup_subtype_levels_latest v
+WHERE v.food_id = %(food_id)s
+ORDER BY
+  CASE v.subtype_code
+    WHEN 'fructan' THEN 1
+    WHEN 'gos' THEN 2
+    WHEN 'sorbitol' THEN 3
+    WHEN 'mannitol' THEN 4
+    WHEN 'fructose' THEN 5
+    WHEN 'lactose' THEN 6
+    ELSE 7
+  END ASC
+"""
+
 SQL_GET_TRAIT_ROLE = """
 SELECT
   c.role_code AS code,

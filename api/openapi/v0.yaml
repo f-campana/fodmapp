@@ -1,10 +1,10 @@
 openapi: 3.1.0
 info:
-  title: Fodmap Swap API (v0 Review Draft)
-  version: 0.1.0-review
+  title: Fodmap Swap API (v0)
+  version: 0.1.0
   summary: SQL-backed read API for food rollups, traits, and active swaps.
   description: |
-    Review artifact only (not implemented yet).
+    Canonical v0 read contract implemented by the FastAPI service.
 
     v0 contracts:
     - Public identity is `food_slug` (priority rank remains internal/debug only).
@@ -40,6 +40,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
 
+  /v0/foods:
+    get:
+      tags: [foods]
+      summary: Search foods by slug or canonical names
+      operationId: searchFoods
+      parameters:
+        - $ref: '#/components/parameters/FoodSearchQuery'
+        - $ref: '#/components/parameters/FoodSearchLimitQuery'
+      responses:
+        '200':
+          description: Food search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodSearchResponse'
+
   /v0/foods/{food_slug}:
     get:
       tags: [foods]
@@ -74,6 +90,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FoodRollupResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /v0/foods/{food_slug}/subtypes:
+    get:
+      tags: [foods]
+      summary: Per-subtype levels and thresholds for a food
+      operationId: getFoodSubtypesBySlug
+      parameters:
+        - $ref: '#/components/parameters/FoodSlugPath'
+      responses:
+        '200':
+          description: Subtype-level breakdown found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodSubtypeListResponse'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -136,6 +169,25 @@ components:
         type: string
         minLength: 1
         maxLength: 160
+    FoodSearchQuery:
+      name: q
+      in: query
+      required: true
+      description: Case-insensitive food search string.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 160
+    FoodSearchLimitQuery:
+      name: limit
+      in: query
+      required: false
+      description: Maximum number of food results.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
     FromSlugQuery:
       name: from
       in: query
@@ -240,6 +292,43 @@ components:
               type: string
               nullable: true
 
+    FoodSearchItem:
+      allOf:
+        - $ref: '#/components/schemas/FoodIdentity'
+        - type: object
+          properties:
+            overall_level:
+              $ref: '#/components/schemas/FoodLevel'
+              nullable: true
+            driver_subtype:
+              type: string
+              nullable: true
+            coverage_ratio:
+              type: number
+              minimum: 0
+              maximum: 1
+              nullable: true
+            rollup_computed_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    FoodSearchResponse:
+      type: object
+      required: [query, limit, items, total]
+      properties:
+        query:
+          type: string
+        limit:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodSearchItem'
+        total:
+          type: integer
+          minimum: 0
+
     FoodRollupResponse:
       type: object
       required:
@@ -285,6 +374,72 @@ components:
           type: string
           nullable: true
           description: Included when relevant to downstream swap scoring context.
+
+    FoodSubtypeItem:
+      type: object
+      required:
+        - subtype_code
+        - subtype_level
+        - is_default_threshold
+        - is_polyol_proxy
+        - computed_at
+      properties:
+        subtype_code:
+          type: string
+        subtype_level:
+          $ref: '#/components/schemas/FoodLevel'
+        amount_g_per_serving:
+          type: number
+          nullable: true
+        comparator:
+          type: string
+          nullable: true
+        low_max_g:
+          type: number
+          nullable: true
+        moderate_max_g:
+          type: number
+          nullable: true
+        burden_ratio:
+          type: number
+          nullable: true
+        signal_source_kind:
+          type: string
+          nullable: true
+        signal_source_slug:
+          type: string
+          nullable: true
+        threshold_source_slug:
+          type: string
+          nullable: true
+        is_default_threshold:
+          type: boolean
+        is_polyol_proxy:
+          type: boolean
+        rollup_serving_g:
+          type: number
+          nullable: true
+        computed_at:
+          type: string
+          format: date-time
+
+    FoodSubtypeListResponse:
+      type: object
+      required: [food_slug, canonical_name_fr, canonical_name_en, items, total]
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodSubtypeItem'
+        total:
+          type: integer
+          minimum: 0
 
     TraitLabel:
       type: object
