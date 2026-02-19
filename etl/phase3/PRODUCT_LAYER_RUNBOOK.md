@@ -162,6 +162,29 @@ Data freshness / dependency note:
   - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
   - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
+## 3.2b.1 CI Seeded Integration Pipeline
+
+CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:
+
+1. Fetch pinned CIQUAL files with checksum verification:
+   - `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/fetch_ciqual_data.sh`
+2. Phase 2 from-zero replay:
+   - `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+3. Phase 3 seed for API integration:
+   - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_seed_for_api_ci.sh`
+4. API integration tests:
+   - `pytest -m integration api/tests`
+
+CI compatibility shim:
+
+- existing Phase 2/3 SQL uses absolute `\copy` paths rooted at:
+  `/Users/fabiencampana/Documents/Fodmap`
+- CI creates a symlink from workspace to that path to keep current SQL stable.
+
+Deferred follow-up:
+
+- refactor Phase 2/3 SQL `\copy` paths to repo-relative/env-driven references in a dedicated PR.
+
 ## Rollback Strategy
 
 If needed, remove source-scoped Phase 3 artifacts and rerun:

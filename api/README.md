@@ -39,6 +39,20 @@ cd /Users/fabiencampana/Documents/Fodmap/api
 API_DB_URL="postgresql://$USER@localhost:5432/fodmap_test" pytest -m integration
 ```
 
+## CI integration profile
+
+GitHub Actions now runs integration tests against a fully seeded Postgres database:
+
+1. Phase 2 full replay (`etl/phase2/scripts/phase2_replay_from_zero.sh`)
+2. Phase 3 product-layer seed (`etl/phase3/scripts/phase3_seed_for_api_ci.sh`)
+3. API integration tests (`pytest -m integration api/tests`)
+
+CIQUAL inputs are downloaded from official public endpoints and validated by SHA-256 via:
+
+- `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/fetch_ciqual_data.sh`
+
+If checksums drift, CI fails fast before seeding.
+
 ## OpenAPI
 
 Canonical v0 review contract is committed at:
