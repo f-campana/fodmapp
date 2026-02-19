@@ -107,14 +107,9 @@ jobs:
             esac
           done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
 
-      - name: Create CI path shim for absolute SQL paths
-        run: |
-          sudo mkdir -p /Users/fabiencampana/Documents
-          sudo ln -sfn "$GITHUB_WORKSPACE" /Users/fabiencampana/Documents/Fodmap
-
       - name: Validate replay script syntax
         run: |
-          bash -n /Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh
+          bash -n etl/phase2/scripts/phase2_replay_from_zero.sh
 
       - name: Seed Phase2 via full replay
         env:
@@ -126,14 +121,14 @@ jobs:
           PGPORT: 5432
           PSQL_BIN: psql
         run: |
-          /Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh
+          etl/phase2/scripts/phase2_replay_from_zero.sh
 
       - name: Seed Phase3 product layer
         env:
           SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
           PSQL_BIN: psql
         run: |
-          /Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_seed_for_api_ci.sh
+          etl/phase3/scripts/phase3_seed_for_api_ci.sh
 
       - name: Sanity assert seeded state via psql
         run: |

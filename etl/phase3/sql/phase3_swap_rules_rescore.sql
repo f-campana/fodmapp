@@ -257,7 +257,7 @@ SELECT
 FROM rescore_snapshot rs
 ORDER BY rs.rule_key;
 
-\copy review_export TO '/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy review_export TO 'etl/phase3/decisions/phase3_swap_activation_review_v1.csv' WITH (FORMAT csv, HEADER true)
 
 SELECT
   rule_key,

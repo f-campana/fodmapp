@@ -10,7 +10,7 @@ CREATE TEMP TABLE stg_exemptions (
   reason TEXT
 ) ON COMMIT DROP;
 
-\copy stg_exemptions (priority_rank,trait_domain,reason) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_exemptions (priority_rank,trait_domain,reason) FROM 'etl/phase3/data/phase3_trait_exemptions_v1.csv' WITH (FORMAT csv, HEADER true)
 
 WITH target_foods AS (
   SELECT p.priority_rank, p.resolved_food_id AS food_id

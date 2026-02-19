@@ -42,7 +42,7 @@ CREATE TEMP TABLE stg_generated (
   second_review_required BOOLEAN
 ) ON COMMIT DROP;
 
-\copy stg_generated (rule_key,from_priority_rank,to_priority_rank,rule_kind,instruction_fr,instruction_en,min_ratio,max_ratio,default_ratio,evidence_tier,confidence_score,valid_from,status,notes,context_cooking_methods,context_dish_roles,context_cuisines,excluded_priority_ranks,fodmap_safety_score,flavor_match_score,texture_match_score,method_match_score,availability_fr_score,cost_fr_score,ranking_score,from_overall_level,to_overall_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,from_root_category,to_root_category,allergen_change,second_review_required) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_generated (rule_key,from_priority_rank,to_priority_rank,rule_kind,instruction_fr,instruction_en,min_ratio,max_ratio,default_ratio,evidence_tier,confidence_score,valid_from,status,notes,context_cooking_methods,context_dish_roles,context_cuisines,excluded_priority_ranks,fodmap_safety_score,flavor_match_score,texture_match_score,method_match_score,availability_fr_score,cost_fr_score,ranking_score,from_overall_level,to_overall_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,from_root_category,to_root_category,allergen_change,second_review_required) FROM 'etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv' WITH (FORMAT csv, HEADER true)
 
 CREATE TEMP TABLE stg_allergens (
   priority_rank INTEGER,
@@ -50,7 +50,7 @@ CREATE TEMP TABLE stg_allergens (
   allergen_family_code TEXT
 ) ON COMMIT DROP;
 
-\copy stg_allergens (priority_rank,food_slug,allergen_family_code) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_allergens (priority_rank,food_slug,allergen_family_code) FROM 'etl/phase3/data/phase3_food_allergen_families_v1.csv' WITH (FORMAT csv, HEADER true)
 
 CREATE TEMP TABLE stg_review (
   rule_key TEXT,
@@ -75,7 +75,7 @@ CREATE TEMP TABLE stg_review (
   second_reviewed_at TEXT
 ) ON COMMIT DROP;
 
-\copy stg_review (rule_key,from_priority_rank,to_priority_rank,scoring_version_snapshot,fodmap_safety_score_snapshot,from_level,to_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,auto_eligible,second_review_required,review_decision,review_reason_code,review_notes,reviewed_by,reviewed_at,second_review_decision,second_reviewed_by,second_reviewed_at) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch01_review_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_review (rule_key,from_priority_rank,to_priority_rank,scoring_version_snapshot,fodmap_safety_score_snapshot,from_level,to_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,auto_eligible,second_review_required,review_decision,review_reason_code,review_notes,reviewed_by,reviewed_at,second_review_decision,second_reviewed_by,second_reviewed_at) FROM 'etl/phase3/decisions/phase3_swap_batch01_review_v1.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE

@@ -53,12 +53,12 @@ CREATE TEMP TABLE stg_exemptions (
   reason TEXT
 ) ON COMMIT DROP;
 
-\copy stg_roles (priority_rank,role_code,intensity,source_slug,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_culinary_roles_v1.csv' WITH (FORMAT csv, HEADER true)
-\copy stg_flavors (priority_rank,flavor_code,intensity,source_slug,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_flavor_profiles_v1.csv' WITH (FORMAT csv, HEADER true)
-\copy stg_textures (priority_rank,texture_code,intensity,source_slug,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_texture_profiles_v1.csv' WITH (FORMAT csv, HEADER true)
-\copy stg_behaviors (priority_rank,behavior_code,source_slug,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cooking_behaviors_v1.csv' WITH (FORMAT csv, HEADER true)
-\copy stg_cuisines (priority_rank,cuisine_code,weight,source_slug,notes) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv' WITH (FORMAT csv, HEADER true)
-\copy stg_exemptions (priority_rank,trait_domain,reason) FROM '/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_roles (priority_rank,role_code,intensity,source_slug,notes) FROM 'etl/phase3/data/phase3_food_culinary_roles_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_flavors (priority_rank,flavor_code,intensity,source_slug,notes) FROM 'etl/phase3/data/phase3_food_flavor_profiles_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_textures (priority_rank,texture_code,intensity,source_slug,notes) FROM 'etl/phase3/data/phase3_food_texture_profiles_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_behaviors (priority_rank,behavior_code,source_slug,notes) FROM 'etl/phase3/data/phase3_food_cooking_behaviors_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_cuisines (priority_rank,cuisine_code,weight,source_slug,notes) FROM 'etl/phase3/data/phase3_food_cuisine_affinities_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_exemptions (priority_rank,trait_domain,reason) FROM 'etl/phase3/data/phase3_trait_exemptions_v1.csv' WITH (FORMAT csv, HEADER true)
 
 DO $$
 DECLARE
