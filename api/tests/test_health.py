@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from contextlib import contextmanager
 
 import yaml
 
@@ -14,6 +15,21 @@ def test_health_ok(client) -> None:
     assert payload["service"]
     assert payload["version"]
     assert payload["timestamp"]
+
+
+def test_health_db_unavailable_returns_503(client, app_instance, monkeypatch) -> None:
+    @contextmanager
+    def _broken_readonly_connection():
+        raise RuntimeError("db down")
+        yield
+
+    monkeypatch.setattr(app_instance.state.db, "readonly_connection", _broken_readonly_connection)
+
+    response = client.get("/v0/health")
+    assert response.status_code == 503
+    payload = response.json()
+    assert payload["error"]["code"] == "service_unavailable"
+    assert payload["error"]["message"] == "Database unavailable"
 
 
 def test_openapi_contract_parity(app_instance) -> None:

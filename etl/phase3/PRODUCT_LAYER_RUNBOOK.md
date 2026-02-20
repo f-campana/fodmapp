@@ -260,6 +260,41 @@ Execution stop gate for Phase 3.4:
 - run generate -> apply -> rescore -> checks
 - stop before activation and hand off the review packet for human decisions
 
+## 3.6 Coverage Uplift Batch A (Research-First)
+
+Scope lock (top-6 high-impact 1/6 foods by `to_candidate_frequency`):
+
+- rank `18` `pois-chiche-appertise-egoutte`
+- rank `21` `phase2-lentille-brune-cuite`
+- rank `12` `phase2-farine-ble-t65`
+- rank `38` `phase2-shiitake-cru`
+- rank `7` `phase2-oignon-nouveau-bulbe-blanc`
+- rank `11` `phase2-farine-ble-t55`
+
+Artifacts:
+
+- research matrix:
+  - `etl/phase3/research/phase3_coverage_batchA_matrix_v1.csv`
+- research report:
+  - `etl/phase3/research/phase3_coverage_batchA_report_v1.md`
+- curated ingestion input:
+  - `etl/phase3/data/phase3_coverage_batchA_measurements_v1.csv`
+- SQL flow:
+  - `phase3_coverage_batchA_apply.sql`
+  - `phase3_rollups_compute.sql`
+  - `phase3_rollups_6subtype_checks.sql`
+  - `phase3_coverage_batchA_checks.sql`
+
+Execution notes:
+
+- only rows with `measurement_found=true` are promoted into `food_fodmap_measurements`
+- explicit measurement precedence remains enforced by `phase3_rollups_6subtype_checks.sql`
+- allowed ingestion methods in Batch A:
+  - `derived_from_nutrient` (exact CIQUAL nutrient derivation)
+  - `expert_estimate` for plant-food lactose-zero inference rows
+  - `derived_from_nutrient` for close cooked-variant CIQUAL polyol proxy rows (tracked by notes marker `coverage_batchA_v1:polyols_proxy_*`)
+- blocked rows remain documented in the matrix with `blocked_reason`; unresolved cells are not auto-filled
+
 ## 3.2b.1 CI Seeded Integration Pipeline
 
 CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:
@@ -278,6 +313,7 @@ Path contract:
 - Phase 2/3 SQL `\copy` file inputs are repo-relative (`etl/...`).
 - Replay/seed scripts resolve `ROOT_DIR` from script location and execute from repo root.
 - CI no longer requires a `/Users/...` symlink shim for seeded integration runs.
+- Known limitation: `phase3_seed_for_api_ci.sh` seeds through MVP activation (`phase3_swap_activation_*`) only; Batch01/Batch02 activation state is intentionally not replayed in CI seeded profile.
 
 ## Rollback Strategy
 

@@ -1191,6 +1191,50 @@ Issue #25 execution contract:
 - run through generate/apply/rescore/checks only
 - activation is deferred to a later human-reviewed pass by design
 
+### 11.8 Coverage uplift Batch A (Phase 3.6)
+
+Coverage uplift Batch A is research-first and scoped to six high-impact `1/6` foods:
+
+- `18` `pois-chiche-appertise-egoutte`
+- `21` `phase2-lentille-brune-cuite`
+- `12` `phase2-farine-ble-t65`
+- `38` `phase2-shiitake-cru`
+- `7` `phase2-oignon-nouveau-bulbe-blanc`
+- `11` `phase2-farine-ble-t55`
+
+Contracts:
+
+- research matrix is mandatory input:
+  - `etl/phase3/research/phase3_coverage_batchA_matrix_v1.csv`
+- only `measurement_found=true` rows are ingested from:
+  - `etl/phase3/data/phase3_coverage_batchA_measurements_v1.csv`
+- blocked rows must carry explicit `blocked_reason` in the matrix
+- batchA allowed methods:
+  - `derived_from_nutrient` (exact CIQUAL derivation)
+  - `expert_estimate` for plant-food lactose-zero inference rows
+  - `derived_from_nutrient` for close cooked-variant CIQUAL polyol proxy rows
+- rollup precedence remains unchanged:
+  - inserted rows must resolve to `signal_source_kind='explicit_measurement'` after recompute
+
+Execution sequence:
+
+1. `phase3_coverage_batchA_apply.sql`
+2. `phase3_rollups_compute.sql`
+3. `phase3_rollups_6subtype_checks.sql`
+4. `phase3_coverage_batchA_checks.sql`
+
+### 11.9 API health readiness hardening (Phase 3.5)
+
+`GET /v0/health` is readiness-aware:
+
+- `200` only when DB ping succeeds
+- `503` with `service_unavailable` error code when DB is unavailable
+
+CI seeded-profile limitation (intentional):
+
+- `etl/phase3/scripts/phase3_seed_for_api_ci.sh` seeds through MVP activation only
+- Batch01/Batch02 activation state is not replayed in the seeded CI profile
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
