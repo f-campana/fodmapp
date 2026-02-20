@@ -1,0 +1,31 @@
+priority_rank,food_slug,subtype_code,known_before,measurement_found,source_citation,value_raw,unit,basis,comparator,amount_g_per_100g,serving_g,amount_g_per_serving,method,evidence_tier,confidence_score,quarantine_flag,blocked_reason,notes
+18,pois-chiche-appertise-egoutte,fructan,false,false,,,,,,,,,,,,false,no_exact_subtype_measurement_in_ciqual_or_peer_review,CIQUAL code 20532 has missing fructose/glucose/polyols; no robust canned-drained fructan value identified
+18,pois-chiche-appertise-egoutte,fructose,false,false,,,,,,,,,,,,false,no_exact_subtype_measurement_in_ciqual_or_peer_review,CIQUAL code 20532 lacks fructose/glucose values; excess fructose cannot be computed
+18,pois-chiche-appertise-egoutte,lactose,false,false,,,,,,,,,,,,false,no_exact_subtype_measurement_in_ciqual_or_peer_review,CIQUAL code 20532 lactose is missing ('-'); boiled chickpea proxy not promoted to current measurement
+18,pois-chiche-appertise-egoutte,mannitol,false,false,,,,,,,,,,,,false,no_exact_subtype_measurement_in_ciqual_or_peer_review,No canned-drained mannitol value found
+18,pois-chiche-appertise-egoutte,sorbitol,false,false,,,,,,,,,,,,false,no_exact_subtype_measurement_in_ciqual_or_peer_review,No canned-drained sorbitol value found
+21,phase2-lentille-brune-cuite,fructan,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,Only lentil average/green/blond/red CIQUAL values available; brown-cooked variant retained as blocked
+21,phase2-lentille-brune-cuite,fructose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,Excess fructose cannot be robustly computed for brown-cooked variant with available sources
+21,phase2-lentille-brune-cuite,lactose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,Only non-brown proxies available; kept blocked
+21,phase2-lentille-brune-cuite,mannitol,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No brown-cooked subtype-specific mannitol value found
+21,phase2-lentille-brune-cuite,sorbitol,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No brown-cooked subtype-specific sorbitol value found
+12,phase2-farine-ble-t65,fructose,false,true,"ANSES CIQUAL 2025 (alim_code=9435, Wheat flour type 65; fructose <0.1 g/100g, glucose 0.073 g/100g)",<0.027,g_per_100g,per_100g,lt,0.027,40,0.011,derived_from_nutrient,secondary_db,0.600,false,,"Upper bound for excess fructose computed as max(0, 0.1 - 0.073)"
+12,phase2-farine-ble-t65,gos,false,false,,,,,,,,,,,,false,no_subtype_specific_source,No direct GOS value found for T65 in available public sources
+12,phase2-farine-ble-t65,lactose,false,true,"ANSES CIQUAL 2025 (alim_code=9435, Wheat flour type 65; lactose <0.1 g/100g)",<0.1,g_per_100g,per_100g,lt,0.1,40,0.040,derived_from_nutrient,secondary_db,0.700,false,,Exact CIQUAL row match for T65
+12,phase2-farine-ble-t65,mannitol,false,true,"ANSES CIQUAL 2025 (alim_code=9435, Wheat flour type 65; total polyols = 0 g/100g)",0,g_per_100g,per_100g,eq,0,40,0.000,derived_from_nutrient,secondary_db,0.600,false,,Inferred mannitol=0 from total polyols=0
+12,phase2-farine-ble-t65,sorbitol,false,true,"ANSES CIQUAL 2025 (alim_code=9435, Wheat flour type 65; total polyols = 0 g/100g)",0,g_per_100g,per_100g,eq,0,40,0.000,derived_from_nutrient,secondary_db,0.600,false,,Inferred sorbitol=0 from total polyols=0
+38,phase2-shiitake-cru,fructan,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw shiitake fructan value located in public CIQUAL row set
+38,phase2-shiitake-cru,fructose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw shiitake fructose/glucose pair available for excess computation
+38,phase2-shiitake-cru,gos,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw shiitake GOS measurement located
+38,phase2-shiitake-cru,lactose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw shiitake lactose row; cooked/dried proxies not promoted
+38,phase2-shiitake-cru,sorbitol,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw shiitake sorbitol row; only cooked total polyols observed
+7,phase2-oignon-nouveau-bulbe-blanc,fructose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,Only sauteed spring onion composite available (CIQUAL 20323); raw white bulb kept blocked
+7,phase2-oignon-nouveau-bulbe-blanc,gos,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No raw white-bulb GOS value found
+7,phase2-oignon-nouveau-bulbe-blanc,lactose,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No exact raw white-bulb lactose value found
+7,phase2-oignon-nouveau-bulbe-blanc,mannitol,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No exact raw white-bulb mannitol value found
+7,phase2-oignon-nouveau-bulbe-blanc,sorbitol,false,false,,,,,,,,,,,,false,insufficient_variant_specific_evidence,No exact raw white-bulb sorbitol value found
+11,phase2-farine-ble-t55,fructose,false,false,,,,,,,,,,,,false,no_robust_excess_bound,"CIQUAL fructose and glucose are both bounded (<0.2), excess-fructose bound considered too loose"
+11,phase2-farine-ble-t55,gos,false,false,,,,,,,,,,,,false,no_subtype_specific_source,No direct GOS value found for T55 in available public sources
+11,phase2-farine-ble-t55,lactose,false,true,"ANSES CIQUAL 2025 (alim_code=9436, Wheat flour type 55; lactose <0.2 g/100g)",<0.2,g_per_100g,per_100g,lt,0.2,40,0.080,derived_from_nutrient,secondary_db,0.700,false,,Exact CIQUAL row match for T55
+11,phase2-farine-ble-t55,mannitol,false,true,"ANSES CIQUAL 2025 (alim_code=9436, Wheat flour type 55; total polyols = 0 g/100g)",0,g_per_100g,per_100g,eq,0,40,0.000,derived_from_nutrient,secondary_db,0.600,false,,Inferred mannitol=0 from total polyols=0
+11,phase2-farine-ble-t55,sorbitol,false,true,"ANSES CIQUAL 2025 (alim_code=9436, Wheat flour type 55; total polyols = 0 g/100g)",0,g_per_100g,per_100g,eq,0,40,0.000,derived_from_nutrient,secondary_db,0.600,false,,Inferred sorbitol=0 from total polyols=0
