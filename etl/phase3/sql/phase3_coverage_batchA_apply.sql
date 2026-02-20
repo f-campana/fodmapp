@@ -51,16 +51,16 @@ BEGIN
 
   SELECT COUNT(*) INTO bad_count
   FROM stg_measurements
-  WHERE method <> 'derived_from_nutrient';
+  WHERE method NOT IN ('derived_from_nutrient', 'expert_estimate');
   IF bad_count > 0 THEN
-    RAISE EXCEPTION 'coverage batchA expects method=derived_from_nutrient for all rows';
+    RAISE EXCEPTION 'coverage batchA contains unsupported method values (allowed: derived_from_nutrient, expert_estimate)';
   END IF;
 
   SELECT COUNT(*) INTO bad_count
   FROM stg_measurements
-  WHERE source_slug <> 'ciqual_2025';
+  WHERE source_slug NOT IN ('ciqual_2025', 'internal_rules_v1');
   IF bad_count > 0 THEN
-    RAISE EXCEPTION 'coverage batchA expects source_slug=ciqual_2025 for all rows';
+    RAISE EXCEPTION 'coverage batchA contains unsupported source_slug values';
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -100,6 +100,39 @@ BEGIN
   IF bad_count > 0 THEN
     RAISE EXCEPTION 'coverage batchA rows must include amount + serving + citation fields';
   END IF;
+
+  -- Plant lactose inference policy: explicit zero rows scoped by notes marker.
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchA_v1:plant_lactose_zero_inference%'
+    AND (
+      subtype_code <> 'lactose'
+      OR source_slug <> 'internal_rules_v1'
+      OR method <> 'expert_estimate'
+      OR comparator <> 'eq'
+      OR amount_g_per_100g <> 0
+      OR amount_g_per_serving <> 0
+      OR evidence_tier <> 'inferred'
+      OR confidence_score < 0.95
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'plant_lactose_zero_inference rows must satisfy lactose=0 expert-estimate contract';
+  END IF;
+
+  -- Variant proxy policy: CIQUAL-linked proxy rows only for sorbitol/mannitol.
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchA_v1:polyols_proxy_%'
+    AND (
+      subtype_code NOT IN ('sorbitol', 'mannitol')
+      OR source_slug <> 'ciqual_2025'
+      OR method <> 'derived_from_nutrient'
+      OR comparator NOT IN ('lt', 'lte', 'eq')
+      OR evidence_tier <> 'inferred'
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'polyols proxy rows violate subtype/source/comparator policy';
+  END IF;
 END $$;
 
 -- Idempotency: replace only prior batchA injected rows.
@@ -108,7 +141,11 @@ USING phase2_priority_foods p, fodmap_subtypes fs
 WHERE m.food_id = p.resolved_food_id
   AND m.fodmap_subtype_id = fs.fodmap_subtype_id
   AND p.priority_rank IN (18, 21, 12, 38, 7, 11)
-  AND m.source_id = (SELECT source_id FROM sources WHERE source_slug = 'ciqual_2025')
+  AND m.source_id IN (
+    SELECT source_id
+    FROM sources
+    WHERE source_slug IN ('ciqual_2025', 'internal_rules_v1')
+  )
   AND m.notes LIKE 'coverage_batchA_v1:%';
 
 INSERT INTO food_fodmap_measurements (

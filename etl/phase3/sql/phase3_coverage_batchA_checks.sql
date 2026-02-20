@@ -138,6 +138,46 @@ BEGIN
     RAISE EXCEPTION 'matrix found rows missing in measurements CSV';
   END IF;
 
+  -- Method/source policy guards.
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE method NOT IN ('derived_from_nutrient', 'expert_estimate')
+     OR source_slug NOT IN ('ciqual_2025', 'internal_rules_v1');
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage batchA contains unsupported method/source combinations';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchA_v1:plant_lactose_zero_inference%'
+    AND (
+      subtype_code <> 'lactose'
+      OR source_slug <> 'internal_rules_v1'
+      OR method <> 'expert_estimate'
+      OR comparator <> 'eq'
+      OR amount_g_per_100g <> 0
+      OR amount_g_per_serving <> 0
+      OR evidence_tier <> 'inferred'
+      OR confidence_score < 0.95
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'plant_lactose_zero_inference rows violate lactose-zero policy';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchA_v1:polyols_proxy_%'
+    AND (
+      subtype_code NOT IN ('sorbitol', 'mannitol')
+      OR source_slug <> 'ciqual_2025'
+      OR method <> 'derived_from_nutrient'
+      OR comparator NOT IN ('lt', 'lte', 'eq')
+      OR evidence_tier <> 'inferred'
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'polyols proxy rows violate subtype/source/comparator policy';
+  END IF;
+
   SELECT COUNT(*) INTO db_count
   FROM food_fodmap_measurements
   WHERE notes LIKE 'coverage_batchA_v1:%'
@@ -182,6 +222,32 @@ BEGIN
     AND known_subtypes_count < 5;
   IF bad_count > 0 THEN
     RAISE EXCEPTION 'coverage uplift expectation failed for rank 12 (expected >=5 known subtypes)';
+  END IF;
+
+  -- Priority targets in Batch A: expected uplift to >=3 known subtypes for ranks 18 and 21.
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollups_latest_full
+  WHERE priority_rank = 18
+    AND known_subtypes_count < 3;
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage uplift expectation failed for rank 18 (expected >=3 known subtypes)';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollups_latest_full
+  WHERE priority_rank = 21
+    AND known_subtypes_count < 3;
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage uplift expectation failed for rank 21 (expected >=3 known subtypes)';
+  END IF;
+
+  -- Plant lactose inference should lift ranks 7 and 38 to at least 2 known subtypes.
+  SELECT COUNT(*) INTO bad_count
+  FROM v_phase3_rollups_latest_full
+  WHERE priority_rank IN (7, 38)
+    AND known_subtypes_count < 2;
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage uplift expectation failed for plant lactose-zero inference rows (ranks 7/38)';
   END IF;
 
   -- Batch quality diagnostic: should not worsen vs pre-uplift baseline (29 of 79).

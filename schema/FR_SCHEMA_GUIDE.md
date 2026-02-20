@@ -1209,6 +1209,10 @@ Contracts:
 - only `measurement_found=true` rows are ingested from:
   - `etl/phase3/data/phase3_coverage_batchA_measurements_v1.csv`
 - blocked rows must carry explicit `blocked_reason` in the matrix
+- batchA allowed methods:
+  - `derived_from_nutrient` (exact CIQUAL derivation)
+  - `expert_estimate` for plant-food lactose-zero inference rows
+  - `derived_from_nutrient` for close cooked-variant CIQUAL polyol proxy rows
 - rollup precedence remains unchanged:
   - inserted rows must resolve to `signal_source_kind='explicit_measurement'` after recompute
 

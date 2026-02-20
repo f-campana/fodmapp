@@ -289,7 +289,11 @@ Execution notes:
 
 - only rows with `measurement_found=true` are promoted into `food_fodmap_measurements`
 - explicit measurement precedence remains enforced by `phase3_rollups_6subtype_checks.sql`
-- blocked rows remain documented in the matrix with `blocked_reason`; no synthetic fallback insertion
+- allowed ingestion methods in Batch A:
+  - `derived_from_nutrient` (exact CIQUAL nutrient derivation)
+  - `expert_estimate` for plant-food lactose-zero inference rows
+  - `derived_from_nutrient` for close cooked-variant CIQUAL polyol proxy rows (tracked by notes marker `coverage_batchA_v1:polyols_proxy_*`)
+- blocked rows remain documented in the matrix with `blocked_reason`; unresolved cells are not auto-filled
 
 ## 3.2b.1 CI Seeded Integration Pipeline
 
