@@ -1235,6 +1235,57 @@ CI seeded-profile limitation (intentional):
 - `etl/phase3/scripts/phase3_seed_for_api_ci.sh` seeds through MVP activation only
 - Batch01/Batch02 activation state is not replayed in the seeded CI profile
 
+### 11.10 Coverage uplift Batch B (Phase 3.6b)
+
+Coverage uplift Batch B is research-first and scoped to seven remaining high-impact `1/6` foods:
+
+- `9` `phase2-echalote-bulbe-cru`
+- `16` `phase2-artichaut-coeur`
+- `24` `phase2-haricot-noir-cuit`
+- `25` `pois-casse-bouilli-cuit-a-l-eau`
+- `26` `phase2-edamame-cuit`
+- `29` `phase2-pistache-crue`
+- `32` `phase2-cerise-douce-crue`
+
+Contracts:
+
+- research matrix is mandatory input:
+  - `etl/phase3/research/phase3_coverage_batchB_matrix_v1.csv`
+- evidence audit artifacts:
+  - `etl/phase3/research/phase3_coverage_batchB_evidence_ledger_v1.csv`
+  - `etl/phase3/research/phase3_coverage_batchB_ciqual_candidates_v1.csv`
+- only `measurement_found=true` rows are ingested from:
+  - `etl/phase3/data/phase3_coverage_batchB_measurements_v1.csv`
+- locked 4-pass methodology before declaring blocked rows:
+  1. plant lactose-zero inference
+  2. bibliography pass (Monash + Phase2 literature sources)
+  3. CIQUAL strict-match derivation (fructose/glucose pair and total-polyols bounds)
+  4. explicit blocked rows with allowed `blocked_reason` taxonomy
+- batchB allowed methods:
+  - `expert_estimate` (plant lactose-zero inference)
+  - `derived_from_nutrient` (exact CIQUAL derivation and conservative proxy derivation)
+  - `literature` (direct bibliography-derived rows when available)
+- forbidden blocked token:
+  - `insufficient_variant_specific_evidence`
+- allowed blocked taxonomy:
+  - `no_literature_numeric_value`
+  - `no_strict_ciqual_match`
+  - `strict_match_rejected_prep_mismatch`
+  - `insufficient_fructose_glucose_pair`
+  - `evidence_conflict_not_promotable`
+- rollup precedence remains unchanged:
+  - inserted rows must resolve to `signal_source_kind='explicit_measurement'` after recompute
+- Batch B R1 quality gates:
+  - non-lactose `measurement_found=true` rows `>= 6`
+  - rank `9` and rank `32` must each gain at least one non-lactose subtype
+
+Execution sequence:
+
+1. `phase3_coverage_batchB_apply.sql`
+2. `phase3_rollups_compute.sql`
+3. `phase3_rollups_6subtype_checks.sql`
+4. `phase3_coverage_batchB_checks.sql`
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
