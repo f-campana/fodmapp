@@ -22,6 +22,10 @@ def rollup_not_available(message: str = "Rollup not available for this food") ->
     return ApiError(code="rollup_not_available", message=message, status_code=404)
 
 
+def service_unavailable(message: str = "Database unavailable") -> ApiError:
+    return ApiError(code="service_unavailable", message=message, status_code=503)
+
+
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def handle_api_error(_request: Request, exc: ApiError) -> JSONResponse:
