@@ -100,6 +100,15 @@ BEGIN
 
   SELECT COUNT(*) INTO bad_count
   FROM stg_measurements
+  WHERE notes IS NULL
+     OR notes = ''
+     OR notes NOT LIKE 'coverage_batchB_v1:%';
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage batchB rows must use coverage_batchB_v1 notes markers';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
   WHERE amount_g_per_100g IS NULL
      OR amount_g_per_serving IS NULL
      OR serving_g IS NULL
@@ -140,6 +149,21 @@ BEGIN
     );
   IF bad_count > 0 THEN
     RAISE EXCEPTION 'polyols proxy rows violate subtype/source/comparator policy';
+  END IF;
+
+  -- CIQUAL fructose/glucose derivation policy for excess fructose rows.
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchB_v1:excess_from_ciqual%'
+    AND (
+      subtype_code <> 'fructose'
+      OR source_slug <> 'ciqual_2025'
+      OR method <> 'derived_from_nutrient'
+      OR comparator NOT IN ('eq', 'lt', 'lte')
+      OR evidence_tier <> 'inferred'
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'excess_from_ciqual rows violate subtype/source/comparator policy';
   END IF;
 END $$;
 

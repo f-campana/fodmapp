@@ -56,6 +56,9 @@ DECLARE
   db_count INTEGER;
   low_coverage_targets INTEGER;
   one_of_six_bucket INTEGER;
+  non_lactose_found INTEGER;
+  rank9_non_lactose_found INTEGER;
+  rank32_non_lactose_found INTEGER;
 BEGIN
   SELECT COUNT(*) INTO matrix_count FROM stg_matrix;
   IF matrix_count <> 35 THEN
@@ -104,6 +107,36 @@ BEGIN
     RAISE EXCEPTION 'coverage matrix has blocked rows without blocked_reason';
   END IF;
 
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_matrix
+  WHERE measurement_found = FALSE
+    AND blocked_reason = 'insufficient_variant_specific_evidence';
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'generic blocked reason insufficient_variant_specific_evidence is forbidden in batchB';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_matrix
+  WHERE measurement_found = FALSE
+    AND blocked_reason NOT IN (
+      'no_literature_numeric_value',
+      'no_strict_ciqual_match',
+      'strict_match_rejected_prep_mismatch',
+      'insufficient_fructose_glucose_pair',
+      'evidence_conflict_not_promotable'
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage matrix has blocked rows outside allowed taxonomy';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_matrix
+  WHERE measurement_found = FALSE
+    AND COALESCE(notes, '') = '';
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'coverage matrix has blocked rows without source-trace notes';
+  END IF;
+
   SELECT COUNT(*) INTO found_count
   FROM stg_matrix
   WHERE measurement_found = TRUE;
@@ -113,6 +146,35 @@ BEGIN
 
   IF csv_count <> found_count THEN
     RAISE EXCEPTION 'measurements CSV row count (%) must equal matrix found row count (%)', csv_count, found_count;
+  END IF;
+
+  SELECT COUNT(*) INTO non_lactose_found
+  FROM stg_matrix
+  WHERE measurement_found = TRUE
+    AND subtype_code <> 'lactose';
+
+  IF non_lactose_found < 6 THEN
+    RAISE EXCEPTION 'batchB research-yield floor failed: non-lactose found rows must be >= 6, got %', non_lactose_found;
+  END IF;
+
+  SELECT COUNT(*) INTO rank9_non_lactose_found
+  FROM stg_matrix
+  WHERE priority_rank = 9
+    AND measurement_found = TRUE
+    AND subtype_code <> 'lactose';
+
+  IF rank9_non_lactose_found < 1 THEN
+    RAISE EXCEPTION 'targeted proof failed: rank 9 must gain at least one non-lactose found subtype';
+  END IF;
+
+  SELECT COUNT(*) INTO rank32_non_lactose_found
+  FROM stg_matrix
+  WHERE priority_rank = 32
+    AND measurement_found = TRUE
+    AND subtype_code <> 'lactose';
+
+  IF rank32_non_lactose_found < 1 THEN
+    RAISE EXCEPTION 'targeted proof failed: rank 32 must gain at least one non-lactose found subtype';
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -185,6 +247,20 @@ BEGIN
     );
   IF bad_count > 0 THEN
     RAISE EXCEPTION 'polyols proxy rows violate subtype/source/comparator policy';
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM stg_measurements
+  WHERE notes LIKE 'coverage_batchB_v1:excess_from_ciqual%'
+    AND (
+      subtype_code <> 'fructose'
+      OR source_slug <> 'ciqual_2025'
+      OR method <> 'derived_from_nutrient'
+      OR comparator NOT IN ('eq', 'lt', 'lte')
+      OR evidence_tier <> 'inferred'
+    );
+  IF bad_count > 0 THEN
+    RAISE EXCEPTION 'excess_from_ciqual rows violate subtype/source/comparator policy';
   END IF;
 
   SELECT COUNT(*) INTO db_count

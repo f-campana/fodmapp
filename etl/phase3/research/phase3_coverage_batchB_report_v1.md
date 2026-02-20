@@ -1,4 +1,4 @@
-# Phase 3.6b Coverage Uplift Batch B (Research-First)
+# Phase 3.6b Coverage Uplift Batch B (Research-First, R1 fix-forward)
 
 ## Scope
 Target foods: remaining high-impact `1/6` foods tied on `to_candidate_frequency=1` in batch01+batch02 generated pools.
@@ -25,30 +25,39 @@ Cells audited: 35 missing subtype cells (7 foods x 5 missing subtypes).
   - `biesiekierski_2011_fructan`
   - `yao_2005_polyols`
   - `dysseler_hoffem_gos`
-- No additional subtype-composition rows were identified that could be promoted for the remaining missing cells without overreaching variant specificity.
+- Cells with no promotable numeric evidence were blocked with specific taxonomy reasons (no generic placeholder reasons).
 
-3. **Pass 3: CIQUAL cooked-variant proxy evaluation for polyols**
-- Evaluated CIQUAL analogue path for conservative polyol split (`CIQUAL_34000` with `lt/lte/eq`).
-- No robust analogue rows were promoted in Batch B due to variant-distance and nutrient-availability constraints for this target set.
+3. **Pass 3: strict-match CIQUAL evaluation**
+- Strict-match policy enforced (ingredient identity + preparation class compatibility).
+- Promoted strict candidates:
+  - rank 9 from CIQUAL `20097` (raw shallot)
+  - rank 16 from CIQUAL `20155` (artichoke heart, canned/drained)
+  - rank 32 from CIQUAL `13008` (raw sweet cherry)
+- Rejected candidates logged where prep mismatch or evidence conflict prevented promotion.
 
 4. **Pass 4: explicit blocked outcomes**
-- All remaining cells recorded with `measurement_found=false` and specific `blocked_reason` + notes.
+- Remaining unresolved cells recorded with allowed blocked taxonomy and source-check trace notes.
 
 ## Outcomes
 - Matrix rows: **35**
-- `measurement_found=true`: **7**
-- `measurement_found=false`: **28**
+- `measurement_found=true`: **15**
+- `measurement_found=false`: **20**
+- non-lactose found rows: **8** (passes floor `>=6`)
 
 ## Expected coverage impact (post-ingest)
 | Rank | Food | Before | After | Uplift source |
 |---|---|---:|---:|---|
-| 9 | phase2-echalote-bulbe-cru | 1/6 | 2/6 | lactose zero inference |
-| 16 | phase2-artichaut-coeur | 1/6 | 2/6 | lactose zero inference |
-| 24 | phase2-haricot-noir-cuit | 1/6 | 2/6 | lactose zero inference |
-| 25 | pois-casse-bouilli-cuit-a-l-eau | 1/6 | 2/6 | lactose zero inference |
-| 26 | phase2-edamame-cuit | 1/6 | 2/6 | lactose zero inference |
-| 29 | phase2-pistache-crue | 1/6 | 2/6 | lactose zero inference |
-| 32 | phase2-cerise-douce-crue | 1/6 | 2/6 | lactose zero inference |
+| 9 | phase2-echalote-bulbe-cru | 1/6 | 5/6 | CIQUAL strict-match + lactose inference |
+| 16 | phase2-artichaut-coeur | 1/6 | 5/6 | CIQUAL strict-match + lactose inference |
+| 24 | phase2-haricot-noir-cuit | 1/6 | 2/6 | lactose inference |
+| 25 | pois-casse-bouilli-cuit-a-l-eau | 1/6 | 2/6 | lactose inference |
+| 26 | phase2-edamame-cuit | 1/6 | 2/6 | lactose inference |
+| 29 | phase2-pistache-crue | 1/6 | 2/6 | lactose inference |
+| 32 | phase2-cerise-douce-crue | 1/6 | 4/6 | CIQUAL strict-match + lactose inference |
+
+## New audit trail artifacts
+1. `etl/phase3/research/phase3_coverage_batchB_evidence_ledger_v1.csv`
+2. `etl/phase3/research/phase3_coverage_batchB_ciqual_candidates_v1.csv`
 
 ## Deliverables
 1. `etl/phase3/research/phase3_coverage_batchB_matrix_v1.csv`

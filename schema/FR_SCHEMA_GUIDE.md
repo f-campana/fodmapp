@@ -1251,19 +1251,33 @@ Contracts:
 
 - research matrix is mandatory input:
   - `etl/phase3/research/phase3_coverage_batchB_matrix_v1.csv`
+- evidence audit artifacts:
+  - `etl/phase3/research/phase3_coverage_batchB_evidence_ledger_v1.csv`
+  - `etl/phase3/research/phase3_coverage_batchB_ciqual_candidates_v1.csv`
 - only `measurement_found=true` rows are ingested from:
   - `etl/phase3/data/phase3_coverage_batchB_measurements_v1.csv`
 - locked 4-pass methodology before declaring blocked rows:
   1. plant lactose-zero inference
   2. bibliography pass (Monash + Phase2 literature sources)
-  3. CIQUAL cooked-variant proxy evaluation for polyols
-  4. explicit blocked rows with `blocked_reason`
+  3. CIQUAL strict-match derivation (fructose/glucose pair and total-polyols bounds)
+  4. explicit blocked rows with allowed `blocked_reason` taxonomy
 - batchB allowed methods:
   - `expert_estimate` (plant lactose-zero inference)
   - `derived_from_nutrient` (exact CIQUAL derivation and conservative proxy derivation)
   - `literature` (direct bibliography-derived rows when available)
+- forbidden blocked token:
+  - `insufficient_variant_specific_evidence`
+- allowed blocked taxonomy:
+  - `no_literature_numeric_value`
+  - `no_strict_ciqual_match`
+  - `strict_match_rejected_prep_mismatch`
+  - `insufficient_fructose_glucose_pair`
+  - `evidence_conflict_not_promotable`
 - rollup precedence remains unchanged:
   - inserted rows must resolve to `signal_source_kind='explicit_measurement'` after recompute
+- Batch B R1 quality gates:
+  - non-lactose `measurement_found=true` rows `>= 6`
+  - rank `9` and rank `32` must each gain at least one non-lactose subtype
 
 Execution sequence:
 

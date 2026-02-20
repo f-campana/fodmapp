@@ -313,6 +313,10 @@ Artifacts:
   - `etl/phase3/research/phase3_coverage_batchB_matrix_v1.csv`
 - research report:
   - `etl/phase3/research/phase3_coverage_batchB_report_v1.md`
+- evidence ledger:
+  - `etl/phase3/research/phase3_coverage_batchB_evidence_ledger_v1.csv`
+- CIQUAL candidate log:
+  - `etl/phase3/research/phase3_coverage_batchB_ciqual_candidates_v1.csv`
 - curated ingestion input:
   - `etl/phase3/data/phase3_coverage_batchB_measurements_v1.csv`
 - SQL flow:
@@ -325,17 +329,28 @@ Locked Batch B research protocol:
 
 1. plant lactose-zero inference first (`expert_estimate`, `inferred`, confidence `0.95`)
 2. bibliography pass before blocking (`monash_app_v4_reference`, `muir_2007_fructan`, `biesiekierski_2011_fructan`, `yao_2005_polyols`, `dysseler_hoffem_gos`)
-3. CIQUAL cooked-variant proxy evaluation for polyol split (`CIQUAL_34000`, conservative `lt/lte/eq`)
-4. only then mark unresolved cells with `measurement_found=false` + explicit `blocked_reason`
+3. CIQUAL strict-match derivation:
+   - excess fructose from `CIQUAL_32210`/`CIQUAL_32250`
+   - conservative sorbitol/mannitol bounds from `CIQUAL_34000`
+4. only then mark unresolved cells with `measurement_found=false` + explicit blocked taxonomy
 
 Execution notes:
 
 - only rows with `measurement_found=true` are ingested
 - explicit precedence remains mandatory (`signal_source_kind='explicit_measurement'`)
+- generic blocked reason `insufficient_variant_specific_evidence` is forbidden in Batch B R1
+- blocked rows must use allowed taxonomy:
+  - `no_literature_numeric_value`
+  - `no_strict_ciqual_match`
+  - `strict_match_rejected_prep_mismatch`
+  - `insufficient_fructose_glucose_pair`
+  - `evidence_conflict_not_promotable`
 - batch checks enforce:
   - all 7 targets uplift to at least `2/6`
   - global `known_subtypes_count=1` bucket `<= 8`
   - no increase above low-coverage target baseline (`12`) in batch01+batch02 rules
+  - non-lactose found floor `>= 6`
+  - targeted proof: rank `9` and rank `32` each gain at least one non-lactose subtype
 
 ## 3.2b.1 CI Seeded Integration Pipeline
 

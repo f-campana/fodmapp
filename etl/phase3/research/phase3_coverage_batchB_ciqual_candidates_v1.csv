@@ -1,0 +1,9 @@
+priority_rank,food_slug,candidate_ciqual_code,candidate_food_slug,candidate_prep_class,target_prep_class,match_decision,match_reason,nutrient_32210,nutrient_32250,nutrient_34000,nutrient_32410,notes
+9,phase2-echalote-bulbe-cru,20097,echalote-crue,raw,raw,accept,strict_match_pass,0.8,0.5,<0.5,<0.2,"exact ingredient/prep candidate used for fructose excess + polyol bounds"
+16,phase2-artichaut-coeur,20155,artichaut-coeur-appertise-egoutte,appertise_egoutte,coeur_prepared,accept,strict_match_pass,0.6,0.6,<0.5,<0.2,"best strict heart-cut candidate used for fructose excess + polyol bounds"
+16,phase2-artichaut-coeur,20156,artichaut-fond-appertise-egoutte,appertise_egoutte,coeur_prepared,reject,evidence_conflict_not_promotable,0.8,<0.2,<0.5,<0.2,"alternate heart/fond candidate reviewed but not selected as primary"
+16,phase2-artichaut-coeur,20074,artichaut-cuit-a-la-vapeur-sous-pression,cooked_steam,coeur_prepared,reject,evidence_conflict_not_promotable,0.7,<0.2,<0.5,<0.2,"cooked pressure candidate retained as backup only"
+25,pois-casse-bouilli-cuit-a-l-eau,20515,pois-casse-sec,dry,cooked,reject,strict_match_rejected_prep_mismatch,<0.1,0.14,,<0.1,"dry split-pea candidate rejected for cooked target"
+29,phase2-pistache-crue,15009,pistache-grillee-salee,roasted,raw,reject,strict_match_rejected_prep_mismatch,0.22,0.25,,0,"roasted candidate rejected for raw target"
+29,phase2-pistache-crue,15044,pistache-grillee-sans-sel-ajoute,roasted,raw,reject,strict_match_rejected_prep_mismatch,0.22,0.26,,0,"roasted candidate rejected for raw target"
+32,phase2-cerise-douce-crue,13008,ceriser-chair-et-peau-sans-noyau-crue,raw,raw,accept,strict_match_pass,4.6,5.4,2.8,<0.2,"strict sweet-cherry raw candidate used for fructose excess and mannitol bound"
