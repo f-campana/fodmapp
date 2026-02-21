@@ -260,6 +260,54 @@ Execution stop gate for Phase 3.4:
 - run generate -> apply -> rescore -> checks
 - stop before activation and hand off the review packet for human decisions
 
+## 3.7 Batch03 Direct-Swap Expansion (Single-Review Activation Path)
+
+Batch03 extends the Batch02 contract with a new additive scope:
+- `notes='phase3_batch03_rule'`
+- `rule_key` prefix `B03_`
+- `rule_kind='direct_swap'`
+
+Locked generation gates:
+- universe restricted to ranks `1..42`, excluding rank `2`
+- conservative severity and burden gates:
+  - `to_severity <= from_severity`
+  - `to_burden_ratio <= from_burden_ratio`
+- same-subtype hard gate:
+  - `from_driver_subtype = to_driver_subtype`
+- open direct-swap exclusions in both directions:
+  - exact `(from,to)`
+  - reverse `(to,from)`
+- culinary compatibility:
+  - role overlap required
+  - and at least one of flavor/texture/method overlap > 0
+- selection contract:
+  - final size `1..40`
+  - per-from cap `<=5`
+  - per-to cap `<=5`
+  - deterministic backfill
+
+Batch03 artifacts:
+- generated CSV:
+  - `etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
+- review CSV:
+  - `etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
+- SQL flow:
+  - `phase3_swap_rules_batch03_generate.sql`
+  - `phase3_swap_rules_batch03_apply.sql`
+  - `phase3_swap_rules_batch03_rescore.sql`
+  - `phase3_swap_rules_batch03_activation_apply.sql`
+  - `phase3_swap_rules_batch03_checks.sql`
+
+Review and activation contract:
+- Gate A exports blank human decision metadata.
+- Gate B enforces snapshot lock and conservative re-evaluation.
+- Strict second-review policy remains:
+  - rows requiring second review cannot be approved without second-review metadata
+  - `second_reviewed_by` must differ from `reviewed_by`.
+- status mapping:
+  - `approve -> active`
+  - `reject|defer -> draft`
+
 ## 3.6 Coverage Uplift Batch A (Research-First)
 
 Scope lock (top-6 high-impact 1/6 foods by `to_candidate_frequency`):
