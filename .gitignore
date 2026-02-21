@@ -7,3 +7,9 @@ etl/ciqual/__pycache__/
 api/.venv/
 api/.pytest_cache/
 api/**/__pycache__/
+node_modules/
+.pnpm-store/
+.turbo/
+.env
+.env.local
+.env.*.local

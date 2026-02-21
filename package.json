@@ -1,0 +1,20 @@
+{
+  "name": "fodmap-platform",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "openapi:generate": "pnpm --filter @fodmap/types openapi:generate",
+    "openapi:check": "pnpm --filter @fodmap/types openapi:check"
+  },
+  "devDependencies": {
+    "turbo": "2.5.8"
+  }
+}
