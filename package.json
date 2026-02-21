@@ -15,6 +15,6 @@
     "openapi:check": "pnpm --filter @fodmap/types openapi:check"
   },
   "devDependencies": {
-    "turbo": "2.5.8"
+    "turbo": "2.8.10"
   }
 }
