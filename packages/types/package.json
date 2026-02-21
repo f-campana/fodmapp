@@ -1,0 +1,15 @@
+{
+  "name": "@fodmap/types",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "openapi:generate": "openapi-typescript ../../api/openapi/v0.yaml -o src/generated/v0.ts",
+    "openapi:check": "pnpm run openapi:generate && git diff --exit-code -- src/generated/v0.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.10.1",
+    "typescript": "5.9.2"
+  }
+}
