@@ -20,41 +20,41 @@ Out of scope:
 ## Artifacts
 
 Data files:
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_culinary_roles_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_texture_profiles_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cooking_behaviors_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
+- `etl/phase3/data/phase3_food_culinary_roles_v1.csv`
+- `etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
+- `etl/phase3/data/phase3_food_texture_profiles_v1.csv`
+- `etl/phase3/data/phase3_food_cooking_behaviors_v1.csv`
+- `etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
+- `etl/phase3/data/phase3_trait_exemptions_v1.csv`
+- `etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+- `etl/phase3/data/phase3_food_allergen_families_v1.csv`
+- `etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
+- `etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
+- `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
+- `etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
 
 SQL files:
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_rescore.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_apply.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_generate.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_apply.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_rescore.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_activation_apply.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_batch01_checks.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/scripts/phase3_swap_batch01_draft_instructions.py`
+- `etl/phase3/sql/phase3_traits_apply.sql`
+- `etl/phase3/sql/phase3_rollups_compute.sql`
+- `etl/phase3/sql/phase3_swap_rules_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_rescore.sql`
+- `etl/phase3/sql/phase3_swap_activation_apply.sql`
+- `etl/phase3/sql/phase3_swap_activation_checks.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch01_generate.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch01_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch01_rescore.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch01_activation_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch01_checks.sql`
+- `etl/phase3/sql/phase3_mvp_checks.sql`
+- `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+- `etl/phase3/scripts/phase3_swap_batch01_draft_instructions.py`
 
 API files:
-- `/Users/fabiencampana/Documents/Fodmap/api/openapi/v0.yaml`
-- `/Users/fabiencampana/Documents/Fodmap/api/app/main.py`
-- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/health.py`
-- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/foods.py`
-- `/Users/fabiencampana/Documents/Fodmap/api/app/routers/swaps.py`
+- `api/openapi/v0.yaml`
+- `api/app/main.py`
+- `api/app/routers/health.py`
+- `api/app/routers/foods.py`
+- `api/app/routers/swaps.py`
 
 ## Execution Order
 
@@ -122,7 +122,7 @@ Read interfaces:
 Pipeline-managed snapshot artifacts:
 - `phase3_subtype_levels_snapshot`
 - `phase3_rollups_snapshot`
-- both tables are rebuilt by `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+- both tables are rebuilt by `etl/phase3/sql/phase3_rollups_compute.sql`
 - do not edit manually; treat as internal pipeline artifacts
 - if upstream measurements/thresholds/nutrient links change, rerun rollup compute to avoid stale reads
 
@@ -149,7 +149,7 @@ Scoring/eligibility specifics:
 
 CSV handoff contract:
 - Gate A writes:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
+  `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
   via `\copy (SELECT ...) TO ... CSV HEADER`
 - reviewer updates in place:
   - `review_decision` (`approve` or `reject`)
@@ -186,8 +186,8 @@ Data freshness / dependency note:
   - `phase3_subtype_levels_snapshot`
   - `phase3_rollups_snapshot`
 - preflight before serving refreshed API data:
-  - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
-  - rerun `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+  - rerun `etl/phase3/sql/phase3_rollups_compute.sql`
+  - rerun `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
 Subtype endpoint payload contract:
 - `subtype_code`, `subtype_level`
@@ -242,9 +242,9 @@ Batch02 generation scope:
 
 Batch02 artifacts:
 - generated CSV:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
+  - `etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
 - review CSV:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
+  - `etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
 - SQL flow:
   - `phase3_swap_rules_batch02_generate.sql`
   - `phase3_swap_rules_batch02_apply.sql`
@@ -369,7 +369,7 @@ Path contract:
 
 - Phase 2/3 SQL `\copy` file inputs are repo-relative (`etl/...`).
 - Replay/seed scripts resolve `ROOT_DIR` from script location and execute from repo root.
-- CI no longer requires a `/Users/...` symlink shim for seeded integration runs.
+- CI no longer requires a user-home symlink shim for seeded integration runs.
 - Known limitation: `phase3_seed_for_api_ci.sh` seeds through MVP activation (`phase3_swap_activation_*`) only; Batch01/Batch02 activation state is intentionally not replayed in CI seeded profile.
 
 ## Rollback Strategy
