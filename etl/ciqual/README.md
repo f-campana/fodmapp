@@ -49,31 +49,31 @@ pip install openpyxl psycopg2-binary
 
 Schema must already be applied:
 
-- `/Users/fabiencampana/Documents/Fodmap/schema/fodmap_fr_schema.sql`
+- `schema/fodmap_fr_schema.sql`
 
 ## Commands
 
 ### Inspect workbook mapping
 
 ```bash
-python /Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py inspect \
-  "/Users/fabiencampana/Downloads/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx"
+python etl/ciqual/ciqual_etl.py inspect \
+  "etl/ciqual/data/raw/Table Ciqual 2025_ENG_2025_11_03.xlsx"
 ```
 
 ### Coverage stats
 
 ```bash
-time python /Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py stats \
-  "/Users/fabiencampana/Downloads/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx"
+time python etl/ciqual/ciqual_etl.py stats \
+  "etl/ciqual/data/raw/Table Ciqual 2025_ENG_2025_11_03.xlsx"
 ```
 
 ### Load into Postgres
 
 ```bash
-python /Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py load \
-  "/Users/fabiencampana/Downloads/ciqual-data/Table Ciqual 2025_ENG_2025_11_03.xlsx" \
-  --alim-xml "/Users/fabiencampana/Downloads/ciqual-data/alim_2025_11_03.xml" \
-  --alim-grp-xml "/Users/fabiencampana/Downloads/ciqual-data/alim_grp_2025_11_03.xml" \
+python etl/ciqual/ciqual_etl.py load \
+  "etl/ciqual/data/raw/Table Ciqual 2025_ENG_2025_11_03.xlsx" \
+  --alim-xml "etl/ciqual/data/raw/alim_2025_11_03.xml" \
+  --alim-grp-xml "etl/ciqual/data/raw/alim_grp_2025_11_03.xml" \
   --db-url "postgresql://$USER@localhost:5432/fodmap_test"
 ```
 

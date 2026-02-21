@@ -66,7 +66,7 @@ This remains the key blocker for garlic/onion/wheat/legume precision and require
 
 ## 6. Hardening delivered in ETL v1.1
 
-Implemented in `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py`:
+Implemented in `etl/ciqual/ciqual_etl.py`:
 
 - Streaming reads (`iter_rows(values_only=True)`) in inspect/stats/load
 - Hybrid ingestion contract:

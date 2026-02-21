@@ -4,11 +4,11 @@ This document defines the canonical SQL contract for the FODMAP planner and swap
 
 ## 1) Canonical contract and scope
 
-- Canonical source of truth: `/Users/fabiencampana/Documents/Fodmap/schema/fodmap_fr_schema.sql`
+- Canonical source of truth: `schema/fodmap_fr_schema.sql`
 - JSON payloads are projections derived from SQL, not peer schemas.
 - Scope in v1.1: schema hardening plus a reference CIQUAL ETL implementation.
 - Out of scope in v1.1: API endpoint implementation and bulk data population.
-- Reference ETL path: `/Users/fabiencampana/Documents/Fodmap/etl/ciqual/ciqual_etl.py`
+- Reference ETL path: `etl/ciqual/ciqual_etl.py`
 
 ## 2) Locked modeling decisions
 
@@ -187,14 +187,14 @@ Bucket rationale:
 
 Scaffold artifacts:
 
-- Priority template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/phase2_priority_foods_by_gap_template.csv`
-- Measurement template: `/Users/fabiencampana/Documents/Fodmap/schema/templates/fodmap_research_measurements_template.csv`
+- Priority template: `schema/templates/phase2_priority_foods_by_gap_template.csv`
+- Measurement template: `schema/templates/fodmap_research_measurements_template.csv`
 - Persistent table: `phase2_priority_foods` (seeded in canonical SQL)
-- Helper views: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_scaffold_views.sql`
-- Existing DB setup/upsert: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_priority_foods_setup.sql`
-- Pass 1 deterministic resolver: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass1.sql`
-- Pass 2 candidate report (read-only): `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_resolver_pass2_candidates.sql`
-- Validation queries: `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_validation_queries.sql`
+- Helper views: `etl/phase2/sql/phase2_scaffold_views.sql`
+- Existing DB setup/upsert: `etl/phase2/sql/phase2_priority_foods_setup.sql`
+- Pass 1 deterministic resolver: `etl/phase2/sql/phase2_resolver_pass1.sql`
+- Pass 2 candidate report (read-only): `etl/phase2/sql/phase2_resolver_pass2_candidates.sql`
+- Validation queries: `etl/phase2/sql/phase2_validation_queries.sql`
 
 `phase2_priority_foods` workflow fields:
 
@@ -250,17 +250,17 @@ Locked cohort (10 rows):
 Batch10 artifacts:
 
 - curated measurements CSV:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_measurements.csv`
+  `etl/phase2/data/phase2_batch10_measurements.csv`
 - curated thresholds CSV:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_batch10_thresholds.csv`
+  `etl/phase2/data/phase2_batch10_thresholds.csv`
 - ingestion SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_ingest_batch10.sql`
+  `etl/phase2/sql/phase2_ingest_batch10.sql`
 - status sync SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_status_sync_batch10.sql`
+  `etl/phase2/sql/phase2_status_sync_batch10.sql`
 - post-load checks:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_post_batch10_checks.sql`
+  `etl/phase2/sql/phase2_post_batch10_checks.sql`
 - readiness matrix query:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_swap_readiness_batch10.sql`
+  `etl/phase2/sql/phase2_swap_readiness_batch10.sql`
 
 Batch10 replay portability contract:
 
@@ -286,12 +286,12 @@ Batch10 status transitions:
 Batch10 quarantine workflow:
 
 - rank 2 garlic powder (`priority_rank=2`) is soft-quarantined in:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_quarantine_rank2_garlic_powder.sql`
+  `etl/phase2/sql/phase2_quarantine_rank2_garlic_powder.sql`
 - quarantine marks suspect measurement rows as `is_current = FALSE` and appends a traceable note token
 - quarantined rows remain in DB for audit and provenance
 - readiness and completion logic now excludes non-current measurements
 - dedicated checks are provided in:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_post_quarantine_checks.sql`
+  `etl/phase2/sql/phase2_post_quarantine_checks.sql`
 
 Batch10 acceptance gates:
 
@@ -338,21 +338,21 @@ Note:
 Per-wave artifact contract:
 
 - wave manifest:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_wave_manifest.csv`
+  `etl/phase2/decisions/phase2_wave_manifest.csv`
 - pod runbook:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/POD_WAVES_RUNBOOK.md`
+  `etl/phase2/POD_WAVES_RUNBOOK.md`
 - decision ledger:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_<bucket>_wave<nn>_decisions.csv`
+  `etl/phase2/decisions/phase2_<bucket>_wave<nn>_decisions.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_measurements.csv`
+  `etl/phase2/data/phase2_<bucket>_wave<nn>_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_thresholds.csv`
+  `etl/phase2/data/phase2_<bucket>_wave<nn>_thresholds.csv`
 - optional Pass 3 new-food rows:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<bucket>_wave<nn>_new_foods.csv`
+  `etl/phase2/data/phase2_<bucket>_wave<nn>_new_foods.csv`
 - apply SQL draft:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<bucket>_wave<nn>_apply.sql`
+  `etl/phase2/sql/phase2_<bucket>_wave<nn>_apply.sql`
 - post-check SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<bucket>_wave<nn>_checks.sql`
+  `etl/phase2/sql/phase2_<bucket>_wave<nn>_checks.sql`
 
 Shared Pass 3 creation rules:
 
@@ -379,17 +379,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_fructan_wave01_decisions.csv`
+  `etl/phase2/decisions/phase2_fructan_wave01_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_new_foods.csv`
+  `etl/phase2/data/phase2_fructan_wave01_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_measurements.csv`
+  `etl/phase2/data/phase2_fructan_wave01_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave01_thresholds.csv`
+  `etl/phase2/data/phase2_fructan_wave01_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave01_apply.sql`
+  `etl/phase2/sql/phase2_fructan_wave01_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave01_checks.sql`
+  `etl/phase2/sql/phase2_fructan_wave01_checks.sql`
 
 Wave 1 numeric anchors (fructan):
 
@@ -445,17 +445,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_fructan_wave02_decisions.csv`
+  `etl/phase2/decisions/phase2_fructan_wave02_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_new_foods.csv`
+  `etl/phase2/data/phase2_fructan_wave02_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_measurements.csv`
+  `etl/phase2/data/phase2_fructan_wave02_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_fructan_wave02_thresholds.csv`
+  `etl/phase2/data/phase2_fructan_wave02_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave02_apply.sql`
+  `etl/phase2/sql/phase2_fructan_wave02_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_fructan_wave02_checks.sql`
+  `etl/phase2/sql/phase2_fructan_wave02_checks.sql`
 
 Wave 2 numeric anchors (fructan):
 
@@ -500,17 +500,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_gos_wave01_decisions.csv`
+  `etl/phase2/decisions/phase2_gos_wave01_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_new_foods.csv`
+  `etl/phase2/data/phase2_gos_wave01_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_measurements.csv`
+  `etl/phase2/data/phase2_gos_wave01_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave01_thresholds.csv`
+  `etl/phase2/data/phase2_gos_wave01_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave01_apply.sql`
+  `etl/phase2/sql/phase2_gos_wave01_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave01_checks.sql`
+  `etl/phase2/sql/phase2_gos_wave01_checks.sql`
 
 Selected `resolve_existing` mappings:
 
@@ -574,17 +574,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_gos_wave02_decisions.csv`
+  `etl/phase2/decisions/phase2_gos_wave02_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_new_foods.csv`
+  `etl/phase2/data/phase2_gos_wave02_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_measurements.csv`
+  `etl/phase2/data/phase2_gos_wave02_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_gos_wave02_thresholds.csv`
+  `etl/phase2/data/phase2_gos_wave02_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave02_apply.sql`
+  `etl/phase2/sql/phase2_gos_wave02_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_gos_wave02_checks.sql`
+  `etl/phase2/sql/phase2_gos_wave02_checks.sql`
 
 Selected `resolve_existing` mapping:
 
@@ -647,17 +647,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_polyol_wave01_decisions.csv`
+  `etl/phase2/decisions/phase2_polyol_wave01_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_new_foods.csv`
+  `etl/phase2/data/phase2_polyol_wave01_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_measurements.csv`
+  `etl/phase2/data/phase2_polyol_wave01_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave01_thresholds.csv`
+  `etl/phase2/data/phase2_polyol_wave01_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave01_apply.sql`
+  `etl/phase2/sql/phase2_polyol_wave01_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave01_checks.sql`
+  `etl/phase2/sql/phase2_polyol_wave01_checks.sql`
 
 Selected `resolve_existing` mappings:
 
@@ -737,17 +737,17 @@ Wave:
 Execution artifacts:
 
 - decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_polyol_wave02_decisions.csv`
+  `etl/phase2/decisions/phase2_polyol_wave02_decisions.csv`
 - new-food definitions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_new_foods.csv`
+  `etl/phase2/data/phase2_polyol_wave02_new_foods.csv`
 - measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_measurements.csv`
+  `etl/phase2/data/phase2_polyol_wave02_measurements.csv`
 - thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_polyol_wave02_thresholds.csv`
+  `etl/phase2/data/phase2_polyol_wave02_thresholds.csv`
 - apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave02_apply.sql`
+  `etl/phase2/sql/phase2_polyol_wave02_apply.sql`
 - checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_polyol_wave02_checks.sql`
+  `etl/phase2/sql/phase2_polyol_wave02_checks.sql`
 
 Selected `resolve_existing` mappings:
 
@@ -821,15 +821,15 @@ Goal:
 Replay artifacts:
 
 - Batch01 decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_batch01_decisions.csv`
+  `etl/phase2/decisions/phase2_batch01_decisions.csv`
 - Batch01 apply:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_batch01_apply.sql`
+  `etl/phase2/sql/phase2_batch01_apply.sql`
 - Batch01 checks:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_batch01_checks.sql`
+  `etl/phase2/sql/phase2_batch01_checks.sql`
 - Final replay invariants:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_replay_final_checks.sql`
+  `etl/phase2/sql/phase2_replay_final_checks.sql`
 - Replay runner:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+  `etl/phase2/scripts/phase2_replay_from_zero.sh`
 
 Resolve-existing replay contract:
 
@@ -891,28 +891,28 @@ Scope:
 Artifacts:
 
 - runbook:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
+  `etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
 - trait files:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_culinary_roles_v1.csv`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_texture_profiles_v1.csv`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cooking_behaviors_v1.csv`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
+  - `etl/phase3/data/phase3_food_culinary_roles_v1.csv`
+  - `etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
+  - `etl/phase3/data/phase3_food_texture_profiles_v1.csv`
+  - `etl/phase3/data/phase3_food_cooking_behaviors_v1.csv`
+  - `etl/phase3/data/phase3_food_cuisine_affinities_v1.csv`
+  - `etl/phase3/data/phase3_trait_exemptions_v1.csv`
 - rule file:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
+  `etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
 - rollup defaults:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
+  `etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 - SQL pipeline:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_traits_apply.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_apply.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_rules_rescore.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_apply.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_swap_activation_checks.sql`
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_mvp_checks.sql`
+  - `etl/phase3/sql/phase3_traits_apply.sql`
+  - `etl/phase3/sql/phase3_rollups_compute.sql`
+  - `etl/phase3/sql/phase3_swap_rules_apply.sql`
+  - `etl/phase3/sql/phase3_swap_rules_rescore.sql`
+  - `etl/phase3/sql/phase3_swap_activation_apply.sql`
+  - `etl/phase3/sql/phase3_swap_activation_checks.sql`
+  - `etl/phase3/sql/phase3_mvp_checks.sql`
 - review packet:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
+  - `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
 
 ### 11.1 Rollup semantics (Phase 3.1a full 6-subtype)
 
@@ -935,7 +935,7 @@ Pipeline-managed snapshot artifacts:
 
 - `phase3_subtype_levels_snapshot`
 - `phase3_rollups_snapshot`
-- both are internal artifacts rebuilt by `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+- both are internal artifacts rebuilt by `etl/phase3/sql/phase3_rollups_compute.sql`
 - do not edit directly; rerun rollup compute after upstream data changes to refresh them
 
 Signal precedence by subtype:
@@ -949,7 +949,7 @@ Threshold precedence:
 
 - food-specific threshold first (`food_fodmap_thresholds`)
 - then global fallback defaults from:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
+  - `etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 
 Fallback threshold citation policy:
 
@@ -976,7 +976,7 @@ MVP trait checks enforce minimum coverage for each of the 42 foods:
 
 An exemption mechanism is present via:
 
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_trait_exemptions_v1.csv`
+- `etl/phase3/data/phase3_trait_exemptions_v1.csv`
 
 MVP lock:
 
@@ -998,7 +998,7 @@ Phase 3.1b activates a reviewed subset of the 12 MVP rules in two gates:
    - recompute `swap_rule_scores.fodmap_safety_score` from full rollups
    - set `scoring_version='v2_full_rollup_2026_02_18'`
    - export reviewer packet via
-     `\copy (SELECT ...) TO '/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_activation_review_v1.csv'`
+     `\copy (SELECT ...) TO 'etl/phase3/decisions/phase3_swap_activation_review_v1.csv'`
 
 2. Gate B (`phase3_swap_activation_apply.sql`):
    - load reviewed CSV via `\copy ... FROM`
@@ -1063,7 +1063,7 @@ Rollup freshness contract:
 
 - API rollup projections come from `v_phase3_rollups_latest_full`
 - this depends on pipeline-managed snapshots rebuilt by:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/sql/phase3_rollups_compute.sql`
+  - `etl/phase3/sql/phase3_rollups_compute.sql`
 - API responses expose freshness/provenance fields:
   - `rollup_computed_at`
   - `scoring_version`
@@ -1097,11 +1097,11 @@ Locked scope:
 Batch01 artifacts:
 
 - generated candidates:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
+  - `etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
 - allergen gate mapping:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_food_allergen_families_v1.csv`
+  - `etl/phase3/data/phase3_food_allergen_families_v1.csv`
 - review packet:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
+  - `etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
 - SQL flow:
   - `phase3_swap_rules_batch01_generate.sql`
   - `phase3_swap_rules_batch01_apply.sql`
@@ -1171,9 +1171,9 @@ Locked Batch02 delta:
 Batch02 artifacts:
 
 - generated candidates:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
+  - `etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
 - review packet:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
+  - `etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
 - SQL flow:
   - `phase3_swap_rules_batch02_generate.sql`
   - `phase3_swap_rules_batch02_apply.sql`

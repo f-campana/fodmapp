@@ -21,19 +21,19 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 
 ## Artifact locations
 - Wave manifest:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_wave_manifest.csv`
+  `etl/phase2/decisions/phase2_wave_manifest.csv`
 - Decisions:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/decisions/phase2_<wave_key>_decisions.csv`
+  `etl/phase2/decisions/phase2_<wave_key>_decisions.csv`
 - Measurements:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<wave_key>_measurements.csv`
+  `etl/phase2/data/phase2_<wave_key>_measurements.csv`
 - Thresholds:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<wave_key>_thresholds.csv`
+  `etl/phase2/data/phase2_<wave_key>_thresholds.csv`
 - Optional Pass3 new-food rows:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/data/phase2_<wave_key>_new_foods.csv`
+  `etl/phase2/data/phase2_<wave_key>_new_foods.csv`
 - Apply SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<wave_key>_apply.sql`
+  `etl/phase2/sql/phase2_<wave_key>_apply.sql`
 - Checks SQL:
-  `/Users/fabiencampana/Documents/Fodmap/etl/phase2/sql/phase2_<wave_key>_checks.sql`
+  `etl/phase2/sql/phase2_<wave_key>_checks.sql`
 
 ## Wave execution contract (active)
 - `fructan_wave01` executed (mutating, all rows `create_new_food`).
@@ -115,7 +115,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 ## Replay-gap remediation workflow (from-zero deterministic replay)
 
 Replay runner:
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase2/scripts/phase2_replay_from_zero.sh`
+- `etl/phase2/scripts/phase2_replay_from_zero.sh`
 
 Replay sequence (locked):
 1. Drop/create replay DB.
@@ -150,7 +150,7 @@ Final invariant highlights:
 ## Product-layer handoff
 
 Phase 2 data foundation now feeds Phase 3 SQL product-layer work:
-- `/Users/fabiencampana/Documents/Fodmap/etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
+- `etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
 
 Phase 3 executes:
 - culinary trait curation for priority ranks `1..42`
