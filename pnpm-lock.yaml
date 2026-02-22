@@ -72,9 +72,15 @@ importers:
 
   packages/design-tokens:
     devDependencies:
+      colorjs.io:
+        specifier: 0.5.2
+        version: 0.5.2
       style-dictionary:
         specifier: 5.3.2
         version: 5.3.2(tslib@2.8.1)
+      tinycolor2:
+        specifier: 1.6.0
+        version: 1.6.0
 
   packages/tailwind-config:
     dependencies:

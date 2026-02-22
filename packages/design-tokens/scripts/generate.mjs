@@ -2,11 +2,14 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import Color from "colorjs.io";
+import tinycolor from "tinycolor2";
 
 const __filename = fileURLToPath(import.meta.url);
 const packageRoot = path.resolve(path.dirname(__filename), "..");
 const generatedDir = path.join(packageRoot, "src", "generated");
 const tempBuildDir = path.join(packageRoot, ".tmp", "style-dictionary");
+const baseColorTokensFile = path.join(packageRoot, "src", "tokens", "base", "color.json");
 
 const aliasMap = [
   ["--color-bg", "--fd-semantic-color-background-canvas"],
@@ -42,6 +45,89 @@ function runBuild(target) {
 
 function readJson(filename) {
   return JSON.parse(readFileSync(path.join(tempBuildDir, filename), "utf8"));
+}
+
+function isFiniteNumber(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function validateBaseColorTokens() {
+  const source = JSON.parse(readFileSync(baseColorTokensFile, "utf8"));
+  const errors = [];
+
+  function validateColorLeaf(tokenPath, value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      errors.push(`${tokenPath}: expected \"$value\" to be an object.`);
+      return;
+    }
+
+    const { colorSpace, components, hex } = value;
+
+    if (colorSpace !== "oklch") {
+      errors.push(`${tokenPath}: expected colorSpace=\"oklch\", received ${JSON.stringify(colorSpace)}.`);
+    }
+
+    if (!Array.isArray(components) || components.length !== 3 || components.some((component) => !isFiniteNumber(component))) {
+      errors.push(`${tokenPath}: expected components to be [L, C, H] finite numbers.`);
+      return;
+    }
+
+    const [l, c, h] = components;
+
+    if (l < 0 || l > 1) {
+      errors.push(`${tokenPath}: L must be within 0..1, received ${l}.`);
+    }
+
+    if (c < 0) {
+      errors.push(`${tokenPath}: C must be >= 0, received ${c}.`);
+    }
+
+    if (h < 0 || h >= 360) {
+      errors.push(`${tokenPath}: H must be >= 0 and < 360, received ${h}.`);
+    }
+
+    if (typeof hex !== "string" || !/^#[0-9a-f]{6}$/.test(hex)) {
+      errors.push(`${tokenPath}: hex must be lowercase #rrggbb, received ${JSON.stringify(hex)}.`);
+      return;
+    }
+
+    if (!tinycolor(hex).isValid()) {
+      errors.push(`${tokenPath}: hex value is not a valid color (${hex}).`);
+      return;
+    }
+
+    try {
+      const roundTripHex = new Color("oklch", [l, c, h]).to("srgb").toString({ format: "hex" }).toLowerCase();
+
+      if (roundTripHex !== hex) {
+        errors.push(`${tokenPath}: hex mismatch, expected ${hex} from source but roundtrip produced ${roundTripHex}.`);
+      }
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error);
+      errors.push(`${tokenPath}: failed OKLCH roundtrip check (${details}).`);
+    }
+  }
+
+  function walk(node, pathParts) {
+    if (!node || typeof node !== "object") {
+      return;
+    }
+
+    if (node.$type === "color") {
+      validateColorLeaf(pathParts.join("."), node.$value);
+      return;
+    }
+
+    for (const [key, value] of Object.entries(node)) {
+      walk(value, [...pathParts, key]);
+    }
+  }
+
+  walk(source, []);
+
+  if (errors.length > 0) {
+    throw new Error(`Base color token preflight failed:\n${errors.map((error) => `- ${error}`).join("\n")}`);
+  }
 }
 
 function extractVariableDeclarations(cssText) {
@@ -146,6 +232,8 @@ function writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, dark
 
 rmSync(tempBuildDir, { recursive: true, force: true });
 mkdirSync(tempBuildDir, { recursive: true });
+
+validateBaseColorTokens();
 
 runBuild("base");
 runBuild("light");
