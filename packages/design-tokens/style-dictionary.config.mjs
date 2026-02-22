@@ -1,15 +1,24 @@
+import StyleDictionary from "style-dictionary";
+import { transformGroups, transforms } from "style-dictionary/enums";
+
 const target = process.env.FD_BUILD_TARGET ?? "light";
 const outputPath = process.env.FD_OUTPUT_PATH ?? "src/generated/tmp/";
 const buildPath = outputPath.endsWith("/") ? outputPath : `${outputPath}/`;
 
 const semanticFilter = (token) => token.path[0] === "semantic";
+const cssTransforms = StyleDictionary.hooks.transformGroups[transformGroups.css].map((transform) =>
+  transform === transforms.colorCss ? transforms.colorOklch : transform
+);
+const jsTransforms = StyleDictionary.hooks.transformGroups[transformGroups.js].map((transform) =>
+  transform === transforms.colorHex ? transforms.colorOklch : transform
+);
 
 const configs = {
   base: {
     source: ["src/tokens/base/**/*.json"],
     platforms: {
       json: {
-        transformGroup: "js",
+        transforms: jsTransforms,
         buildPath,
         files: [
           {
@@ -24,7 +33,7 @@ const configs = {
     source: ["src/tokens/base/**/*.json", "src/tokens/semantic/light.json"],
     platforms: {
       css: {
-        transformGroup: "css",
+        transforms: cssTransforms,
         prefix: "fd",
         buildPath,
         files: [
@@ -38,7 +47,7 @@ const configs = {
         ]
       },
       json: {
-        transformGroup: "js",
+        transforms: jsTransforms,
         buildPath,
         files: [
           {
@@ -54,7 +63,7 @@ const configs = {
     source: ["src/tokens/base/**/*.json", "src/tokens/semantic/dark.json"],
     platforms: {
       css: {
-        transformGroup: "css",
+        transforms: cssTransforms,
         prefix: "fd",
         buildPath,
         files: [
@@ -68,7 +77,7 @@ const configs = {
         ]
       },
       json: {
-        transformGroup: "js",
+        transforms: jsTransforms,
         buildPath,
         files: [
           {

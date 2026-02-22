@@ -23,6 +23,8 @@
     "build": "pnpm run tokens:generate"
   },
   "devDependencies": {
+    "colorjs.io": "0.5.2",
+    "tinycolor2": "1.6.0",
     "style-dictionary": "5.3.2"
   }
 }

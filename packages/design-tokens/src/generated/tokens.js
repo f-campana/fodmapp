@@ -22,97 +22,97 @@ export const tokens = {
     },
     "color": {
       "neutral": {
-        "50": "#fafaf9",
-        "100": "#f5f5f4",
-        "200": "#e7e5e4",
-        "300": "#d6d3d1",
-        "400": "#a8a29e",
-        "500": "#78716c",
-        "600": "#57534e",
-        "700": "#44403c",
-        "800": "#292524",
-        "900": "#1c1917",
-        "950": "#0c0a09"
+        "50": "oklch(0.9848 0.0013 106.42)",
+        "100": "oklch(0.9699 0.0013 106.42)",
+        "200": "oklch(0.9232 0.0026 48.72)",
+        "300": "oklch(0.8687 0.0043 56.37)",
+        "400": "oklch(0.7161 0.0091 56.26)",
+        "500": "oklch(0.5534 0.0116 58.07)",
+        "600": "oklch(0.4444 0.0096 73.64)",
+        "700": "oklch(0.3741 0.0087 67.56)",
+        "800": "oklch(0.2685 0.0063 34.30)",
+        "900": "oklch(0.2161 0.0061 56.04)",
+        "950": "oklch(0.1469 0.0041 49.25)"
       },
       "blue": {
-        "50": "#f0f9ff",
-        "100": "#e0f2fe",
-        "200": "#bae6fd",
-        "300": "#7dd3fc",
-        "400": "#38bdf8",
-        "500": "#0ea5e9",
-        "600": "#0284c7",
-        "700": "#0369a1",
-        "800": "#075985",
-        "900": "#0c4a6e"
+        "50": "oklch(0.9771 0.0125 236.62)",
+        "100": "oklch(0.9514 0.0250 236.82)",
+        "200": "oklch(0.9014 0.0555 230.90)",
+        "300": "oklch(0.8276 0.1013 230.32)",
+        "400": "oklch(0.7535 0.1390 232.66)",
+        "500": "oklch(0.6847 0.1479 237.32)",
+        "600": "oklch(0.5876 0.1389 241.97)",
+        "700": "oklch(0.5000 0.1193 242.75)",
+        "800": "oklch(0.4434 0.1000 240.79)",
+        "900": "oklch(0.3912 0.0845 240.88)"
       },
       "emerald": {
-        "50": "#ecfdf5",
-        "100": "#d1fae5",
-        "200": "#a7f3d0",
-        "300": "#6ee7b7",
-        "400": "#34d399",
-        "500": "#10b981",
-        "600": "#059669",
-        "700": "#047857",
-        "800": "#065f46",
-        "900": "#064e3b"
+        "50": "oklch(0.9793 0.0207 166.11)",
+        "100": "oklch(0.9505 0.0507 163.05)",
+        "200": "oklch(0.9049 0.0895 164.15)",
+        "300": "oklch(0.8452 0.1299 164.98)",
+        "400": "oklch(0.7729 0.1535 163.22)",
+        "500": "oklch(0.6959 0.1491 162.48)",
+        "600": "oklch(0.5960 0.1274 163.23)",
+        "700": "oklch(0.5081 0.1049 165.61)",
+        "800": "oklch(0.4318 0.0865 166.91)",
+        "900": "oklch(0.3780 0.0730 168.94)"
       },
       "amber": {
-        "50": "#fffbeb",
-        "100": "#fef3c7",
-        "200": "#fde68a",
-        "300": "#fcd34d",
-        "400": "#fbbf24",
-        "500": "#f59e0b",
-        "600": "#d97706",
-        "700": "#b45309",
-        "800": "#92400e",
-        "900": "#78350f"
+        "50": "oklch(0.9869 0.0214 95.28)",
+        "100": "oklch(0.9619 0.0580 95.62)",
+        "200": "oklch(0.9243 0.1151 95.75)",
+        "300": "oklch(0.8790 0.1534 91.61)",
+        "400": "oklch(0.8369 0.1644 84.43)",
+        "500": "oklch(0.7686 0.1647 70.08)",
+        "600": "oklch(0.6658 0.1574 58.32)",
+        "700": "oklch(0.5553 0.1455 49.00)",
+        "800": "oklch(0.4732 0.1247 46.20)",
+        "900": "oklch(0.4137 0.1054 45.90)"
       },
       "red": {
-        "50": "#fef2f2",
-        "100": "#fee2e2",
-        "200": "#fecaca",
-        "300": "#fca5a5",
-        "400": "#f87171",
-        "500": "#ef4444",
-        "600": "#dc2626",
-        "700": "#b91c1c",
-        "800": "#991b1b",
-        "900": "#7f1d1d"
+        "50": "oklch(0.9705 0.0129 17.38)",
+        "100": "oklch(0.9356 0.0309 17.72)",
+        "200": "oklch(0.8845 0.0593 18.33)",
+        "300": "oklch(0.8077 0.1035 19.57)",
+        "400": "oklch(0.7106 0.1661 22.22)",
+        "500": "oklch(0.6368 0.2078 25.33)",
+        "600": "oklch(0.5771 0.2152 27.33)",
+        "700": "oklch(0.5054 0.1905 27.52)",
+        "800": "oklch(0.4437 0.1613 26.90)",
+        "900": "oklch(0.3958 0.1331 25.72)"
       },
       "brand": {
-        "canvasLight": "#faf6ef",
-        "surfaceLight": "#fffdf8",
-        "surfaceStrongLight": "#f0e6d5",
-        "surfaceMutedLight": "#ece2d2",
-        "textLight": "#2d2218",
-        "textMutedLight": "#6d5541",
-        "borderLight": "#d4c0a5",
-        "accentLight": "#5d7a35",
-        "accentStrongLight": "#4a622a",
-        "accentForegroundLight": "#f9f6ef",
-        "ringLight": "#89a95f",
-        "warningLight": "#9d5f19",
-        "warningForegroundLight": "#fff8ed",
-        "dangerLight": "#99413a",
-        "dangerForegroundLight": "#fff5f4",
-        "canvasDark": "#1b1510",
-        "surfaceDark": "#292018",
-        "surfaceStrongDark": "#362a1f",
-        "surfaceMutedDark": "#3f3024",
-        "textDark": "#f6ebdc",
-        "textMutedDark": "#ccbaa4",
-        "borderDark": "#5a4735",
-        "accentDark": "#86a94f",
-        "accentStrongDark": "#9abc63",
-        "accentForegroundDark": "#11170b",
-        "ringDark": "#b8d98a",
-        "warningDark": "#d09147",
-        "warningForegroundDark": "#271507",
-        "dangerDark": "#d27b73",
-        "dangerForegroundDark": "#2c100f"
+        "canvasLight": "oklch(0.9743 0.0102 81.80)",
+        "surfaceLight": "oklch(0.9942 0.0069 88.64)",
+        "surfaceStrongLight": "oklch(0.9283 0.0251 81.12)",
+        "surfaceMutedLight": "oklch(0.9164 0.0240 79.74)",
+        "textLight": "oklch(0.2618 0.0244 63.71)",
+        "textMutedLight": "oklch(0.4688 0.0442 61.23)",
+        "borderLight": "oklch(0.8175 0.0431 75.34)",
+        "accentLight": "oklch(0.5407 0.1021 128.36)",
+        "accentStrongLight": "oklch(0.4630 0.0866 128.61)",
+        "accentForegroundLight": "oklch(0.9735 0.0098 87.47)",
+        "ringLight": "oklch(0.6932 0.1067 128.04)",
+        "warningLight": "oklch(0.5436 0.1133 63.26)",
+        "warningForegroundLight": "oklch(0.9816 0.0163 79.35)",
+        "dangerLight": "oklch(0.4910 0.1197 26.91)",
+        "dangerForegroundLight": "oklch(0.9776 0.0109 24.32)",
+        "canvasDark": "oklch(0.2013 0.0137 61.72)",
+        "surfaceDark": "oklch(0.2515 0.0200 63.35)",
+        "surfaceStrongDark": "oklch(0.2953 0.0260 64.06)",
+        "surfaceMutedDark": "oklch(0.3225 0.0298 60.12)",
+        "textDark": "oklch(0.9447 0.0232 75.86)",
+        "textMutedDark": "oklch(0.7982 0.0365 72.80)",
+        "borderDark": "oklch(0.4129 0.0384 64.89)",
+        "accentDark": "oklch(0.6888 0.1248 127.03)",
+        "accentStrongDark": "oklch(0.7500 0.1226 126.36)",
+        "accentForegroundDark": "oklch(0.1942 0.0247 130.03)",
+        "ringDark": "oklch(0.8426 0.1096 127.06)",
+        "warningDark": "oklch(0.7049 0.1180 68.09)",
+        "warningForegroundDark": "oklch(0.2170 0.0381 57.37)",
+        "dangerDark": "oklch(0.6753 0.1098 25.96)",
+        "dangerForegroundDark": "oklch(0.2166 0.0467 23.79)"
       }
     },
     "motion": {
@@ -232,55 +232,55 @@ export const tokens = {
       "semantic": {
         "color": {
           "background": {
-            "canvas": "#faf6ef"
+            "canvas": "oklch(0.9743 0.0102 81.80)"
           },
           "surface": {
-            "default": "#fffdf8",
-            "raised": "#f0e6d5",
-            "muted": "#ece2d2",
-            "inverse": "#1c1917"
+            "default": "oklch(0.9942 0.0069 88.64)",
+            "raised": "oklch(0.9283 0.0251 81.12)",
+            "muted": "oklch(0.9164 0.0240 79.74)",
+            "inverse": "oklch(0.2161 0.0061 56.04)"
           },
           "text": {
-            "primary": "#2d2218",
-            "muted": "#6d5541",
-            "inverse": "#fafaf9"
+            "primary": "oklch(0.2618 0.0244 63.71)",
+            "muted": "oklch(0.4688 0.0442 61.23)",
+            "inverse": "oklch(0.9848 0.0013 106.42)"
           },
           "border": {
-            "default": "#d4c0a5",
-            "subtle": "#e7e5e4",
-            "strong": "#a8a29e"
+            "default": "oklch(0.8175 0.0431 75.34)",
+            "subtle": "oklch(0.9232 0.0026 48.72)",
+            "strong": "oklch(0.7161 0.0091 56.26)"
           },
           "focus": {
-            "ring": "#89a95f"
+            "ring": "oklch(0.6932 0.1067 128.04)"
           },
           "action": {
             "primary": {
-              "bg": "#5d7a35",
-              "bgHover": "#4a622a",
-              "fg": "#f9f6ef"
+              "bg": "oklch(0.5407 0.1021 128.36)",
+              "bgHover": "oklch(0.4630 0.0866 128.61)",
+              "fg": "oklch(0.9735 0.0098 87.47)"
             },
             "secondary": {
-              "bg": "#f5f5f4",
-              "bgHover": "#e7e5e4",
-              "fg": "#1c1917"
+              "bg": "oklch(0.9699 0.0013 106.42)",
+              "bgHover": "oklch(0.9232 0.0026 48.72)",
+              "fg": "oklch(0.2161 0.0061 56.04)"
             }
           },
           "status": {
             "info": {
-              "bg": "#0369a1",
-              "fg": "#fafaf9"
+              "bg": "oklch(0.5000 0.1193 242.75)",
+              "fg": "oklch(0.9848 0.0013 106.42)"
             },
             "success": {
-              "bg": "#047857",
-              "fg": "#fafaf9"
+              "bg": "oklch(0.5081 0.1049 165.61)",
+              "fg": "oklch(0.9848 0.0013 106.42)"
             },
             "warning": {
-              "bg": "#9d5f19",
-              "fg": "#fff8ed"
+              "bg": "oklch(0.5436 0.1133 63.26)",
+              "fg": "oklch(0.9816 0.0163 79.35)"
             },
             "danger": {
-              "bg": "#99413a",
-              "fg": "#fff5f4"
+              "bg": "oklch(0.4910 0.1197 26.91)",
+              "fg": "oklch(0.9776 0.0109 24.32)"
             }
           }
         },
@@ -312,55 +312,55 @@ export const tokens = {
       "semantic": {
         "color": {
           "background": {
-            "canvas": "#1b1510"
+            "canvas": "oklch(0.2013 0.0137 61.72)"
           },
           "surface": {
-            "default": "#292018",
-            "raised": "#362a1f",
-            "muted": "#3f3024",
-            "inverse": "#fafaf9"
+            "default": "oklch(0.2515 0.0200 63.35)",
+            "raised": "oklch(0.2953 0.0260 64.06)",
+            "muted": "oklch(0.3225 0.0298 60.12)",
+            "inverse": "oklch(0.9848 0.0013 106.42)"
           },
           "text": {
-            "primary": "#f6ebdc",
-            "muted": "#ccbaa4",
-            "inverse": "#0c0a09"
+            "primary": "oklch(0.9447 0.0232 75.86)",
+            "muted": "oklch(0.7982 0.0365 72.80)",
+            "inverse": "oklch(0.1469 0.0041 49.25)"
           },
           "border": {
-            "default": "#5a4735",
-            "subtle": "#44403c",
-            "strong": "#78716c"
+            "default": "oklch(0.4129 0.0384 64.89)",
+            "subtle": "oklch(0.3741 0.0087 67.56)",
+            "strong": "oklch(0.5534 0.0116 58.07)"
           },
           "focus": {
-            "ring": "#b8d98a"
+            "ring": "oklch(0.8426 0.1096 127.06)"
           },
           "action": {
             "primary": {
-              "bg": "#86a94f",
-              "bgHover": "#9abc63",
-              "fg": "#11170b"
+              "bg": "oklch(0.6888 0.1248 127.03)",
+              "bgHover": "oklch(0.7500 0.1226 126.36)",
+              "fg": "oklch(0.1942 0.0247 130.03)"
             },
             "secondary": {
-              "bg": "#44403c",
-              "bgHover": "#57534e",
-              "fg": "#fafaf9"
+              "bg": "oklch(0.3741 0.0087 67.56)",
+              "bgHover": "oklch(0.4444 0.0096 73.64)",
+              "fg": "oklch(0.9848 0.0013 106.42)"
             }
           },
           "status": {
             "info": {
-              "bg": "#38bdf8",
-              "fg": "#0c0a09"
+              "bg": "oklch(0.7535 0.1390 232.66)",
+              "fg": "oklch(0.1469 0.0041 49.25)"
             },
             "success": {
-              "bg": "#34d399",
-              "fg": "#0c0a09"
+              "bg": "oklch(0.7729 0.1535 163.22)",
+              "fg": "oklch(0.1469 0.0041 49.25)"
             },
             "warning": {
-              "bg": "#d09147",
-              "fg": "#271507"
+              "bg": "oklch(0.7049 0.1180 68.09)",
+              "fg": "oklch(0.2170 0.0381 57.37)"
             },
             "danger": {
-              "bg": "#d27b73",
-              "fg": "#2c100f"
+              "bg": "oklch(0.6753 0.1098 25.96)",
+              "fg": "oklch(0.2166 0.0467 23.79)"
             }
           }
         },
