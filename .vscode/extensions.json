@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "csstools.postcss",
+    "ms-playwright.playwright",
+    "ms-python.python",
+    "eamodio.gitlens",
+    "github.vscode-github-actions",
+    "yoavbls.pretty-ts-errors"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@fodmap/tailwind-config",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    "./shared-styles.css": "./shared-styles.css"
+  },
+  "files": [
+    "shared-styles.css",
+    "README.md"
+  ],
+  "dependencies": {
+    "@fodmap/design-tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.2.0"
+  }
+}

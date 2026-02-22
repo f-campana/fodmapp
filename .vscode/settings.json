@@ -1,0 +1,9 @@
+{
+  "npm.packageManager": "pnpm",
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "tailwindCSS.hovers": true,
+  "tailwindCSS.suggestions": true,
+  "tailwindCSS.codeActions": true
+}

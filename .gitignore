@@ -1,15 +1,41 @@
-.DS_Store
-*.log
-.idea/
-.vscode/
-etl/ciqual/data/
-etl/ciqual/__pycache__/
-api/.venv/
-api/.pytest_cache/
-api/**/__pycache__/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
 node_modules/
 .pnpm-store/
+
+# build outputs and caches
 .turbo/
+dist/
+coverage/
+storybook-static/
+playwright-report/
+packages/design-tokens/.tmp/
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# environment files
 .env
 .env.local
 .env.*.local
+
+# python environments and caches
+api/.venv/
+api/.pytest_cache/
+api/**/__pycache__/
+etl/ciqual/__pycache__/
+
+# local data files
+etl/ciqual/data/
+
+# editors and system files
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store

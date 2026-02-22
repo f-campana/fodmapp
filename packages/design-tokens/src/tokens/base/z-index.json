@@ -1,0 +1,16 @@
+{
+  "base": {
+    "zIndex": {
+      "auto": { "$value": "auto", "$type": "string" },
+      "base": { "$value": 0, "$type": "number" },
+      "dropdown": { "$value": 1000, "$type": "number" },
+      "sticky": { "$value": 1020, "$type": "number" },
+      "fixed": { "$value": 1030, "$type": "number" },
+      "overlay": { "$value": 1040, "$type": "number" },
+      "modal": { "$value": 1050, "$type": "number" },
+      "popover": { "$value": 1060, "$type": "number" },
+      "toast": { "$value": 1080, "$type": "number" },
+      "tooltip": { "$value": 1100, "$type": "number" }
+    }
+  }
+}

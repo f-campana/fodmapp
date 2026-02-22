@@ -16,6 +16,18 @@
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "outputs": []
+    },
+    "storybook": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["apps/storybook/storybook-static/**"]
+    },
+    "storybook:test": {
+      "dependsOn": ["storybook:build"],
+      "outputs": []
     }
   }
 }
