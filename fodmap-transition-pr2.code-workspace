@@ -1,0 +1,42 @@
+{
+  "folders": [
+    {
+      "name": "Fodmap Transition PR2",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "npm.packageManager": "pnpm",
+    "files.associations": {
+      "*.css": "tailwindcss",
+      "turbo.json": "jsonc"
+    },
+    "editor.quickSuggestions": {
+      "strings": "on"
+    },
+    "tailwindCSS.classFunctions": [
+      "cn",
+      "cva",
+      "clsx"
+    ],
+    "tailwindCSS.experimental.configFile": "packages/tailwind-config/shared-styles.css",
+    "tailwindCSS.hovers": true,
+    "tailwindCSS.suggestions": true,
+    "tailwindCSS.codeActions": true
+  },
+  "extensions": {
+    "recommendations": [
+      "bradlc.vscode-tailwindcss",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "csstools.postcss",
+      "ms-playwright.playwright",
+      "ms-python.python",
+      "eamodio.gitlens",
+      "github.vscode-github-actions",
+      "yoavbls.pretty-ts-errors"
+    ]
+  }
+}

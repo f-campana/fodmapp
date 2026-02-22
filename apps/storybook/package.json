@@ -1,0 +1,31 @@
+{
+  "name": "@fodmap/storybook",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "storybook": "pnpm --filter @fodmap/ui build && storybook dev -p 6006 --ci",
+    "storybook:build": "pnpm --filter @fodmap/ui build && storybook build",
+    "storybook:typecheck": "tsc -p tsconfig.json --noEmit",
+    "storybook:serve": "http-server ./storybook-static -p 6006 -a 127.0.0.1 --silent",
+    "storybook:test": "start-server-and-test \"pnpm storybook:serve\" http://127.0.0.1:6006 \"test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\""
+  },
+  "dependencies": {
+    "@fodmap/ui": "workspace:*",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@storybook/addon-a11y": "10.2.10",
+    "@storybook/react-vite": "10.2.10",
+    "@storybook/test-runner": "0.24.2",
+    "http-server": "14.1.1",
+    "playwright": "1.58.2",
+    "start-server-and-test": "2.1.3",
+    "storybook": "10.2.10",
+    "typescript": "5.9.3",
+    "vite": "7.3.1"
+  }
+}

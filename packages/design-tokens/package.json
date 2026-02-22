@@ -1,0 +1,28 @@
+{
+  "name": "@fodmap/design-tokens",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/generated/tokens.d.ts",
+      "import": "./src/generated/tokens.js"
+    },
+    "./css": "./src/generated/tokens.css",
+    "./json": "./src/generated/tokens.json"
+  },
+  "files": [
+    "src/generated",
+    "src/tokens",
+    "style-dictionary.config.mjs",
+    "README.md"
+  ],
+  "scripts": {
+    "tokens:generate": "node ./scripts/generate.mjs",
+    "tokens:check": "pnpm run tokens:generate && git diff --exit-code -- src/generated",
+    "build": "pnpm run tokens:generate"
+  },
+  "devDependencies": {
+    "style-dictionary": "5.3.2"
+  }
+}

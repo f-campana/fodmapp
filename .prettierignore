@@ -1,0 +1,8 @@
+node_modules
+.pnpm-store
+.turbo
+coverage
+storybook-static
+dist
+packages/design-tokens/src/generated
+pnpm-lock.yaml

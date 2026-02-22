@@ -1,0 +1,15 @@
+{
+  "base": {
+    "radius": {
+      "none": { "$value": "0rem", "$type": "dimension" },
+      "xs": { "$value": "0.125rem", "$type": "dimension" },
+      "sm": { "$value": "0.25rem", "$type": "dimension" },
+      "md": { "$value": "0.5rem", "$type": "dimension" },
+      "lg": { "$value": "0.75rem", "$type": "dimension" },
+      "xl": { "$value": "1rem", "$type": "dimension" },
+      "2xl": { "$value": "1.5rem", "$type": "dimension" },
+      "3xl": { "$value": "2rem", "$type": "dimension" },
+      "full": { "$value": "9999px", "$type": "dimension" }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "base": {
+    "typography": {
+      "fontFamily": {
+        "display": {
+          "$value": "\"Cormorant Garamond\", \"Times New Roman\", serif",
+          "$type": "fontFamily"
+        },
+        "body": {
+          "$value": "\"Source Sans 3\", \"Helvetica Neue\", sans-serif",
+          "$type": "fontFamily"
+        },
+        "mono": {
+          "$value": "\"JetBrains Mono\", \"SFMono-Regular\", Menlo, monospace",
+          "$type": "fontFamily"
+        }
+      },
+      "fontSize": {
+        "xs": { "$value": "0.75rem", "$type": "dimension" },
+        "sm": { "$value": "0.875rem", "$type": "dimension" },
+        "md": { "$value": "1rem", "$type": "dimension" },
+        "lg": { "$value": "1.125rem", "$type": "dimension" },
+        "xl": { "$value": "1.25rem", "$type": "dimension" },
+        "2xl": { "$value": "1.5rem", "$type": "dimension" },
+        "3xl": { "$value": "1.875rem", "$type": "dimension" },
+        "4xl": { "$value": "2.25rem", "$type": "dimension" },
+        "5xl": { "$value": "3rem", "$type": "dimension" }
+      },
+      "fontWeight": {
+        "regular": { "$value": 400, "$type": "fontWeight" },
+        "medium": { "$value": 500, "$type": "fontWeight" },
+        "semibold": { "$value": 600, "$type": "fontWeight" },
+        "bold": { "$value": 700, "$type": "fontWeight" }
+      },
+      "lineHeight": {
+        "tight": { "$value": 1.2, "$type": "number" },
+        "snug": { "$value": 1.35, "$type": "number" },
+        "normal": { "$value": 1.5, "$type": "number" },
+        "relaxed": { "$value": 1.625, "$type": "number" },
+        "loose": { "$value": 1.75, "$type": "number" }
+      },
+      "letterSpacing": {
+        "tight": { "$value": "-0.02em", "$type": "dimension" },
+        "normal": { "$value": "0em", "$type": "dimension" },
+        "wide": { "$value": "0.01em", "$type": "dimension" },
+        "wider": { "$value": "0.025em", "$type": "dimension" }
+      }
+    }
+  }
+}
