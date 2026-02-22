@@ -1,0 +1,1456 @@
+.fd-tokendocs-page {
+  font-family: var(--font-body, "Source Sans 3", "Helvetica Neue", sans-serif);
+  color: var(--color-foreground);
+  background:
+    radial-gradient(
+      circle at 8% -12%,
+      color-mix(in oklab, var(--color-primary) 14%, transparent),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 92% -14%,
+      color-mix(in oklab, var(--color-warning) 10%, transparent),
+      transparent 34%
+    ),
+    var(--color-background);
+}
+
+.fd-tokendocs-container {
+  margin: 0 auto;
+  display: grid;
+  width: 100%;
+  max-width: 76rem;
+  gap: 1rem;
+  padding: 1.25rem 1rem 2.25rem;
+}
+
+@media (min-width: 768px) {
+  .fd-tokendocs-container {
+    gap: 1.25rem;
+    padding: 1.5rem 1.5rem 2.75rem;
+  }
+}
+
+.fd-tokendocs-header {
+  display: grid;
+  gap: 0.45rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
+  padding-bottom: 0.9rem;
+}
+
+.fd-tokendocs-title {
+  margin: 0;
+  font-size: clamp(1.75rem, 2.8vw, 2.55rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.fd-tokendocs-subtitle {
+  margin: 0;
+  max-width: 66ch;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-pageToolbar {
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.95rem;
+  background: color-mix(in oklab, var(--color-surface) 90%, var(--color-background));
+  box-shadow: 0 12px 30px -28px color-mix(in oklab, var(--color-foreground) 42%, transparent);
+  padding: 0.75rem;
+}
+
+.fd-tokendocs-toolbar--page {
+  gap: 0.5rem;
+}
+
+.fd-tokendocs-section {
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface) 89%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-background) 95%, var(--color-surface-muted)) 100%
+    );
+  box-shadow: 0 18px 38px -34px color-mix(in oklab, var(--color-foreground) 42%, transparent);
+  padding: 0.95rem;
+}
+
+.fd-tokendocs-sectionHeader {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fd-tokendocs-sectionTitle {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.1vw, 2rem);
+  font-weight: 670;
+  letter-spacing: -0.02em;
+  line-height: 1.16;
+}
+
+.fd-tokendocs-sectionDescription {
+  margin: 0;
+  font-size: 0.91rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-reference {
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.8rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  overflow: clip;
+}
+
+.fd-tokendocs-referenceSummary {
+  list-style: none;
+  display: grid;
+  gap: 0.18rem;
+  position: relative;
+  cursor: pointer;
+  padding: 0.7rem 0.78rem;
+  background: color-mix(in oklab, var(--color-surface-muted) 46%, transparent);
+}
+
+.fd-tokendocs-referenceSummary::-webkit-details-marker {
+  display: none;
+}
+
+.fd-tokendocs-referenceSummary::after {
+  content: "Show";
+  position: absolute;
+  top: 0.78rem;
+  right: 1rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-reference[open] .fd-tokendocs-referenceSummary::after {
+  content: "Hide";
+}
+
+.fd-tokendocs-referenceSummary:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ring) 46%, transparent);
+}
+
+.fd-tokendocs-referenceTitle {
+  font-size: 0.82rem;
+  font-weight: 670;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-referenceHint {
+  font-size: 0.73rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-referenceBody {
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+  padding: 0.7rem;
+}
+
+.fd-tokendocs-grid {
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.72rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.6rem;
+}
+
+.fd-tokendocs-toolbar {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.fd-tokendocs-toolbarTop {
+  display: grid;
+  gap: 0.65rem;
+}
+
+@media (min-width: 960px) {
+  .fd-tokendocs-toolbarTop {
+    grid-template-columns: minmax(18rem, 1fr) auto;
+    align-items: end;
+  }
+}
+
+.fd-tokendocs-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fd-tokendocs-fieldLabel {
+  font-size: 0.66rem;
+  font-weight: 720;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-input,
+.fd-tokendocs-select,
+.fd-tokendocs-button {
+  height: 2.2rem;
+  border: 1px solid color-mix(in oklab, var(--color-input) 84%, var(--color-border));
+  border-radius: 0.55rem;
+  background: color-mix(in oklab, var(--color-background) 92%, var(--color-surface-muted));
+  padding: 0 0.72rem;
+  font-size: 0.83rem;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-input::placeholder {
+  color: color-mix(in oklab, var(--color-muted-foreground) 92%, transparent);
+}
+
+.fd-tokendocs-input:focus-visible,
+.fd-tokendocs-select:focus-visible,
+.fd-tokendocs-button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px color-mix(in oklab, var(--color-ring) 52%, transparent),
+    0 0 0 5px color-mix(in oklab, var(--color-ring) 20%, transparent);
+}
+
+.fd-tokendocs-sortControls {
+  display: grid;
+  grid-template-columns: minmax(9.75rem, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.fd-tokendocs-count {
+  margin: 0;
+  justify-self: end;
+  font-size: 0.72rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-groups {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.fd-tokendocs-group {
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.56rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  overflow: hidden;
+}
+
+.fd-tokendocs-groupToggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 0;
+  background: color-mix(in oklab, var(--color-surface-muted) 26%, transparent);
+  padding: 0.58rem 0.74rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fd-tokendocs-groupToggle:hover {
+  background: color-mix(in oklab, var(--color-surface-muted) 58%, transparent);
+}
+
+.fd-tokendocs-groupToggle:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ring) 46%, transparent);
+}
+
+.fd-tokendocs-groupLabel {
+  font-size: 0.83rem;
+  font-weight: 630;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-groupDescription {
+  display: block;
+  margin-top: 0.14rem;
+  font-size: 0.72rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-groupCount {
+  flex-shrink: 0;
+  font-size: 0.71rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-groupPanel {
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+}
+
+.fd-tokendocs-empty {
+  margin: 0;
+  padding: 0.92rem 0.76rem;
+  font-size: 0.82rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-desktop {
+  display: none;
+}
+
+.fd-tokendocs-mobile {
+  display: grid;
+}
+
+@media (min-width: 768px) {
+  .fd-tokendocs-desktop {
+    display: block;
+  }
+
+  .fd-tokendocs-mobile {
+    display: none;
+  }
+}
+
+.fd-tokendocs-tableScroll {
+  max-height: none;
+  overflow: visible;
+}
+
+.fd-tokendocs-table {
+  width: 100%;
+  min-width: 0;
+}
+
+.fd-tokendocs-headRow {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  align-items: center;
+  column-gap: 0.75rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  background: color-mix(in oklab, var(--color-surface-muted) 68%, var(--color-background));
+  padding: 0.52rem 0.76rem;
+}
+
+.fd-tokendocs-headCell {
+  font-size: 0.71rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-headCell.is-right {
+  text-align: right;
+}
+
+.fd-tokendocs-sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.24rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.fd-tokendocs-sortButton:hover {
+  color: var(--color-primary);
+}
+
+.fd-tokendocs-row {
+  display: grid;
+  align-items: center;
+  column-gap: 0.75rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
+  padding: 0.55rem 0.76rem;
+}
+
+.fd-tokendocs-row:nth-child(even) {
+  background: color-mix(in oklab, var(--color-surface-muted) 20%, transparent);
+}
+
+.fd-tokendocs-row:last-child {
+  border-bottom: 0;
+}
+
+.fd-tokendocs-row:hover {
+  background: color-mix(in oklab, var(--color-surface-muted) 66%, transparent);
+}
+
+.fd-tokendocs-row--fixed {
+  min-height: 2.75rem;
+}
+
+.fd-tokendocs-cell {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.44rem;
+}
+
+.fd-tokendocs-cell.is-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.fd-tokendocs-cellBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.fd-tokendocs-cellBody.is-wrap {
+  white-space: normal;
+}
+
+.fd-tokendocs-path {
+  display: inline-block;
+  max-width: 100%;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.73rem;
+  line-height: 1.45;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-value-pill {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-surface-muted) 85%, transparent);
+  padding: 0.2rem 0.5rem;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.72rem;
+  color: var(--color-foreground);
+  white-space: nowrap;
+}
+
+.fd-tokendocs-value-wrap {
+  display: inline-block;
+  max-width: 100%;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.72rem;
+  line-height: 1.42;
+  color: var(--color-foreground);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-value-plain {
+  display: inline-block;
+  max-width: 100%;
+  font-size: 0.79rem;
+  line-height: 1.44;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-colorCell {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.46rem;
+}
+
+.fd-tokendocs-swatch {
+  display: inline-block;
+  height: 0.92rem;
+  width: 1.44rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.32rem;
+  flex-shrink: 0;
+}
+
+.fd-tokendocs-scaleCell {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.56rem;
+}
+
+.fd-tokendocs-scaleBar {
+  display: inline-block;
+  height: 0.44rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-primary) 64%, var(--color-surface-muted)) 0%,
+    color-mix(in oklab, var(--color-primary) 44%, var(--color-surface-muted)) 100%
+  );
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 36%, transparent);
+  flex-shrink: 0;
+}
+
+.fd-tokendocs-copy {
+  flex-shrink: 0;
+  border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-surface-muted) 74%, var(--color-background));
+  padding: 0.12rem 0.42rem;
+  font-size: 0.62rem;
+  line-height: 1.3;
+  color: var(--color-muted-foreground);
+  opacity: 0;
+  transition:
+    opacity 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.fd-tokendocs-copy:hover {
+  color: var(--color-foreground);
+  background: color-mix(in oklab, var(--color-surface-muted) 92%, var(--color-background));
+}
+
+.fd-tokendocs-copy:focus-visible,
+.fd-tokendocs-copy[data-state="copied"],
+.fd-tokendocs-copy[data-state="error"],
+.fd-tokendocs-row:hover .fd-tokendocs-copy,
+.fd-tokendocs-row:focus-within .fd-tokendocs-copy,
+.fd-tokendocs-mobileField:focus-within .fd-tokendocs-copy {
+  opacity: 1;
+}
+
+.fd-tokendocs-copy[data-state="copied"] {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.fd-tokendocs-copy[data-state="error"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+@media (max-width: 767px) {
+  .fd-tokendocs-copy {
+    opacity: 1;
+  }
+}
+
+.fd-tokendocs-mobileList {
+  display: grid;
+}
+
+.fd-tokendocs-mobileRow {
+  display: grid;
+  gap: 0.45rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
+  padding: 0.72rem;
+}
+
+.fd-tokendocs-mobileRow:last-child {
+  border-bottom: 0;
+}
+
+.fd-tokendocs-mobileField {
+  display: grid;
+  gap: 0.24rem;
+}
+
+.fd-tokendocs-mobileKey {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-mobileValue {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.fd-tokendocs-mobileValueBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.fd-tokendocs-showcase {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.68rem;
+  background: color-mix(in oklab, var(--color-surface-muted) 32%, transparent);
+  padding: 0.72rem;
+}
+
+.fd-tokendocs-showcaseTitle {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 660;
+  letter-spacing: -0.01em;
+}
+
+.fd-tokendocs-showcaseHint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-ribbonGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  gap: 0.55rem;
+}
+
+.fd-tokendocs-ribbonCard {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 85%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.56rem;
+}
+
+.fd-tokendocs-ribbonHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.fd-tokendocs-ribbonLabel {
+  margin: 0;
+  font-size: 0.77rem;
+  font-weight: 640;
+}
+
+.fd-tokendocs-ribbonCount {
+  font-size: 0.68rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-ribbonTrack {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  min-height: 1.08rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 999px;
+}
+
+.fd-tokendocs-ribbonStop {
+  display: block;
+  min-height: 1.08rem;
+}
+
+.fd-tokendocs-contrastGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.6rem;
+}
+
+.fd-tokendocs-contrastCard {
+  display: grid;
+  gap: 0.46rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.62rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.58rem;
+}
+
+.fd-tokendocs-contrastTitle {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 640;
+}
+
+.fd-tokendocs-contrastPath {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.67rem;
+  color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-contrastSwatches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.38rem;
+}
+
+.fd-tokendocs-contrastChip {
+  display: grid;
+  gap: 0.2rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.52rem;
+  padding: 0.38rem;
+}
+
+.fd-tokendocs-contrastChipSample {
+  min-height: 1rem;
+  border-radius: 0.3rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 76%, transparent);
+}
+
+.fd-tokendocs-contrastChipLabel {
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-contrastChipValue {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.65rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-spacingShowcase {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fd-tokendocs-spacingRow {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.fd-tokendocs-spacingLabel {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.7rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-spacingTrack {
+  height: 0.74rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-surface-muted) 72%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  padding: 0.12rem;
+}
+
+.fd-tokendocs-spacingTrackBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-primary) 60%, var(--color-surface-muted)) 0%,
+    color-mix(in oklab, var(--color-primary) 42%, var(--color-surface-muted)) 100%
+  );
+}
+
+.fd-tokendocs-gapPreview {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.fd-tokendocs-stackPreview {
+  display: grid;
+  min-height: 4rem;
+  align-content: center;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.42rem 0.6rem;
+}
+
+.fd-tokendocs-stackBlock {
+  display: block;
+  min-height: 0.54rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-primary) 52%, var(--color-surface-muted));
+  border: 1px solid color-mix(in oklab, var(--color-border) 76%, transparent);
+}
+
+.fd-tokendocs-gapBlocks {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0 0.6rem;
+}
+
+.fd-tokendocs-gapBlock {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 0.28rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 52%, var(--color-surface-muted));
+}
+
+.fd-tokendocs-gridGutter {
+  display: grid;
+  min-height: 2rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.42rem;
+}
+
+.fd-tokendocs-gridGutterCell {
+  border-radius: 0.25rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 44%, var(--color-surface-muted));
+}
+
+.fd-tokendocs-shadowShowcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+  gap: 0.7rem;
+}
+
+.fd-tokendocs-shadowCard {
+  display: grid;
+  gap: 0.54rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.66rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.62rem;
+}
+
+.fd-tokendocs-shadowSurface {
+  min-height: 3.2rem;
+  border-radius: 0.52rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
+  background: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--color-surface) 86%, var(--color-background)) 0%,
+    color-mix(in oklab, var(--color-background) 96%, var(--color-surface-muted)) 100%
+  );
+}
+
+.fd-tokendocs-shadowMeta {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fd-tokendocs-shadowPath {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.68rem;
+}
+
+.fd-tokendocs-shadowValue {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.67rem;
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-colorMatrix {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.fd-tokendocs-colorMatrixHead,
+.fd-tokendocs-colorMatrixRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, auto) repeat(var(--fd-color-cols, 10), minmax(0, 1fr));
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.fd-tokendocs-colorMatrixHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.24rem 0;
+  background: color-mix(in oklab, var(--color-background) 94%, var(--color-surface));
+}
+
+.fd-tokendocs-colorScaleLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  text-align: center;
+}
+
+.fd-tokendocs-colorFamilyLabel {
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--color-foreground);
+  padding-right: 0.3rem;
+}
+
+.fd-tokendocs-colorMatrixCell {
+  display: grid;
+  gap: 0;
+}
+
+.fd-tokendocs-colorSwatchBlock {
+  min-height: 2.15rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+}
+
+.fd-tokendocs-colorMatrixCell.is-missing .fd-tokendocs-colorSwatchBlock {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in oklab, var(--color-surface-muted) 86%, transparent) 0,
+      color-mix(in oklab, var(--color-surface-muted) 86%, transparent) 6px,
+      color-mix(in oklab, var(--color-border) 45%, transparent) 6px,
+      color-mix(in oklab, var(--color-border) 45%, transparent) 12px
+    );
+}
+
+.fd-tokendocs-colorCellValue {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fd-tokendocs-srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fd-tokendocs-brandGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.55rem;
+}
+
+.fd-tokendocs-brandCard {
+  display: grid;
+  gap: 0.4rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.55rem;
+}
+
+.fd-tokendocs-brandTitle {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.fd-tokendocs-brandSwatches {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.fd-tokendocs-brandSwatch {
+  display: grid;
+  gap: 0.16rem;
+}
+
+.fd-tokendocs-brandSwatchBlock {
+  min-height: 1.4rem;
+  border-radius: 0.38rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+}
+
+.fd-tokendocs-brandLabel {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-brandValue {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.62rem;
+  color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-typoShowcase {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fd-tokendocs-typoSpecimens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.55rem;
+}
+
+.fd-tokendocs-typoCard {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.58rem;
+}
+
+.fd-tokendocs-typoSample {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-typoMeta {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.fd-tokendocs-typoLabel {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-typoValue {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.68rem;
+  color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-typeScaleList {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.fd-tokendocs-typeScaleItem {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.55rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
+  padding: 0.45rem 0.55rem;
+}
+
+.fd-tokendocs-typeSample {
+  margin: 0;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-typeKey {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.67rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-structShowcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.55rem;
+}
+
+.fd-tokendocs-radiusCard {
+  display: grid;
+  gap: 0.4rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.56rem;
+}
+
+.fd-tokendocs-radiusSwatch {
+  min-height: 2.25rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  background: color-mix(in oklab, var(--color-surface-muted) 72%, var(--color-background));
+}
+
+.fd-tokendocs-motionLab {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fd-tokendocs-motionLanes {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.fd-tokendocs-motionLaneRow {
+  --fd-motion-duration: 1400ms;
+  --fd-motion-easing: linear;
+  display: grid;
+  grid-template-columns: minmax(9.5rem, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.56rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.5rem 0.58rem;
+}
+
+.fd-tokendocs-motionLaneLabel {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.68rem;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-motionLaneTrack {
+  position: relative;
+  min-height: 1.1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-surface-muted) 72%, transparent) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 36%, transparent) 100%
+    );
+  overflow: hidden;
+}
+
+.fd-tokendocs-motionLaneBall {
+  position: absolute;
+  top: 50%;
+  left: 0.44rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  transform: translate(0, -50%);
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  background: var(--color-primary);
+  box-shadow:
+    0 2px 6px color-mix(in oklab, var(--color-primary) 30%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--color-background) 52%, transparent);
+  animation: fd-token-lane-travel var(--fd-motion-duration) var(--fd-motion-easing)
+    infinite;
+}
+
+.fd-tokendocs-motionLaneBall.is-easing {
+  background: var(--color-warning);
+  box-shadow:
+    0 2px 6px color-mix(in oklab, var(--color-warning) 36%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--color-background) 52%, transparent);
+}
+
+.fd-tokendocs-motionLaneValue {
+  justify-self: end;
+}
+
+@keyframes fd-token-lane-travel {
+  from {
+    left: 0.44rem;
+  }
+  to {
+    left: calc(100% - 1.16rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-tokendocs-motionLaneBall {
+    animation: none;
+    left: 50%;
+  }
+}
+
+.fd-tokendocs-metricGrid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+
+.fd-tokendocs-metricCard {
+  display: grid;
+  gap: 0.24rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.62rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.72rem;
+}
+
+.fd-tokendocs-metricLabel {
+  margin: 0;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-metricValue {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 1.44rem;
+  line-height: 1.15;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-metricDescription {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-links {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.45rem;
+  list-style: none;
+}
+
+.fd-tokendocs-link {
+  display: grid;
+  gap: 0.12rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 0.56rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.52rem 0.6rem;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 0.84rem;
+}
+
+.fd-tokendocs-link:hover {
+  background: color-mix(in oklab, var(--color-surface-muted) 54%, transparent);
+  text-decoration: underline;
+}
+
+.fd-tokendocs-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-ring) 45%, transparent);
+}
+
+.fd-tokendocs-linkHint {
+  font-size: 0.72rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-domainLayout {
+  display: grid;
+  gap: 0.7rem;
+}
+
+@media (min-width: 980px) {
+  .fd-tokendocs-domainLayout {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+.fd-tokendocs-domainColumn {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.fd-tokendocs-coveragePanel {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.62rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.66rem 0.74rem;
+}
+
+.fd-tokendocs-coverageTitle {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 660;
+}
+
+.fd-tokendocs-coverageRows {
+  display: grid;
+}
+
+.fd-tokendocs-coverageRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 0.5rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
+  padding: 0.35rem 0;
+}
+
+.fd-tokendocs-coverageRow:last-child {
+  border-bottom: 0;
+}
+
+.fd-tokendocs-coverageRow--triple {
+  grid-template-columns: 1fr auto auto;
+}
+
+.fd-tokendocs-coverageLabel {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-coverageValue {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.74rem;
+  color: var(--color-foreground);
+}
+
+@media (max-width: 767px) {
+  .fd-tokendocs-container {
+    padding-inline: 0.75rem;
+  }
+
+  .fd-tokendocs-title {
+    font-size: 1.66rem;
+  }
+
+  .fd-tokendocs-sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .fd-tokendocs-toolbarTop {
+    gap: 0.55rem;
+  }
+
+  .fd-tokendocs-sortControls {
+    grid-template-columns: 1fr auto;
+  }
+
+  .fd-tokendocs-referenceSummary::after {
+    top: 0.72rem;
+  }
+
+  .fd-tokendocs-spacingRow {
+    grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr);
+  }
+
+  .fd-tokendocs-spacingRow .fd-tokendocs-value-pill {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .fd-tokendocs-motionLaneRow {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .fd-tokendocs-motionLaneValue {
+    justify-self: start;
+  }
+
+  .fd-tokendocs-links {
+    grid-template-columns: 1fr;
+  }
+}

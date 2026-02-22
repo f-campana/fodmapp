@@ -1,5 +1,11 @@
 export type TokenPrimitive = string | number | boolean;
 export type TokenRecord = Record<string, unknown>;
+export type TokenSortDirection = "asc" | "desc";
+
+export interface TokenSortOption {
+  key: string;
+  label: string;
+}
 
 export interface TokenRow {
   id: string;
@@ -35,7 +41,11 @@ function isRecord(value: unknown): value is TokenRecord {
 }
 
 function isTokenPrimitive(value: unknown): value is TokenPrimitive {
-  return typeof value === "string" || typeof value === "number" || typeof value === "boolean";
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  );
 }
 
 function parseFractionLike(segment: string): number | null {
@@ -103,10 +113,16 @@ function comparePathSegment(left: string, right: string): number {
     return leftScale - rightScale;
   }
 
-  return left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" });
+  return left.localeCompare(right, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
 }
 
-export function naturalTokenPathCompare(leftPath: string, rightPath: string): number {
+export function naturalTokenPathCompare(
+  leftPath: string,
+  rightPath: string,
+): number {
   if (leftPath === rightPath) {
     return 0;
   }
@@ -193,7 +209,12 @@ export function countTokenLeaves(node: unknown): number {
 }
 
 export function isColorTokenValue(value: string): boolean {
-  return value.startsWith("oklch(") || value.startsWith("#") || value.startsWith("rgb(") || value.startsWith("hsl(");
+  return (
+    value.startsWith("oklch(") ||
+    value.startsWith("#") ||
+    value.startsWith("rgb(") ||
+    value.startsWith("hsl(")
+  );
 }
 
 export function parseNumberish(value: string): number | null {
@@ -214,10 +235,54 @@ export function compareValueText(left: string, right: string): number {
     return leftParsed - rightParsed;
   }
 
-  return left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" });
+  return left.localeCompare(right, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
 }
 
-export function groupRowsBySegment(rows: TokenRow[], pathSegmentIndex: number): Array<{ id: string; label: string; rows: TokenRow[] }> {
+export function clamp(value: number, min: number, max: number): number {
+  if (value < min) {
+    return min;
+  }
+  if (value > max) {
+    return max;
+  }
+  return value;
+}
+
+export function normalizeSearchText(...parts: string[]): string {
+  return parts.join(" ").toLowerCase();
+}
+
+export function normalizeFilterQuery(query: string): string {
+  return query.trim().toLowerCase();
+}
+
+export function createSortOptions(
+  ...entries: Array<[key: string, label: string]>
+): TokenSortOption[] {
+  return entries.map(([key, label]) => ({ key, label }));
+}
+
+export function countVisibleRows<
+  Row extends { path: string; searchText?: string },
+>(rows: Row[], query: string): number {
+  const normalizedQuery = normalizeFilterQuery(query);
+  if (normalizedQuery.length === 0) {
+    return rows.length;
+  }
+
+  return rows.filter((row) => {
+    const haystack = normalizeSearchText(row.path, row.searchText ?? "");
+    return haystack.includes(normalizedQuery);
+  }).length;
+}
+
+export function groupRowsBySegment(
+  rows: TokenRow[],
+  pathSegmentIndex: number,
+): Array<{ id: string; label: string; rows: TokenRow[] }> {
   const grouped = new Map<string, TokenRow[]>();
 
   for (const row of rows) {
@@ -234,6 +299,8 @@ export function groupRowsBySegment(rows: TokenRow[], pathSegmentIndex: number): 
     .map(([key, groupRows]) => ({
       id: key,
       label: key,
-      rows: [...groupRows].sort((left, right) => naturalTokenPathCompare(left.path, right.path)),
+      rows: [...groupRows].sort((left, right) =>
+        naturalTokenPathCompare(left.path, right.path),
+      ),
     }));
 }
