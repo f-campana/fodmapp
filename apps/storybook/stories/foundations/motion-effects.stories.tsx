@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -6,7 +7,6 @@ import { expect, within } from "storybook/test";
 import tokens from "@fodmap/design-tokens";
 
 import {
-  ReferenceTables,
   TokenDataGrid,
   TokenDocsPage,
   TokenPathText,
@@ -23,17 +23,19 @@ interface EffectRow {
   id: string;
   path: string;
   value: string;
-  searchText: string;
 }
 
 interface MotionLaneRow {
   id: string;
   label: string;
+  path: string;
   value: string;
   laneDuration: string;
   laneEasing: string;
   variant: "duration" | "easing";
 }
+
+const SYNC_CYCLE_MS = 7200;
 
 const base = asRecord(tokens.base, "base");
 const motion = asRecord(base.motion, "base.motion");
@@ -46,7 +48,6 @@ function toRows(node: unknown, prefix: string): EffectRow[] {
       id: row.id,
       path: row.path,
       value,
-      searchText: `${row.path} ${value}`,
     };
   });
 }
@@ -69,7 +70,7 @@ function parseDurationMs(value: string): number {
 
 function laneDuration(value: string): string {
   const ms = parseDurationMs(value);
-  const scaledMs = Math.round(Math.min(4200, Math.max(900, ms * 8)));
+  const scaledMs = Math.round(Math.min(4200, Math.max(900, ms * 9)));
   return `${scaledMs}ms`;
 }
 
@@ -92,6 +93,7 @@ const normalDuration =
 const durationLaneRows: MotionLaneRow[] = durationRows.map((row) => ({
   id: `duration:${row.id}`,
   label: row.path.split(".").pop() ?? row.path,
+  path: row.path,
   value: row.value,
   laneDuration: laneDuration(row.value),
   laneEasing: standardEasing,
@@ -101,6 +103,7 @@ const durationLaneRows: MotionLaneRow[] = durationRows.map((row) => ({
 const easingLaneRows: MotionLaneRow[] = easingRows.map((row) => ({
   id: `easing:${row.id}`,
   label: row.path.split(".").pop() ?? row.path,
+  path: row.path,
   value: row.value,
   laneDuration: laneDuration(normalDuration),
   laneEasing: row.value,
@@ -136,16 +139,28 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Reference: Story = {
+export const Showcase: Story = {
   render: () => {
+    const [syncTick, setSyncTick] = useState(0);
+
+    useEffect(() => {
+      const timer = window.setInterval(() => {
+        setSyncTick((value) => value + 1);
+      }, SYNC_CYCLE_MS);
+
+      return () => {
+        window.clearInterval(timer);
+      };
+    }, []);
+
     return (
       <TokenDocsPage
         title="Motion & Effects Tokens"
-        subtitle="Passive motion lanes visualize duration and easing tokens directly, with exact references collapsed below."
+        subtitle="Passive motion lanes visualize duration and easing behavior with synchronized restarts. Shadow tiers are previewed below."
       >
         <TokenSection
           title="Motion Lanes"
-          description="A moving ball travels from label to value using each token's timing behavior."
+          description="A pacman marker travels from start to end using each token's timing behavior."
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
@@ -162,8 +177,18 @@ export const Reference: Story = {
                   }
                 >
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
-                  <div className="fd-tokendocs-motionLaneTrack" aria-hidden="true">
-                    <span className="fd-tokendocs-motionLaneBall" />
+                  <div
+                    className="fd-tokendocs-motionLaneTrack"
+                    aria-hidden="true"
+                    title={`${row.path}: ${row.value}`}
+                  >
+                    <span
+                      key={`${row.id}-${syncTick}`}
+                      className={classNames(
+                        "fd-tokendocs-motionLaneBall",
+                        row.variant === "duration" ? "is-duration" : "is-easing",
+                      )}
+                    />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -186,8 +211,18 @@ export const Reference: Story = {
                   }
                 >
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
-                  <div className="fd-tokendocs-motionLaneTrack" aria-hidden="true">
-                    <span className="fd-tokendocs-motionLaneBall is-easing" />
+                  <div
+                    className="fd-tokendocs-motionLaneTrack"
+                    aria-hidden="true"
+                    title={`${row.path}: ${row.value}`}
+                  >
+                    <span
+                      key={`${row.id}-${syncTick}`}
+                      className={classNames(
+                        "fd-tokendocs-motionLaneBall",
+                        row.variant === "duration" ? "is-duration" : "is-easing",
+                      )}
+                    />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -196,47 +231,14 @@ export const Reference: Story = {
               ))}
             </div>
           </div>
-
-          <ReferenceTables hint="Expand for exact duration/easing path/value references.">
-            <TokenDataGrid
-              gridLabel="motion-grid"
-              groups={motionGroups}
-              showToolbar={false}
-              columns={[
-                {
-                  key: "path",
-                  label: "Token Path",
-                  width: "minmax(320px, 1.7fr)",
-                  sortable: false,
-                  getValue: (row) => row.path,
-                  render: (row) => <TokenPathText value={row.path} />,
-                  valueMode: "plain",
-                  copyValue: (row) => row.path,
-                },
-                {
-                  key: "value",
-                  label: "Value",
-                  width: "minmax(320px, 1fr)",
-                  align: "right",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  valueMode: "wrap",
-                  copyValue: (row) => row.value,
-                },
-              ]}
-            />
-          </ReferenceTables>
         </TokenSection>
 
         <TokenSection
           title="Shadows"
-          description="Elevation values with larger preview surfaces to make depth tiers easier to compare."
+          description="Elevation values rendered on larger surfaces for clearer depth comparison."
         >
           <div className="fd-tokendocs-showcase" aria-label="Shadow depth preview">
             <h3 className="fd-tokendocs-showcaseTitle">Depth Surface Showcase</h3>
-            <p className="fd-tokendocs-showcaseHint">
-              Preview cards below use the generated token shadows directly.
-            </p>
             <div className="fd-tokendocs-shadowShowcase">
               {shadowRows.map((row) => (
                 <article key={`${row.id}-showcase`} className="fd-tokendocs-shadowCard">
@@ -247,56 +249,14 @@ export const Reference: Story = {
                   />
                   <div className="fd-tokendocs-shadowMeta">
                     <p className="fd-tokendocs-shadowPath">{row.path}</p>
-                    <p className="fd-tokendocs-shadowValue">{row.value}</p>
+                    <p className="fd-tokendocs-shadowValue" title={row.value}>
+                      {row.value}
+                    </p>
                   </div>
                 </article>
               ))}
             </div>
           </div>
-
-          <ReferenceTables hint="Expand for exact shadow path/value references.">
-            <TokenDataGrid
-              gridLabel="shadow-grid"
-              groups={shadowGroups}
-              showToolbar={false}
-              columns={[
-                {
-                  key: "path",
-                  label: "Token Path",
-                  width: "minmax(280px, 1.4fr)",
-                  sortable: false,
-                  getValue: (row) => row.path,
-                  render: (row) => <TokenPathText value={row.path} />,
-                  valueMode: "plain",
-                  copyValue: (row) => row.path,
-                },
-                {
-                  key: "preview",
-                  label: "Preview",
-                  width: "minmax(220px, 1fr)",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  render: (row) => (
-                    <span
-                      className="fd-tokendocs-shadowSurface"
-                      style={{ boxShadow: row.value, minHeight: "2rem" }}
-                      aria-hidden="true"
-                    />
-                  ),
-                  copyValue: () => null,
-                },
-                {
-                  key: "value",
-                  label: "Shadow Value",
-                  width: "minmax(420px, 2fr)",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  valueMode: "wrap",
-                  copyValue: (row) => row.value,
-                },
-              ]}
-            />
-          </ReferenceTables>
         </TokenSection>
       </TokenDocsPage>
     );
@@ -306,7 +266,88 @@ export const Reference: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Motion & Effects Tokens" }),
     ).toBeInTheDocument();
-    await expect(canvas.getByText("Duration Lanes")).toBeInTheDocument();
-    await expect(canvas.getByText("Easing Lanes")).toBeInTheDocument();
+    await expect(canvas.getByText("Motion Lanes")).toBeInTheDocument();
+    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
   },
 };
+
+export const Reference: Story = {
+  render: () => {
+    return (
+      <TokenDocsPage
+        title="Motion & Effects Token Reference"
+        subtitle="Exact duration, easing, and shadow token references for implementation and QA."
+      >
+        <TokenSection
+          title="Motion References"
+          description="Grouped duration and easing path/value references."
+        >
+          <TokenDataGrid
+            gridLabel="motion-grid"
+            groups={motionGroups}
+            columns={[
+              {
+                key: "path",
+                label: "Token Path",
+                width: "minmax(320px, 1.7fr)",
+                getValue: (row) => row.path,
+                render: (row) => <TokenPathText value={row.path} />,
+                valueMode: "plain",
+                copyValue: (row) => row.path,
+              },
+              {
+                key: "value",
+                label: "Value",
+                width: "minmax(320px, 1fr)",
+                align: "right",
+                getValue: (row) => row.value,
+                valueMode: "wrap",
+                copyValue: (row) => row.value,
+              },
+            ]}
+          />
+        </TokenSection>
+
+        <TokenSection
+          title="Shadow References"
+          description="Grouped path/value references for shadow scales."
+        >
+          <TokenDataGrid
+            gridLabel="shadow-grid"
+            groups={shadowGroups}
+            columns={[
+              {
+                key: "path",
+                label: "Token Path",
+                width: "minmax(280px, 1.5fr)",
+                getValue: (row) => row.path,
+                render: (row) => <TokenPathText value={row.path} />,
+                valueMode: "plain",
+                copyValue: (row) => row.path,
+              },
+              {
+                key: "value",
+                label: "Shadow Value",
+                width: "minmax(320px, 1.4fr)",
+                getValue: (row) => row.value,
+                valueMode: "wrap",
+                copyValue: (row) => row.value,
+              },
+            ]}
+          />
+        </TokenSection>
+      </TokenDocsPage>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("heading", { name: "Motion & Effects Token Reference" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("Motion References")).toBeInTheDocument();
+  },
+};
+
+function classNames(...classes: Array<string | false | null | undefined>): string {
+  return classes.filter(Boolean).join(" ");
+}

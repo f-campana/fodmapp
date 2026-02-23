@@ -4,7 +4,6 @@ import { expect, within } from "storybook/test";
 import tokens from "@fodmap/design-tokens";
 
 import {
-  ReferenceTables,
   TokenDataGrid,
   TokenDocsPage,
   TokenPathText,
@@ -21,7 +20,6 @@ interface TypographyRow {
   id: string;
   path: string;
   value: string;
-  searchText: string;
 }
 
 const base = asRecord(tokens.base, "base");
@@ -34,9 +32,30 @@ function rowsFor(node: unknown, prefix: string): TypographyRow[] {
       id: row.id,
       path: row.path,
       value,
-      searchText: `${row.path} ${value}`,
     };
   });
+}
+
+function clampRem(value: string, maxRem: number): string {
+  const match = value.match(/^(-?\d+(?:\.\d+)?)rem$/);
+  if (!match) {
+    return value;
+  }
+
+  const parsed = Number.parseFloat(match[1]);
+  if (!Number.isFinite(parsed)) {
+    return value;
+  }
+
+  return `${Math.min(parsed, maxRem)}rem`;
+}
+
+function cssNumberOrString(value: string): number | string {
+  const parsed = Number.parseFloat(value);
+  if (Number.isFinite(parsed) && `${parsed}` === value) {
+    return parsed;
+  }
+  return value;
 }
 
 const familyRows = rowsFor(
@@ -91,14 +110,6 @@ const groups = [
   },
 ];
 
-function cssNumberOrString(value: string): number | string {
-  const parsed = Number.parseFloat(value);
-  if (Number.isFinite(parsed) && `${parsed}` === value) {
-    return parsed;
-  }
-  return value;
-}
-
 const meta = {
   title: "Foundations/Tokens/Typography",
   tags: ["autodocs"],
@@ -112,16 +123,16 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Reference: Story = {
+export const Showcase: Story = {
   render: () => {
     return (
       <TokenDocsPage
         title="Typography Tokens"
-        subtitle="Specimen-first typography preview using token values directly, with collapsed implementation references below."
+        subtitle="Specimen-first preview of tokenized families, scale, and weights. Exact path/value references are in the companion Reference story."
       >
         <TokenSection
           title="Typography Showcase"
-          description="Token-driven specimens to preview family, scale, and weight behavior with clearer hierarchy."
+          description="Token-driven specimens with stronger hierarchy and reduced vertical excess for easier scanning."
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-typoShowcase" aria-label="Typography specimens">
             <h3 className="fd-tokendocs-showcaseTitle">Family Specimens</h3>
@@ -142,7 +153,7 @@ export const Reference: Story = {
               ))}
             </div>
 
-            <h3 className="fd-tokendocs-showcaseTitle">Type Scale</h3>
+            <h3 className="fd-tokendocs-showcaseTitle">Type Waterfall</h3>
             <div className="fd-tokendocs-typeScaleList">
               {sizeRows.map((row) => (
                 <div key={`${row.id}-sample`} className="fd-tokendocs-typeScaleItem">
@@ -150,7 +161,7 @@ export const Reference: Story = {
                   <p
                     className="fd-tokendocs-typeSample"
                     style={{
-                      fontSize: row.value,
+                      fontSize: clampRem(row.value, 2.5),
                       lineHeight: lineHeightDefault,
                     }}
                   >
@@ -167,7 +178,11 @@ export const Reference: Story = {
                 <article key={`${row.id}-weight`} className="fd-tokendocs-typoCard">
                   <p
                     className="fd-tokendocs-typoSample"
-                    style={{ fontWeight: cssNumberOrString(row.value) }}
+                    style={{
+                      fontWeight: cssNumberOrString(row.value),
+                      fontSize: "1.35rem",
+                      lineHeight: 1.3,
+                    }}
                   >
                     {row.path.split(".").pop()} {row.value}
                   </p>
@@ -177,40 +192,6 @@ export const Reference: Story = {
             </div>
           </div>
         </TokenSection>
-
-        <TokenSection
-          title="Typography Primitives"
-          description="Exact path/value documentation for implementation and QA checks."
-        >
-          <ReferenceTables hint="Expand for exact typography path/value references.">
-            <TokenDataGrid
-              gridLabel="typography-grid"
-              groups={groups}
-              showToolbar={false}
-              columns={[
-                {
-                  key: "path",
-                  label: "Token Path",
-                  width: "minmax(340px, 1.8fr)",
-                  sortable: false,
-                  getValue: (row) => row.path,
-                  render: (row) => <TokenPathText value={row.path} />,
-                  valueMode: "plain",
-                  copyValue: (row) => row.path,
-                },
-                {
-                  key: "value",
-                  label: "Value",
-                  width: "minmax(280px, 1fr)",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  valueMode: "wrap",
-                  copyValue: (row) => row.value,
-                },
-              ]}
-            />
-          </ReferenceTables>
-        </TokenSection>
       </TokenDocsPage>
     );
   },
@@ -219,7 +200,54 @@ export const Reference: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Typography Tokens" }),
     ).toBeInTheDocument();
-    await expect(canvas.getByText("Family Specimens")).toBeInTheDocument();
-    await expect(canvas.getByText("Type Scale")).toBeInTheDocument();
+    await expect(canvas.getByText("Type Waterfall")).toBeInTheDocument();
+    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+  },
+};
+
+export const Reference: Story = {
+  render: () => {
+    return (
+      <TokenDocsPage
+        title="Typography Token Reference"
+        subtitle="Exact token paths and values for implementation and QA checks."
+      >
+        <TokenSection
+          title="Typography Primitives"
+          description="Grouped deterministic tables for all typography token domains."
+        >
+          <TokenDataGrid
+            gridLabel="typography-grid"
+            groups={groups}
+            columns={[
+              {
+                key: "path",
+                label: "Token Path",
+                width: "minmax(340px, 1.8fr)",
+                getValue: (row) => row.path,
+                render: (row) => <TokenPathText value={row.path} />,
+                valueMode: "plain",
+                copyValue: (row) => row.path,
+              },
+              {
+                key: "value",
+                label: "Value",
+                width: "minmax(280px, 1fr)",
+                getValue: (row) => row.value,
+                valueMode: "wrap",
+                copyValue: (row) => row.value,
+              },
+            ]}
+          />
+        </TokenSection>
+      </TokenDocsPage>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("heading", { name: "Typography Token Reference" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("Typography Primitives")).toBeInTheDocument();
   },
 };

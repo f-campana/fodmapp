@@ -1,14 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-import {
-  compareValueText,
-  naturalTokenPathCompare,
-  normalizeFilterQuery,
-  normalizeSearchText,
-  type TokenSortDirection,
-  type TokenSortOption,
-} from "./token-docs.helpers";
 import "./token-docs.css";
 
 type ColumnValueMode = "pill" | "wrap" | "plain";
@@ -18,7 +10,6 @@ export interface TokenGridColumn<Row> {
   label: string;
   mobileLabel?: string;
   width?: string;
-  sortable?: boolean;
   align?: "left" | "right";
   valueMode?: ColumnValueMode;
   getValue: (row: Row) => string;
@@ -44,53 +35,13 @@ interface TokenDataGridProps<Row extends TokenGridRowBase> {
   gridLabel: string;
   columns: TokenGridColumn<Row>[];
   groups: TokenGridGroup<Row>[];
-  searchPlaceholder?: string;
-  searchLabel?: string;
-  virtualizationThreshold?: number;
-  rowHeight?: number;
   mobileMode?: "reflow" | "table";
-  virtualizationMode?: "auto" | "fixed" | "off";
-  showToolbar?: boolean;
-  query?: string;
-  onQueryChange?: (query: string) => void;
-  sortOptions?: TokenSortOption[];
-  sortKey?: string;
-  onSortKeyChange?: (sortKey: string) => void;
-  sortDirection?: TokenSortDirection;
-  onSortDirectionChange?: (direction: TokenSortDirection) => void;
-}
-
-interface TokenDocsToolbarProps {
-  idPrefix: string;
-  query: string;
-  onQueryChange: (query: string) => void;
-  sortOptions: TokenSortOption[];
-  sortKey: string;
-  onSortKeyChange: (sortKey: string) => void;
-  sortDirection: TokenSortDirection;
-  onSortDirectionChange: (direction: TokenSortDirection) => void;
-  searchPlaceholder?: string;
-  searchLabel?: string;
-  visibleCount?: number;
-  totalCount?: number;
-  className?: string;
 }
 
 function classNames(
   ...classes: Array<string | false | null | undefined>
 ): string {
   return classes.filter(Boolean).join(" ");
-}
-
-function getAriaSort(
-  active: boolean,
-  direction: TokenSortDirection,
-): "ascending" | "descending" | "none" {
-  if (!active) {
-    return "none";
-  }
-
-  return direction === "asc" ? "ascending" : "descending";
 }
 
 function valueModeForColumn<Row>(
@@ -209,86 +160,6 @@ export function TokenSection({
   );
 }
 
-export function TokenDocsToolbar({
-  idPrefix,
-  query,
-  onQueryChange,
-  sortOptions,
-  sortKey,
-  onSortKeyChange,
-  sortDirection,
-  onSortDirectionChange,
-  searchPlaceholder = "Search token path or value",
-  searchLabel = "Search tokens",
-  visibleCount,
-  totalCount,
-  className,
-}: TokenDocsToolbarProps) {
-  const hasRowSummary =
-    typeof visibleCount === "number" && typeof totalCount === "number";
-
-  return (
-    <div className={classNames("fd-tokendocs-toolbar", className)}>
-      <div className="fd-tokendocs-toolbarTop">
-        <div className="fd-tokendocs-field">
-          <label htmlFor={`${idPrefix}-search`} className="fd-tokendocs-fieldLabel">
-            Search
-          </label>
-          <input
-            id={`${idPrefix}-search`}
-            type="search"
-            value={query}
-            onChange={(event) => onQueryChange(event.currentTarget.value)}
-            placeholder={searchPlaceholder}
-            className="fd-tokendocs-input"
-            aria-label={searchLabel}
-          />
-        </div>
-        <div className="fd-tokendocs-sortControls">
-          <div className="fd-tokendocs-field">
-            <label htmlFor={`${idPrefix}-sort`} className="fd-tokendocs-fieldLabel">
-              Sort By
-            </label>
-            <select
-              id={`${idPrefix}-sort`}
-              className="fd-tokendocs-select"
-              value={sortKey}
-              onChange={(event) => onSortKeyChange(event.currentTarget.value)}
-              disabled={sortOptions.length === 0}
-            >
-              {sortOptions.map((option) => (
-                <option key={`${idPrefix}-sort-${option.key}`} value={option.key}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="fd-tokendocs-field">
-            <label htmlFor={`${idPrefix}-direction`} className="fd-tokendocs-fieldLabel">
-              Direction
-            </label>
-            <button
-              id={`${idPrefix}-direction`}
-              type="button"
-              className="fd-tokendocs-button"
-              onClick={() =>
-                onSortDirectionChange(sortDirection === "asc" ? "desc" : "asc")
-              }
-            >
-              {sortDirection === "asc" ? "Ascending" : "Descending"}
-            </button>
-          </div>
-        </div>
-      </div>
-      {hasRowSummary ? (
-        <p className="fd-tokendocs-count">
-          {visibleCount} / {totalCount} rows
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
 export function TokenPathText({ value }: { value: string }) {
   return <code className="fd-tokendocs-path">{value}</code>;
 }
@@ -337,78 +208,14 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   gridLabel,
   columns,
   groups,
-  searchPlaceholder = "Search token path or value",
-  searchLabel = "Search tokens",
   mobileMode = "reflow",
-  showToolbar = true,
-  query,
-  onQueryChange,
-  sortOptions,
-  sortKey,
-  onSortKeyChange,
-  sortDirection,
-  onSortDirectionChange,
 }: TokenDataGridProps<Row>) {
-  const sortableColumns = columns.filter((column) => column.sortable !== false);
-  const defaultSortOptions: TokenSortOption[] = sortableColumns.map((column) => ({
-    key: column.key,
-    label: column.label,
-  }));
-  const availableSortOptions =
-    sortOptions && sortOptions.length > 0 ? sortOptions : defaultSortOptions;
-
-  const initialSortKey = availableSortOptions[0]?.key ?? columns[0]?.key ?? "path";
-
-  const isQueryControlled = query !== undefined;
-  const isSortKeyControlled = sortKey !== undefined;
-  const isSortDirectionControlled = sortDirection !== undefined;
-  const usesExternalControls =
-    isQueryControlled ||
-    isSortKeyControlled ||
-    isSortDirectionControlled ||
-    onQueryChange !== undefined ||
-    onSortKeyChange !== undefined ||
-    onSortDirectionChange !== undefined;
-
-  const [localQuery, setLocalQuery] = useState("");
-  const [localSortKey, setLocalSortKey] = useState(initialSortKey);
-  const [localSortDirection, setLocalSortDirection] =
-    useState<TokenSortDirection>("asc");
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () =>
       Object.fromEntries(
         groups.map((group) => [group.id, !group.defaultCollapsed]),
       ),
   );
-
-  const queryValue = isQueryControlled ? query ?? "" : localQuery;
-  const sortKeyValue = isSortKeyControlled ? sortKey ?? initialSortKey : localSortKey;
-  const sortDirectionValue = isSortDirectionControlled
-    ? sortDirection ?? "asc"
-    : localSortDirection;
-
-  const setQueryValue = isQueryControlled
-    ? (onQueryChange ?? (() => {}))
-    : setLocalQuery;
-  const setSortKeyValue = isSortKeyControlled
-    ? (onSortKeyChange ?? (() => {}))
-    : setLocalSortKey;
-  const setSortDirectionValue = isSortDirectionControlled
-    ? (onSortDirectionChange ?? (() => {}))
-    : setLocalSortDirection;
-
-  useEffect(() => {
-    if (sortKey !== undefined) {
-      return;
-    }
-
-    const hasSortKey = availableSortOptions.some(
-      (option) => option.key === localSortKey,
-    );
-    if (!hasSortKey) {
-      setLocalSortKey(initialSortKey);
-    }
-  }, [availableSortOptions, initialSortKey, localSortKey, sortKey]);
 
   useEffect(() => {
     setExpandedGroups((state) => {
@@ -420,83 +227,9 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
     });
   }, [groups]);
 
-  const allowedSortKeys = useMemo(
-    () => new Set(availableSortOptions.map((option) => option.key)),
-    [availableSortOptions],
-  );
-
-  const activeSortColumn = columns.find((column) => column.key === sortKeyValue);
-  const normalizedQuery = normalizeFilterQuery(queryValue);
-  const shouldRenderToolbar = showToolbar && !usesExternalControls;
-
-  const processedGroups = useMemo(() => {
-    return groups.map((group) => {
-      const filteredRows =
-        normalizedQuery.length === 0
-          ? group.rows
-          : group.rows.filter((row) => {
-              const values = columns.map((column) => column.getValue(row));
-              const haystack = normalizeSearchText(
-                row.path,
-                ...values,
-                row.searchText ?? "",
-              );
-              return haystack.includes(normalizedQuery);
-            });
-
-      const sortedRows = [...filteredRows].sort((left, right) => {
-        if (!activeSortColumn) {
-          return naturalTokenPathCompare(left.path, right.path);
-        }
-
-        const leftValue = activeSortColumn.getValue(left);
-        const rightValue = activeSortColumn.getValue(right);
-        const compare =
-          activeSortColumn.key === "path"
-            ? naturalTokenPathCompare(leftValue, rightValue)
-            : compareValueText(leftValue, rightValue);
-        return sortDirectionValue === "asc" ? compare : -compare;
-      });
-
-      return {
-        ...group,
-        rows: sortedRows,
-      };
-    });
-  }, [
-    activeSortColumn,
-    columns,
-    groups,
-    normalizedQuery,
-    sortDirectionValue,
-  ]);
-
-  const visibleCount = processedGroups.reduce(
-    (count, group) => count + group.rows.length,
-    0,
-  );
-  const totalCount = groups.reduce(
-    (count, group) => count + group.rows.length,
-    0,
-  );
-
   const gridTemplateColumns = columns
     .map((column) => column.width ?? "minmax(220px, 1fr)")
     .join(" ");
-
-  function toggleSort(columnKey: string) {
-    if (!allowedSortKeys.has(columnKey)) {
-      return;
-    }
-
-    if (sortKeyValue === columnKey) {
-      setSortDirectionValue(sortDirectionValue === "asc" ? "desc" : "asc");
-      return;
-    }
-
-    setSortKeyValue(columnKey);
-    setSortDirectionValue("asc");
-  }
 
   function toggleGroup(groupId: string) {
     setExpandedGroups((state) => ({
@@ -603,25 +336,8 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
 
   return (
     <div className="fd-tokendocs-grid">
-      {shouldRenderToolbar ? (
-        <TokenDocsToolbar
-          idPrefix={gridLabel}
-          query={queryValue}
-          onQueryChange={setQueryValue}
-          sortOptions={availableSortOptions}
-          sortKey={sortKeyValue}
-          onSortKeyChange={setSortKeyValue}
-          sortDirection={sortDirectionValue}
-          onSortDirectionChange={setSortDirectionValue}
-          searchPlaceholder={searchPlaceholder}
-          searchLabel={searchLabel}
-          visibleCount={visibleCount}
-          totalCount={totalCount}
-        />
-      ) : null}
-
       <div className="fd-tokendocs-groups">
-        {processedGroups.map((group) => {
+        {groups.map((group) => {
           const expanded = expandedGroups[group.id] ?? true;
           const contentId = `${gridLabel}-${group.id}-rows`;
 
@@ -648,9 +364,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
               {expanded ? (
                 <div id={contentId} className="fd-tokendocs-groupPanel">
                   {group.rows.length === 0 ? (
-                    <p className="fd-tokendocs-empty">
-                      No matching rows for current filter.
-                    </p>
+                    <p className="fd-tokendocs-empty">No rows available.</p>
                   ) : (
                     <>
                       <div className="fd-tokendocs-desktop">
@@ -665,42 +379,18 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                               className="fd-tokendocs-headRow"
                               style={{ gridTemplateColumns }}
                             >
-                              {columns.map((column) => {
-                                const active = column.key === sortKeyValue;
-                                const ariaSort = getAriaSort(active, sortDirectionValue);
-                                const canSort =
-                                  column.sortable !== false &&
-                                  allowedSortKeys.has(column.key);
-
-                                return (
-                                  <div
-                                    key={`${group.id}:${column.key}`}
-                                    role="columnheader"
-                                    aria-sort={ariaSort}
-                                    className={classNames(
-                                      "fd-tokendocs-headCell",
-                                      column.align === "right" ? "is-right" : "is-left",
-                                    )}
-                                  >
-                                    {canSort ? (
-                                      <button
-                                        type="button"
-                                        className="fd-tokendocs-sortButton"
-                                        onClick={() => toggleSort(column.key)}
-                                      >
-                                        <span>{column.label}</span>
-                                        {active ? (
-                                          <span aria-hidden="true">
-                                            {sortDirectionValue === "asc" ? "↑" : "↓"}
-                                          </span>
-                                        ) : null}
-                                      </button>
-                                    ) : (
-                                      <span>{column.label}</span>
-                                    )}
-                                  </div>
-                                );
-                              })}
+                              {columns.map((column) => (
+                                <div
+                                  key={`${group.id}:${column.key}`}
+                                  role="columnheader"
+                                  className={classNames(
+                                    "fd-tokendocs-headCell",
+                                    column.align === "right" ? "is-right" : "is-left",
+                                  )}
+                                >
+                                  <span>{column.label}</span>
+                                </div>
+                              ))}
                             </div>
                             <div role="rowgroup">
                               {group.rows.map((row) => renderDesktopRow(row))}
@@ -719,43 +409,5 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
         })}
       </div>
     </div>
-  );
-}
-
-export function ReferenceTables({
-  title = "Reference Tables",
-  hint = "Expand for exact token path/value lookup.",
-  children,
-}: {
-  title?: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <details className="fd-tokendocs-reference">
-      <summary className="fd-tokendocs-referenceSummary">
-        <span className="fd-tokendocs-referenceTitle">{title}</span>
-        <span className="fd-tokendocs-referenceHint">{hint}</span>
-      </summary>
-      <div className="fd-tokendocs-referenceBody">{children}</div>
-    </details>
-  );
-}
-
-export function MetricCard({
-  label,
-  value,
-  description,
-}: {
-  label: string;
-  value: string;
-  description: string;
-}) {
-  return (
-    <article className="fd-tokendocs-metricCard">
-      <p className="fd-tokendocs-metricLabel">{label}</p>
-      <p className="fd-tokendocs-metricValue">{value}</p>
-      <p className="fd-tokendocs-metricDescription">{description}</p>
-    </article>
   );
 }

@@ -1,11 +1,9 @@
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
 
 import {
-  ReferenceTables,
   ScaleBarCell,
   TokenDataGrid,
   TokenDocsPage,
@@ -25,7 +23,6 @@ interface ScaleRow {
   id: string;
   path: string;
   value: string;
-  searchText: string;
 }
 
 interface SpacingRow extends ScaleRow {
@@ -51,7 +48,6 @@ function toScaleRows(node: unknown, prefix: string): ScaleRow[] {
       id: row.id,
       path: row.path,
       value,
-      searchText: `${row.path} ${value}`,
     };
   });
 }
@@ -82,9 +78,7 @@ function toPercent(value: string, maxValue: number): number {
 }
 
 const rawSpacingRows = toScaleRows(spacing, "base.space");
-const maxSpacingWidth = Math.max(
-  ...rawSpacingRows.map((row) => spacingWidth(row.value)),
-);
+const maxSpacingWidth = Math.max(...rawSpacingRows.map((row) => spacingWidth(row.value)));
 
 const spacingRows: SpacingRow[] = rawSpacingRows.map((row) => {
   const widthPx = Math.max(6, spacingWidth(row.value));
@@ -102,7 +96,11 @@ const maxBreakpointValue = Math.max(
   ...breakpointRows.map((row) => parseNumberish(row.value) ?? 0),
 );
 
-const layoutGroups = [
+const spacingReferenceGroups = [
+  { id: "spacing", label: "Spacing", rows: spacingRows },
+];
+
+const layoutReferenceGroups = [
   { id: "radius", label: "Radius", rows: radiusRows },
   {
     id: "border-width",
@@ -119,8 +117,18 @@ const layoutGroups = [
     label: "Breakpoints",
     rows: breakpointRows,
   },
-  { id: "z-index", label: "Z-Index", rows: toScaleRows(zIndex, "base.zIndex") },
+  {
+    id: "z-index",
+    label: "Z-Index",
+    rows: toScaleRows(zIndex, "base.zIndex"),
+  },
 ];
+
+const preferredSpacingStops = ["0_5", "1", "1_5", "2", "2_5", "3", "4", "6", "8"];
+const spacingShowcaseRows = spacingRows.filter((row) => {
+  const key = stripPathPrefix(row.path, "base.space");
+  return preferredSpacingStops.includes(key);
+});
 
 const meta = {
   title: "Foundations/Tokens/Spacing & Layout",
@@ -135,33 +143,26 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Reference: Story = {
+export const Showcase: Story = {
   render: () => {
-    const spacingAppliedRows = spacingRows.slice(1, 9);
-    const spacingGridRows = spacingRows.slice(4, 12);
-
     return (
       <TokenDocsPage
         title="Spacing & Layout Tokens"
-        subtitle="Applied spacing rhythm and structural previews first, with collapsed path/value references below."
+        subtitle="Applied spacing rhythm and structural previews first. Exact implementation references are in the companion Reference story."
       >
         <TokenSection
           title="Spacing Scale"
-          description="Applied examples make spacing increments easier to compare in realistic layout contexts."
+          description="Applied mini-layouts make spacing increments easier to compare in realistic contexts."
         >
           <div className="fd-tokendocs-showcase" aria-label="Spacing visual showcase">
             <h3 className="fd-tokendocs-showcaseTitle">Vertical Stack Rhythm</h3>
             <div className="fd-tokendocs-spacingShowcase">
-              {spacingAppliedRows.map((row) => (
-                <div key={`${row.id}-preview`} className="fd-tokendocs-spacingRow">
+              {spacingShowcaseRows.map((row) => (
+                <div key={`${row.id}-stack`} className="fd-tokendocs-spacingRow">
                   <span className="fd-tokendocs-spacingLabel">
                     {stripPathPrefix(row.path, "base.space")}
                   </span>
-                  <div
-                    className="fd-tokendocs-stackPreview"
-                    style={{ gap: row.value }}
-                    aria-hidden="true"
-                  >
+                  <div className="fd-tokendocs-stackPreview" style={{ gap: row.value }} aria-hidden="true">
                     <span className="fd-tokendocs-stackBlock" />
                     <span className="fd-tokendocs-stackBlock" />
                     <span className="fd-tokendocs-stackBlock" />
@@ -173,12 +174,13 @@ export const Reference: Story = {
 
             <h3 className="fd-tokendocs-showcaseTitle">Inline Cluster Gap</h3>
             <div className="fd-tokendocs-gapPreview">
-              {spacingAppliedRows.map((row) => (
+              {spacingShowcaseRows.map((row) => (
                 <div key={`${row.id}-gap`} className="fd-tokendocs-spacingRow">
                   <span className="fd-tokendocs-spacingLabel">
                     {stripPathPrefix(row.path, "base.space")}
                   </span>
-                  <div className="fd-tokendocs-gapBlocks" style={{ gap: row.value }}>
+                  <div className="fd-tokendocs-gapBlocks" style={{ gap: row.value }} aria-hidden="true">
+                    <span className="fd-tokendocs-gapBlock" />
                     <span className="fd-tokendocs-gapBlock" />
                     <span className="fd-tokendocs-gapBlock" />
                   </div>
@@ -187,18 +189,14 @@ export const Reference: Story = {
               ))}
             </div>
 
-            <h3 className="fd-tokendocs-showcaseTitle">Grid Gutter Example</h3>
+            <h3 className="fd-tokendocs-showcaseTitle">Card Grid Gutter</h3>
             <div className="fd-tokendocs-gapPreview">
-              {spacingGridRows.map((row) => (
+              {spacingShowcaseRows.map((row) => (
                 <div key={`${row.id}-grid`} className="fd-tokendocs-spacingRow">
                   <span className="fd-tokendocs-spacingLabel">
                     {stripPathPrefix(row.path, "base.space")}
                   </span>
-                  <div
-                    className="fd-tokendocs-gridGutter"
-                    style={{ gap: row.value }}
-                    aria-hidden="true"
-                  >
+                  <div className="fd-tokendocs-gridGutter" style={{ gap: row.value }} aria-hidden="true">
                     <span className="fd-tokendocs-gridGutterCell" />
                     <span className="fd-tokendocs-gridGutterCell" />
                     <span className="fd-tokendocs-gridGutterCell" />
@@ -209,43 +207,11 @@ export const Reference: Story = {
               ))}
             </div>
           </div>
-
-          <ReferenceTables hint="Expand for exact spacing path/value references.">
-            <TokenDataGrid
-              gridLabel="spacing-grid"
-              groups={[{ id: "spacing", label: "Spacing", rows: spacingRows }]}
-              showToolbar={false}
-              columns={[
-                {
-                  key: "path",
-                  label: "Token Path",
-                  width: "minmax(280px, 1.5fr)",
-                  sortable: false,
-                  getValue: (row) => row.path,
-                  render: (row) => <TokenPathText value={row.path} />,
-                  valueMode: "plain",
-                  copyValue: (row) => row.path,
-                },
-                {
-                  key: "value",
-                  label: "Value",
-                  width: "minmax(340px, 1.5fr)",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  render: (row) => (
-                    <ScaleBarCell value={row.value} widthPx={row.widthPx} />
-                  ),
-                  valueMode: "plain",
-                  copyValue: (row) => row.value,
-                },
-              ]}
-            />
-          </ReferenceTables>
         </TokenSection>
 
         <TokenSection
           title="Layout and Structural Scales"
-          description="Radius and breakpoints get direct visual previews; all structural tokens remain listed below."
+          description="Radius and breakpoints get concise visual previews for rapid implementation checks."
         >
           <div className="fd-tokendocs-showcase" aria-label="Structural token showcase">
             <h3 className="fd-tokendocs-showcaseTitle">Radius Preview</h3>
@@ -283,36 +249,6 @@ export const Reference: Story = {
               ))}
             </div>
           </div>
-
-          <ReferenceTables hint="Expand for exact radius/border/opacity/breakpoint/z-index references.">
-            <TokenDataGrid
-              gridLabel="layout-grid"
-              groups={layoutGroups}
-              showToolbar={false}
-              columns={[
-                {
-                  key: "path",
-                  label: "Token Path",
-                  width: "minmax(320px, 1.8fr)",
-                  sortable: false,
-                  getValue: (row) => row.path,
-                  render: (row) => <TokenPathText value={row.path} />,
-                  valueMode: "plain",
-                  copyValue: (row) => row.path,
-                },
-                {
-                  key: "value",
-                  label: "Value",
-                  width: "minmax(260px, 1fr)",
-                  align: "right",
-                  sortable: false,
-                  getValue: (row) => row.value,
-                  valueMode: "plain",
-                  copyValue: (row) => row.value,
-                },
-              ]}
-            />
-          </ReferenceTables>
         </TokenSection>
       </TokenDocsPage>
     );
@@ -322,8 +258,88 @@ export const Reference: Story = {
     await expect(
       canvas.getByRole("heading", { name: "Spacing & Layout Tokens" }),
     ).toBeInTheDocument();
-    await expect(canvas.getByText("Inline Cluster Gap")).toBeInTheDocument();
-    await expect(canvas.getByText("Grid Gutter Example")).toBeInTheDocument();
-    await expect(canvas.getByText("Breakpoint Ladder")).toBeInTheDocument();
+    await expect(canvas.getByText("Vertical Stack Rhythm")).toBeInTheDocument();
+    await expect(canvas.getByText("Card Grid Gutter")).toBeInTheDocument();
+    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+  },
+};
+
+export const Reference: Story = {
+  render: () => {
+    return (
+      <TokenDocsPage
+        title="Spacing & Layout Token Reference"
+        subtitle="Deterministic grouped tables for spacing and structural scales with copy actions."
+      >
+        <TokenSection
+          title="Spacing References"
+          description="Complete base spacing path/value references."
+        >
+          <TokenDataGrid
+            gridLabel="spacing-grid"
+            groups={spacingReferenceGroups}
+            columns={[
+              {
+                key: "path",
+                label: "Token Path",
+                width: "minmax(280px, 1.5fr)",
+                getValue: (row) => row.path,
+                render: (row) => <TokenPathText value={row.path} />,
+                valueMode: "plain",
+                copyValue: (row) => row.path,
+              },
+              {
+                key: "value",
+                label: "Value",
+                width: "minmax(340px, 1.5fr)",
+                getValue: (row) => row.value,
+                render: (row) => (
+                  <ScaleBarCell value={row.value} widthPx={row.widthPx} />
+                ),
+                valueMode: "plain",
+                copyValue: (row) => row.value,
+              },
+            ]}
+          />
+        </TokenSection>
+
+        <TokenSection
+          title="Layout & Structural References"
+          description="Radius, border, opacity, breakpoint, and z-index path/value references."
+        >
+          <TokenDataGrid
+            gridLabel="layout-grid"
+            groups={layoutReferenceGroups}
+            columns={[
+              {
+                key: "path",
+                label: "Token Path",
+                width: "minmax(320px, 1.8fr)",
+                getValue: (row) => row.path,
+                render: (row) => <TokenPathText value={row.path} />,
+                valueMode: "plain",
+                copyValue: (row) => row.path,
+              },
+              {
+                key: "value",
+                label: "Value",
+                width: "minmax(260px, 1fr)",
+                align: "right",
+                getValue: (row) => row.value,
+                valueMode: "plain",
+                copyValue: (row) => row.value,
+              },
+            ]}
+          />
+        </TokenSection>
+      </TokenDocsPage>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("heading", { name: "Spacing & Layout Token Reference" }),
+    ).toBeInTheDocument();
+    await expect(canvas.getByText("Spacing References")).toBeInTheDocument();
   },
 };
