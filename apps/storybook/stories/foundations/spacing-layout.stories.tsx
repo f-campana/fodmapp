@@ -123,49 +123,81 @@ export const Showcase: Story = {
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-spacingShowcaseRoot" aria-label="Spacing visual showcase">
             <h3 className="fd-tokendocs-showcaseTitle">Vertical Stack Rhythm</h3>
-            <div className="fd-tokendocs-spacingAppliedList">
+            <div className="fd-tokendocs-spacingShowcaseModule">
+              <p className="fd-tokendocs-showcaseHint">
+                Four stacked surfaces use tokenized `gap` values so rhythm changes are instantly visible.
+              </p>
+            </div>
+            <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-stack`} className="fd-tokendocs-spacingAppliedRow">
-                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                <article key={`${row.id}-stack`} className="fd-tokendocs-spacingDemoCard">
                   <div className="fd-tokendocs-stackApplied" style={{ gap: row.value }} aria-hidden="true">
                     <div className="fd-tokendocs-stackAppliedCard" />
                     <div className="fd-tokendocs-stackAppliedCard" />
                     <div className="fd-tokendocs-stackAppliedCard" />
+                    <div className="fd-tokendocs-stackAppliedCard" />
                   </div>
-                  <TokenValuePill value={row.value} />
-                </div>
+                  <div className="fd-tokendocs-spacingDemoMeta">
+                    <span className="fd-tokendocs-spacingLabel">
+                      {stripPathPrefix(row.path, "base.space")}
+                    </span>
+                    <TokenValuePill value={row.value} />
+                  </div>
+                </article>
               ))}
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Inline Cluster Gap</h3>
-            <div className="fd-tokendocs-spacingAppliedList">
+            <div className="fd-tokendocs-spacingShowcaseModule">
+              <p className="fd-tokendocs-showcaseHint">
+                Chip clusters expose wrap and horizontal spacing behavior at each token step.
+              </p>
+            </div>
+            <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-cluster`} className="fd-tokendocs-spacingAppliedRow">
-                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                <article key={`${row.id}-cluster`} className="fd-tokendocs-spacingDemoCard">
                   <div className="fd-tokendocs-clusterApplied" style={{ gap: row.value }} aria-hidden="true">
                     <span className="fd-tokendocs-chip">Low</span>
                     <span className="fd-tokendocs-chip">Moderate</span>
                     <span className="fd-tokendocs-chip">High</span>
                     <span className="fd-tokendocs-chip">None</span>
+                    <span className="fd-tokendocs-chip">Review</span>
+                    <span className="fd-tokendocs-chip">Safe</span>
                   </div>
-                  <TokenValuePill value={row.value} />
-                </div>
+                  <div className="fd-tokendocs-spacingDemoMeta">
+                    <span className="fd-tokendocs-spacingLabel">
+                      {stripPathPrefix(row.path, "base.space")}
+                    </span>
+                    <TokenValuePill value={row.value} />
+                  </div>
+                </article>
               ))}
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Card Lattice Gutter</h3>
-            <div className="fd-tokendocs-spacingAppliedList">
+            <div className="fd-tokendocs-spacingShowcaseModule">
+              <p className="fd-tokendocs-showcaseHint">
+                Two-by-three card lattices highlight gutter differences for dashboard-like layouts.
+              </p>
+            </div>
+            <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-lattice`} className="fd-tokendocs-spacingAppliedRow">
-                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                <article key={`${row.id}-lattice`} className="fd-tokendocs-spacingDemoCard">
                   <div className="fd-tokendocs-latticeApplied" style={{ gap: row.value }} aria-hidden="true">
                     <span className="fd-tokendocs-latticeCard" />
                     <span className="fd-tokendocs-latticeCard" />
                     <span className="fd-tokendocs-latticeCard" />
                     <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard" />
                   </div>
-                  <TokenValuePill value={row.value} />
-                </div>
+                  <div className="fd-tokendocs-spacingDemoMeta">
+                    <span className="fd-tokendocs-spacingLabel">
+                      {stripPathPrefix(row.path, "base.space")}
+                    </span>
+                    <TokenValuePill value={row.value} />
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -188,9 +220,9 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Breakpoint Ladder</h3>
-            <div className="fd-tokendocs-spacingAppliedList">
+            <div className="fd-tokendocs-breakpointList">
               {breakpointRows.map((row) => (
-                <div key={`${row.id}-breakpoint`} className="fd-tokendocs-spacingAppliedRow">
+                <div key={`${row.id}-breakpoint`} className="fd-tokendocs-breakpointRow">
                   <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.breakpoint")}</span>
                   <div className="fd-tokendocs-breakpointTrack" aria-hidden="true">
                     <span
@@ -232,6 +264,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="spacing-grid"
             groups={spacingReferenceGroups}
+            accordion
+            initialOpenGroupId="spacing"
             columns={[
               {
                 key: "path",
@@ -261,6 +295,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="layout-grid"
             groups={layoutReferenceGroups}
+            accordion
+            initialOpenGroupId="radius"
             columns={[
               {
                 key: "path",

@@ -189,10 +189,8 @@ export const Showcase: Story = {
                     Digestive support rhythm across interface states.
                   </p>
                   <div className="fd-tokendocs-weightCellMeta">
-                    <span className="fd-tokendocs-typoLabel">
-                      {row.path.split(".").pop()} {row.value}
-                    </span>
-                    <code className="fd-tokendocs-typoValue">base.typography.fontWeight</code>
+                    <span className="fd-tokendocs-typoLabel">{row.path.split(".").pop()}</span>
+                    <span className="fd-tokendocs-value-plain">{row.value}</span>
                   </div>
                 </article>
               ))}
@@ -224,6 +222,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="typography-grid"
             groups={groups}
+            accordion
+            initialOpenGroupId="families"
             columns={[
               {
                 key: "path",
@@ -239,7 +239,7 @@ export const Reference: Story = {
                 label: "Value",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.value,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.value,
               },
             ]}

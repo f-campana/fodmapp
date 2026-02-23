@@ -36,6 +36,8 @@ interface TokenDataGridProps<Row extends TokenGridRowBase> {
   columns: TokenGridColumn<Row>[];
   groups: TokenGridGroup<Row>[];
   mobileMode?: "reflow" | "table";
+  accordion?: boolean;
+  initialOpenGroupId?: string;
 }
 
 function classNames(
@@ -174,30 +176,64 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   columns,
   groups,
   mobileMode = "reflow",
+  accordion = false,
+  initialOpenGroupId,
 }: TokenDataGridProps<Row>) {
+  function createInitialExpandedState(
+    groupList: TokenGridGroup<Row>[],
+    previous?: Record<string, boolean>,
+  ): Record<string, boolean> {
+    if (groupList.length === 0) {
+      return {};
+    }
+
+    if (accordion) {
+      const validIds = new Set(groupList.map((group) => group.id));
+      const requestedId =
+        initialOpenGroupId && validIds.has(initialOpenGroupId) ? initialOpenGroupId : null;
+      const preservedOpenId =
+        previous && Object.keys(previous).find((id) => previous[id] && validIds.has(id));
+      const defaultOpenId =
+        groupList.find((group) => !group.defaultCollapsed)?.id ?? groupList[0]?.id;
+      const openId = requestedId ?? preservedOpenId ?? defaultOpenId;
+
+      return Object.fromEntries(groupList.map((group) => [group.id, group.id === openId]));
+    }
+
+    return Object.fromEntries(
+      groupList.map((group) => [
+        group.id,
+        previous?.[group.id] ?? !group.defaultCollapsed,
+      ]),
+    );
+  }
+
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(groups.map((group) => [group.id, !group.defaultCollapsed])),
+    createInitialExpandedState(groups),
   );
 
   useEffect(() => {
-    setExpandedGroups((state) => {
-      const next: Record<string, boolean> = {};
-      for (const group of groups) {
-        next[group.id] = state[group.id] ?? !group.defaultCollapsed;
-      }
-      return next;
-    });
-  }, [groups]);
+    setExpandedGroups((state) => createInitialExpandedState(groups, state));
+  }, [groups, accordion, initialOpenGroupId]);
 
   const gridTemplateColumns = columns
     .map((column) => column.width ?? "minmax(220px, 1fr)")
     .join(" ");
 
   function toggleGroup(groupId: string) {
-    setExpandedGroups((state) => ({
-      ...state,
-      [groupId]: !state[groupId],
-    }));
+    if (accordion) {
+      setExpandedGroups((state) => {
+        const isOpen = state[groupId] ?? false;
+        if (isOpen) {
+          return state;
+        }
+
+        return Object.fromEntries(groups.map((group) => [group.id, group.id === groupId]));
+      });
+      return;
+    }
+
+    setExpandedGroups((state) => ({ ...state, [groupId]: !state[groupId] }));
   }
 
   function renderCellValue(column: TokenGridColumn<Row>, row: Row): ReactNode {

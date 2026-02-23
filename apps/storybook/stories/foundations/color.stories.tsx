@@ -481,6 +481,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="base-color-grid"
             groups={baseColorGroups}
+            accordion
+            initialOpenGroupId="neutral"
             columns={[
               {
                 key: "path",
@@ -496,7 +498,7 @@ export const Reference: Story = {
                 label: "Color Value",
                 width: "minmax(340px, 1fr)",
                 getValue: (row) => row.value,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.value,
               },
             ]}
@@ -523,6 +525,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="semantic-color-grid"
             groups={semanticColorGroups}
+            accordion
+            initialOpenGroupId="action"
             columns={[
               {
                 key: "path",
@@ -538,7 +542,7 @@ export const Reference: Story = {
                 label: "Light",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.light,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.light,
               },
               {
@@ -546,7 +550,7 @@ export const Reference: Story = {
                 label: "Dark",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.dark,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.dark,
               },
             ]}

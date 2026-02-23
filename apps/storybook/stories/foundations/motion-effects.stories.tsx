@@ -29,8 +29,10 @@ interface MotionLaneRow {
   label: string;
   path: string;
   value: string;
-  laneDuration: string;
-  laneEasing: string;
+  tokenDuration: string;
+  tokenEasing: string;
+  baselineDuration: string;
+  baselineEasing: string;
   laneDelay: string;
 }
 
@@ -84,18 +86,22 @@ const easingRows = toRows(
 
 const standardEasing =
   easingRows.find((row) => row.path.endsWith(".standard"))?.value ?? "linear";
+const baselineEasing = "linear";
 const normalDuration =
   durationRows.find((row) => row.path.endsWith(".normal"))?.value ??
   durationRows[0]?.value ??
   "180ms";
+const baselineLaneDuration = laneDuration(normalDuration);
 
 const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => ({
   id: `duration:${row.id}`,
   label: row.path.split(".").pop() ?? row.path,
   path: row.path,
   value: row.value,
-  laneDuration: laneDuration(row.value),
-  laneEasing: standardEasing,
+  tokenDuration: laneDuration(row.value),
+  tokenEasing: standardEasing,
+  baselineDuration: baselineLaneDuration,
+  baselineEasing: standardEasing,
   laneDelay: `-${index * LANE_DELAY_STEP_MS}ms`,
 }));
 
@@ -104,8 +110,10 @@ const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => ({
   label: row.path.split(".").pop() ?? row.path,
   path: row.path,
   value: row.value,
-  laneDuration: laneDuration(normalDuration),
-  laneEasing: row.value,
+  tokenDuration: baselineLaneDuration,
+  tokenEasing: row.value,
+  baselineDuration: baselineLaneDuration,
+  baselineEasing,
   laneDelay: `-${(index + durationRows.length) * LANE_DELAY_STEP_MS}ms`,
 }));
 
@@ -151,6 +159,9 @@ export const Showcase: Story = {
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
+            <p className="fd-tokendocs-showcaseHint">
+              Accent marker uses token duration; neutral marker uses baseline normal duration.
+            </p>
             <div className="fd-tokendocs-motionLanes">
               {durationLaneRows.map((row) => (
                 <div
@@ -158,8 +169,6 @@ export const Showcase: Story = {
                   className="fd-tokendocs-motionLaneRow"
                   style={
                     {
-                      "--fd-motion-duration": row.laneDuration,
-                      "--fd-motion-easing": row.laneEasing,
                       "--fd-motion-delay": row.laneDelay,
                     } as CSSProperties
                   }
@@ -170,7 +179,26 @@ export const Showcase: Story = {
                     aria-hidden="true"
                     title={`${row.path}: ${row.value}`}
                   >
-                    <span className="fd-tokendocs-motionLaneBall is-duration" />
+                    <span
+                      className="fd-tokendocs-motionLaneBall is-baseline"
+                      style={
+                        {
+                          "--fd-lane-duration": row.baselineDuration,
+                          "--fd-lane-easing": row.baselineEasing,
+                          "--fd-lane-delay": row.laneDelay,
+                        } as CSSProperties
+                      }
+                    />
+                    <span
+                      className="fd-tokendocs-motionLaneBall is-token"
+                      style={
+                        {
+                          "--fd-lane-duration": row.tokenDuration,
+                          "--fd-lane-easing": row.tokenEasing,
+                          "--fd-lane-delay": row.laneDelay,
+                        } as CSSProperties
+                      }
+                    />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -180,6 +208,9 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Easing Lanes</h3>
+            <p className="fd-tokendocs-showcaseHint">
+              Neutral marker is linear baseline, accent marker uses the easing token with same duration.
+            </p>
             <div className="fd-tokendocs-motionLanes">
               {easingLaneRows.map((row) => (
                 <div
@@ -187,8 +218,6 @@ export const Showcase: Story = {
                   className="fd-tokendocs-motionLaneRow"
                   style={
                     {
-                      "--fd-motion-duration": row.laneDuration,
-                      "--fd-motion-easing": row.laneEasing,
                       "--fd-motion-delay": row.laneDelay,
                     } as CSSProperties
                   }
@@ -199,8 +228,26 @@ export const Showcase: Story = {
                     aria-hidden="true"
                     title={`${row.path}: ${row.value}`}
                   >
-                    <span className="fd-tokendocs-motionLaneBall is-baseline" />
-                    <span className="fd-tokendocs-motionLaneBall is-easing" />
+                    <span
+                      className="fd-tokendocs-motionLaneBall is-baseline"
+                      style={
+                        {
+                          "--fd-lane-duration": row.baselineDuration,
+                          "--fd-lane-easing": row.baselineEasing,
+                          "--fd-lane-delay": row.laneDelay,
+                        } as CSSProperties
+                      }
+                    />
+                    <span
+                      className="fd-tokendocs-motionLaneBall is-token"
+                      style={
+                        {
+                          "--fd-lane-duration": row.tokenDuration,
+                          "--fd-lane-easing": row.tokenEasing,
+                          "--fd-lane-delay": row.laneDelay,
+                        } as CSSProperties
+                      }
+                    />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -263,6 +310,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="motion-grid"
             groups={motionGroups}
+            accordion
+            initialOpenGroupId="durations"
             columns={[
               {
                 key: "path",
@@ -278,7 +327,7 @@ export const Reference: Story = {
                 label: "Value",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.value,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.value,
               },
             ]}
@@ -292,6 +341,8 @@ export const Reference: Story = {
           <TokenDataGrid
             gridLabel="shadow-grid"
             groups={shadowGroups}
+            accordion
+            initialOpenGroupId="shadow"
             columns={[
               {
                 key: "path",
@@ -307,7 +358,7 @@ export const Reference: Story = {
                 label: "Shadow Value",
                 width: "minmax(420px, 1.4fr)",
                 getValue: (row) => row.value,
-                valueMode: "wrap",
+                valueMode: "plain",
                 copyValue: (row) => row.value,
               },
             ]}
