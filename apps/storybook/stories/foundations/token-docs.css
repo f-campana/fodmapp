@@ -173,11 +173,15 @@
 }
 
 .fd-tokendocs-group[data-expanded="true"] {
-  border-color: color-mix(in oklab, var(--color-border) 70%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-surface-muted) 48%, transparent);
+  border-color: color-mix(in oklab, var(--color-primary) 38%, var(--color-border));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 28%, transparent),
+    inset 3px 0 0 color-mix(in oklab, var(--color-primary) 64%, transparent),
+    0 10px 24px -22px color-mix(in oklab, var(--color-primary) 42%, transparent);
 }
 
 .fd-tokendocs-groupToggle {
+  position: relative;
   display: flex;
   width: 100%;
   align-items: center;
@@ -190,8 +194,29 @@
   cursor: pointer;
 }
 
+.fd-tokendocs-groupToggle::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+  margin-right: 0.2rem;
+  background: transparent;
+  box-shadow: 0 0 0 2px transparent;
+}
+
 .fd-tokendocs-groupToggle[data-expanded="true"] {
-  background: color-mix(in oklab, var(--color-surface-muted) 48%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-primary) 17%, var(--color-surface-muted)) 0%,
+      color-mix(in oklab, var(--color-primary) 8%, var(--color-background)) 100%
+    );
+}
+
+.fd-tokendocs-groupToggle[data-expanded="true"]::before {
+  background: color-mix(in oklab, var(--color-primary) 82%, var(--color-background));
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-primary) 22%, transparent);
 }
 
 .fd-tokendocs-groupToggle:hover {
@@ -204,7 +229,7 @@
 }
 
 .fd-tokendocs-groupLabel {
-  font-size: 0.87rem;
+  font-size: 0.9rem;
   font-weight: 650;
   color: var(--color-foreground);
 }
@@ -219,12 +244,12 @@
 
 .fd-tokendocs-groupCount {
   flex-shrink: 0;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   color: var(--color-muted-foreground);
 }
 
 .fd-tokendocs-groupPanel {
-  border-top: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+  border-top: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
 }
 
 .fd-tokendocs-empty {
@@ -275,7 +300,7 @@
 }
 
 .fd-tokendocs-headCell {
-  font-size: 0.83rem;
+  font-size: 0.94rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--color-foreground);
@@ -290,12 +315,16 @@
   display: grid;
   align-items: center;
   column-gap: 0.74rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
-  padding: 0.78rem 0.84rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  padding: 0.98rem 0.94rem;
+}
+
+.fd-tokendocs-group[data-expanded="true"] .fd-tokendocs-row:first-child {
+  border-top: 1px solid color-mix(in oklab, var(--color-primary) 24%, transparent);
 }
 
 .fd-tokendocs-row:nth-child(even) {
-  background: color-mix(in oklab, var(--color-surface-muted) 20%, transparent);
+  background: color-mix(in oklab, var(--color-surface-muted) 26%, transparent);
 }
 
 .fd-tokendocs-row:last-child {
@@ -333,8 +362,8 @@
   display: inline-block;
   max-width: 100%;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.88rem;
-  line-height: 1.62;
+  font-size: 0.98rem;
+  line-height: 1.76;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
 }
@@ -356,8 +385,8 @@
   display: inline-block;
   max-width: 100%;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.9rem;
-  line-height: 1.62;
+  font-size: 1rem;
+  line-height: 1.76;
   color: var(--color-foreground);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -366,15 +395,16 @@
 .fd-tokendocs-value-plain {
   display: inline-block;
   max-width: 100%;
-  font-size: 0.94rem;
-  line-height: 1.62;
+  font-size: 1.05rem;
+  line-height: 1.76;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
 }
 
 .fd-tokendocs-value-wrapSoft {
   white-space: pre-wrap;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .fd-tokendocs-copy {
@@ -505,6 +535,40 @@
   text-transform: lowercase;
 }
 
+.fd-tokendocs-colorFamilyCell {
+  display: grid;
+  gap: 0.16rem;
+}
+
+.fd-tokendocs-colorSparseList {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.24rem;
+}
+
+.fd-tokendocs-colorSparseChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  padding: 0.08rem 0.26rem;
+}
+
+.fd-tokendocs-colorSparseSwatch {
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-border) 74%, transparent);
+}
+
+.fd-tokendocs-colorSparseStep {
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.62rem;
+  color: var(--color-muted-foreground);
+}
+
 .fd-tokendocs-colorMatrixCell {
   display: grid;
 }
@@ -560,7 +624,7 @@
 }
 
 .fd-tokendocs-brandLabel {
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -575,29 +639,29 @@
 
 .fd-tokendocs-semanticCard {
   display: grid;
-  gap: 0.36rem;
+  gap: 0.18rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.52rem;
+  padding: 0.44rem;
 }
 
 .fd-tokendocs-semanticTitle {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 640;
   overflow-wrap: anywhere;
 }
 
 .fd-tokendocs-semanticRow {
   display: grid;
-  grid-template-columns: minmax(2.6rem, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(2.4rem, auto) minmax(0, 1fr);
   align-items: center;
-  gap: 0.34rem;
+  gap: 0.3rem;
 }
 
 .fd-tokendocs-semanticMode {
-  font-size: 0.66rem;
+  font-size: 0.56rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -606,12 +670,12 @@
 
 .fd-tokendocs-semanticSwatch {
   display: inline-flex;
-  min-height: 1.5rem;
+  min-height: 1.36rem;
   align-items: center;
   border-radius: 0.36rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
-  padding-inline: 0.42rem;
-  font-size: 0.98rem;
+  padding-inline: 0.38rem;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
@@ -691,19 +755,26 @@
   color: var(--color-muted-foreground);
 }
 
+.fd-tokendocs-weightBand,
 .fd-tokendocs-weightStrip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
-  gap: 0.42rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.4rem;
 }
 
+.fd-tokendocs-weightBandCell,
 .fd-tokendocs-weightCell {
   display: grid;
-  gap: 0.22rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  gap: 0.18rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
   border-radius: 0.56rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.44rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-background) 96%, var(--color-surface)) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 28%, var(--color-background)) 100%
+    );
+  padding: 0.4rem 0.42rem;
 }
 
 .fd-tokendocs-weightCellSample {
@@ -713,9 +784,17 @@
   color: var(--color-foreground);
 }
 
+.fd-tokendocs-weightBandMeta,
 .fd-tokendocs-weightCellMeta {
   display: grid;
-  gap: 0.14rem;
+  gap: 0.1rem;
+}
+
+.fd-tokendocs-weightNumeric {
+  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.9rem;
+  line-height: 1.2;
+  color: var(--color-muted-foreground);
 }
 
 .fd-tokendocs-spacingShowcaseRoot {
@@ -742,10 +821,15 @@
 .fd-tokendocs-spacingDemoCard {
   display: grid;
   gap: 0.34rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-primary) 56%, var(--color-border));
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.48rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-primary) 28%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 52%, var(--color-background)) 100%
+    );
+  padding: 0.56rem;
 }
 
 .fd-tokendocs-spacingDemoMeta {
@@ -759,38 +843,44 @@
 .fd-tokendocs-clusterApplied,
 .fd-tokendocs-latticeApplied,
 .fd-tokendocs-breakpointTrack {
-  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-primary) 56%, var(--color-border));
   border-radius: 0.52rem;
   background:
     linear-gradient(
       180deg,
-      color-mix(in oklab, var(--color-primary) 8%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 34%, var(--color-background)) 100%
+      color-mix(in oklab, var(--color-primary) 34%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 56%, var(--color-background)) 100%
     );
 }
 
 .fd-tokendocs-stackApplied {
   display: grid;
   align-content: start;
-  min-height: 6.6rem;
-  padding: 0.5rem;
+  min-height: 7.2rem;
+  padding: 0.56rem;
 }
 
 .fd-tokendocs-stackAppliedCard {
   display: flex;
   align-items: center;
-  min-height: 1.05rem;
-  border-radius: 0.32rem;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 46%, transparent);
-  background: color-mix(in oklab, var(--color-primary) 68%, var(--color-background));
+  min-height: 1.24rem;
+  border-radius: 0.38rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 96%, transparent);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in oklab, var(--color-primary) 100%, #000) 0%,
+      color-mix(in oklab, var(--color-primary) 84%, #111) 100%
+    );
   padding-inline: 0.34rem;
+  box-shadow: 0 10px 18px -12px color-mix(in oklab, var(--color-primary) 82%, transparent);
 }
 
 .fd-tokendocs-stackCardTitle {
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: color-mix(in oklab, var(--color-foreground) 94%, var(--color-primary));
+  color: color-mix(in oklab, var(--color-background) 97%, white);
 }
 
 .fd-tokendocs-clusterApplied {
@@ -798,27 +888,34 @@
   flex-wrap: wrap;
   align-items: center;
   align-content: flex-start;
-  min-height: 6.6rem;
-  padding: 0.5rem;
+  min-height: 7.2rem;
+  max-width: 8.2rem;
+  padding: 0.56rem;
 }
 
 .fd-tokendocs-chip {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 42%, transparent);
-  background: color-mix(in oklab, var(--color-primary) 84%, var(--color-background));
-  padding: 0.2rem 0.56rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 95%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-primary) 100%, #000) 0%,
+      color-mix(in oklab, var(--color-primary) 82%, #111) 100%
+    );
+  padding: 0.24rem 0.52rem;
   font-size: 0.73rem;
   font-weight: 700;
-  color: color-mix(in oklab, var(--color-foreground) 92%, var(--color-primary));
+  color: color-mix(in oklab, var(--color-background) 96%, white);
+  box-shadow: 0 10px 18px -14px color-mix(in oklab, var(--color-primary) 82%, transparent);
 }
 
 .fd-tokendocs-latticeApplied {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  min-height: 6.6rem;
-  padding: 0.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-height: 7.2rem;
+  padding: 0.56rem;
 }
 
 .fd-tokendocs-latticeCard {
@@ -826,17 +923,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 0.34rem;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 46%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-primary) 96%, transparent);
   background:
     linear-gradient(
       150deg,
-      color-mix(in oklab, var(--color-primary) 84%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-primary) 60%, var(--color-surface-muted)) 100%
+      color-mix(in oklab, var(--color-primary) 100%, #000) 0%,
+      color-mix(in oklab, var(--color-primary) 84%, #111) 100%
     );
-  box-shadow: 0 10px 20px -14px color-mix(in oklab, var(--color-primary) 54%, transparent);
-  color: color-mix(in oklab, var(--color-foreground) 92%, var(--color-primary));
+  box-shadow: 0 14px 24px -14px color-mix(in oklab, var(--color-primary) 84%, transparent);
+  color: color-mix(in oklab, var(--color-background) 97%, white);
   font-size: 0.78rem;
   font-weight: 700;
+  min-height: 1.58rem;
 }
 
 .fd-tokendocs-structShowcase {
@@ -856,18 +954,24 @@
 
 .fd-tokendocs-radiusSwatch {
   min-height: 1.84rem;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 38%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-primary) 58%, transparent);
   background:
     linear-gradient(
       155deg,
-      color-mix(in oklab, var(--color-primary) 70%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-primary) 45%, var(--color-surface-muted)) 100%
+      color-mix(in oklab, var(--color-primary) 86%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-primary) 54%, var(--color-surface-muted)) 100%
     );
 }
 
 .fd-tokendocs-breakpointTrack {
   height: 1.02rem;
   padding: 0.1rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-primary) 30%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 56%, var(--color-background)) 100%
+    );
 }
 
 .fd-tokendocs-breakpointList {
@@ -888,9 +992,9 @@
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    color-mix(in oklab, var(--color-primary) 95%, transparent) 0%,
-    color-mix(in oklab, var(--color-primary) 72%, transparent) 62%,
-    color-mix(in oklab, var(--color-primary) 56%, transparent) 100%
+    color-mix(in oklab, var(--color-primary) 100%, #000) 0%,
+    color-mix(in oklab, var(--color-primary) 92%, #111) 62%,
+    color-mix(in oklab, var(--color-primary) 78%, #111) 100%
   );
 }
 
@@ -909,33 +1013,35 @@
   display: inline-flex;
   align-items: center;
   gap: 0.34rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-background) 94%, var(--color-surface-muted));
   padding: 0.16rem 0.5rem;
   font-size: 0.72rem;
-  color: var(--color-muted-foreground);
+  color: var(--color-foreground);
 }
 
 .fd-tokendocs-motionLegendItem::before {
   content: "";
-  width: 0.7rem;
-  height: 0.7rem;
+  width: 0.84rem;
+  height: 0.84rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--color-border) 60%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 44%, transparent);
 }
 
 .fd-tokendocs-motionLegendItem.is-token::before {
-  background: color-mix(in oklab, var(--color-warning) 90%, var(--color-background));
+  background: color-mix(in oklab, var(--color-warning) 96%, #000);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-warning) 52%, transparent);
 }
 
 .fd-tokendocs-motionLegendItem.is-baseline::before {
-  background: color-mix(in oklab, var(--color-foreground) 44%, var(--color-background));
+  background: color-mix(in oklab, var(--color-foreground) 94%, #111);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-foreground) 24%, transparent);
 }
 
 .fd-tokendocs-motionLanes {
   display: grid;
-  gap: 0.44rem;
+  gap: 0.5rem;
 }
 
 .fd-tokendocs-motionLaneRow {
@@ -946,9 +1052,9 @@
   grid-template-columns: minmax(9rem, auto) minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.58rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   border-radius: 0.62rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-background) 95%, var(--color-surface-muted));
   padding: 0.5rem 0.56rem;
 }
 
@@ -959,50 +1065,99 @@
   overflow-wrap: anywhere;
 }
 
-.fd-tokendocs-motionLaneTrack {
-  position: relative;
-  min-height: 1.42rem;
+.fd-tokendocs-motionLaneCompare {
+  display: grid;
+  gap: 0.46rem;
+}
+
+.fd-tokendocs-motionRailRow {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.46rem;
+}
+
+.fd-tokendocs-motionRailTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.36rem;
+  height: 1.36rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid color-mix(in oklab, var(--color-border) 58%, transparent);
+}
+
+.fd-tokendocs-motionRailRow.is-baseline .fd-tokendocs-motionRailTag {
+  color: color-mix(in oklab, var(--color-foreground) 84%, var(--color-background));
+  background: color-mix(in oklab, var(--color-foreground) 16%, var(--color-background));
+}
+
+.fd-tokendocs-motionRailRow.is-token .fd-tokendocs-motionRailTag {
+  color: color-mix(in oklab, var(--color-warning) 88%, #111);
+  background: color-mix(in oklab, var(--color-warning) 28%, var(--color-background));
+}
+
+.fd-tokendocs-motionRail {
+  position: relative;
+  min-height: 1.54rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 56%, var(--color-border));
   background:
     linear-gradient(
       90deg,
-      color-mix(in oklab, var(--color-surface-muted) 86%, transparent) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 44%, transparent) 100%
+      color-mix(in oklab, var(--color-foreground) 12%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-foreground) 24%, var(--color-surface-muted)) 100%
     );
   overflow: hidden;
 }
 
-.fd-tokendocs-motionLaneTrack::before,
-.fd-tokendocs-motionLaneTrack::after {
+.fd-tokendocs-motionRail.is-token {
+  border-color: color-mix(in oklab, var(--color-warning) 68%, var(--color-border));
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-warning) 84%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-warning) 52%, var(--color-surface-muted)) 100%
+    );
+}
+
+.fd-tokendocs-motionRail::before,
+.fd-tokendocs-motionRail::after {
   content: "";
   position: absolute;
   top: 50%;
-  width: 0.2rem;
-  height: 0.76rem;
-  border-radius: 0.2rem;
+  width: 0.15rem;
+  height: 74%;
+  border-radius: 999px;
   transform: translateY(-50%);
-  background: color-mix(in oklab, var(--color-foreground) 32%, var(--color-background));
-  border: 1px solid color-mix(in oklab, var(--color-border) 64%, transparent);
+  background: color-mix(in oklab, var(--color-foreground) 56%, var(--color-background));
 }
 
-.fd-tokendocs-motionLaneTrack::before {
-  left: 0.36rem;
+.fd-tokendocs-motionRail::before {
+  left: 0.56rem;
 }
 
-.fd-tokendocs-motionLaneTrack::after {
-  right: 0.36rem;
+.fd-tokendocs-motionRail::after {
+  right: 0.56rem;
+}
+
+.fd-tokendocs-motionRail.is-token::before,
+.fd-tokendocs-motionRail.is-token::after {
+  background: color-mix(in oklab, var(--color-warning) 94%, #111);
 }
 
 .fd-tokendocs-motionLaneBall {
   position: absolute;
   top: 50%;
-  left: 0.7rem;
-  width: 1.02rem;
-  height: 1.02rem;
+  left: 0.96rem;
+  width: 1rem;
+  height: 1rem;
   border-radius: 999px;
   transform: translate(-50%, -50%);
-  border: 1px solid color-mix(in oklab, var(--color-border) 62%, transparent);
+  border: 2px solid color-mix(in oklab, var(--color-border) 42%, transparent);
   animation: fd-token-lane-travel var(--fd-lane-duration, var(--fd-motion-duration))
     var(--fd-lane-easing, var(--fd-motion-easing)) infinite;
   animation-delay: var(--fd-lane-delay, var(--fd-motion-delay));
@@ -1011,37 +1166,37 @@
 .fd-tokendocs-motionLaneBall::before {
   content: "";
   position: absolute;
-  top: 0.3rem;
-  left: 0.56rem;
-  width: 0.22rem;
-  height: 0.22rem;
+  top: 0.21rem;
+  left: 0.62rem;
+  width: 0.18rem;
+  height: 0.18rem;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground));
+  background: color-mix(in oklab, var(--color-background) 96%, #fff);
 }
 
 .fd-tokendocs-motionLaneBall.is-token {
   z-index: 2;
-  top: 38%;
-  width: 1.12rem;
-  height: 1.12rem;
+  width: 1.44rem;
+  height: 1.44rem;
   background:
     conic-gradient(
-      from 28deg at 58% 50%,
+      from 20deg at 58% 50%,
       transparent 0deg,
-      transparent 54deg,
-      color-mix(in oklab, var(--color-warning) 88%, var(--color-background)) 54deg,
-      color-mix(in oklab, var(--color-warning) 88%, var(--color-background)) 360deg
+      transparent 74deg,
+      color-mix(in oklab, var(--color-warning) 100%, #111) 62deg,
+      color-mix(in oklab, var(--color-warning) 100%, #111) 360deg
     );
-  box-shadow: 0 5px 14px color-mix(in oklab, var(--color-warning) 44%, transparent);
+  border-color: color-mix(in oklab, var(--color-warning) 92%, var(--color-border));
+  box-shadow: 0 12px 24px color-mix(in oklab, var(--color-warning) 84%, transparent);
 }
 
 .fd-tokendocs-motionLaneBall.is-baseline {
   z-index: 1;
-  top: 62%;
-  width: 0.9rem;
-  height: 0.9rem;
-  background: color-mix(in oklab, var(--color-foreground) 66%, var(--color-background));
-  box-shadow: 0 4px 10px color-mix(in oklab, var(--color-foreground) 22%, transparent);
+  width: 1.02rem;
+  height: 1.02rem;
+  border-color: color-mix(in oklab, var(--color-foreground) 88%, var(--color-border));
+  background: color-mix(in oklab, var(--color-foreground) 94%, #111);
+  box-shadow: 0 8px 16px color-mix(in oklab, var(--color-foreground) 52%, transparent);
 }
 
 .fd-tokendocs-motionLaneBall.is-baseline::before {
@@ -1054,11 +1209,11 @@
 
 @keyframes fd-token-lane-travel {
   from {
-    left: 0.95rem;
+    left: 0.98rem;
   }
 
   to {
-    left: calc(100% - 0.95rem);
+    left: calc(100% - 0.98rem);
   }
 }
 
@@ -1169,6 +1324,7 @@
   .fd-tokendocs-typoSpecimens,
   .fd-tokendocs-brandGrid,
   .fd-tokendocs-semanticGrid,
+  .fd-tokendocs-weightBand,
   .fd-tokendocs-weightStrip,
   .fd-tokendocs-structShowcase {
     grid-template-columns: 1fr;

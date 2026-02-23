@@ -185,9 +185,9 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Weight Spectrum</h3>
-            <div className="fd-tokendocs-weightStrip">
+            <div className="fd-tokendocs-weightBand" aria-label="Typography weight comparison">
               {weightRows.map((row) => (
-                <article key={`${row.id}-weight`} className="fd-tokendocs-weightCell">
+                <article key={`${row.id}-weight`} className="fd-tokendocs-weightBandCell">
                   <p
                     className="fd-tokendocs-weightCellSample"
                     style={{
@@ -196,9 +196,9 @@ export const Showcase: Story = {
                   >
                     Digestive support rhythm across interface states.
                   </p>
-                  <div className="fd-tokendocs-weightCellMeta">
+                  <div className="fd-tokendocs-weightBandMeta">
                     <span className="fd-tokendocs-typoLabel">{row.path.split(".").pop()}</span>
-                    <span className="fd-tokendocs-value-plain">{row.value}</span>
+                    <span className="fd-tokendocs-weightNumeric">{row.value}</span>
                   </div>
                 </article>
               ))}

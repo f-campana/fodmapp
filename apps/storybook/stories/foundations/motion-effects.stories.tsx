@@ -37,7 +37,7 @@ interface MotionLaneRow {
   tokenDelay: string;
 }
 
-const LANE_DELAY_STEP_MS = 240;
+const LANE_DELAY_STEP_MS = 280;
 
 const base = asRecord(tokens.base, "base");
 const motion = asRecord(base.motion, "base.motion");
@@ -107,7 +107,7 @@ const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => {
     baselineDuration: baselineLaneDuration,
     baselineEasing: standardEasing,
     baselineDelay: `${delayMs}ms`,
-    tokenDelay: `${delayMs - 140}ms`,
+    tokenDelay: `${delayMs}ms`,
   };
 });
 
@@ -124,7 +124,7 @@ const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => {
     baselineDuration: baselineLaneDuration,
     baselineEasing,
     baselineDelay: `${delayMs}ms`,
-    tokenDelay: `${delayMs - 140}ms`,
+    tokenDelay: `${delayMs}ms`,
   };
 });
 
@@ -143,6 +143,52 @@ const motionGroups = [
 
 const shadowRows = toRows(shadows, "base.shadow");
 const shadowGroups = [{ id: "shadow", label: "Shadow Scale", rows: shadowRows }];
+
+function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
+  return (
+    <div
+      className="fd-tokendocs-motionLaneCompare"
+      aria-hidden="true"
+      title={`${row.path}: ${row.value}`}
+    >
+      <span className="fd-tokendocs-motionRailRow is-baseline">
+        <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
+          B
+        </span>
+        <span className="fd-tokendocs-motionRail is-baseline">
+          <span
+            className="fd-tokendocs-motionLaneBall is-baseline"
+            style={
+              {
+                "--fd-lane-duration": row.baselineDuration,
+                "--fd-lane-easing": row.baselineEasing,
+                "--fd-lane-delay": row.baselineDelay,
+              } as CSSProperties
+            }
+          />
+        </span>
+      </span>
+
+      <span className="fd-tokendocs-motionRailRow is-token">
+        <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
+          T
+        </span>
+        <span className="fd-tokendocs-motionRail is-token">
+          <span
+            className="fd-tokendocs-motionLaneBall is-token"
+            style={
+              {
+                "--fd-lane-duration": row.tokenDuration,
+                "--fd-lane-easing": row.tokenEasing,
+                "--fd-lane-delay": row.tokenDelay,
+              } as CSSProperties
+            }
+          />
+        </span>
+      </span>
+    </div>
+  );
+}
 
 const meta = {
   title: "Foundations/Tokens/Motion & Effects",
@@ -181,32 +227,7 @@ export const Showcase: Story = {
               {durationLaneRows.map((row) => (
                 <div key={row.id} className="fd-tokendocs-motionLaneRow">
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
-                  <div
-                    className="fd-tokendocs-motionLaneTrack"
-                    aria-hidden="true"
-                    title={`${row.path}: ${row.value}`}
-                  >
-                    <span
-                      className="fd-tokendocs-motionLaneBall is-baseline"
-                      style={
-                        {
-                          "--fd-lane-duration": row.baselineDuration,
-                          "--fd-lane-easing": row.baselineEasing,
-                          "--fd-lane-delay": row.baselineDelay,
-                        } as CSSProperties
-                      }
-                    />
-                    <span
-                      className="fd-tokendocs-motionLaneBall is-token"
-                      style={
-                        {
-                          "--fd-lane-duration": row.tokenDuration,
-                          "--fd-lane-easing": row.tokenEasing,
-                          "--fd-lane-delay": row.tokenDelay,
-                        } as CSSProperties
-                      }
-                    />
-                  </div>
+                  <MotionLaneCompare row={row} />
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
                   </span>
@@ -222,32 +243,7 @@ export const Showcase: Story = {
               {easingLaneRows.map((row) => (
                 <div key={row.id} className="fd-tokendocs-motionLaneRow">
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
-                  <div
-                    className="fd-tokendocs-motionLaneTrack"
-                    aria-hidden="true"
-                    title={`${row.path}: ${row.value}`}
-                  >
-                    <span
-                      className="fd-tokendocs-motionLaneBall is-baseline"
-                      style={
-                        {
-                          "--fd-lane-duration": row.baselineDuration,
-                          "--fd-lane-easing": row.baselineEasing,
-                          "--fd-lane-delay": row.baselineDelay,
-                        } as CSSProperties
-                      }
-                    />
-                    <span
-                      className="fd-tokendocs-motionLaneBall is-token"
-                      style={
-                        {
-                          "--fd-lane-duration": row.tokenDuration,
-                          "--fd-lane-easing": row.tokenEasing,
-                          "--fd-lane-delay": row.tokenDelay,
-                        } as CSSProperties
-                      }
-                    />
-                  </div>
+                  <MotionLaneCompare row={row} />
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
                   </span>

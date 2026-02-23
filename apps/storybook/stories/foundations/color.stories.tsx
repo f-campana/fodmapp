@@ -36,6 +36,7 @@ interface SemanticColorGridRow {
 interface ColorMatrixRow {
   family: string;
   values: Record<string, string | null>;
+  sparseStops: Array<{ step: string; value: string }>;
 }
 
 interface BrandPair {
@@ -109,17 +110,36 @@ const coreFamilyEntries = baseFamilyEntries.filter(
     Object.keys(entry.scale).some((key) => isScaleStep(key)),
 );
 
-const unionScaleStops = [
-  ...new Set(
-    coreFamilyEntries.flatMap((entry) =>
-      Object.keys(entry.scale).filter((key) => isScaleStep(key)),
-    ),
-  ),
-].sort(sortScaleStep);
+const scaleStopCounts = new Map<string, number>();
+for (const entry of coreFamilyEntries) {
+  for (const stop of Object.keys(entry.scale).filter((key) => isScaleStep(key))) {
+    const token = entry.scale[stop];
+    if (typeof token !== "string" || !isColorTokenValue(token)) {
+      continue;
+    }
+    scaleStopCounts.set(stop, (scaleStopCounts.get(stop) ?? 0) + 1);
+  }
+}
+
+const sharedScaleStops = [...scaleStopCounts.entries()]
+  .filter(([, count]) => count >= 2)
+  .map(([stop]) => stop)
+  .sort(sortScaleStep);
 
 const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
+  const sparseStops = Object.keys(entry.scale)
+    .filter((key) => isScaleStep(key) && (scaleStopCounts.get(key) ?? 0) < 2)
+    .map((step) => {
+      const token = entry.scale[step];
+      return {
+        step,
+        value: typeof token === "string" && isColorTokenValue(token) ? token : "",
+      };
+    })
+    .filter((item) => item.value);
+
   const values = Object.fromEntries(
-    unionScaleStops.map((step) => {
+    sharedScaleStops.map((step) => {
       const token = entry.scale[step];
       return [
         step,
@@ -131,6 +151,7 @@ const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
   return {
     family: entry.family,
     values,
+    sparseStops,
   };
 });
 
@@ -305,7 +326,7 @@ type Story = StoryObj<typeof meta>;
 export const Showcase: Story = {
   render: () => {
     const matrixStyle = {
-      "--fd-color-cols": String(unionScaleStops.length),
+      "--fd-color-cols": String(sharedScaleStops.length),
     } as CSSProperties;
 
     return (
@@ -320,15 +341,15 @@ export const Showcase: Story = {
           <div className="fd-tokendocs-showcase" aria-label="Base color scale matrix">
             <h3 className="fd-tokendocs-showcaseTitle">Scale Matrix</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Core families on rows, union scale stops on columns.
+              Core families on rows, shared scale stops on columns.
             </p>
             <p className="fd-tokendocs-matrixNote">
-              950 is shown only when a family defines that stop.
+              Sparse-only stops (for example `950`) render inline on the owning row.
             </p>
             <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
               <div className="fd-tokendocs-colorMatrixHead">
                 <span aria-hidden="true" />
-                {unionScaleStops.map((step) => (
+                {sharedScaleStops.map((step) => (
                   <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
                     {step}
                   </span>
@@ -336,8 +357,28 @@ export const Showcase: Story = {
               </div>
               {matrixRows.map((row) => (
                 <div key={row.family} className="fd-tokendocs-colorMatrixRow">
-                  <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
-                  {unionScaleStops.map((step) => {
+                  <span className="fd-tokendocs-colorFamilyCell">
+                    <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
+                    {row.sparseStops.length ? (
+                      <span className="fd-tokendocs-colorSparseList">
+                        {row.sparseStops.map((sparse) => {
+                          const sparsePath = `base.color.${row.family}.${sparse.step}`;
+                          return (
+                            <span key={`${row.family}-${sparse.step}`} className="fd-tokendocs-colorSparseChip">
+                              <span
+                                className="fd-tokendocs-colorSparseSwatch"
+                                style={{ backgroundColor: sparse.value }}
+                                title={`${sparsePath}: ${sparse.value}`}
+                                aria-hidden="true"
+                              />
+                              <span className="fd-tokendocs-colorSparseStep">{sparse.step}</span>
+                            </span>
+                          );
+                        })}
+                      </span>
+                    ) : null}
+                  </span>
+                  {sharedScaleStops.map((step) => {
                     const value = row.values[step];
                     const tokenPath = `base.color.${row.family}.${step}`;
                     const label = value
