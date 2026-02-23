@@ -33,7 +33,8 @@ interface MotionLaneRow {
   tokenEasing: string;
   baselineDuration: string;
   baselineEasing: string;
-  laneDelay: string;
+  baselineDelay: string;
+  tokenDelay: string;
 }
 
 const LANE_DELAY_STEP_MS = 240;
@@ -93,29 +94,39 @@ const normalDuration =
   "180ms";
 const baselineLaneDuration = laneDuration(normalDuration);
 
-const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => ({
-  id: `duration:${row.id}`,
-  label: row.path.split(".").pop() ?? row.path,
-  path: row.path,
-  value: row.value,
-  tokenDuration: laneDuration(row.value),
-  tokenEasing: standardEasing,
-  baselineDuration: baselineLaneDuration,
-  baselineEasing: standardEasing,
-  laneDelay: `-${index * LANE_DELAY_STEP_MS}ms`,
-}));
+const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => {
+  const delayMs = -(index * LANE_DELAY_STEP_MS);
 
-const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => ({
-  id: `easing:${row.id}`,
-  label: row.path.split(".").pop() ?? row.path,
-  path: row.path,
-  value: row.value,
-  tokenDuration: baselineLaneDuration,
-  tokenEasing: row.value,
-  baselineDuration: baselineLaneDuration,
-  baselineEasing,
-  laneDelay: `-${(index + durationRows.length) * LANE_DELAY_STEP_MS}ms`,
-}));
+  return {
+    id: `duration:${row.id}`,
+    label: row.path.split(".").pop() ?? row.path,
+    path: row.path,
+    value: row.value,
+    tokenDuration: laneDuration(row.value),
+    tokenEasing: standardEasing,
+    baselineDuration: baselineLaneDuration,
+    baselineEasing: standardEasing,
+    baselineDelay: `${delayMs}ms`,
+    tokenDelay: `${delayMs - 140}ms`,
+  };
+});
+
+const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => {
+  const delayMs = -((index + durationRows.length) * LANE_DELAY_STEP_MS);
+
+  return {
+    id: `easing:${row.id}`,
+    label: row.path.split(".").pop() ?? row.path,
+    path: row.path,
+    value: row.value,
+    tokenDuration: baselineLaneDuration,
+    tokenEasing: row.value,
+    baselineDuration: baselineLaneDuration,
+    baselineEasing,
+    baselineDelay: `${delayMs}ms`,
+    tokenDelay: `${delayMs - 140}ms`,
+  };
+});
 
 const motionGroups = [
   {
@@ -158,21 +169,17 @@ export const Showcase: Story = {
           description="Token timing behavior rendered passively: duration rows compare speed, easing rows compare token output against linear baseline."
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
+            <div className="fd-tokendocs-motionLegend" aria-hidden="true">
+              <span className="fd-tokendocs-motionLegendItem is-baseline">Baseline (neutral)</span>
+              <span className="fd-tokendocs-motionLegendItem is-token">Token timing (accent)</span>
+            </div>
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
             <p className="fd-tokendocs-showcaseHint">
               Accent marker uses token duration; neutral marker uses baseline normal duration.
             </p>
             <div className="fd-tokendocs-motionLanes">
               {durationLaneRows.map((row) => (
-                <div
-                  key={row.id}
-                  className="fd-tokendocs-motionLaneRow"
-                  style={
-                    {
-                      "--fd-motion-delay": row.laneDelay,
-                    } as CSSProperties
-                  }
-                >
+                <div key={row.id} className="fd-tokendocs-motionLaneRow">
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
                   <div
                     className="fd-tokendocs-motionLaneTrack"
@@ -185,7 +192,7 @@ export const Showcase: Story = {
                         {
                           "--fd-lane-duration": row.baselineDuration,
                           "--fd-lane-easing": row.baselineEasing,
-                          "--fd-lane-delay": row.laneDelay,
+                          "--fd-lane-delay": row.baselineDelay,
                         } as CSSProperties
                       }
                     />
@@ -195,7 +202,7 @@ export const Showcase: Story = {
                         {
                           "--fd-lane-duration": row.tokenDuration,
                           "--fd-lane-easing": row.tokenEasing,
-                          "--fd-lane-delay": row.laneDelay,
+                          "--fd-lane-delay": row.tokenDelay,
                         } as CSSProperties
                       }
                     />
@@ -213,15 +220,7 @@ export const Showcase: Story = {
             </p>
             <div className="fd-tokendocs-motionLanes">
               {easingLaneRows.map((row) => (
-                <div
-                  key={row.id}
-                  className="fd-tokendocs-motionLaneRow"
-                  style={
-                    {
-                      "--fd-motion-delay": row.laneDelay,
-                    } as CSSProperties
-                  }
-                >
+                <div key={row.id} className="fd-tokendocs-motionLaneRow">
                   <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
                   <div
                     className="fd-tokendocs-motionLaneTrack"
@@ -234,7 +233,7 @@ export const Showcase: Story = {
                         {
                           "--fd-lane-duration": row.baselineDuration,
                           "--fd-lane-easing": row.baselineEasing,
-                          "--fd-lane-delay": row.laneDelay,
+                          "--fd-lane-delay": row.baselineDelay,
                         } as CSSProperties
                       }
                     />
@@ -244,7 +243,7 @@ export const Showcase: Story = {
                         {
                           "--fd-lane-duration": row.tokenDuration,
                           "--fd-lane-easing": row.tokenEasing,
-                          "--fd-lane-delay": row.laneDelay,
+                          "--fd-lane-delay": row.tokenDelay,
                         } as CSSProperties
                       }
                     />
@@ -311,6 +310,7 @@ export const Reference: Story = {
             gridLabel="motion-grid"
             groups={motionGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="durations"
             columns={[
               {
@@ -342,6 +342,7 @@ export const Reference: Story = {
             gridLabel="shadow-grid"
             groups={shadowGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="shadow"
             columns={[
               {

@@ -58,6 +58,14 @@ function cssNumberOrString(value: string): number | string {
   return value;
 }
 
+function formatTypographyReferenceValue(row: TypographyRow): string {
+  if (row.path.includes(".fontFamily.")) {
+    return row.value.replace(/,\s*/g, ", ");
+  }
+
+  return row.value;
+}
+
 const MAX_SPECIMEN_REM = 2.5;
 const SHOWCASE_SIZE_STOPS = ["xs", "sm", "md", "lg", "xl", "2xl", "4xl"];
 
@@ -223,6 +231,7 @@ export const Reference: Story = {
             gridLabel="typography-grid"
             groups={groups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="families"
             columns={[
               {
@@ -239,6 +248,11 @@ export const Reference: Story = {
                 label: "Value",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.value,
+                render: (row) => (
+                  <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
+                    {formatTypographyReferenceValue(row)}
+                  </span>
+                ),
                 valueMode: "plain",
                 copyValue: (row) => row.value,
               },

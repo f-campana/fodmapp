@@ -132,10 +132,18 @@ export const Showcase: Story = {
               {spacingShowcaseRows.map((row) => (
                 <article key={`${row.id}-stack`} className="fd-tokendocs-spacingDemoCard">
                   <div className="fd-tokendocs-stackApplied" style={{ gap: row.value }} aria-hidden="true">
-                    <div className="fd-tokendocs-stackAppliedCard" />
-                    <div className="fd-tokendocs-stackAppliedCard" />
-                    <div className="fd-tokendocs-stackAppliedCard" />
-                    <div className="fd-tokendocs-stackAppliedCard" />
+                    <div className="fd-tokendocs-stackAppliedCard">
+                      <span className="fd-tokendocs-stackCardTitle">Header</span>
+                    </div>
+                    <div className="fd-tokendocs-stackAppliedCard">
+                      <span className="fd-tokendocs-stackCardTitle">Body</span>
+                    </div>
+                    <div className="fd-tokendocs-stackAppliedCard">
+                      <span className="fd-tokendocs-stackCardTitle">Summary</span>
+                    </div>
+                    <div className="fd-tokendocs-stackAppliedCard">
+                      <span className="fd-tokendocs-stackCardTitle">Action</span>
+                    </div>
                   </div>
                   <div className="fd-tokendocs-spacingDemoMeta">
                     <span className="fd-tokendocs-spacingLabel">
@@ -184,12 +192,12 @@ export const Showcase: Story = {
               {spacingShowcaseRows.map((row) => (
                 <article key={`${row.id}-lattice`} className="fd-tokendocs-spacingDemoCard">
                   <div className="fd-tokendocs-latticeApplied" style={{ gap: row.value }} aria-hidden="true">
-                    <span className="fd-tokendocs-latticeCard" />
-                    <span className="fd-tokendocs-latticeCard" />
-                    <span className="fd-tokendocs-latticeCard" />
-                    <span className="fd-tokendocs-latticeCard" />
-                    <span className="fd-tokendocs-latticeCard" />
-                    <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard">A</span>
+                    <span className="fd-tokendocs-latticeCard">B</span>
+                    <span className="fd-tokendocs-latticeCard">C</span>
+                    <span className="fd-tokendocs-latticeCard">D</span>
+                    <span className="fd-tokendocs-latticeCard">E</span>
+                    <span className="fd-tokendocs-latticeCard">F</span>
                   </div>
                   <div className="fd-tokendocs-spacingDemoMeta">
                     <span className="fd-tokendocs-spacingLabel">
@@ -265,6 +273,7 @@ export const Reference: Story = {
             gridLabel="spacing-grid"
             groups={spacingReferenceGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="spacing"
             columns={[
               {
@@ -296,6 +305,7 @@ export const Reference: Story = {
             gridLabel="layout-grid"
             groups={layoutReferenceGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="radius"
             columns={[
               {

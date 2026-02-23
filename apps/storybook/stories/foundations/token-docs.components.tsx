@@ -38,6 +38,7 @@ interface TokenDataGridProps<Row extends TokenGridRowBase> {
   mobileMode?: "reflow" | "table";
   accordion?: boolean;
   initialOpenGroupId?: string;
+  allowCollapseAll?: boolean;
 }
 
 function classNames(
@@ -178,6 +179,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   mobileMode = "reflow",
   accordion = false,
   initialOpenGroupId,
+  allowCollapseAll = true,
 }: TokenDataGridProps<Row>) {
   function createInitialExpandedState(
     groupList: TokenGridGroup<Row>[],
@@ -224,8 +226,12 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
     if (accordion) {
       setExpandedGroups((state) => {
         const isOpen = state[groupId] ?? false;
-        if (isOpen) {
+        if (isOpen && !allowCollapseAll) {
           return state;
+        }
+
+        if (isOpen && allowCollapseAll) {
+          return Object.fromEntries(groups.map((group) => [group.id, false]));
         }
 
         return Object.fromEntries(groups.map((group) => [group.id, group.id === groupId]));
@@ -332,13 +338,19 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
           const contentId = `${groupSectionId}-rows`;
 
           return (
-            <section key={group.id} id={groupSectionId} className="fd-tokendocs-group">
+            <section
+              key={group.id}
+              id={groupSectionId}
+              className="fd-tokendocs-group"
+              data-expanded={expanded ? "true" : "false"}
+            >
               <button
                 type="button"
                 className="fd-tokendocs-groupToggle"
                 onClick={() => toggleGroup(group.id)}
                 aria-expanded={expanded}
                 aria-controls={contentId}
+                data-expanded={expanded ? "true" : "false"}
               >
                 <span>
                   <span className="fd-tokendocs-groupLabel">{group.label}</span>

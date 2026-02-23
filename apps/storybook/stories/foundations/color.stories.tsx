@@ -322,6 +322,9 @@ export const Showcase: Story = {
             <p className="fd-tokendocs-showcaseHint">
               Core families on rows, union scale stops on columns.
             </p>
+            <p className="fd-tokendocs-matrixNote">
+              950 is shown only when a family defines that stop.
+            </p>
             <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
               <div className="fd-tokendocs-colorMatrixHead">
                 <span aria-hidden="true" />
@@ -482,12 +485,13 @@ export const Reference: Story = {
             gridLabel="base-color-grid"
             groups={baseColorGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="neutral"
             columns={[
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(340px, 1.6fr)",
+                width: "minmax(400px, 1.85fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -496,7 +500,7 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Color Value",
-                width: "minmax(340px, 1fr)",
+                width: "minmax(360px, 1.1fr)",
                 getValue: (row) => row.value,
                 valueMode: "plain",
                 copyValue: (row) => row.value,
@@ -526,12 +530,13 @@ export const Reference: Story = {
             gridLabel="semantic-color-grid"
             groups={semanticColorGroups}
             accordion
+            allowCollapseAll
             initialOpenGroupId="action"
             columns={[
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(340px, 1.6fr)",
+                width: "minmax(400px, 1.75fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
