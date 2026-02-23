@@ -44,10 +44,8 @@ function classNames(
   return classes.filter(Boolean).join(" ");
 }
 
-function valueModeForColumn<Row>(
-  column: TokenGridColumn<Row>,
-): ColumnValueMode {
-  return column.valueMode ?? "pill";
+function valueModeForColumn<Row>(column: TokenGridColumn<Row>): ColumnValueMode {
+  return column.valueMode ?? "plain";
 }
 
 function renderValueByMode(value: string, mode: ColumnValueMode): ReactNode {
@@ -68,7 +66,7 @@ async function copyText(text: string): Promise<boolean> {
       await navigator.clipboard.writeText(text);
       return true;
     } catch {
-      // Fall through to deterministic non-permission fallback.
+      // Fall through to deterministic fallback.
     }
   }
 
@@ -102,8 +100,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
     window.setTimeout(() => setStatus("idle"), 1200);
   }
 
-  const display =
-    status === "idle" ? "Copy" : status === "copied" ? "Copied" : "Error";
+  const display = status === "idle" ? "Copy" : status === "copied" ? "Copied" : "Error";
 
   return (
     <button
@@ -172,49 +169,14 @@ export function TokenValuePill({ value }: { value: string }) {
   );
 }
 
-export function ColorValueCell({ value }: { value: string }) {
-  return (
-    <div className="fd-tokendocs-colorCell">
-      <span
-        className="fd-tokendocs-swatch"
-        style={{ backgroundColor: value }}
-        aria-hidden="true"
-      />
-      <TokenValuePill value={value} />
-    </div>
-  );
-}
-
-export function ScaleBarCell({
-  value,
-  widthPx,
-}: {
-  value: string;
-  widthPx: number;
-}) {
-  return (
-    <div className="fd-tokendocs-scaleCell">
-      <span
-        className="fd-tokendocs-scaleBar"
-        style={{ width: `${Math.max(4, widthPx)}px` }}
-        aria-hidden="true"
-      />
-      <TokenValuePill value={value} />
-    </div>
-  );
-}
-
 export function TokenDataGrid<Row extends TokenGridRowBase>({
   gridLabel,
   columns,
   groups,
   mobileMode = "reflow",
 }: TokenDataGridProps<Row>) {
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    () =>
-      Object.fromEntries(
-        groups.map((group) => [group.id, !group.defaultCollapsed]),
-      ),
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(groups.map((group) => [group.id, !group.defaultCollapsed])),
   );
 
   useEffect(() => {
@@ -280,9 +242,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
               >
                 {renderCellValue(column, row)}
               </div>
-              {copyValue ? (
-                <CopyButton text={copyValue} label={`${column.label} ${row.path}`} />
-              ) : null}
+              {copyValue ? <CopyButton text={copyValue} label={`${column.label} ${row.path}`} /> : null}
             </div>
           );
         })}
@@ -305,13 +265,8 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
               const valueMode = valueModeForColumn(column);
 
               return (
-                <div
-                  key={`${row.id}:${column.key}:mobile`}
-                  className="fd-tokendocs-mobileField"
-                >
-                  <span className="fd-tokendocs-mobileKey">
-                    {column.mobileLabel ?? column.label}
-                  </span>
+                <div key={`${row.id}:${column.key}:mobile`} className="fd-tokendocs-mobileField">
+                  <span className="fd-tokendocs-mobileKey">{column.mobileLabel ?? column.label}</span>
                   <div className="fd-tokendocs-mobileValue">
                     <div
                       className={classNames(
@@ -321,9 +276,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                     >
                       {renderCellValue(column, row)}
                     </div>
-                    {copyValue ? (
-                      <CopyButton text={copyValue} label={`${column.label} ${row.path}`} />
-                    ) : null}
+                    {copyValue ? <CopyButton text={copyValue} label={`${column.label} ${row.path}`} /> : null}
                   </div>
                 </div>
               );
@@ -339,10 +292,11 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
       <div className="fd-tokendocs-groups">
         {groups.map((group) => {
           const expanded = expandedGroups[group.id] ?? true;
-          const contentId = `${gridLabel}-${group.id}-rows`;
+          const groupSectionId = `${gridLabel}-${group.id}`;
+          const contentId = `${groupSectionId}-rows`;
 
           return (
-            <section key={group.id} className="fd-tokendocs-group">
+            <section key={group.id} id={groupSectionId} className="fd-tokendocs-group">
               <button
                 type="button"
                 className="fd-tokendocs-groupToggle"
@@ -353,9 +307,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                 <span>
                   <span className="fd-tokendocs-groupLabel">{group.label}</span>
                   {group.description ? (
-                    <span className="fd-tokendocs-groupDescription">
-                      {group.description}
-                    </span>
+                    <span className="fd-tokendocs-groupDescription">{group.description}</span>
                   ) : null}
                 </span>
                 <span className="fd-tokendocs-groupCount">{group.rows.length} rows</span>
@@ -392,9 +344,7 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                                 </div>
                               ))}
                             </div>
-                            <div role="rowgroup">
-                              {group.rows.map((row) => renderDesktopRow(row))}
-                            </div>
+                            <div role="rowgroup">{group.rows.map((row) => renderDesktopRow(row))}</div>
                           </div>
                         </div>
                       </div>

@@ -4,7 +4,6 @@ import { expect, within } from "storybook/test";
 import tokens from "@fodmap/design-tokens";
 
 import {
-  ScaleBarCell,
   TokenDataGrid,
   TokenDocsPage,
   TokenPathText,
@@ -25,10 +24,7 @@ interface ScaleRow {
   value: string;
 }
 
-interface SpacingRow extends ScaleRow {
-  widthPx: number;
-  widthPercent: number;
-}
+const SHOWCASE_STOPS = ["0_5", "1", "2", "4", "6", "8"];
 
 const base = asRecord(tokens.base, "base");
 const spacing = asRecord(base.space, "base.space");
@@ -52,49 +48,26 @@ function toScaleRows(node: unknown, prefix: string): ScaleRow[] {
   });
 }
 
-function spacingWidth(value: string): number {
-  const parsed = parseNumberish(value);
-  if (parsed === null) {
-    return 6;
-  }
-
-  if (value.endsWith("px")) {
-    return Math.round(parsed * 12);
-  }
-
-  if (value.endsWith("rem")) {
-    return Math.round(parsed * 56);
-  }
-
-  return Math.round(parsed * 40);
-}
-
 function toPercent(value: string, maxValue: number): number {
   const parsed = parseNumberish(value);
   if (parsed === null || maxValue === 0) {
     return 4;
   }
+
   return Math.max(4, (parsed / maxValue) * 100);
 }
 
-const rawSpacingRows = toScaleRows(spacing, "base.space");
-const maxSpacingWidth = Math.max(...rawSpacingRows.map((row) => spacingWidth(row.value)));
-
-const spacingRows: SpacingRow[] = rawSpacingRows.map((row) => {
-  const widthPx = Math.max(6, spacingWidth(row.value));
-  return {
-    ...row,
-    widthPx,
-    widthPercent: Math.max(2, (widthPx / maxSpacingWidth) * 100),
-  };
-});
-
+const spacingRows = toScaleRows(spacing, "base.space");
 const radiusRows = toScaleRows(radius, "base.radius");
 const breakpointRows = toScaleRows(breakpoints, "base.breakpoint");
-
 const maxBreakpointValue = Math.max(
   ...breakpointRows.map((row) => parseNumberish(row.value) ?? 0),
 );
+
+const spacingShowcaseRows = spacingRows.filter((row) => {
+  const key = stripPathPrefix(row.path, "base.space");
+  return SHOWCASE_STOPS.includes(key);
+});
 
 const spacingReferenceGroups = [
   { id: "spacing", label: "Spacing", rows: spacingRows },
@@ -124,12 +97,6 @@ const layoutReferenceGroups = [
   },
 ];
 
-const preferredSpacingStops = ["0_5", "1", "2", "4", "6", "8"];
-const spacingShowcaseRows = spacingRows.filter((row) => {
-  const key = stripPathPrefix(row.path, "base.space");
-  return preferredSpacingStops.includes(key);
-});
-
 const meta = {
   title: "Foundations/Tokens/Spacing & Layout",
   tags: ["autodocs"],
@@ -152,20 +119,18 @@ export const Showcase: Story = {
       >
         <TokenSection
           title="Spacing Scale"
-          description="Applied mini-layouts make spacing increments easier to compare in realistic contexts."
+          description="Applied layout modules make spacing deltas immediately readable in practical UI contexts."
         >
-          <div className="fd-tokendocs-showcase" aria-label="Spacing visual showcase">
+          <div className="fd-tokendocs-showcase fd-tokendocs-spacingShowcaseRoot" aria-label="Spacing visual showcase">
             <h3 className="fd-tokendocs-showcaseTitle">Vertical Stack Rhythm</h3>
-            <div className="fd-tokendocs-spacingShowcase">
+            <div className="fd-tokendocs-spacingAppliedList">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-stack`} className="fd-tokendocs-spacingRow">
-                  <span className="fd-tokendocs-spacingLabel">
-                    {stripPathPrefix(row.path, "base.space")}
-                  </span>
-                  <div className="fd-tokendocs-stackPreview" style={{ gap: row.value }} aria-hidden="true">
-                    <span className="fd-tokendocs-stackBlock" />
-                    <span className="fd-tokendocs-stackBlock" />
-                    <span className="fd-tokendocs-stackBlock" />
+                <div key={`${row.id}-stack`} className="fd-tokendocs-spacingAppliedRow">
+                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                  <div className="fd-tokendocs-stackApplied" style={{ gap: row.value }} aria-hidden="true">
+                    <div className="fd-tokendocs-stackAppliedCard" />
+                    <div className="fd-tokendocs-stackAppliedCard" />
+                    <div className="fd-tokendocs-stackAppliedCard" />
                   </div>
                   <TokenValuePill value={row.value} />
                 </div>
@@ -173,34 +138,31 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Inline Cluster Gap</h3>
-            <div className="fd-tokendocs-gapPreview">
+            <div className="fd-tokendocs-spacingAppliedList">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-gap`} className="fd-tokendocs-spacingRow">
-                  <span className="fd-tokendocs-spacingLabel">
-                    {stripPathPrefix(row.path, "base.space")}
-                  </span>
-                  <div className="fd-tokendocs-gapBlocks" style={{ gap: row.value }} aria-hidden="true">
-                    <span className="fd-tokendocs-gapBlock" />
-                    <span className="fd-tokendocs-gapBlock" />
-                    <span className="fd-tokendocs-gapBlock" />
+                <div key={`${row.id}-cluster`} className="fd-tokendocs-spacingAppliedRow">
+                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                  <div className="fd-tokendocs-clusterApplied" style={{ gap: row.value }} aria-hidden="true">
+                    <span className="fd-tokendocs-chip">Low</span>
+                    <span className="fd-tokendocs-chip">Moderate</span>
+                    <span className="fd-tokendocs-chip">High</span>
+                    <span className="fd-tokendocs-chip">None</span>
                   </div>
                   <TokenValuePill value={row.value} />
                 </div>
               ))}
             </div>
 
-            <h3 className="fd-tokendocs-showcaseTitle">Card Grid Gutter</h3>
-            <div className="fd-tokendocs-gapPreview">
+            <h3 className="fd-tokendocs-showcaseTitle">Card Lattice Gutter</h3>
+            <div className="fd-tokendocs-spacingAppliedList">
               {spacingShowcaseRows.map((row) => (
-                <div key={`${row.id}-grid`} className="fd-tokendocs-spacingRow">
-                  <span className="fd-tokendocs-spacingLabel">
-                    {stripPathPrefix(row.path, "base.space")}
-                  </span>
-                  <div className="fd-tokendocs-gridGutter" style={{ gap: row.value }} aria-hidden="true">
-                    <span className="fd-tokendocs-gridGutterCell" />
-                    <span className="fd-tokendocs-gridGutterCell" />
-                    <span className="fd-tokendocs-gridGutterCell" />
-                    <span className="fd-tokendocs-gridGutterCell" />
+                <div key={`${row.id}-lattice`} className="fd-tokendocs-spacingAppliedRow">
+                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.space")}</span>
+                  <div className="fd-tokendocs-latticeApplied" style={{ gap: row.value }} aria-hidden="true">
+                    <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard" />
+                    <span className="fd-tokendocs-latticeCard" />
                   </div>
                   <TokenValuePill value={row.value} />
                 </div>
@@ -211,36 +173,28 @@ export const Showcase: Story = {
 
         <TokenSection
           title="Layout and Structural Scales"
-          description="Radius and breakpoints get concise visual previews for rapid implementation checks."
+          description="Radius and breakpoints remain compact but high-contrast to support quick visual implementation checks."
         >
           <div className="fd-tokendocs-showcase" aria-label="Structural token showcase">
             <h3 className="fd-tokendocs-showcaseTitle">Radius Preview</h3>
             <div className="fd-tokendocs-structShowcase">
               {radiusRows.map((row) => (
                 <article key={`${row.id}-radius`} className="fd-tokendocs-radiusCard">
-                  <div
-                    className="fd-tokendocs-radiusSwatch"
-                    style={{ borderRadius: row.value }}
-                    aria-hidden="true"
-                  />
-                  <span className="fd-tokendocs-spacingLabel">
-                    {stripPathPrefix(row.path, "base.radius")}
-                  </span>
+                  <div className="fd-tokendocs-radiusSwatch" style={{ borderRadius: row.value }} aria-hidden="true" />
+                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.radius")}</span>
                   <TokenValuePill value={row.value} />
                 </article>
               ))}
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Breakpoint Ladder</h3>
-            <div className="fd-tokendocs-spacingShowcase">
+            <div className="fd-tokendocs-spacingAppliedList">
               {breakpointRows.map((row) => (
-                <div key={`${row.id}-breakpoint`} className="fd-tokendocs-spacingRow">
-                  <span className="fd-tokendocs-spacingLabel">
-                    {stripPathPrefix(row.path, "base.breakpoint")}
-                  </span>
-                  <div className="fd-tokendocs-spacingTrack" aria-hidden="true">
+                <div key={`${row.id}-breakpoint`} className="fd-tokendocs-spacingAppliedRow">
+                  <span className="fd-tokendocs-spacingLabel">{stripPathPrefix(row.path, "base.breakpoint")}</span>
+                  <div className="fd-tokendocs-breakpointTrack" aria-hidden="true">
                     <span
-                      className="fd-tokendocs-spacingTrackBar"
+                      className="fd-tokendocs-breakpointBar"
                       style={{ width: `${toPercent(row.value, maxBreakpointValue)}%` }}
                     />
                   </div>
@@ -259,7 +213,7 @@ export const Showcase: Story = {
       canvas.getByRole("heading", { name: "Spacing & Layout Tokens" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Vertical Stack Rhythm")).toBeInTheDocument();
-    await expect(canvas.getByText("Card Grid Gutter")).toBeInTheDocument();
+    await expect(canvas.getByText("Card Lattice Gutter")).toBeInTheDocument();
     await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
   },
 };
@@ -282,7 +236,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(280px, 1.5fr)",
+                width: "minmax(360px, 1.6fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -291,11 +245,8 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Value",
-                width: "minmax(340px, 1.5fr)",
+                width: "minmax(300px, 1fr)",
                 getValue: (row) => row.value,
-                render: (row) => (
-                  <ScaleBarCell value={row.value} widthPx={row.widthPx} />
-                ),
                 valueMode: "plain",
                 copyValue: (row) => row.value,
               },
@@ -314,7 +265,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(320px, 1.8fr)",
+                width: "minmax(360px, 1.8fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -323,8 +274,7 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Value",
-                width: "minmax(260px, 1fr)",
-                align: "right",
+                width: "minmax(300px, 1fr)",
                 getValue: (row) => row.value,
                 valueMode: "plain",
                 copyValue: (row) => row.value,

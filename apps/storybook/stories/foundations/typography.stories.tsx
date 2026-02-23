@@ -50,8 +50,6 @@ function clampRem(value: string, maxRem: number): string {
   return `${Math.min(parsed, maxRem)}rem`;
 }
 
-const MAX_SPECIMEN_REM = 2.4;
-
 function cssNumberOrString(value: string): number | string {
   const parsed = Number.parseFloat(value);
   if (Number.isFinite(parsed) && `${parsed}` === value) {
@@ -59,6 +57,9 @@ function cssNumberOrString(value: string): number | string {
   }
   return value;
 }
+
+const MAX_SPECIMEN_REM = 2.5;
+const SHOWCASE_SIZE_STOPS = ["xs", "sm", "md", "lg", "xl", "2xl", "4xl"];
 
 const familyRows = rowsFor(
   asRecord(typography.fontFamily, "base.typography.fontFamily"),
@@ -83,6 +84,10 @@ const letterSpacingRows = rowsFor(
 
 const lineHeightDefault =
   lineHeightRows.find((row) => row.path.endsWith(".normal"))?.value ?? "1.5";
+
+const sizeShowcaseRows = sizeRows.filter((row) =>
+  SHOWCASE_SIZE_STOPS.includes(row.path.split(".").pop() ?? ""),
+);
 
 const groups = [
   {
@@ -134,17 +139,14 @@ export const Showcase: Story = {
       >
         <TokenSection
           title="Typography Showcase"
-          description="Token-driven specimens with stronger hierarchy and reduced vertical excess for easier scanning."
+          description="Token-driven specimens with tighter hierarchy and less repetitive vertical flow."
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-typoShowcase" aria-label="Typography specimens">
             <h3 className="fd-tokendocs-showcaseTitle">Family Specimens</h3>
             <div className="fd-tokendocs-typoSpecimens">
               {familyRows.map((row) => (
                 <article key={row.id} className="fd-tokendocs-typoCard">
-                  <p
-                    className="fd-tokendocs-typoSample"
-                    style={{ fontFamily: row.value }}
-                  >
+                  <p className="fd-tokendocs-typoSample" style={{ fontFamily: row.value }}>
                     Digestive support starts with readable hierarchy.
                   </p>
                   <div className="fd-tokendocs-typoMeta">
@@ -157,7 +159,7 @@ export const Showcase: Story = {
 
             <h3 className="fd-tokendocs-showcaseTitle">Type Waterfall</h3>
             <div className="fd-tokendocs-typeScaleList">
-              {sizeRows.map((row) => (
+              {sizeShowcaseRows.map((row) => (
                 <div key={`${row.id}-sample`} className="fd-tokendocs-typeScaleItem">
                   <span className="fd-tokendocs-typeKey">{row.path.split(".").pop()}</span>
                   <p
@@ -175,24 +177,22 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Weight Spectrum</h3>
-            <div className="fd-tokendocs-typoSpecimens">
+            <div className="fd-tokendocs-weightStrip">
               {weightRows.map((row) => (
-                <article key={`${row.id}-weight`} className="fd-tokendocs-typoCard">
+                <article key={`${row.id}-weight`} className="fd-tokendocs-weightCell">
                   <p
-                    className="fd-tokendocs-weightSample"
+                    className="fd-tokendocs-weightCellSample"
                     style={{
                       fontWeight: cssNumberOrString(row.value),
-                      fontSize: "1.2rem",
-                      lineHeight: 1.3,
                     }}
                   >
                     Digestive support rhythm across interface states.
                   </p>
-                  <div className="fd-tokendocs-typoMeta">
+                  <div className="fd-tokendocs-weightCellMeta">
                     <span className="fd-tokendocs-typoLabel">
                       {row.path.split(".").pop()} {row.value}
                     </span>
-                    <p className="fd-tokendocs-typoValue">base.typography.fontWeight</p>
+                    <code className="fd-tokendocs-typoValue">base.typography.fontWeight</code>
                   </div>
                 </article>
               ))}
@@ -204,9 +204,7 @@ export const Showcase: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(
-      canvas.getByRole("heading", { name: "Typography Tokens" }),
-    ).toBeInTheDocument();
+    await expect(canvas.getByRole("heading", { name: "Typography Tokens" })).toBeInTheDocument();
     await expect(canvas.getByText("Type Waterfall")).toBeInTheDocument();
     await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
   },
@@ -230,7 +228,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(340px, 1.8fr)",
+                width: "minmax(360px, 1.8fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -239,7 +237,7 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Value",
-                width: "minmax(280px, 1fr)",
+                width: "minmax(320px, 1fr)",
                 getValue: (row) => row.value,
                 valueMode: "wrap",
                 copyValue: (row) => row.value,

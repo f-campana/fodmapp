@@ -6,7 +6,6 @@ import { expect, within } from "storybook/test";
 import tokens from "@fodmap/design-tokens";
 
 import {
-  ColorValueCell,
   TokenDataGrid,
   TokenDocsPage,
   TokenPathText,
@@ -37,17 +36,6 @@ interface SemanticColorGridRow {
 interface ColorMatrixRow {
   family: string;
   values: Record<string, string | null>;
-}
-
-interface FamilyExtraStop {
-  step: string;
-  value: string;
-  path: string;
-}
-
-interface FamilyExtraRow {
-  family: string;
-  stops: FamilyExtraStop[];
 }
 
 interface BrandPair {
@@ -121,24 +109,17 @@ const coreFamilyEntries = baseFamilyEntries.filter(
     Object.keys(entry.scale).some((key) => isScaleStep(key)),
 );
 
-const normalizedSharedScaleSteps =
-  coreFamilyEntries.length === 0
-    ? []
-    : [
-        ...coreFamilyEntries
-          .map((entry) =>
-            new Set(Object.keys(entry.scale).filter((key) => isScaleStep(key))),
-          )
-          .reduce((shared, next) => {
-            return new Set([...shared].filter((step) => next.has(step)));
-          }),
-      ].sort(sortScaleStep);
-
-const sharedScaleSet = new Set(normalizedSharedScaleSteps);
+const unionScaleStops = [
+  ...new Set(
+    coreFamilyEntries.flatMap((entry) =>
+      Object.keys(entry.scale).filter((key) => isScaleStep(key)),
+    ),
+  ),
+].sort(sortScaleStep);
 
 const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
   const values = Object.fromEntries(
-    normalizedSharedScaleSteps.map((step) => {
+    unionScaleStops.map((step) => {
       const token = entry.scale[step];
       return [
         step,
@@ -152,33 +133,6 @@ const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
     values,
   };
 });
-
-const familyExtraRows: FamilyExtraRow[] = coreFamilyEntries
-  .map((entry) => {
-    const stops = Object.keys(entry.scale)
-      .filter((step) => isScaleStep(step) && !sharedScaleSet.has(step))
-      .sort(sortScaleStep)
-      .flatMap((step): FamilyExtraStop[] => {
-        const token = entry.scale[step];
-        if (typeof token !== "string" || !isColorTokenValue(token)) {
-          return [];
-        }
-
-        return [
-          {
-            step,
-            value: token,
-            path: `base.color.${entry.family}.${step}`,
-          },
-        ];
-      });
-
-    return {
-      family: entry.family,
-      stops,
-    };
-  })
-  .filter((entry) => entry.stops.length > 0);
 
 const brandScale = asRecord(baseColorNode.brand, "base.color.brand");
 const brandPairsMap = new Map<string, BrandPair>();
@@ -241,9 +195,10 @@ const baseColorGroups = groupRowsBySegment(
     valueText: row.value,
   })),
   2,
-).map((group) => ({
+).map((group, index) => ({
   id: group.id,
   label: group.label,
+  defaultCollapsed: index > 0,
   rows: group.rows.map((row) => ({
     id: row.id,
     path: row.path,
@@ -327,18 +282,12 @@ const semanticColorGroups = groupRowsBySegment(
     valueText: row.light,
   })),
   2,
-).map((group) => ({
+).map((group, index) => ({
   id: group.id,
   label: group.label,
+  defaultCollapsed: index > 0,
   rows: semanticColorRows.filter((row) => row.path.split(".")[2] === group.id),
 }));
-
-function renderColorValue(value: string) {
-  if (!isColorTokenValue(value)) {
-    return <span className="fd-tokendocs-value-plain">{value}</span>;
-  }
-  return <ColorValueCell value={value} />;
-}
 
 const meta = {
   title: "Foundations/Tokens/Color",
@@ -356,7 +305,7 @@ type Story = StoryObj<typeof meta>;
 export const Showcase: Story = {
   render: () => {
     const matrixStyle = {
-      "--fd-color-cols": String(normalizedSharedScaleSteps.length),
+      "--fd-color-cols": String(unionScaleStops.length),
     } as CSSProperties;
 
     return (
@@ -366,17 +315,17 @@ export const Showcase: Story = {
       >
         <TokenSection
           title="Base Color Scales"
-          description="Shared scale stops are shown in one matrix for fast comparison. Family-specific extras are listed separately."
+          description="Union scale stops are shown in one matrix. Families without a stop keep that slot intentionally empty."
         >
           <div className="fd-tokendocs-showcase" aria-label="Base color scale matrix">
             <h3 className="fd-tokendocs-showcaseTitle">Scale Matrix</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Core families on rows, shared stops on columns.
+              Core families on rows, union scale stops on columns.
             </p>
             <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
               <div className="fd-tokendocs-colorMatrixHead">
                 <span aria-hidden="true" />
-                {normalizedSharedScaleSteps.map((step) => (
+                {unionScaleStops.map((step) => (
                   <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
                     {step}
                   </span>
@@ -385,19 +334,19 @@ export const Showcase: Story = {
               {matrixRows.map((row) => (
                 <div key={row.family} className="fd-tokendocs-colorMatrixRow">
                   <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
-                  {normalizedSharedScaleSteps.map((step) => {
+                  {unionScaleStops.map((step) => {
                     const value = row.values[step];
                     const tokenPath = `base.color.${row.family}.${step}`;
                     const label = value
                       ? `${tokenPath}: ${value}`
-                      : `${tokenPath}: missing value`;
+                      : `${tokenPath}: no token at this stop`;
 
                     return (
                       <div
                         key={`${row.family}-${step}`}
                         className={classNames(
                           "fd-tokendocs-colorMatrixCell",
-                          value ? "" : "is-missing",
+                          value ? "" : "is-empty",
                         )}
                       >
                         <span
@@ -407,50 +356,12 @@ export const Showcase: Story = {
                           role="img"
                           aria-label={label}
                         />
-                        <span className="fd-tokendocs-colorCellValue">
-                          {value ?? "Missing value"}
-                        </span>
                       </div>
                     );
                   })}
                 </div>
               ))}
             </div>
-
-            {familyExtraRows.length > 0 ? (
-              <div className="fd-tokendocs-colorExtras">
-                <h3 className="fd-tokendocs-showcaseTitle">Family Extensions</h3>
-                <p className="fd-tokendocs-showcaseHint">
-                  Non-shared stops kept visible without polluting the primary matrix.
-                </p>
-                <div className="fd-tokendocs-colorExtraGrid">
-                  {familyExtraRows.map((family) => (
-                    <article key={family.family} className="fd-tokendocs-colorExtraCard">
-                      <div className="fd-tokendocs-colorExtraHeader">
-                        <p className="fd-tokendocs-colorExtraTitle">{family.family}</p>
-                        <span className="fd-tokendocs-colorExtraCount">
-                          {family.stops.length} stop{family.stops.length > 1 ? "s" : ""}
-                        </span>
-                      </div>
-                      <div className="fd-tokendocs-colorExtraStops">
-                        {family.stops.map((stop) => (
-                          <div key={`${family.family}-${stop.step}`} className="fd-tokendocs-colorExtraStop">
-                            <span
-                              className="fd-tokendocs-colorExtraSwatch"
-                              style={{ backgroundColor: stop.value }}
-                              title={`${stop.path}: ${stop.value}`}
-                              role="img"
-                              aria-label={`${stop.path}: ${stop.value}`}
-                            />
-                            <span className="fd-tokendocs-colorExtraStep">{stop.step}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            ) : null}
 
             <div className="fd-tokendocs-brandGrid">
               {brandPairs.map((pair) => (
@@ -491,7 +402,7 @@ export const Showcase: Story = {
           <div className="fd-tokendocs-showcase" aria-label="Semantic role pair previews">
             <h3 className="fd-tokendocs-showcaseTitle">Semantic Role Pairs</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Each card uses matching `bg`/`fg` tokens to preview contrast across themes.
+              Each card uses matching `bg` / `fg` pairs to preview contrast across themes.
             </p>
             <div className="fd-tokendocs-semanticGrid">
               {semanticPairCards.map((card) => (
@@ -548,12 +459,25 @@ export const Reference: Story = {
     return (
       <TokenDocsPage
         title="Color Token Reference"
-        subtitle="Exact path/value lookup for base and semantic color tokens with copy actions for implementation workflows."
+        subtitle="Exact path/value lookup for base and semantic color tokens."
       >
         <TokenSection
           title="Base Color References"
-          description="Deterministic grouped tables for every base color token."
+          description="Grouped deterministic tables for every base color token."
         >
+          <nav aria-label="Base color group jump links" className="fd-tokendocs-jumpList">
+            <span className="fd-tokendocs-jumpLabel">Jump to</span>
+            {baseColorGroups.map((group) => (
+              <a
+                key={`base-${group.id}`}
+                href={`#base-color-grid-${group.id}`}
+                className="fd-tokendocs-jumpLink"
+              >
+                {group.label}
+              </a>
+            ))}
+          </nav>
+
           <TokenDataGrid
             gridLabel="base-color-grid"
             groups={baseColorGroups}
@@ -561,7 +485,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(320px, 1.6fr)",
+                width: "minmax(340px, 1.6fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -570,10 +494,9 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Color Value",
-                width: "minmax(260px, 1fr)",
+                width: "minmax(340px, 1fr)",
                 getValue: (row) => row.value,
-                render: (row) => <ColorValueCell value={row.value} />,
-                valueMode: "plain",
+                valueMode: "wrap",
                 copyValue: (row) => row.value,
               },
             ]}
@@ -584,6 +507,19 @@ export const Reference: Story = {
           title="Semantic Color References"
           description="Light/dark semantic contract values grouped by domain."
         >
+          <nav aria-label="Semantic color group jump links" className="fd-tokendocs-jumpList">
+            <span className="fd-tokendocs-jumpLabel">Jump to</span>
+            {semanticColorGroups.map((group) => (
+              <a
+                key={`semantic-${group.id}`}
+                href={`#semantic-color-grid-${group.id}`}
+                className="fd-tokendocs-jumpLink"
+              >
+                {group.label}
+              </a>
+            ))}
+          </nav>
+
           <TokenDataGrid
             gridLabel="semantic-color-grid"
             groups={semanticColorGroups}
@@ -591,7 +527,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(320px, 1.6fr)",
+                width: "minmax(340px, 1.6fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -600,19 +536,17 @@ export const Reference: Story = {
               {
                 key: "light",
                 label: "Light",
-                width: "minmax(220px, 1fr)",
+                width: "minmax(320px, 1fr)",
                 getValue: (row) => row.light,
-                render: (row) => renderColorValue(row.light),
-                valueMode: "plain",
+                valueMode: "wrap",
                 copyValue: (row) => row.light,
               },
               {
                 key: "dark",
                 label: "Dark",
-                width: "minmax(220px, 1fr)",
+                width: "minmax(320px, 1fr)",
                 getValue: (row) => row.dark,
-                render: (row) => renderColorValue(row.dark),
-                valueMode: "plain",
+                valueMode: "wrap",
                 copyValue: (row) => row.dark,
               },
             ]}

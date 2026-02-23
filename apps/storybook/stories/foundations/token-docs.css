@@ -3,16 +3,25 @@
   color: var(--color-foreground);
   background:
     radial-gradient(
-      circle at 8% -14%,
+      circle at 10% -10%,
       color-mix(in oklab, var(--color-primary) 12%, transparent),
       transparent 40%
     ),
     radial-gradient(
       circle at 92% -12%,
-      color-mix(in oklab, var(--color-warning) 9%, transparent),
+      color-mix(in oklab, var(--color-warning) 8%, transparent),
       transparent 36%
     ),
     var(--color-background);
+}
+
+.fd-tokendocs-page .fd-tokendocs-title,
+.fd-tokendocs-page .fd-tokendocs-sectionTitle,
+.fd-tokendocs-page .fd-tokendocs-showcaseTitle,
+.fd-tokendocs-page .fd-tokendocs-groupLabel,
+.fd-tokendocs-page .fd-tokendocs-groupToggle,
+.fd-tokendocs-page .fd-tokendocs-headCell {
+  font-family: var(--font-body, "Source Sans 3", "Helvetica Neue", sans-serif);
 }
 
 .fd-tokendocs-container {
@@ -20,72 +29,72 @@
   display: grid;
   width: 100%;
   max-width: 76rem;
-  gap: 1.15rem;
-  padding: 1.3rem 1rem 2.6rem;
+  gap: 1.05rem;
+  padding: 1.3rem 1rem 2.5rem;
 }
 
 .fd-tokendocs-header {
   display: grid;
-  gap: 0.45rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
-  padding-bottom: 0.95rem;
+  gap: 0.4rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  padding-bottom: 0.9rem;
 }
 
 .fd-tokendocs-title {
   margin: 0;
-  font-size: clamp(1.75rem, 2.8vw, 2.6rem);
-  font-weight: 720;
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  font-size: clamp(2rem, 2.9vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.024em;
 }
 
 .fd-tokendocs-subtitle {
   margin: 0;
-  max-width: 70ch;
-  font-size: 0.96rem;
-  line-height: 1.52;
+  max-width: 72ch;
+  font-size: 1rem;
+  line-height: 1.46;
   color: var(--color-muted-foreground);
 }
 
 .fd-tokendocs-section {
   display: grid;
-  gap: 0.82rem;
+  gap: 0.78rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.95rem;
   background:
     linear-gradient(
       180deg,
       color-mix(in oklab, var(--color-surface) 88%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 97%, var(--color-surface-muted)) 100%
+      color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted)) 100%
     );
-  box-shadow: 0 16px 36px -34px color-mix(in oklab, var(--color-foreground) 45%, transparent);
-  padding: 0.92rem;
+  box-shadow: 0 18px 38px -34px color-mix(in oklab, var(--color-foreground) 44%, transparent);
+  padding: 0.88rem;
 }
 
 .fd-tokendocs-sectionHeader {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.18rem;
 }
 
 .fd-tokendocs-sectionTitle {
   margin: 0;
-  font-size: clamp(1.35rem, 2.1vw, 1.95rem);
-  font-weight: 680;
-  line-height: 1.16;
+  font-size: clamp(1.58rem, 2.2vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.12;
   letter-spacing: -0.02em;
 }
 
 .fd-tokendocs-sectionDescription {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.45;
   color: var(--color-muted-foreground);
 }
 
 .fd-tokendocs-showcase {
   display: grid;
-  gap: 0.72rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  gap: 0.66rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.78rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
   padding: 0.72rem;
@@ -93,25 +102,55 @@
 
 .fd-tokendocs-showcaseTitle {
   margin: 0;
-  font-size: 0.9rem;
-  font-weight: 690;
+  font-size: 0.96rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .fd-tokendocs-showcaseHint {
   margin: 0;
-  font-size: 0.74rem;
-  line-height: 1.46;
+  font-size: 0.82rem;
+  line-height: 1.42;
   color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-jumpList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-bottom: 0.15rem;
+}
+
+.fd-tokendocs-jumpLabel {
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-jumpLink {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted));
+  padding: 0.14rem 0.48rem;
+  font-size: 0.74rem;
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.fd-tokendocs-jumpLink:hover {
+  background: color-mix(in oklab, var(--color-surface-muted) 74%, transparent);
 }
 
 .fd-tokendocs-grid {
   display: grid;
   gap: 0.62rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.72rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.58rem;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
+  padding: 0.55rem;
 }
 
 .fd-tokendocs-groups {
@@ -122,7 +161,7 @@
 .fd-tokendocs-group {
   border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
   overflow: hidden;
 }
 
@@ -133,23 +172,23 @@
   justify-content: space-between;
   gap: 0.74rem;
   border: 0;
-  background: color-mix(in oklab, var(--color-surface-muted) 26%, transparent);
-  padding: 0.58rem 0.74rem;
+  background: color-mix(in oklab, var(--color-surface-muted) 24%, transparent);
+  padding: 0.6rem 0.74rem;
   text-align: left;
   cursor: pointer;
 }
 
 .fd-tokendocs-groupToggle:hover {
-  background: color-mix(in oklab, var(--color-surface-muted) 56%, transparent);
+  background: color-mix(in oklab, var(--color-surface-muted) 58%, transparent);
 }
 
 .fd-tokendocs-groupToggle:focus-visible {
   outline: none;
-  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ring) 45%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ring) 44%, transparent);
 }
 
 .fd-tokendocs-groupLabel {
-  font-size: 0.83rem;
+  font-size: 0.87rem;
   font-weight: 650;
   color: var(--color-foreground);
 }
@@ -157,13 +196,14 @@
 .fd-tokendocs-groupDescription {
   display: block;
   margin-top: 0.12rem;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
+  line-height: 1.38;
   color: var(--color-muted-foreground);
 }
 
 .fd-tokendocs-groupCount {
   flex-shrink: 0;
-  font-size: 0.71rem;
+  font-size: 0.74rem;
   color: var(--color-muted-foreground);
 }
 
@@ -173,8 +213,8 @@
 
 .fd-tokendocs-empty {
   margin: 0;
-  padding: 0.9rem 0.74rem;
-  font-size: 0.82rem;
+  padding: 0.92rem 0.74rem;
+  font-size: 0.9rem;
   color: var(--color-muted-foreground);
 }
 
@@ -214,15 +254,16 @@
   align-items: center;
   column-gap: 0.74rem;
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background));
-  padding: 0.52rem 0.76rem;
+  background: color-mix(in oklab, var(--color-surface-muted) 68%, var(--color-background));
+  padding: 0.56rem 0.78rem;
 }
 
 .fd-tokendocs-headCell {
-  font-size: 0.7rem;
-  font-weight: 720;
-  letter-spacing: 0.03em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--color-foreground);
+  text-align: left;
 }
 
 .fd-tokendocs-headCell.is-right {
@@ -234,7 +275,7 @@
   align-items: center;
   column-gap: 0.74rem;
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
-  padding: 0.54rem 0.76rem;
+  padding: 0.6rem 0.78rem;
 }
 
 .fd-tokendocs-row:nth-child(even) {
@@ -246,7 +287,7 @@
 }
 
 .fd-tokendocs-row:hover {
-  background: color-mix(in oklab, var(--color-surface-muted) 66%, transparent);
+  background: color-mix(in oklab, var(--color-surface-muted) 64%, transparent);
 }
 
 .fd-tokendocs-cell {
@@ -276,8 +317,8 @@
   display: inline-block;
   max-width: 100%;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.73rem;
-  line-height: 1.44;
+  font-size: 0.79rem;
+  line-height: 1.48;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
 }
@@ -290,7 +331,7 @@
   background: color-mix(in oklab, var(--color-surface-muted) 85%, transparent);
   padding: 0.2rem 0.5rem;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--color-foreground);
   white-space: nowrap;
 }
@@ -299,8 +340,8 @@
   display: inline-block;
   max-width: 100%;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.72rem;
-  line-height: 1.42;
+  font-size: 0.8rem;
+  line-height: 1.5;
   color: var(--color-foreground);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -309,46 +350,10 @@
 .fd-tokendocs-value-plain {
   display: inline-block;
   max-width: 100%;
-  font-size: 0.79rem;
-  line-height: 1.44;
+  font-size: 0.86rem;
+  line-height: 1.5;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
-}
-
-.fd-tokendocs-colorCell {
-  display: inline-flex;
-  min-width: 0;
-  align-items: center;
-  gap: 0.46rem;
-}
-
-.fd-tokendocs-swatch {
-  display: inline-block;
-  height: 0.94rem;
-  width: 1.44rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
-  border-radius: 0.32rem;
-  flex-shrink: 0;
-}
-
-.fd-tokendocs-scaleCell {
-  display: inline-flex;
-  min-width: 0;
-  align-items: center;
-  gap: 0.56rem;
-}
-
-.fd-tokendocs-scaleBar {
-  display: inline-block;
-  height: 0.44rem;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--color-primary) 68%, var(--color-surface-muted)) 0%,
-    color-mix(in oklab, var(--color-primary) 46%, var(--color-surface-muted)) 100%
-  );
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 38%, transparent);
-  flex-shrink: 0;
 }
 
 .fd-tokendocs-copy {
@@ -356,12 +361,11 @@
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  flex-shrink: 0;
   border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-surface-muted) 74%, var(--color-background));
-  padding: 0.12rem 0.42rem;
-  font-size: 0.62rem;
+  background: color-mix(in oklab, var(--color-surface-muted) 76%, var(--color-background));
+  padding: 0.14rem 0.45rem;
+  font-size: 0.64rem;
   line-height: 1.3;
   color: var(--color-muted-foreground);
   opacity: 0;
@@ -427,7 +431,7 @@
 }
 
 .fd-tokendocs-mobileKey {
-  font-size: 0.64rem;
+  font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -461,14 +465,6 @@
   gap: 0.3rem;
 }
 
-.fd-tokendocs-colorMatrixHead {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 0.22rem 0;
-  background: color-mix(in oklab, var(--color-background) 95%, var(--color-surface));
-}
-
 .fd-tokendocs-colorScaleLabel {
   font-size: 0.64rem;
   font-weight: 700;
@@ -479,10 +475,9 @@
 }
 
 .fd-tokendocs-colorFamilyLabel {
-  font-size: 0.8rem;
-  font-weight: 670;
+  font-size: 0.84rem;
+  font-weight: 650;
   color: var(--color-foreground);
-  padding-right: 0.32rem;
   text-transform: lowercase;
 }
 
@@ -491,96 +486,15 @@
 }
 
 .fd-tokendocs-colorSwatchBlock {
-  min-height: 2.2rem;
-  border-radius: 0.5rem;
+  min-height: 2.24rem;
+  border-radius: 0.48rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
 }
 
-.fd-tokendocs-colorMatrixCell.is-missing .fd-tokendocs-colorSwatchBlock {
-  background: color-mix(in oklab, var(--color-surface-muted) 74%, transparent);
-}
-
-.fd-tokendocs-colorCellValue,
-.fd-tokendocs-srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.fd-tokendocs-colorExtras {
-  display: grid;
-  gap: 0.52rem;
-}
-
-.fd-tokendocs-colorExtraGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 0.52rem;
-}
-
-.fd-tokendocs-colorExtraCard {
-  display: grid;
-  gap: 0.44rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.56rem;
-}
-
-.fd-tokendocs-colorExtraHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.fd-tokendocs-colorExtraTitle {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 650;
-  text-transform: lowercase;
-}
-
-.fd-tokendocs-colorExtraCount {
-  font-size: 0.67rem;
-  color: var(--color-muted-foreground);
-}
-
-.fd-tokendocs-colorExtraStops {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.36rem;
-}
-
-.fd-tokendocs-colorExtraStop {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.22rem;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted));
-  padding: 0.12rem 0.28rem 0.12rem 0.16rem;
-}
-
-.fd-tokendocs-colorExtraStep {
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.64rem;
-  font-weight: 620;
-  color: var(--color-foreground);
-}
-
-.fd-tokendocs-colorExtraSwatch {
-  display: block;
-  width: 1.2rem;
-  min-height: 1.2rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+.fd-tokendocs-colorMatrixCell.is-empty .fd-tokendocs-colorSwatchBlock {
+  background: transparent;
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--color-border) 88%, transparent);
 }
 
 .fd-tokendocs-brandGrid {
@@ -591,17 +505,17 @@
 
 .fd-tokendocs-brandCard {
   display: grid;
-  gap: 0.36rem;
+  gap: 0.34rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.55rem;
+  padding: 0.52rem;
 }
 
 .fd-tokendocs-brandTitle {
   margin: 0;
-  font-size: 0.76rem;
-  font-weight: 650;
+  font-size: 0.78rem;
+  font-weight: 640;
 }
 
 .fd-tokendocs-brandSwatches {
@@ -616,8 +530,8 @@
 }
 
 .fd-tokendocs-brandSwatchBlock {
-  min-height: 1.35rem;
-  border-radius: 0.36rem;
+  min-height: 1.3rem;
+  border-radius: 0.34rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
 }
 
@@ -637,24 +551,23 @@
 
 .fd-tokendocs-semanticCard {
   display: grid;
-  gap: 0.42rem;
+  gap: 0.36rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.6rem;
-  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
-  padding: 0.55rem;
+  border-radius: 0.58rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.52rem;
 }
 
 .fd-tokendocs-semanticTitle {
   margin: 0;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
   font-size: 0.67rem;
-  color: var(--color-foreground);
   overflow-wrap: anywhere;
 }
 
 .fd-tokendocs-semanticRow {
   display: grid;
-  grid-template-columns: minmax(2.5rem, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(2.6rem, auto) minmax(0, 1fr);
   align-items: center;
   gap: 0.34rem;
 }
@@ -671,50 +584,43 @@
   display: inline-flex;
   min-height: 1.5rem;
   align-items: center;
-  justify-content: flex-start;
-  border-radius: 0.38rem;
+  border-radius: 0.36rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
   padding-inline: 0.42rem;
-  font-weight: 680;
   font-size: 0.98rem;
-  line-height: 1;
+  font-weight: 700;
 }
 
 .fd-tokendocs-typoShowcase {
   display: grid;
-  gap: 0.65rem;
+  gap: 0.56rem;
 }
 
 .fd-tokendocs-typoSpecimens {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 0.55rem;
+  gap: 0.48rem;
 }
 
 .fd-tokendocs-typoCard {
   display: grid;
-  gap: 0.44rem;
+  gap: 0.34rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.58rem;
+  padding: 0.52rem;
 }
 
 .fd-tokendocs-typoSample {
   margin: 0;
   color: var(--color-foreground);
-  font-size: 1.14rem;
-  line-height: 1.4;
-}
-
-.fd-tokendocs-weightSample {
-  margin: 0;
-  color: var(--color-foreground);
+  font-size: 1.12rem;
+  line-height: 1.32;
 }
 
 .fd-tokendocs-typoMeta {
   display: grid;
-  gap: 0.18rem;
+  gap: 0.14rem;
 }
 
 .fd-tokendocs-typoLabel {
@@ -728,25 +634,26 @@
 .fd-tokendocs-typoValue {
   margin: 0;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
+  line-height: 1.34;
   color: var(--color-muted-foreground);
   overflow-wrap: anywhere;
 }
 
 .fd-tokendocs-typeScaleList {
   display: grid;
-  gap: 0.34rem;
+  gap: 0.3rem;
 }
 
 .fd-tokendocs-typeScaleItem {
   display: grid;
   grid-template-columns: minmax(8.5rem, auto) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
-  border-radius: 0.54rem;
+  border-radius: 0.52rem;
   background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
-  padding: 0.46rem 0.56rem;
+  padding: 0.4rem 0.54rem;
 }
 
 .fd-tokendocs-typeSample {
@@ -756,203 +663,205 @@
 
 .fd-tokendocs-typeKey {
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.67rem;
+  font-size: 0.68rem;
   color: var(--color-muted-foreground);
 }
 
-.fd-tokendocs-spacingShowcase {
+.fd-tokendocs-weightStrip {
   display: grid;
-  gap: 0.45rem;
+  grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+  gap: 0.5rem;
 }
 
-.fd-tokendocs-spacingRow {
+.fd-tokendocs-weightCell {
   display: grid;
-  grid-template-columns: minmax(6.8rem, auto) minmax(0, 1fr) auto;
+  gap: 0.3rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.56rem;
+  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  padding: 0.5rem;
+}
+
+.fd-tokendocs-weightCellSample {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-weightCellMeta {
+  display: grid;
+  gap: 0.14rem;
+}
+
+.fd-tokendocs-spacingShowcaseRoot {
+  gap: 0.6rem;
+}
+
+.fd-tokendocs-spacingAppliedList {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.fd-tokendocs-spacingAppliedRow {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, auto) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.56rem;
+  gap: 0.5rem;
 }
 
 .fd-tokendocs-spacingLabel {
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.69rem;
+  font-size: 0.7rem;
   color: var(--color-muted-foreground);
 }
 
-.fd-tokendocs-spacingTrack {
-  height: 0.86rem;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--color-surface-muted) 74%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  padding: 0.12rem;
+.fd-tokendocs-stackApplied,
+.fd-tokendocs-clusterApplied,
+.fd-tokendocs-latticeApplied,
+.fd-tokendocs-breakpointTrack {
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.52rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-background) 93%, var(--color-surface)) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 44%, transparent) 100%
+    );
 }
 
-.fd-tokendocs-spacingTrackBar {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--color-primary) 78%, transparent) 0%,
-    color-mix(in oklab, var(--color-primary) 52%, transparent) 100%
-  );
-}
-
-.fd-tokendocs-gapPreview {
+.fd-tokendocs-stackApplied {
   display: grid;
-  gap: 0.36rem;
-}
-
-.fd-tokendocs-stackPreview {
-  display: grid;
-  min-height: 4.35rem;
   align-content: start;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.56rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-background) 95%, var(--color-surface)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 34%, transparent) 100%
-    );
-  padding: 0.48rem 0.62rem;
+  min-height: 5.1rem;
+  padding: 0.56rem;
 }
 
-.fd-tokendocs-stackBlock {
-  display: block;
-  min-height: 0.66rem;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--color-primary) 88%, var(--color-background)) 0%,
-    color-mix(in oklab, var(--color-primary) 64%, var(--color-surface-muted)) 100%
-  );
-  border: 1px solid color-mix(in oklab, var(--color-primary) 54%, transparent);
-}
-
-.fd-tokendocs-stackBlock:nth-child(2) {
-  width: 92%;
-}
-
-.fd-tokendocs-stackBlock:nth-child(3) {
-  width: 84%;
-}
-
-.fd-tokendocs-gapBlocks {
-  display: flex;
-  min-height: 2.45rem;
-  align-items: center;
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.54rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-background) 95%, var(--color-surface)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 34%, transparent) 100%
-    );
-  padding: 0 0.62rem;
-}
-
-.fd-tokendocs-gapBlock {
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 0.3rem;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 52%, transparent);
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--color-primary) 86%, var(--color-background)) 0%,
-    color-mix(in oklab, var(--color-primary) 68%, var(--color-surface-muted)) 100%
-  );
-}
-
-.fd-tokendocs-gridGutter {
-  display: grid;
-  min-height: 2.55rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.54rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-background) 95%, var(--color-surface)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 34%, transparent) 100%
-    );
-  padding: 0.45rem;
-}
-
-.fd-tokendocs-gridGutterCell {
-  border-radius: 0.28rem;
+.fd-tokendocs-stackAppliedCard {
+  min-height: 0.84rem;
+  border-radius: 0.26rem;
   border: 1px solid color-mix(in oklab, var(--color-primary) 48%, transparent);
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-primary) 84%, var(--color-background)) 0%,
-    color-mix(in oklab, var(--color-primary) 58%, var(--color-surface-muted)) 100%
-  );
-  box-shadow: 0 6px 14px -10px color-mix(in oklab, var(--color-primary) 45%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 72%, var(--color-background));
+}
+
+.fd-tokendocs-clusterApplied {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0.52rem;
+}
+
+.fd-tokendocs-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 42%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 80%, var(--color-background));
+  padding: 0.18rem 0.52rem;
+  font-size: 0.72rem;
+  font-weight: 620;
+  color: color-mix(in oklab, var(--color-foreground) 92%, var(--color-primary));
+}
+
+.fd-tokendocs-latticeApplied {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 3.45rem;
+  padding: 0.52rem;
+}
+
+.fd-tokendocs-latticeCard {
+  border-radius: 0.3rem;
+  border: 1px solid color-mix(in oklab, var(--color-primary) 45%, transparent);
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--color-primary) 82%, var(--color-background)) 0%,
+      color-mix(in oklab, var(--color-primary) 60%, var(--color-surface-muted)) 100%
+    );
+  box-shadow: 0 8px 18px -12px color-mix(in oklab, var(--color-primary) 52%, transparent);
 }
 
 .fd-tokendocs-structShowcase {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-  gap: 0.55rem;
+  gap: 0.5rem;
 }
 
 .fd-tokendocs-radiusCard {
   display: grid;
-  gap: 0.42rem;
+  gap: 0.36rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
-  border-radius: 0.58rem;
+  border-radius: 0.56rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.56rem;
+  padding: 0.5rem;
 }
 
 .fd-tokendocs-radiusSwatch {
-  min-height: 2.25rem;
+  min-height: 2.1rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
-  background: color-mix(in oklab, var(--color-primary) 22%, var(--color-background));
+  background: color-mix(in oklab, var(--color-primary) 30%, var(--color-background));
+}
+
+.fd-tokendocs-breakpointTrack {
+  height: 0.98rem;
+  padding: 0.12rem;
+}
+
+.fd-tokendocs-breakpointBar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-primary) 84%, transparent) 0%,
+    color-mix(in oklab, var(--color-primary) 58%, transparent) 100%
+  );
 }
 
 .fd-tokendocs-motionLab {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.72rem;
 }
 
 .fd-tokendocs-motionLanes {
   display: grid;
-  gap: 0.46rem;
+  gap: 0.44rem;
 }
 
 .fd-tokendocs-motionLaneRow {
-  --fd-motion-duration: 1400ms;
+  --fd-motion-duration: 1600ms;
   --fd-motion-easing: linear;
   --fd-motion-delay: 0ms;
   display: grid;
   grid-template-columns: minmax(9rem, auto) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.54rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.5rem 0.58rem;
+  padding: 0.48rem 0.56rem;
 }
 
 .fd-tokendocs-motionLaneLabel {
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
 }
 
 .fd-tokendocs-motionLaneTrack {
   position: relative;
-  min-height: 1.22rem;
+  min-height: 1.34rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--color-surface-muted) 76%, transparent) 0%,
-    color-mix(in oklab, var(--color-surface-muted) 28%, transparent) 100%
-  );
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-background) 38%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-surface-muted) 74%, transparent) 0%,
+      color-mix(in oklab, var(--color-surface-muted) 34%, transparent) 100%
+    );
   overflow: hidden;
 }
 
@@ -961,64 +870,81 @@
   content: "";
   position: absolute;
   top: 50%;
-  width: 0.46rem;
-  height: 0.46rem;
+  width: 0.58rem;
+  height: 0.58rem;
   border-radius: 999px;
   transform: translateY(-50%);
-  background: color-mix(in oklab, var(--color-foreground) 22%, var(--color-background));
-  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  background: color-mix(in oklab, var(--color-foreground) 24%, var(--color-background));
+  border: 1px solid color-mix(in oklab, var(--color-border) 70%, transparent);
 }
 
 .fd-tokendocs-motionLaneTrack::before {
-  left: 0.34rem;
+  left: 0.36rem;
 }
 
 .fd-tokendocs-motionLaneTrack::after {
-  right: 0.34rem;
+  right: 0.36rem;
 }
 
 .fd-tokendocs-motionLaneBall {
-  --fd-ball-color: var(--color-primary);
   position: absolute;
   top: 50%;
-  left: 0.54rem;
-  width: 0.94rem;
-  height: 0.94rem;
+  left: 0.7rem;
+  width: 1.02rem;
+  height: 1.02rem;
   border-radius: 999px;
   transform: translateY(-50%);
-  border: 1px solid color-mix(in oklab, var(--color-border) 76%, transparent);
-  background:
-    conic-gradient(
-      from 35deg at 58% 50%,
-      transparent 0deg,
-      transparent 54deg,
-      var(--fd-ball-color) 54deg,
-      var(--fd-ball-color) 360deg
-    );
-  box-shadow:
-    0 3px 9px color-mix(in oklab, var(--fd-ball-color) 36%, transparent),
-    inset 0 0 0 1px color-mix(in oklab, var(--color-background) 52%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-border) 74%, transparent);
   animation: fd-token-lane-travel var(--fd-motion-duration) var(--fd-motion-easing) infinite;
   animation-delay: var(--fd-motion-delay);
 }
 
-.fd-tokendocs-motionLaneBall::after {
+.fd-tokendocs-motionLaneBall::before {
   content: "";
   position: absolute;
-  top: 0.26rem;
-  right: 0.2rem;
-  width: 0.16rem;
-  height: 0.16rem;
+  top: 0.28rem;
+  left: 0.52rem;
+  width: 0.28rem;
+  height: 0.28rem;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 90%, var(--color-foreground));
+  background: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground));
 }
 
 .fd-tokendocs-motionLaneBall.is-duration {
-  --fd-ball-color: color-mix(in oklab, var(--color-primary) 92%, var(--color-background));
+  background:
+    conic-gradient(
+      from 28deg at 58% 50%,
+      transparent 0deg,
+      transparent 54deg,
+      color-mix(in oklab, var(--color-primary) 92%, var(--color-background)) 54deg,
+      color-mix(in oklab, var(--color-primary) 92%, var(--color-background)) 360deg
+    );
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-primary) 40%, transparent);
+}
+
+.fd-tokendocs-motionLaneBall.is-baseline {
+  background:
+    conic-gradient(
+      from 28deg at 58% 50%,
+      transparent 0deg,
+      transparent 54deg,
+      color-mix(in oklab, var(--color-foreground) 68%, var(--color-background)) 54deg,
+      color-mix(in oklab, var(--color-foreground) 68%, var(--color-background)) 360deg
+    );
+  animation-timing-function: linear;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-foreground) 22%, transparent);
 }
 
 .fd-tokendocs-motionLaneBall.is-easing {
-  --fd-ball-color: color-mix(in oklab, var(--color-warning) 88%, var(--color-background));
+  background:
+    conic-gradient(
+      from 28deg at 58% 50%,
+      transparent 0deg,
+      transparent 54deg,
+      color-mix(in oklab, var(--color-warning) 88%, var(--color-background)) 54deg,
+      color-mix(in oklab, var(--color-warning) 88%, var(--color-background)) 360deg
+    );
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--color-warning) 38%, transparent);
 }
 
 .fd-tokendocs-motionLaneValue {
@@ -1027,39 +953,50 @@
 
 @keyframes fd-token-lane-travel {
   from {
-    left: 0.56rem;
+    left: 0.7rem;
   }
 
   to {
-    left: calc(100% - 1.5rem);
+    left: calc(100% - 1.75rem);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .fd-tokendocs-motionLaneBall {
     animation: none;
-    left: 50%;
+  }
+
+  .fd-tokendocs-motionLaneBall.is-duration {
+    left: 66%;
+  }
+
+  .fd-tokendocs-motionLaneBall.is-baseline {
+    left: 34%;
+  }
+
+  .fd-tokendocs-motionLaneBall.is-easing {
+    left: 62%;
   }
 }
 
 .fd-tokendocs-shadowShowcase {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(14.4rem, 1fr));
   gap: 0.7rem;
 }
 
 .fd-tokendocs-shadowCard {
   display: grid;
-  gap: 0.54rem;
+  gap: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
-  border-radius: 0.66rem;
+  border-radius: 0.64rem;
   background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
-  padding: 0.62rem;
+  padding: 0.58rem;
 }
 
 .fd-tokendocs-shadowSurface {
-  min-height: 3.2rem;
-  border-radius: 0.52rem;
+  min-height: 3.15rem;
+  border-radius: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
   background: linear-gradient(
     165deg,
@@ -1070,19 +1007,20 @@
 
 .fd-tokendocs-shadowMeta {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.18rem;
 }
 
 .fd-tokendocs-shadowPath {
   margin: 0;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
 }
 
 .fd-tokendocs-shadowValue {
   margin: 0;
   font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 0.67rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
   color: var(--color-muted-foreground);
   white-space: nowrap;
   overflow: hidden;
@@ -1091,7 +1029,7 @@
 
 @media (min-width: 768px) {
   .fd-tokendocs-container {
-    gap: 1.2rem;
+    gap: 1.15rem;
     padding: 1.55rem 1.5rem 2.8rem;
   }
 }
@@ -1102,19 +1040,19 @@
   }
 
   .fd-tokendocs-title {
-    font-size: 1.62rem;
+    font-size: 1.72rem;
   }
 
   .fd-tokendocs-sectionTitle {
-    font-size: 1.24rem;
+    font-size: 1.34rem;
   }
 
-  .fd-tokendocs-spacingRow {
-    grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr);
+  .fd-tokendocs-spacingAppliedRow {
+    grid-template-columns: 1fr;
+    align-items: start;
   }
 
-  .fd-tokendocs-spacingRow .fd-tokendocs-value-pill {
-    grid-column: 1 / -1;
+  .fd-tokendocs-spacingAppliedRow .fd-tokendocs-value-pill {
     justify-self: start;
   }
 
@@ -1130,7 +1068,8 @@
   .fd-tokendocs-typoSpecimens,
   .fd-tokendocs-brandGrid,
   .fd-tokendocs-semanticGrid,
-  .fd-tokendocs-colorExtraGrid {
+  .fd-tokendocs-weightStrip,
+  .fd-tokendocs-structShowcase {
     grid-template-columns: 1fr;
   }
 

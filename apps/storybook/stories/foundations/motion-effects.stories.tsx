@@ -32,10 +32,9 @@ interface MotionLaneRow {
   laneDuration: string;
   laneEasing: string;
   laneDelay: string;
-  variant: "duration" | "easing";
 }
 
-const LANE_DELAY_STEP_MS = 280;
+const LANE_DELAY_STEP_MS = 240;
 
 const base = asRecord(tokens.base, "base");
 const motion = asRecord(base.motion, "base.motion");
@@ -70,7 +69,7 @@ function parseDurationMs(value: string): number {
 
 function laneDuration(value: string): string {
   const ms = parseDurationMs(value);
-  const scaledMs = Math.round(Math.min(4200, Math.max(900, ms * 9)));
+  const scaledMs = Math.round(Math.min(4000, Math.max(900, ms * 8)));
   return `${scaledMs}ms`;
 }
 
@@ -98,7 +97,6 @@ const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => ({
   laneDuration: laneDuration(row.value),
   laneEasing: standardEasing,
   laneDelay: `-${index * LANE_DELAY_STEP_MS}ms`,
-  variant: "duration",
 }));
 
 const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => ({
@@ -109,7 +107,6 @@ const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => ({
   laneDuration: laneDuration(normalDuration),
   laneEasing: row.value,
   laneDelay: `-${(index + durationRows.length) * LANE_DELAY_STEP_MS}ms`,
-  variant: "easing",
 }));
 
 const motionGroups = [
@@ -150,7 +147,7 @@ export const Showcase: Story = {
       >
         <TokenSection
           title="Motion Lanes"
-          description="A pacman marker travels from start to end using each token's timing behavior."
+          description="Token timing behavior rendered passively: duration rows compare speed, easing rows compare token output against linear baseline."
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
@@ -173,12 +170,7 @@ export const Showcase: Story = {
                     aria-hidden="true"
                     title={`${row.path}: ${row.value}`}
                   >
-                    <span
-                      className={classNames(
-                        "fd-tokendocs-motionLaneBall",
-                        row.variant === "duration" ? "is-duration" : "is-easing",
-                      )}
-                    />
+                    <span className="fd-tokendocs-motionLaneBall is-duration" />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -207,12 +199,8 @@ export const Showcase: Story = {
                     aria-hidden="true"
                     title={`${row.path}: ${row.value}`}
                   >
-                    <span
-                      className={classNames(
-                        "fd-tokendocs-motionLaneBall",
-                        row.variant === "duration" ? "is-duration" : "is-easing",
-                      )}
-                    />
+                    <span className="fd-tokendocs-motionLaneBall is-baseline" />
+                    <span className="fd-tokendocs-motionLaneBall is-easing" />
                   </div>
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -279,7 +267,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(320px, 1.7fr)",
+                width: "minmax(340px, 1.7fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -289,7 +277,6 @@ export const Reference: Story = {
                 key: "value",
                 label: "Value",
                 width: "minmax(320px, 1fr)",
-                align: "right",
                 getValue: (row) => row.value,
                 valueMode: "wrap",
                 copyValue: (row) => row.value,
@@ -309,7 +296,7 @@ export const Reference: Story = {
               {
                 key: "path",
                 label: "Token Path",
-                width: "minmax(280px, 1.5fr)",
+                width: "minmax(320px, 1.5fr)",
                 getValue: (row) => row.path,
                 render: (row) => <TokenPathText value={row.path} />,
                 valueMode: "plain",
@@ -318,7 +305,7 @@ export const Reference: Story = {
               {
                 key: "value",
                 label: "Shadow Value",
-                width: "minmax(320px, 1.4fr)",
+                width: "minmax(420px, 1.4fr)",
                 getValue: (row) => row.value,
                 valueMode: "wrap",
                 copyValue: (row) => row.value,
@@ -337,7 +324,3 @@ export const Reference: Story = {
     await expect(canvas.getByText("Motion References")).toBeInTheDocument();
   },
 };
-
-function classNames(...classes: Array<string | false | null | undefined>): string {
-  return classes.filter(Boolean).join(" ");
-}
