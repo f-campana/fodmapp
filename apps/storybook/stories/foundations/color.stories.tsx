@@ -435,7 +435,6 @@ export const Showcase: Story = {
                       <div className="fd-tokendocs-colorExtraStops">
                         {family.stops.map((stop) => (
                           <div key={`${family.family}-${stop.step}`} className="fd-tokendocs-colorExtraStop">
-                            <span className="fd-tokendocs-colorExtraStep">{stop.step}</span>
                             <span
                               className="fd-tokendocs-colorExtraSwatch"
                               style={{ backgroundColor: stop.value }}
@@ -443,6 +442,7 @@ export const Showcase: Story = {
                               role="img"
                               aria-label={`${stop.path}: ${stop.value}`}
                             />
+                            <span className="fd-tokendocs-colorExtraStep">{stop.step}</span>
                           </div>
                         ))}
                       </div>

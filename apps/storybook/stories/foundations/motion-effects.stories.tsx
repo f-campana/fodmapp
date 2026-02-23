@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
@@ -32,10 +31,11 @@ interface MotionLaneRow {
   value: string;
   laneDuration: string;
   laneEasing: string;
+  laneDelay: string;
   variant: "duration" | "easing";
 }
 
-const SYNC_CYCLE_MS = 7200;
+const LANE_DELAY_STEP_MS = 280;
 
 const base = asRecord(tokens.base, "base");
 const motion = asRecord(base.motion, "base.motion");
@@ -90,23 +90,25 @@ const normalDuration =
   durationRows[0]?.value ??
   "180ms";
 
-const durationLaneRows: MotionLaneRow[] = durationRows.map((row) => ({
+const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => ({
   id: `duration:${row.id}`,
   label: row.path.split(".").pop() ?? row.path,
   path: row.path,
   value: row.value,
   laneDuration: laneDuration(row.value),
   laneEasing: standardEasing,
+  laneDelay: `-${index * LANE_DELAY_STEP_MS}ms`,
   variant: "duration",
 }));
 
-const easingLaneRows: MotionLaneRow[] = easingRows.map((row) => ({
+const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => ({
   id: `easing:${row.id}`,
   label: row.path.split(".").pop() ?? row.path,
   path: row.path,
   value: row.value,
   laneDuration: laneDuration(normalDuration),
   laneEasing: row.value,
+  laneDelay: `-${(index + durationRows.length) * LANE_DELAY_STEP_MS}ms`,
   variant: "easing",
 }));
 
@@ -141,22 +143,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Showcase: Story = {
   render: () => {
-    const [syncTick, setSyncTick] = useState(0);
-
-    useEffect(() => {
-      const timer = window.setInterval(() => {
-        setSyncTick((value) => value + 1);
-      }, SYNC_CYCLE_MS);
-
-      return () => {
-        window.clearInterval(timer);
-      };
-    }, []);
-
     return (
       <TokenDocsPage
         title="Motion & Effects Tokens"
-        subtitle="Passive motion lanes visualize duration and easing behavior with synchronized restarts. Shadow tiers are previewed below."
+        subtitle="Passive motion lanes visualize duration and easing behavior in continuous loops. Shadow tiers are previewed below."
       >
         <TokenSection
           title="Motion Lanes"
@@ -173,6 +163,7 @@ export const Showcase: Story = {
                     {
                       "--fd-motion-duration": row.laneDuration,
                       "--fd-motion-easing": row.laneEasing,
+                      "--fd-motion-delay": row.laneDelay,
                     } as CSSProperties
                   }
                 >
@@ -183,7 +174,6 @@ export const Showcase: Story = {
                     title={`${row.path}: ${row.value}`}
                   >
                     <span
-                      key={`${row.id}-${syncTick}`}
                       className={classNames(
                         "fd-tokendocs-motionLaneBall",
                         row.variant === "duration" ? "is-duration" : "is-easing",
@@ -207,6 +197,7 @@ export const Showcase: Story = {
                     {
                       "--fd-motion-duration": row.laneDuration,
                       "--fd-motion-easing": row.laneEasing,
+                      "--fd-motion-delay": row.laneDelay,
                     } as CSSProperties
                   }
                 >
@@ -217,7 +208,6 @@ export const Showcase: Story = {
                     title={`${row.path}: ${row.value}`}
                   >
                     <span
-                      key={`${row.id}-${syncTick}`}
                       className={classNames(
                         "fd-tokendocs-motionLaneBall",
                         row.variant === "duration" ? "is-duration" : "is-easing",

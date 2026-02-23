@@ -50,6 +50,8 @@ function clampRem(value: string, maxRem: number): string {
   return `${Math.min(parsed, maxRem)}rem`;
 }
 
+const MAX_SPECIMEN_REM = 2.4;
+
 function cssNumberOrString(value: string): number | string {
   const parsed = Number.parseFloat(value);
   if (Number.isFinite(parsed) && `${parsed}` === value) {
@@ -161,7 +163,7 @@ export const Showcase: Story = {
                   <p
                     className="fd-tokendocs-typeSample"
                     style={{
-                      fontSize: clampRem(row.value, 2.5),
+                      fontSize: clampRem(row.value, MAX_SPECIMEN_REM),
                       lineHeight: lineHeightDefault,
                     }}
                   >
@@ -177,16 +179,21 @@ export const Showcase: Story = {
               {weightRows.map((row) => (
                 <article key={`${row.id}-weight`} className="fd-tokendocs-typoCard">
                   <p
-                    className="fd-tokendocs-typoSample"
+                    className="fd-tokendocs-weightSample"
                     style={{
                       fontWeight: cssNumberOrString(row.value),
-                      fontSize: "1.35rem",
+                      fontSize: "1.2rem",
                       lineHeight: 1.3,
                     }}
                   >
-                    {row.path.split(".").pop()} {row.value}
+                    Digestive support rhythm across interface states.
                   </p>
-                  <p className="fd-tokendocs-typoValue">base.typography.fontWeight</p>
+                  <div className="fd-tokendocs-typoMeta">
+                    <span className="fd-tokendocs-typoLabel">
+                      {row.path.split(".").pop()} {row.value}
+                    </span>
+                    <p className="fd-tokendocs-typoValue">base.typography.fontWeight</p>
+                  </div>
                 </article>
               ))}
             </div>

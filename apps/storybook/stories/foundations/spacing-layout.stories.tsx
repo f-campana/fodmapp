@@ -124,7 +124,7 @@ const layoutReferenceGroups = [
   },
 ];
 
-const preferredSpacingStops = ["0_5", "1", "1_5", "2", "2_5", "3", "4", "6", "8"];
+const preferredSpacingStops = ["0_5", "1", "2", "4", "6", "8"];
 const spacingShowcaseRows = spacingRows.filter((row) => {
   const key = stripPathPrefix(row.path, "base.space");
   return preferredSpacingStops.includes(key);
