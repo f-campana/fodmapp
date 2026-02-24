@@ -13,6 +13,7 @@ Apply these instructions to the whole repository root.
 - Keep PRs focused and small.
 - Run the quality command before requesting merge:
   - `./.github/scripts/quality-gate.sh`
+- Watch for CI completion, when all green ask before merge
 
 ## Safety Rules
 - Do not rewrite history on shared branches unless explicitly requested.
