@@ -25,6 +25,7 @@ tags:
   - name: health
   - name: foods
   - name: swaps
+  - name: barcodes
 
 paths:
   /v0/health:
@@ -164,6 +165,35 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /v0/barcodes/{code}:
+    get:
+      tags: [barcodes]
+      summary: Lookup barcode and resolve product/food context
+      operationId: getBarcodeLookup
+      parameters:
+        - $ref: '#/components/parameters/BarcodePath'
+      responses:
+        '200':
+          description: Barcode lookup result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarcodeLookupResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Invalid barcode format/check digit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: Provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   parameters:
     FoodSlugPath:
@@ -222,6 +252,15 @@ components:
         minimum: 0
         maximum: 1
         default: 0
+    BarcodePath:
+      name: code
+      in: path
+      required: true
+      description: Retail barcode (EAN-8, UPC-A, or EAN-13).
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 13
 
   responses:
     NotFound:
@@ -587,3 +626,135 @@ components:
         total:
           type: integer
           minimum: 0
+
+    BarcodeCanonicalFormat:
+      type: string
+      enum: [EAN8, EAN13]
+
+    BarcodeResolutionStatus:
+      type: string
+      enum: [resolved, unresolved]
+
+    BarcodeCacheStatus:
+      type: string
+      enum: [fresh, stale, miss]
+
+    BarcodeLinkMethod:
+      type: string
+      enum: [manual, heuristic]
+
+    BarcodeProduct:
+      type: object
+      required:
+        - categories_tags
+        - countries_tags
+      properties:
+        source_code:
+          type: string
+          nullable: true
+        product_name_fr:
+          type: string
+          nullable: true
+        product_name_en:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          nullable: true
+        ingredients_text_fr:
+          type: string
+          nullable: true
+        categories_tags:
+          type: array
+          items:
+            type: string
+        countries_tags:
+          type: array
+          items:
+            type: string
+
+    BarcodeResolvedFood:
+      type: object
+      required:
+        - food_slug
+        - canonical_name_fr
+        - canonical_name_en
+        - link_method
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        link_method:
+          $ref: '#/components/schemas/BarcodeLinkMethod'
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+
+    BarcodeCandidate:
+      type: object
+      required:
+        - food_slug
+        - canonical_name_fr
+        - canonical_name_en
+        - score
+        - signal_breakdown
+      properties:
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+        signal_breakdown:
+          type: object
+          additionalProperties:
+            type: number
+
+    BarcodeLookupResponse:
+      type: object
+      required:
+        - query_code
+        - normalized_code
+        - canonical_format
+        - resolution_status
+        - cache_status
+        - candidates
+        - provider
+      properties:
+        query_code:
+          type: string
+        normalized_code:
+          type: string
+        canonical_format:
+          $ref: '#/components/schemas/BarcodeCanonicalFormat'
+        resolution_status:
+          $ref: '#/components/schemas/BarcodeResolutionStatus'
+        cache_status:
+          $ref: '#/components/schemas/BarcodeCacheStatus'
+        product:
+          allOf:
+            - $ref: '#/components/schemas/BarcodeProduct'
+          nullable: true
+        resolved_food:
+          allOf:
+            - $ref: '#/components/schemas/BarcodeResolvedFood'
+          nullable: true
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/BarcodeCandidate'
+        provider:
+          type: string
+        provider_last_synced_at:
+          type: string
+          format: date-time
+          nullable: true

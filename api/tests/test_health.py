@@ -44,6 +44,7 @@ def test_openapi_contract_parity(app_instance) -> None:
         "/v0/foods/{food_slug}/subtypes",
         "/v0/foods/{food_slug}/traits",
         "/v0/swaps",
+        "/v0/barcodes/{code}",
     }
 
     assert set(spec["paths"].keys()) == expected_paths

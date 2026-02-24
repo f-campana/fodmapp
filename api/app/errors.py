@@ -26,6 +26,18 @@ def service_unavailable(message: str = "Database unavailable") -> ApiError:
     return ApiError(code="service_unavailable", message=message, status_code=503)
 
 
+def provider_unavailable(message: str = "Provider unavailable") -> ApiError:
+    return ApiError(code="provider_unavailable", message=message, status_code=503)
+
+
+def unauthorized(message: str = "Unauthorized") -> ApiError:
+    return ApiError(code="unauthorized", message=message, status_code=401)
+
+
+def invalid_barcode(message: str = "Invalid barcode") -> ApiError:
+    return ApiError(code="validation_error", message=message, status_code=422)
+
+
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def handle_api_error(_request: Request, exc: ApiError) -> JSONResponse:

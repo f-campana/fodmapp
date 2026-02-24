@@ -1,0 +1,141 @@
+openapi: 3.1.0
+info:
+  title: Fodmap Internal Barcode API (v0)
+  version: 0.1.0
+  summary: Internal barcode curation endpoints.
+  description: |
+    Internal-only routes for manual barcode-to-food link curation.
+    These routes are protected by static bearer token auth.
+servers:
+  - url: https://api.fodmap.local
+    description: Placeholder
+
+tags:
+  - name: barcodes-internal
+
+paths:
+  /v0/internal/barcodes/{code}/link:
+    put:
+      tags: [barcodes-internal]
+      summary: Set or override manual barcode-food link
+      operationId: setManualBarcodeLink
+      parameters:
+        - $ref: '#/components/parameters/BarcodePath'
+        - $ref: '#/components/parameters/ActorHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BarcodeLinkMutationRequest'
+      responses:
+        '200':
+          description: Manual link set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarcodeLinkMutationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Food not found or feature disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [barcodes-internal]
+      summary: Clear manual barcode-food link
+      operationId: clearManualBarcodeLink
+      parameters:
+        - $ref: '#/components/parameters/BarcodePath'
+        - $ref: '#/components/parameters/ActorHeader'
+      responses:
+        '200':
+          description: Manual link cleared (idempotent)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarcodeLinkMutationResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  parameters:
+    BarcodePath:
+      name: code
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 13
+    ActorHeader:
+      name: X-Actor
+      in: header
+      required: true
+      description: Operator identifier for audit trail.
+      schema:
+        type: string
+        minLength: 1
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    BarcodeLinkMutationRequest:
+      type: object
+      required: [food_slug]
+      properties:
+        food_slug:
+          type: string
+
+    BarcodeLinkMutationResponse:
+      type: object
+      required: [normalized_code, canonical_format, action]
+      properties:
+        normalized_code:
+          type: string
+        canonical_format:
+          type: string
+          enum: [EAN8, EAN13]
+        action:
+          type: string
+          enum: [set_manual, clear_manual]
+        food_slug:
+          type: string
+          nullable: true
+        removed:
+          type: boolean
+          nullable: true
