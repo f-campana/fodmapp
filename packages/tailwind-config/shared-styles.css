@@ -27,6 +27,7 @@
     --color-border: var(--fd-semantic-color-border-default);
     --color-input: var(--fd-semantic-color-border-default);
     --color-ring: var(--fd-semantic-color-focus-ring);
+    --color-ring-soft: var(--fd-semantic-color-focus-ring-soft);
 
     --color-primary: var(--fd-semantic-color-action-primary-bg);
     --color-primary-hover: var(--fd-semantic-color-action-primary-bg-hover);
@@ -34,8 +35,9 @@
     --color-secondary: var(--fd-semantic-color-action-secondary-bg);
     --color-secondary-hover: var(--fd-semantic-color-action-secondary-bg-hover);
     --color-secondary-foreground: var(--fd-semantic-color-action-secondary-fg);
-    --color-destructive: var(--fd-semantic-color-status-danger-bg);
-    --color-destructive-foreground: var(--fd-semantic-color-status-danger-fg);
+    --color-destructive: var(--fd-semantic-color-action-destructive-bg);
+    --color-destructive-hover: var(--fd-semantic-color-action-destructive-bg-hover);
+    --color-destructive-foreground: var(--fd-semantic-color-action-destructive-fg);
 
     --color-info: var(--fd-semantic-color-status-info-bg);
     --color-info-foreground: var(--fd-semantic-color-status-info-fg);
@@ -79,6 +81,7 @@
   --color-border: var(--fd-semantic-color-border-default);
   --color-input: var(--fd-semantic-color-border-default);
   --color-ring: var(--fd-semantic-color-focus-ring);
+  --color-ring-soft: var(--fd-semantic-color-focus-ring-soft);
 
   --color-primary: var(--fd-semantic-color-action-primary-bg);
   --color-primary-hover: var(--fd-semantic-color-action-primary-bg-hover);
@@ -86,8 +89,9 @@
   --color-secondary: var(--fd-semantic-color-action-secondary-bg);
   --color-secondary-hover: var(--fd-semantic-color-action-secondary-bg-hover);
   --color-secondary-foreground: var(--fd-semantic-color-action-secondary-fg);
-  --color-destructive: var(--fd-semantic-color-status-danger-bg);
-  --color-destructive-foreground: var(--fd-semantic-color-status-danger-fg);
+  --color-destructive: var(--fd-semantic-color-action-destructive-bg);
+  --color-destructive-hover: var(--fd-semantic-color-action-destructive-bg-hover);
+  --color-destructive-foreground: var(--fd-semantic-color-action-destructive-fg);
 
   --color-info: var(--fd-semantic-color-status-info-bg);
   --color-info-foreground: var(--fd-semantic-color-status-info-fg);

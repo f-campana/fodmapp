@@ -23,9 +23,11 @@ const aliasMap = [
   ["--color-accent-strong", "--fd-semantic-color-action-primary-bg-hover"],
   ["--color-accent-foreground", "--fd-semantic-color-action-primary-fg"],
   ["--color-ring", "--fd-semantic-color-focus-ring"],
+  ["--color-ring-soft", "--fd-semantic-color-focus-ring-soft"],
   ["--color-warning", "--fd-semantic-color-status-warning-bg"],
   ["--color-warning-foreground", "--fd-semantic-color-status-warning-fg"],
   ["--color-danger", "--fd-semantic-color-status-danger-bg"],
+  ["--color-danger-hover", "--fd-semantic-color-action-destructive-bg-hover"],
   ["--color-danger-foreground", "--fd-semantic-color-status-danger-fg"],
   ["--font-body", "--fd-semantic-typography-font-family-body"],
   ["--font-display", "--fd-semantic-typography-font-family-display"]
@@ -128,6 +130,50 @@ function validateBaseColorTokens() {
   if (errors.length > 0) {
     throw new Error(`Base color token preflight failed:\n${errors.map((error) => `- ${error}`).join("\n")}`);
   }
+}
+
+function collectLeafTokenPaths(node, pathParts = [], paths = []) {
+  if (node === null || node === undefined) {
+    return paths;
+  }
+
+  if (typeof node !== "object" || Array.isArray(node)) {
+    if (pathParts.length > 0) {
+      paths.push(pathParts.join("."));
+    }
+    return paths;
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    collectLeafTokenPaths(value, [...pathParts, key], paths);
+  }
+
+  return paths;
+}
+
+function validateSemanticTokenParity(lightTokens, darkTokens) {
+  const lightSemantic = lightTokens.semantic ?? lightTokens;
+  const darkSemantic = darkTokens.semantic ?? darkTokens;
+  const lightPaths = new Set(collectLeafTokenPaths(lightSemantic));
+  const darkPaths = new Set(collectLeafTokenPaths(darkSemantic));
+  const onlyLight = [...lightPaths].filter((path) => !darkPaths.has(path)).sort();
+  const onlyDark = [...darkPaths].filter((path) => !lightPaths.has(path)).sort();
+
+  if (onlyLight.length === 0 && onlyDark.length === 0) {
+    return;
+  }
+
+  const details = [];
+
+  if (onlyLight.length > 0) {
+    details.push(`- Paths present only in light semantic tokens:\n${onlyLight.map((path) => `  - ${path}`).join("\n")}`);
+  }
+
+  if (onlyDark.length > 0) {
+    details.push(`- Paths present only in dark semantic tokens:\n${onlyDark.map((path) => `  - ${path}`).join("\n")}`);
+  }
+
+  throw new Error(`Semantic token parity check failed:\n${details.join("\n")}`);
 }
 
 function extractVariableDeclarations(cssText) {
@@ -244,6 +290,8 @@ const lightTokens = readJson("light.semantic.json");
 const darkTokens = readJson("dark.semantic.json");
 const lightCss = readFileSync(path.join(tempBuildDir, "light.css"), "utf8");
 const darkCss = readFileSync(path.join(tempBuildDir, "dark.css"), "utf8");
+
+validateSemanticTokenParity(lightTokens, darkTokens);
 
 writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, darkCss);
 
