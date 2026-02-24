@@ -368,7 +368,7 @@
 .fd-tokendocs-cell {
   display: flex;
   min-width: 0;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
 }
 
@@ -390,7 +390,7 @@
   display: inline-flex;
   min-width: 0;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   gap: 0.52rem;
 }
@@ -571,7 +571,7 @@
 .fd-tokendocs-mobileValue {
   display: flex;
   min-width: 0;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
 }
 
@@ -579,7 +579,7 @@
   display: inline-flex;
   min-width: 0;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   gap: 0.45rem;
 }

@@ -9,6 +9,7 @@ import {
   TokenDocsPage,
   TokenPathText,
   TokenSection,
+  useTokenDocsResetScrollOnMount,
 } from "./token-docs.components";
 import {
   asRecord,
@@ -290,6 +291,8 @@ export const Showcase: Story = {
 
 export const Reference: Story = {
   render: () => {
+    useTokenDocsResetScrollOnMount();
+
     const [activeGroup, setActiveGroup] = useState<{
       gridId: "spacing-grid" | "layout-grid";
       groupId: string;

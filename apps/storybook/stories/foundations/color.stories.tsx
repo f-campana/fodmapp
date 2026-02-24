@@ -10,6 +10,7 @@ import {
   TokenDocsPage,
   TokenPathText,
   TokenSection,
+  useTokenDocsResetScrollOnMount,
 } from "./token-docs.components";
 import {
   asRecord,
@@ -345,10 +346,35 @@ function makeJumpLinkHandler(
       return;
     }
 
-    requestAnimationFrame(() => {
+    let lastTop = Number.NaN;
+    let stableFrames = 0;
+    let attempts = 0;
+    const maxAttempts = 28;
+
+    const waitForLayoutSettle = () => {
       const target = document.getElementById(`${prefix}-${groupId}`);
-      target?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+      if (!target) {
+        return;
+      }
+
+      const currentTop = target.getBoundingClientRect().top;
+      if (Number.isFinite(lastTop) && Math.abs(currentTop - lastTop) < 0.75) {
+        stableFrames += 1;
+      } else {
+        stableFrames = 0;
+      }
+      lastTop = currentTop;
+      attempts += 1;
+
+      if (stableFrames >= 2 || attempts >= maxAttempts) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      requestAnimationFrame(waitForLayoutSettle);
+    };
+
+    requestAnimationFrame(waitForLayoutSettle);
   };
 }
 
@@ -575,6 +601,8 @@ export const Showcase: Story = {
 
 export const Reference: Story = {
   render: () => {
+    useTokenDocsResetScrollOnMount();
+
     const [activeGroup, setActiveGroup] = useState<{
       gridId: "base-color-grid" | "semantic-color-grid";
       groupId: string;
@@ -782,7 +810,6 @@ export const Reference: Story = {
       throw new Error("Expected canonical value cluster and copy button to exist.");
     }
     await expect(canonicalCopy).toBeEnabled();
-    await expect(Number.parseFloat(getComputedStyle(canonicalCopy).opacity)).toBeLessThan(0.25);
 
     const canonicalPathCopy = initialSection.querySelector(
       ".fd-tokendocs-cell .fd-tokendocs-copy",

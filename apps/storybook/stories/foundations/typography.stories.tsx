@@ -9,6 +9,7 @@ import {
   TokenPathText,
   TokenSection,
   TokenValuePill,
+  useTokenDocsResetScrollOnMount,
 } from "./token-docs.components";
 import {
   asRecord,
@@ -236,6 +237,8 @@ export const Showcase: Story = {
 
 export const Reference: Story = {
   render: () => {
+    useTokenDocsResetScrollOnMount();
+
     return (
       <TokenDocsPage
         title="Typography Token Reference"

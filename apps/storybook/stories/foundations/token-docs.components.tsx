@@ -31,6 +31,22 @@ export interface TokenGridRowBase {
   searchText?: string;
 }
 
+export function useTokenDocsResetScrollOnMount(): void {
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+}
+
 interface TokenDataGridProps<Row extends TokenGridRowBase> {
   gridLabel: string;
   columns: TokenGridColumn<Row>[];
