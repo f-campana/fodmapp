@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
@@ -357,11 +357,34 @@ export const Showcase: Story = {
     await expect(
       easingLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-token").length,
     ).toBe(easingLaneRows.length);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };
 
 export const Reference: Story = {
   render: () => {
+    const [activeGroup, setActiveGroup] = useState<{
+      gridId: "motion-grid" | "shadow-grid";
+      groupId: string;
+    }>(() => ({
+      gridId: "motion-grid",
+      groupId: motionGroups[0]?.id ?? "durations",
+    }));
+
+    function setPageActiveGroup(
+      gridId: "motion-grid" | "shadow-grid",
+      groupId: string | null,
+    ) {
+      if (!groupId) {
+        return;
+      }
+
+      setActiveGroup({ gridId, groupId });
+    }
+
     return (
       <TokenDocsPage
         title="Motion & Effects Token Reference"
@@ -376,7 +399,8 @@ export const Reference: Story = {
             groups={motionGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="durations"
+            openGroupId={activeGroup.gridId === "motion-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("motion-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -408,7 +432,8 @@ export const Reference: Story = {
             groups={shadowGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="shadow"
+            openGroupId={activeGroup.gridId === "shadow-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("shadow-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -442,12 +467,14 @@ export const Reference: Story = {
 
     const durationsSection = canvasElement.querySelector("#motion-grid-durations");
     const easingSection = canvasElement.querySelector("#motion-grid-easing");
-    if (!durationsSection || !easingSection) {
+    const shadowSection = canvasElement.querySelector("#shadow-grid-shadow");
+    if (!durationsSection || !easingSection || !shadowSection) {
       throw new Error("Expected motion sections to exist.");
     }
 
     await expect(durationsSection).toHaveAttribute("data-expanded", "true");
     await expect(easingSection).toHaveAttribute("data-expanded", "false");
+    await expect(shadowSection).toHaveAttribute("data-expanded", "false");
 
     const easingToggle = easingSection.querySelector(".fd-tokendocs-groupToggle");
     if (!easingToggle) {
@@ -457,8 +484,32 @@ export const Reference: Story = {
     await userEvent.click(easingToggle);
     await expect(easingSection).toHaveAttribute("data-expanded", "true");
     await expect(durationsSection).toHaveAttribute("data-expanded", "false");
+    await expect(shadowSection).toHaveAttribute("data-expanded", "false");
 
     await userEvent.click(easingToggle);
+    await expect(easingSection).toHaveAttribute("data-expanded", "true");
+    await expect(durationsSection).toHaveAttribute("data-expanded", "false");
+
+    const shadowToggle = shadowSection.querySelector(".fd-tokendocs-groupToggle");
+    if (!shadowToggle) {
+      throw new Error("Expected shadow toggle to exist.");
+    }
+    await userEvent.click(shadowToggle);
+    await expect(shadowSection).toHaveAttribute("data-expanded", "true");
     await expect(easingSection).toHaveAttribute("data-expanded", "false");
+    await expect(durationsSection).toHaveAttribute("data-expanded", "false");
+
+    const durationsToggle = durationsSection.querySelector(".fd-tokendocs-groupToggle");
+    if (!durationsToggle) {
+      throw new Error("Expected durations toggle to exist.");
+    }
+    await userEvent.click(durationsToggle);
+    await expect(durationsSection).toHaveAttribute("data-expanded", "true");
+    await expect(easingSection).toHaveAttribute("data-expanded", "false");
+    await expect(shadowSection).toHaveAttribute("data-expanded", "false");
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };

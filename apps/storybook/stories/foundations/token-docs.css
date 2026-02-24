@@ -173,11 +173,8 @@
 }
 
 .fd-tokendocs-group[data-expanded="true"] {
-  border-color: color-mix(in oklab, var(--color-primary) 38%, var(--color-border));
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--color-primary) 28%, transparent),
-    inset 3px 0 0 color-mix(in oklab, var(--color-primary) 64%, transparent),
-    0 10px 24px -22px color-mix(in oklab, var(--color-primary) 42%, transparent);
+  border-color: color-mix(in oklab, var(--color-border) 86%, transparent);
+  box-shadow: none;
 }
 
 .fd-tokendocs-groupToggle {
@@ -188,7 +185,7 @@
   justify-content: space-between;
   gap: 0.74rem;
   border: 0;
-  background: color-mix(in oklab, var(--color-surface-muted) 24%, transparent);
+  background: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground) 8%);
   padding: 0.6rem 0.74rem;
   text-align: left;
   cursor: pointer;
@@ -206,26 +203,26 @@
 }
 
 .fd-tokendocs-groupToggle[data-expanded="true"] {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-primary) 17%, var(--color-surface-muted)) 0%,
-      color-mix(in oklab, var(--color-primary) 8%, var(--color-background)) 100%
-    );
+  background: color-mix(in oklab, var(--color-background) 90%, var(--color-foreground) 10%);
 }
 
 .fd-tokendocs-groupToggle[data-expanded="true"]::before {
-  background: color-mix(in oklab, var(--color-primary) 82%, var(--color-background));
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-primary) 22%, transparent);
+  background: color-mix(in oklab, var(--color-muted-foreground) 36%, var(--color-background));
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-border) 72%, transparent);
 }
 
 .fd-tokendocs-groupToggle:hover {
-  background: color-mix(in oklab, var(--color-surface-muted) 58%, transparent);
+  background: color-mix(in oklab, var(--color-background) 86%, var(--color-foreground) 14%);
+}
+
+.fd-tokendocs-groupToggle[data-expanded="true"]:hover {
+  background: color-mix(in oklab, var(--color-background) 84%, var(--color-foreground) 16%);
 }
 
 .fd-tokendocs-groupToggle:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ring) 44%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--color-foreground) 18%, transparent);
+  outline-offset: -2px;
+  box-shadow: none;
 }
 
 .fd-tokendocs-groupLabel {
@@ -318,7 +315,7 @@
   align-items: center;
   column-gap: 0.74rem;
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 68%, var(--color-background));
+  background: color-mix(in oklab, var(--color-background) 90%, var(--color-foreground) 10%);
   padding: 0.56rem 0.78rem;
 }
 
@@ -356,10 +353,6 @@
   transform: translateY(0);
 }
 
-.fd-tokendocs-group[data-expanded="true"] .fd-tokendocs-row:first-child {
-  border-top: 1px solid color-mix(in oklab, var(--color-primary) 24%, transparent);
-}
-
 .fd-tokendocs-row:nth-child(even) {
   background: color-mix(in oklab, var(--color-surface-muted) 26%, transparent);
 }
@@ -373,32 +366,37 @@
 }
 
 .fd-tokendocs-cell {
-  position: relative;
   display: flex;
   min-width: 0;
   align-items: flex-start;
-  gap: 0.42rem;
-  padding-right: 4rem;
+  gap: 0;
 }
 
 .fd-tokendocs-cell.is-right {
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.fd-tokendocs-cell.is-right .fd-tokendocs-cellBody {
-  display: flex;
-  justify-content: flex-end;
   text-align: right;
 }
 
 .fd-tokendocs-cellBody {
   min-width: 0;
-  flex: 1;
+  flex: 0 1 auto;
+  max-width: 100%;
 }
 
 .fd-tokendocs-cellBody.is-wrap {
   white-space: normal;
+}
+
+.fd-tokendocs-cellValueCluster {
+  display: inline-flex;
+  min-width: 0;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.52rem;
+}
+
+.fd-tokendocs-cellValueCluster.is-right {
+  justify-content: flex-end;
 }
 
 .fd-tokendocs-path {
@@ -451,28 +449,33 @@
 }
 
 .fd-tokendocs-copy {
-  width: 3.6rem;
-  min-width: 3.6rem;
-  max-width: 3.6rem;
-  padding: 0.14rem 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  min-width: 0;
+  padding: 0.14rem 0;
   text-align: center;
   font-weight: 650;
   color: var(--color-muted-foreground);
-  position: absolute;
-  top: 50%;
-  right: 0.2rem;
-  transform: translateY(-50%);
-  border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+  flex-shrink: 0;
+  border: 1px solid transparent;
   border-radius: 999px;
   background: color-mix(in oklab, var(--color-surface-muted) 76%, var(--color-background));
   font-size: 0.64rem;
   line-height: 1.3;
   white-space: nowrap;
+  overflow: hidden;
+  visibility: hidden;
   opacity: 0;
   pointer-events: none;
+  transform: scale(0.96);
   cursor: pointer;
   transition:
+    width 120ms ease,
+    padding 120ms ease,
     opacity 120ms ease,
+    transform 120ms ease,
     color 120ms ease,
     border-color 120ms ease,
     background-color 120ms ease;
@@ -483,14 +486,26 @@
   background: color-mix(in oklab, var(--color-surface-muted) 92%, var(--color-background));
 }
 
-.fd-tokendocs-copy:focus-visible,
-.fd-tokendocs-copy[data-state="copied"],
-.fd-tokendocs-copy[data-state="error"],
+.fd-tokendocs-copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-ring) 40%, transparent);
+}
+
 .fd-tokendocs-cell:hover .fd-tokendocs-copy,
 .fd-tokendocs-cell:focus-within .fd-tokendocs-copy,
-.fd-tokendocs-mobileField:focus-within .fd-tokendocs-copy {
+.fd-tokendocs-mobileField:hover .fd-tokendocs-copy,
+.fd-tokendocs-mobileField:focus-within .fd-tokendocs-copy,
+.fd-tokendocs-copy[data-state="copied"],
+.fd-tokendocs-copy[data-state="error"],
+.fd-tokendocs-copy:focus-visible {
+  width: 3.6rem;
+  min-width: 3.6rem;
+  padding: 0.14rem 0.2rem;
+  border-color: color-mix(in oklab, var(--color-border) 88%, transparent);
+  visibility: visible;
   opacity: 1;
   pointer-events: auto;
+  transform: scale(1);
 }
 
 .fd-tokendocs-copy:disabled {
@@ -511,15 +526,14 @@
 
 @media (max-width: 767px) {
   .fd-tokendocs-copy {
-    position: static;
-    top: auto;
-    right: auto;
-    transform: none;
-    opacity: 1;
-    pointer-events: auto;
     width: 3.6rem;
     min-width: 3.6rem;
-    max-width: 3.6rem;
+    padding: 0.14rem 0.2rem;
+    border-color: color-mix(in oklab, var(--color-border) 88%, transparent);
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
   }
 }
 
@@ -558,14 +572,26 @@
   display: flex;
   min-width: 0;
   align-items: flex-start;
+  gap: 0;
+}
+
+.fd-tokendocs-mobileValueCluster {
+  display: inline-flex;
+  min-width: 0;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
   gap: 0.45rem;
-  position: relative;
-  padding-right: 3.6rem;
+}
+
+.fd-tokendocs-mobileValueCluster.is-right {
+  justify-content: flex-end;
 }
 
 .fd-tokendocs-mobileValueBody {
   min-width: 0;
-  flex: 1;
+  flex: 0 1 auto;
+  max-width: 100%;
 }
 
 .fd-tokendocs-colorMatrix {
@@ -734,22 +760,26 @@
 
 .fd-tokendocs-typoShowcase {
   display: grid;
-  gap: 0.46rem;
+  gap: 0.78rem;
+}
+
+.fd-tokendocs-typoShowcase .fd-tokendocs-showcaseTitle:not(:first-child) {
+  margin-top: 0.22rem;
 }
 
 .fd-tokendocs-typoSpecimens {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 0.4rem;
+  gap: 0.62rem;
 }
 
 .fd-tokendocs-typoCard {
   display: grid;
-  gap: 0.28rem;
+  gap: 0.46rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
   background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
-  padding: 0.48rem;
+  padding: 0.7rem;
 }
 
 .fd-tokendocs-typoSample {
@@ -783,18 +813,18 @@
 
 .fd-tokendocs-typeScaleList {
   display: grid;
-  gap: 0.26rem;
+  gap: 0.42rem;
 }
 
 .fd-tokendocs-typeScaleItem {
   display: grid;
   grid-template-columns: minmax(7.2rem, auto) minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.72rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
   border-radius: 0.52rem;
   background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
-  padding: 0.36rem 0.48rem;
+  padding: 0.52rem 0.66rem;
 }
 
 .fd-tokendocs-typeSample {
@@ -811,14 +841,14 @@
 .fd-tokendocs-weightBand {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: 0.4rem;
+  gap: 0.56rem;
 }
 
 .fd-tokendocs-weightBandCell,
 .fd-tokendocs-weightCell {
   display: grid;
   align-items: center;
-  gap: 0.18rem;
+  gap: 0.3rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
   border-radius: 0.56rem;
   background:
@@ -827,7 +857,7 @@
       color-mix(in oklab, var(--color-background) 96%, var(--color-surface)) 0%,
       color-mix(in oklab, var(--color-surface-muted) 28%, var(--color-background)) 100%
     );
-  padding: 0.4rem 0.42rem;
+  padding: 0.54rem 0.6rem;
 }
 
 .fd-tokendocs-weightCellSample {
@@ -1140,19 +1170,19 @@
 .fd-tokendocs-motionLegendItem {
   display: inline-flex;
   align-items: center;
-  gap: 0.34rem;
+  gap: 0.38rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   border-radius: 999px;
   background: color-mix(in oklab, var(--color-background) 94%, var(--color-surface-muted));
   padding: 0.16rem 0.5rem;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--color-foreground);
 }
 
 .fd-tokendocs-motionLegendItem::before {
   content: "";
-  width: 0.84rem;
-  height: 0.84rem;
+  width: 0.94rem;
+  height: 0.94rem;
   border-radius: 999px;
   border: 1px solid color-mix(in oklab, var(--color-border) 44%, transparent);
 }
@@ -1163,9 +1193,9 @@
 }
 
 .fd-tokendocs-motionLegendItem.is-baseline::before {
-  background: color-mix(in oklab, var(--color-foreground, currentColor) 88%, #000);
-  border-color: transparent;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-foreground, currentColor) 24%, transparent);
+  background: color-mix(in oklab, var(--color-foreground, currentColor) 94%, #000);
+  border-color: color-mix(in oklab, var(--color-background) 74%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-foreground, currentColor) 30%, transparent);
 }
 
 .fd-tokendocs-motionLanes {
@@ -1216,20 +1246,21 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.18rem;
-  height: 1.18rem;
+  width: 1.24rem;
+  height: 1.24rem;
   border-radius: 999px;
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 750;
   letter-spacing: 0.03em;
   border: 1px solid color-mix(in oklab, var(--color-border) 58%, transparent);
   color: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground));
 }
 
 .fd-tokendocs-motionRailRow.is-baseline .fd-tokendocs-motionRailTag {
-  color: color-mix(in oklab, var(--color-background) 16%, var(--color-muted-foreground));
-  background: color-mix(in oklab, var(--color-foreground) 42%, var(--color-background));
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-border) 76%, transparent);
+  color: color-mix(in oklab, var(--color-background) 96%, var(--color-foreground));
+  background: color-mix(in oklab, var(--color-foreground) 88%, var(--color-background));
+  border-color: color-mix(in oklab, var(--color-background) 72%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-foreground) 24%, transparent);
 }
 
 .fd-tokendocs-motionRailRow.is-token .fd-tokendocs-motionRailTag {

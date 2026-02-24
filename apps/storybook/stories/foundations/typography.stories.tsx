@@ -227,6 +227,10 @@ export const Showcase: Story = {
     await expect(canvas.getByRole("heading", { name: "Typography Tokens" })).toBeInTheDocument();
     await expect(canvas.getByText("Type Waterfall")).toBeInTheDocument();
     await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };
 
@@ -245,7 +249,7 @@ export const Reference: Story = {
             gridLabel="typography-grid"
             groups={groups}
             accordion
-            allowCollapseAll
+            allowCollapseAll={false}
             initialOpenGroupId="families"
             columns={[
               {
@@ -303,6 +307,19 @@ export const Reference: Story = {
     await expect(familiesSection).toHaveAttribute("data-expanded", "false");
 
     await userEvent.click(sizesToggle);
+    await expect(sizesSection).toHaveAttribute("data-expanded", "true");
+    await expect(familiesSection).toHaveAttribute("data-expanded", "false");
+
+    const familiesToggle = familiesSection.querySelector(".fd-tokendocs-groupToggle");
+    if (!familiesToggle) {
+      throw new Error("Expected families toggle to exist.");
+    }
+    await userEvent.click(familiesToggle);
+    await expect(familiesSection).toHaveAttribute("data-expanded", "true");
     await expect(sizesSection).toHaveAttribute("data-expanded", "false");
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };

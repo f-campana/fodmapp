@@ -359,19 +359,26 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
             >
               <div
                 className={classNames(
-                  "fd-tokendocs-cellBody",
-                  valueMode === "wrap" && "is-wrap",
+                  "fd-tokendocs-cellValueCluster",
+                  column.align === "right" && "is-right",
                 )}
               >
-                {renderCellValue(column, row)}
+                <div
+                  className={classNames(
+                    "fd-tokendocs-cellBody",
+                    valueMode === "wrap" && "is-wrap",
+                  )}
+                >
+                  {renderCellValue(column, row)}
+                </div>
+                {copyValue ? (
+                  <CopyButton
+                    text={copyValue}
+                    label={`${column.label} ${row.path}`}
+                    disabled={!expanded}
+                  />
+                ) : null}
               </div>
-              {copyValue ? (
-                <CopyButton
-                  text={copyValue}
-                  label={`${column.label} ${row.path}`}
-                  disabled={!expanded}
-                />
-              ) : null}
             </div>
           );
         })}
@@ -409,19 +416,26 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                   <div className="fd-tokendocs-mobileValue">
                     <div
                       className={classNames(
-                        "fd-tokendocs-mobileValueBody",
-                        valueMode === "wrap" && "is-wrap",
+                        "fd-tokendocs-mobileValueCluster",
+                        column.align === "right" && "is-right",
                       )}
                     >
-                      {renderCellValue(column, row)}
+                      <div
+                        className={classNames(
+                          "fd-tokendocs-mobileValueBody",
+                          valueMode === "wrap" && "is-wrap",
+                        )}
+                      >
+                        {renderCellValue(column, row)}
+                      </div>
+                      {copyValue ? (
+                        <CopyButton
+                          text={copyValue}
+                          label={`${column.label} ${row.path}`}
+                          disabled={!expanded}
+                        />
+                      ) : null}
                     </div>
-                    {copyValue ? (
-                      <CopyButton
-                        text={copyValue}
-                        label={`${column.label} ${row.path}`}
-                        disabled={!expanded}
-                      />
-                    ) : null}
                   </div>
                 </div>
               );

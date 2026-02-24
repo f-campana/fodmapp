@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
@@ -281,11 +281,34 @@ export const Showcase: Story = {
     await expect(canvas.getByText("Vertical Stack Rhythm")).toBeInTheDocument();
     await expect(canvas.getByText("Card Lattice Gutter")).toBeInTheDocument();
     await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };
 
 export const Reference: Story = {
   render: () => {
+    const [activeGroup, setActiveGroup] = useState<{
+      gridId: "spacing-grid" | "layout-grid";
+      groupId: string;
+    }>(() => ({
+      gridId: "spacing-grid",
+      groupId: spacingReferenceGroups[0]?.id ?? "spacing",
+    }));
+
+    function setPageActiveGroup(
+      gridId: "spacing-grid" | "layout-grid",
+      groupId: string | null,
+    ) {
+      if (!groupId) {
+        return;
+      }
+
+      setActiveGroup({ gridId, groupId });
+    }
+
     return (
       <TokenDocsPage
         title="Spacing & Layout Token Reference"
@@ -300,7 +323,8 @@ export const Reference: Story = {
             groups={spacingReferenceGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="spacing"
+            openGroupId={activeGroup.gridId === "spacing-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("spacing-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -333,7 +357,8 @@ export const Reference: Story = {
             groups={layoutReferenceGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="radius"
+            openGroupId={activeGroup.gridId === "layout-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("layout-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -392,7 +417,7 @@ export const Reference: Story = {
       throw new Error("Expected layout sections to exist.");
     }
 
-    await expect(radiusSection).toHaveAttribute("data-expanded", "true");
+    await expect(radiusSection).toHaveAttribute("data-expanded", "false");
     await expect(borderWidthSection).toHaveAttribute("data-expanded", "false");
 
     const borderWidthToggle = borderWidthSection.querySelector(
@@ -404,7 +429,7 @@ export const Reference: Story = {
 
     await userEvent.click(borderWidthToggle);
     await expect(borderWidthSection).toHaveAttribute("data-expanded", "true");
-    await expect(radiusSection).toHaveAttribute("data-expanded", "false");
+    await expect(spacingSection).toHaveAttribute("data-expanded", "false");
 
     const borderWidthCopy = borderWidthSection.querySelector(
       ".fd-tokendocs-copy",
@@ -415,7 +440,21 @@ export const Reference: Story = {
     await expect(borderWidthCopy).toBeEnabled();
 
     await userEvent.click(borderWidthToggle);
+    await expect(borderWidthSection).toHaveAttribute("data-expanded", "true");
+    await expect(borderWidthCopy).toBeEnabled();
+
+    const spacingToggle = spacingSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    ) as HTMLButtonElement | null;
+    if (!spacingToggle) {
+      throw new Error("Expected spacing toggle to exist.");
+    }
+    await userEvent.click(spacingToggle);
+    await expect(spacingSection).toHaveAttribute("data-expanded", "true");
     await expect(borderWidthSection).toHaveAttribute("data-expanded", "false");
-    await expect(borderWidthCopy).toBeDisabled();
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };

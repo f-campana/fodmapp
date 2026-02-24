@@ -336,11 +336,11 @@ function createInlineSwatch(value: string): ReactNode {
 
 function makeJumpLinkHandler(
   groupId: string,
-  setGroupId: (value: string | null) => void,
   prefix: string,
+  onActivateGroup: (groupId: string) => void,
 ) {
   return () => {
-    setGroupId(groupId);
+    onActivateGroup(groupId);
     if (typeof document === "undefined") {
       return;
     }
@@ -566,17 +566,33 @@ export const Showcase: Story = {
       throw new Error("Expected at least one token section.");
     }
     await expect(getComputedStyle(section).backgroundImage).not.toBe("none");
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };
 
 export const Reference: Story = {
   render: () => {
-    const [baseOpenGroupId, setBaseOpenGroupId] = useState<string | null>(
-      baseColorGroups[0]?.id ?? "neutral",
-    );
-    const [semanticOpenGroupId, setSemanticOpenGroupId] = useState<string | null>(
-      semanticColorGroups[0]?.id ?? "action",
-    );
+    const [activeGroup, setActiveGroup] = useState<{
+      gridId: "base-color-grid" | "semantic-color-grid";
+      groupId: string;
+    }>(() => ({
+      gridId: "base-color-grid",
+      groupId: baseColorGroups[0]?.id ?? "neutral",
+    }));
+
+    function setPageActiveGroup(
+      gridId: "base-color-grid" | "semantic-color-grid",
+      groupId: string | null,
+    ) {
+      if (!groupId) {
+        return;
+      }
+
+      setActiveGroup({ gridId, groupId });
+    }
 
     return (
       <TokenDocsPage
@@ -594,7 +610,9 @@ export const Reference: Story = {
                 key={`base-${group.id}`}
                 className="fd-tokendocs-jumpLink"
                 onClick={() =>
-                  makeJumpLinkHandler(group.id, setBaseOpenGroupId, "base-color-grid")()
+                  makeJumpLinkHandler(group.id, "base-color-grid", (nextGroupId) =>
+                    setPageActiveGroup("base-color-grid", nextGroupId),
+                  )()
                 }
                 type="button"
               >
@@ -608,9 +626,8 @@ export const Reference: Story = {
             groups={baseColorGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="neutral"
-            openGroupId={baseOpenGroupId}
-            onOpenGroupChange={setBaseOpenGroupId}
+            openGroupId={activeGroup.gridId === "base-color-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("base-color-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -646,7 +663,9 @@ export const Reference: Story = {
                 key={`semantic-${group.id}`}
                 className="fd-tokendocs-jumpLink"
                 onClick={() =>
-                  makeJumpLinkHandler(group.id, setSemanticOpenGroupId, "semantic-color-grid")()
+                  makeJumpLinkHandler(group.id, "semantic-color-grid", (nextGroupId) =>
+                    setPageActiveGroup("semantic-color-grid", nextGroupId),
+                  )()
                 }
                 type="button"
               >
@@ -660,9 +679,8 @@ export const Reference: Story = {
             groups={semanticColorGroups}
             accordion
             allowCollapseAll
-            initialOpenGroupId="action"
-            openGroupId={semanticOpenGroupId}
-            onOpenGroupChange={setSemanticOpenGroupId}
+            openGroupId={activeGroup.gridId === "semantic-color-grid" ? activeGroup.groupId : null}
+            onOpenGroupChange={(groupId) => setPageActiveGroup("semantic-color-grid", groupId)}
             columns={[
               {
                 key: "path",
@@ -704,55 +722,79 @@ export const Reference: Story = {
     await expect(canvas.getByRole("heading", { name: "Color Token Reference" })).toBeInTheDocument();
     await expect(canvas.getByText("Base Color References")).toBeInTheDocument();
 
-    const initiallyOpenBaseGroup =
-      baseColorGroups.find((group) => !group.defaultCollapsed) ?? baseColorGroups[0];
-    const targetBaseGroup =
-      baseColorGroups.find((group) => group.id !== initiallyOpenBaseGroup?.id) ??
-      initiallyOpenBaseGroup;
+    const canonicalBaseGroup = baseColorGroups[0];
+    const canonicalSemanticGroup = semanticColorGroups[0];
 
-    if (!initiallyOpenBaseGroup || !targetBaseGroup) {
-      throw new Error("Expected base color groups to be present.");
+    if (!canonicalBaseGroup || !canonicalSemanticGroup) {
+      throw new Error("Expected base and semantic color groups to be present.");
     }
 
     const initialSection = canvasElement.querySelector(
-      `#base-color-grid-${initiallyOpenBaseGroup.id}`,
+      `#base-color-grid-${canonicalBaseGroup.id}`,
     );
-    const targetSection = canvasElement.querySelector(`#base-color-grid-${targetBaseGroup.id}`);
-    if (!initialSection || !targetSection) {
-      throw new Error("Expected base color sections to be present.");
+    const semanticSection = canvasElement.querySelector(
+      `#semantic-color-grid-${canonicalSemanticGroup.id}`,
+    );
+    if (!initialSection || !semanticSection) {
+      throw new Error("Expected canonical base and semantic sections to be present.");
     }
 
     await expect(initialSection).toHaveAttribute("data-expanded", "true");
-    if (targetBaseGroup.id !== initiallyOpenBaseGroup.id) {
-      await expect(targetSection).toHaveAttribute("data-expanded", "false");
-    }
+    await expect(semanticSection).toHaveAttribute("data-expanded", "false");
 
-    const baseJumpNav = canvas.getByRole("navigation", { name: "Base color group jump links" });
-    const jumpButton = within(baseJumpNav).getByRole("button", {
-      name: targetBaseGroup.label,
+    const semanticJumpNav = canvas.getByRole("navigation", {
+      name: "Semantic color group jump links",
     });
-    await userEvent.click(jumpButton);
+    const openSemanticButton = within(semanticJumpNav).getByRole("button", {
+      name: canonicalSemanticGroup.label,
+    });
+    await userEvent.click(openSemanticButton);
 
-    await expect(targetSection).toHaveAttribute("data-expanded", "true");
-    if (targetBaseGroup.id !== initiallyOpenBaseGroup.id) {
-      await expect(initialSection).toHaveAttribute("data-expanded", "false");
-    }
+    await expect(semanticSection).toHaveAttribute("data-expanded", "true");
+    await expect(initialSection).toHaveAttribute("data-expanded", "false");
 
-    const targetCopy = targetSection.querySelector(".fd-tokendocs-copy") as HTMLButtonElement | null;
-    if (!targetCopy) {
-      throw new Error("Expected target group copy button to exist.");
-    }
-    await expect(targetCopy).toBeEnabled();
-
-    const targetToggle = targetSection.querySelector(
+    const semanticToggle = semanticSection.querySelector(
       ".fd-tokendocs-groupToggle",
     ) as HTMLButtonElement | null;
-    if (!targetToggle) {
-      throw new Error("Expected target group toggle to exist.");
+    if (!semanticToggle) {
+      throw new Error("Expected semantic group toggle to exist.");
     }
-    await userEvent.click(targetToggle);
-    await expect(targetSection).toHaveAttribute("data-expanded", "false");
-    await expect(targetCopy).toBeDisabled();
+    await userEvent.click(semanticToggle);
+    await expect(semanticSection).toHaveAttribute("data-expanded", "true");
+    await expect(initialSection).toHaveAttribute("data-expanded", "false");
+
+    const baseJumpNav = canvas.getByRole("navigation", { name: "Base color group jump links" });
+    const restoreBaseButton = within(baseJumpNav).getByRole("button", {
+      name: canonicalBaseGroup.label,
+    });
+    await userEvent.click(restoreBaseButton);
+
+    await expect(initialSection).toHaveAttribute("data-expanded", "true");
+    await expect(semanticSection).toHaveAttribute("data-expanded", "false");
+
+    const canonicalValueCluster = initialSection.querySelector(
+      ".fd-tokendocs-row .fd-tokendocs-cellValueCluster",
+    );
+    const canonicalCopy = canonicalValueCluster?.querySelector(
+      ".fd-tokendocs-copy",
+    ) as HTMLButtonElement | null;
+    if (!canonicalValueCluster || !canonicalCopy) {
+      throw new Error("Expected canonical value cluster and copy button to exist.");
+    }
+    await expect(canonicalCopy).toBeEnabled();
+    await expect(Number.parseFloat(getComputedStyle(canonicalCopy).opacity)).toBeLessThan(0.25);
+
+    const canonicalPathCopy = initialSection.querySelector(
+      ".fd-tokendocs-cell .fd-tokendocs-copy",
+    ) as HTMLButtonElement | null;
+    if (!canonicalPathCopy) {
+      throw new Error("Expected canonical path copy button to exist.");
+    }
+    await expect(canonicalPathCopy).toBeEnabled();
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   },
 };
 
