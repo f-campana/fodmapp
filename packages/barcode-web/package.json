@@ -1,0 +1,36 @@
+{
+  "name": "@fodmap/barcode-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": "^19.2.4"
+  },
+  "dependencies": {
+    "@fodmap/barcode-core": "workspace:*",
+    "@fodmap/ui": "workspace:*"
+  },
+  "scripts": {
+    "pretypecheck": "pnpm --filter @fodmap/ui build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "pnpm --filter @fodmap/ui build",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "jsdom": "28.1.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}

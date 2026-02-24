@@ -16,6 +16,7 @@
     "storybook:test": "start-server-and-test \"pnpm storybook:serve\" http://127.0.0.1:6006 \"test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\""
   },
   "dependencies": {
+    "@fodmap/barcode-web": "workspace:*",
     "@fodmap/design-tokens": "workspace:*",
     "@fodmap/ui": "workspace:*",
     "react": "19.2.4",
