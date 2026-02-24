@@ -400,6 +400,74 @@ Execution notes:
   - non-lactose found floor `>= 6`
   - targeted proof: rank `9` and rank `32` each gain at least one non-lactose subtype
 
+## 3.6c Coverage Uplift Batch C (Research-First, Early Human Gate)
+
+Scope lock (remaining 8 foods at `1/6`):
+
+- rank `3` `phase2-ail-infuse-huile`
+- rank `6` `phase2-oignon-poudre`
+- rank `8` `phase2-oignon-nouveau-tiges-vertes`
+- rank `10` `phase2-poireau-partie-blanche-crue`
+- rank `13` `phase2-farine-ble-t80`
+- rank `17` `phase2-racine-chicoree`
+- rank `27` `phase2-soja-graine-entiere-cuite`
+- rank `28` `phase2-noix-cajou-crue`
+
+Artifacts:
+
+- research matrix:
+  - `etl/phase3/research/phase3_coverage_batchC_matrix_v1.csv`
+- research report:
+  - `etl/phase3/research/phase3_coverage_batchC_report_v1.md`
+- evidence ledger:
+  - `etl/phase3/research/phase3_coverage_batchC_evidence_ledger_v1.csv`
+- CIQUAL candidate log:
+  - `etl/phase3/research/phase3_coverage_batchC_ciqual_candidates_v1.csv`
+- curated ingestion input:
+  - `etl/phase3/data/phase3_coverage_batchC_measurements_v1.csv`
+- SQL flow:
+  - `phase3_coverage_batchC_apply.sql`
+  - `phase3_rollups_compute.sql`
+  - `phase3_rollups_6subtype_checks.sql`
+  - `phase3_coverage_batchC_checks.sql`
+  - `phase3_swap_rules_batch04_feasibility_probe.sql` (non-mutating)
+
+Locked Batch C research protocol:
+
+1. Pass 1 lactose-zero inference for all 8 foods (`expert_estimate`, `inferred`, confidence `>=0.95`).
+2. Pass 1b rank-3 special rule (`phase2-ail-infuse-huile`):
+   - missing non-lactose subtypes must be inferred near-zero, not blocked.
+   - notes marker: `coverage_batchC_v1:garlic_oil_fodmap_zero_inference`.
+3. Pass 2 bibliography pass before blocking (`monash_app_v4_reference`, `muir_2007_fructan`, `biesiekierski_2011_fructan`, `yao_2005_polyols`, `dysseler_hoffem_gos`).
+4. Pass 3 strict-match CIQUAL derivation only (identity + prep compatible).
+5. Pass 4 blocked taxonomy only:
+   - `no_literature_numeric_value`
+   - `no_strict_ciqual_match`
+   - `strict_match_rejected_prep_mismatch`
+   - `insufficient_fructose_glucose_pair`
+   - `evidence_conflict_not_promotable`
+   - forbidden: `insufficient_variant_specific_evidence`
+
+Mandatory stop gate (before ingestion):
+
+- stop after research artifacts + measurements draft
+- human checkpoint must confirm:
+  - `non_lactose_found >= 12` (hard minimum)
+  - target `non_lactose_found >= 15` (otherwise explicit justification required)
+  - rank 3 has no blocked missing subtype rows
+  - no generic blocked token
+  - all blocked rows have traceable notes
+
+Batch C SQL checks enforce post-ingestion:
+
+- matrix count `40` (`8 x 5`)
+- each target reaches `known_subtypes_count >= 2`
+- global `known_subtypes_count=1` bucket must be `0`
+- non-lactose found floor `>= 8`
+- targeted proof: rank `10` and rank `13` each gain at least one non-lactose subtype
+- rank `3` has zero blocked missing subtype rows
+- low-coverage target rows across batch01+batch02+batch03 remain `<= 12`
+
 ## 3.2b.1 CI Seeded Integration Pipeline
 
 CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:

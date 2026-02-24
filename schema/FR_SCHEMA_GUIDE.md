@@ -1337,6 +1337,69 @@ Batch03 review/activation rules:
   - `approve -> active`
   - `reject|defer -> draft`
 
+### 11.12 Coverage uplift Batch C (Phase 3.6c)
+
+Coverage uplift Batch C is research-first and scoped to the final eight foods that remained at `1/6`:
+
+- `3` `phase2-ail-infuse-huile`
+- `6` `phase2-oignon-poudre`
+- `8` `phase2-oignon-nouveau-tiges-vertes`
+- `10` `phase2-poireau-partie-blanche-crue`
+- `13` `phase2-farine-ble-t80`
+- `17` `phase2-racine-chicoree`
+- `27` `phase2-soja-graine-entiere-cuite`
+- `28` `phase2-noix-cajou-crue`
+
+Artifacts:
+
+- research matrix:
+  - `etl/phase3/research/phase3_coverage_batchC_matrix_v1.csv`
+- research report:
+  - `etl/phase3/research/phase3_coverage_batchC_report_v1.md`
+- evidence ledger:
+  - `etl/phase3/research/phase3_coverage_batchC_evidence_ledger_v1.csv`
+- CIQUAL candidate log:
+  - `etl/phase3/research/phase3_coverage_batchC_ciqual_candidates_v1.csv`
+- measurements input:
+  - `etl/phase3/data/phase3_coverage_batchC_measurements_v1.csv`
+- SQL flow:
+  - `phase3_coverage_batchC_apply.sql`
+  - `phase3_rollups_compute.sql`
+  - `phase3_rollups_6subtype_checks.sql`
+  - `phase3_coverage_batchC_checks.sql`
+  - `phase3_swap_rules_batch04_feasibility_probe.sql` (non-mutating)
+
+Locked research protocol:
+
+1. plant lactose-zero inference for all 8 targets
+2. rank-3 special case (`phase2-ail-infuse-huile`): missing non-lactose subtypes must be inferred near-zero and cannot remain blocked
+3. bibliography pass before blocking (`monash_app_v4_reference`, `muir_2007_fructan`, `biesiekierski_2011_fructan`, `yao_2005_polyols`, `dysseler_hoffem_gos`)
+4. strict-match CIQUAL derivation only
+5. blocked taxonomy only (`no_literature_numeric_value`, `no_strict_ciqual_match`, `strict_match_rejected_prep_mismatch`, `insufficient_fructose_glucose_pair`, `evidence_conflict_not_promotable`)
+6. forbidden blocked token: `insufficient_variant_specific_evidence`
+
+Pre-ingestion human checkpoint (mandatory):
+
+- stop before `phase3_coverage_batchC_apply.sql`
+- review matrix/report/ledger/candidates/measurements draft
+- acceptance:
+  - `non_lactose_found >= 12` hard minimum
+  - `non_lactose_found >= 15` target (else explicit justification)
+  - rank 3 has zero blocked missing subtype cells
+  - no generic blocked reasons
+  - blocked rows include traceable notes
+
+Post-ingestion checks contract:
+
+- matrix rows `= 40`
+- measurements found count parity across matrix/CSV/DB
+- inserted rows resolve to `signal_source_kind='explicit_measurement'`
+- every target reaches `known_subtypes_count >= 2`
+- global `known_subtypes_count=1` bucket must be `0`
+- non-lactose found floor `>= 8`
+- rank `10` and rank `13` each gain at least one non-lactose subtype
+- low-coverage target rows in batch01+batch02+batch03 remain `<= 12`
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):

@@ -1,0 +1,10 @@
+priority_rank,food_slug,candidate_ciqual_code,candidate_food_slug,candidate_prep_class,target_prep_class,match_decision,match_reason,nutrient_32210,nutrient_32250,nutrient_34000,nutrient_32410,notes
+3,phase2-ail-infuse-huile,,garlic-infused-oil-strained,oil_infusion,oil_infusion,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL food entry; handled by locked garlic-oil special inference"
+6,phase2-oignon-poudre,,oignon-en-poudre,powder,powder,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL nutrient row confirmed for onion powder in current extraction"
+8,phase2-oignon-nouveau-tiges-vertes,,cebette-vert,raw_green_tops,raw_green_tops,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL nutrient row confirmed for spring onion green tops"
+10,phase2-poireau-partie-blanche-crue,,poireau-partie-blanche-crue,raw,raw,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL nutrient row confirmed for leek white part raw"
+13,phase2-farine-ble-t80,9434,farine-de-ble-type-80,processed_flour,processed_flour,accept,strict_match_pass,<0.1,0.1,0,<0.1,"strict-match candidate accepted for excess-fructose + polyol/lactose derivations"
+17,phase2-racine-chicoree,,racine-de-chicoree-crue,raw,raw,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL nutrient row confirmed for chicory root"
+27,phase2-soja-graine-entiere-cuite,,soja-graine-cuite,cooked,cooked,reject,no_strict_ciqual_match,,,,,"no strict CIQUAL nutrient row confirmed for whole cooked soybean"
+28,phase2-noix-cajou-crue,15009,noix-de-cajou-grillees-salees,roasted,raw,reject,strict_match_rejected_prep_mismatch,0.2,0.2,,0,"roasted cashew candidate rejected for raw target"
+28,phase2-noix-cajou-crue,15044,noix-de-cajou-grillees-sans-sel,roasted,raw,reject,strict_match_rejected_prep_mismatch,0.2,0.2,,0,"roasted cashew candidate rejected for raw target"
