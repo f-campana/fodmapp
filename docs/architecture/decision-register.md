@@ -23,10 +23,11 @@ Status definitions:
 | ADR-009 | Neon branch policy (`main` prod, `staging`, `pr-*`) | Planned | Not wired yet |
 | ADR-010 | Next.js app + Astro marketing/research split | Planned | No app scaffolds merged yet |
 | ADR-011 | Clerk (EU), Sentry, Plausible, Axeptio as cross-cutting frontend stack | Planned | To be wired during app skeleton phase |
-| ADR-012 | Start UI library from shadcn/ui primitives and iterate | Accepted | Implementation currently in isolated PR-2 worktree |
-| ADR-013 | Tailwind v4 strategy uses both `design-tokens` and Tailwind shared package | Accepted | `design-tokens` as source of truth; Tailwind package as adapter |
-| ADR-014 | Keep strict second-review policy (no waiver) | Accepted | Data safety policy retained |
+| ADR-012 | Start UI library from shadcn/ui primitives and iterate | Implemented | `packages/ui` + Storybook foundations are merged on `main` |
+| ADR-013 | Tailwind v4 strategy uses both `design-tokens` and Tailwind shared package | Implemented | `design-tokens` and `tailwind-config` packages are merged and consumed |
+| ADR-014 | Keep strict second-review policy (no waiver) | Implemented | Enforced by batch activation SQL checks; deferred queue tracked in issue #26 |
 | ADR-015 | Architecture track should avoid collisions with data-engine track | Accepted | Worktree isolation and scoped PRs |
+| ADR-016 | Data-engine pause after Batch C due second-review bottleneck | Implemented | Batch04 probe shows 0 single-review candidates; issue #26 remains sole open blocker |
 
 ## Open Timing Decisions
 

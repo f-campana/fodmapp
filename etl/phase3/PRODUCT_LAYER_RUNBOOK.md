@@ -4,18 +4,35 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 
 ## Scope
 
-Phase 3.0/3.1a/3.1b/3.2a/3.3 includes:
+Phase 3.0/3.1a/3.1b/3.2a/3.3/3.4/3.6/3.7 includes:
 - culinary trait curation for priority ranks `1..42`
 - full 6-subtype source-scoped rollups in `food_fodmap_rollups`
 - latest rollup interfaces with coverage metadata
 - initial 12 swap rules with contexts and scores
 - 3.1b re-scoring and activation workflow (`draft` -> reviewed subset `active`)
-- 3.3 systematic batch expansion workflow (`phase3_batch01_rule`)
+- 3.3/3.4/3.7 systematic batch expansion workflows (`phase3_batch01_rule`, `phase3_batch02_rule`, `phase3_batch03_rule`)
+- 3.6a/3.6b/3.6c research-led coverage uplift workflows
+- Batch04 feasibility probe (non-mutating) for post-uplift candidate diagnostics
 - 3.2a read-only FastAPI v0 endpoints using slug-based contracts
 
 Out of scope:
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
+
+## Current Canonical State (Post Batch C Closeout)
+
+- Swap rules:
+  - `phase3_mvp_rule`: 11 active / 1 draft
+  - `phase3_batch01_rule`: 7 active / 32 draft
+  - `phase3_batch02_rule`: 9 active / 31 draft
+  - `phase3_batch03_rule`: 3 active / 11 draft
+  - total: 30 active / 75 draft
+- Deferred queue blocked on second reviewer:
+  - 56 rows (issue #26)
+- Coverage:
+  - global `known_subtypes_count=1` bucket = 0
+- Batch04 probe:
+  - 10 candidates, 10 second-review required, 0 single-review eligible
 
 ## Artifacts
 
@@ -29,9 +46,16 @@ Data files:
 - `etl/phase3/data/phase3_swap_rules_mvp_v1.csv`
 - `etl/phase3/data/phase3_food_allergen_families_v1.csv`
 - `etl/phase3/data/phase3_swap_rules_batch01_generated_v1.csv`
+- `etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
+- `etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
+- `etl/phase3/data/phase3_coverage_batchA_measurements_v1.csv`
+- `etl/phase3/data/phase3_coverage_batchB_measurements_v1.csv`
+- `etl/phase3/data/phase3_coverage_batchC_measurements_v1.csv`
 - `etl/phase3/data/phase3_rollup_default_thresholds_v1.csv`
 - `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
 - `etl/phase3/decisions/phase3_swap_batch01_review_v1.csv`
+- `etl/phase3/decisions/phase3_swap_batch02_review_v1.csv`
+- `etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
 
 SQL files:
 - `etl/phase3/sql/phase3_traits_apply.sql`
@@ -45,6 +69,23 @@ SQL files:
 - `etl/phase3/sql/phase3_swap_rules_batch01_rescore.sql`
 - `etl/phase3/sql/phase3_swap_rules_batch01_activation_apply.sql`
 - `etl/phase3/sql/phase3_swap_rules_batch01_checks.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch02_generate.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch02_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch02_rescore.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch02_activation_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch02_checks.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch03_generate.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch03_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch03_rescore.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch03_activation_apply.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch03_checks.sql`
+- `etl/phase3/sql/phase3_coverage_batchA_apply.sql`
+- `etl/phase3/sql/phase3_coverage_batchA_checks.sql`
+- `etl/phase3/sql/phase3_coverage_batchB_apply.sql`
+- `etl/phase3/sql/phase3_coverage_batchB_checks.sql`
+- `etl/phase3/sql/phase3_coverage_batchC_apply.sql`
+- `etl/phase3/sql/phase3_coverage_batchC_checks.sql`
+- `etl/phase3/sql/phase3_swap_rules_batch04_feasibility_probe.sql`
 - `etl/phase3/sql/phase3_mvp_checks.sql`
 - `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 - `etl/phase3/scripts/phase3_swap_batch01_draft_instructions.py`
@@ -402,7 +443,7 @@ Execution notes:
 
 ## 3.6c Coverage Uplift Batch C (Research-First, Early Human Gate)
 
-Scope lock (remaining 8 foods at `1/6`):
+Scope lock (the final 8 foods that were at `1/6` pre-Batch C):
 
 - rank `3` `phase2-ail-infuse-huile`
 - rank `6` `phase2-oignon-poudre`

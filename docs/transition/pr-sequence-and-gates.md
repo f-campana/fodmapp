@@ -1,42 +1,47 @@
 # PR Sequence And Gates
 
-This sequence reflects current discussions and the need to keep architecture work isolated from ongoing data-engine delivery.
+This document tracks what is already landed and what remains as the next gated options.
 
 ## Track Principle
 
-- Use dedicated worktrees.
+- Use dedicated worktrees for concurrent tracks.
 - Keep PRs narrow and reversible.
-- Avoid ETL/schema/API behavior changes in frontend foundation PRs.
+- Avoid ETL/schema/API behavior changes in frontend foundation PRs unless explicitly intended.
 
-## Recommended Next Architecture Sequence
+## Completed Sequence (Merged)
 
-1. PR-2: Shared UI Foundation + Storybook (isolated)
-- Scope: `packages/ui`, `apps/storybook`, workspace/CI wiring for UI checks.
-- Gate: build/typecheck/unit+a11y/storybook checks green.
+1. Path portability + health readiness landed.
+2. Monorepo bootstrap + OpenAPI type contract + stale-check landed.
+3. UI foundation/token track landed (`packages/ui`, `packages/design-tokens`, `packages/tailwind-config`, `apps/storybook`).
+4. Data-engine coverage and swap expansion landed through Batch C closeout:
+   - PR #30, #31, #32, #51.
 
-2. PR-3: Token Package + Tailwind Shared Package Finalization
-- Scope: establish `packages/design-tokens` and `packages/tailwind-config` contracts and consumption by `packages/ui`.
-- Gate: deterministic token build outputs + UI consumes semantic tokens only.
+## Current Gate State
 
-3. PR-4: App Skeleton(s) That Consume UI And Types
-- Scope: start with one real app shell (likely `apps/app`) using `@fodmap/ui` and `@fodmap/types`.
-- Gate: public SSR route stubs + gated area stubs + i18n/monitoring/auth placeholders compile.
+- Data-engine expansion is currently constrained by second-review availability:
+  - deferred rows: 56 (issue #26)
+  - Batch04 feasibility after Batch C: 10 candidates, 0 single-review eligible
+- No next sprint is locked in this document; planning is intentionally paused.
 
-4. PR-5: DB Migration Track Introduction (`dbmate`) when first schema change is needed
-- Scope: migration baseline + CI smoke apply.
-- Gate: fresh DB migration apply success, canonical schema sync policy documented.
+## Next Options (When Planning Resumes)
 
-5. PR-6: Rollup Publish/Swap Hardening before user-facing traffic
-- Scope: replace drop/recreate refresh with publish/swap pattern.
-- Gate: no API contract break; rollup refresh remains atomic.
+1. Reviewer-unblock path (non-code + activation pass)
+- Scope: resolve issue #26 by completing required second reviews and running batch activation checks.
+- Gate: deferred approvals activate cleanly with snapshot and second-review invariants.
 
-## Notes On Timing
+2. Product/frontend path (with current 30 active rules)
+- Scope: start first app shell/flow consuming `@fodmap/types` and API v0.
+- Gate: agreed first persona + flow spec; route-level integration tests green.
 
-- If a schema-affecting architecture change appears before PR-4, move migration tooling earlier.
-- If frontend product timeline accelerates, PR-3 and PR-4 can be combined as one sprint.
-- Keep data-engine milestones independent; do not block them on frontend scaffolding.
+3. Platform hardening path
+- Scope: rollup publish/swap hardening (`phase3_rollups_compute.sql`) before user-facing traffic.
+- Gate: atomic refresh behavior with no API contract break.
 
-## Merge Gate Checklist (Every Architecture PR)
+4. Migration path (`dbmate`) on first schema-change sprint
+- Scope: migration baseline + CI migration smoke apply.
+- Gate: fresh DB migration apply success; canonical schema sync policy documented.
+
+## Merge Gate Checklist (Default)
 
 - `./.github/scripts/quality-gate.sh`
 - Relevant workspace checks (`pnpm` build/typecheck/test for changed packages)
