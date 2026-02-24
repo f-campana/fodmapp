@@ -1400,6 +1400,24 @@ Post-ingestion checks contract:
 - rank `10` and rank `13` each gain at least one non-lactose subtype
 - low-coverage target rows in batch01+batch02+batch03 remain `<= 12`
 
+Observed closeout outcomes (post PR #51 merge):
+
+- global `known_subtypes_count=1` bucket is `0`
+- target outcomes:
+  - rank `3` -> `6/6`
+  - rank `6` -> `5/6`
+  - rank `8` -> `5/6`
+  - rank `10` -> `5/6`
+  - rank `13` -> `5/6`
+  - rank `17` -> `3/6`
+  - rank `27` -> `5/6`
+  - rank `28` -> `4/6`
+- Batch04 feasibility probe (`phase3_swap_rules_batch04_feasibility_probe.sql`) yields:
+  - `10` candidate rows
+  - `10` second-review-required rows
+  - `0` single-review-eligible rows
+- blocker state remains external and is tracked in issue `#26` (second reviewer required for deferred activation).
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
