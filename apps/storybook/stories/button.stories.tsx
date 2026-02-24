@@ -27,6 +27,10 @@ export const Primary: Story = {
     const button = canvas.getByRole("button", { name: "Appliquer" });
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalled();
+    await expect(button.className).toContain("hover:bg-primary-hover");
+    await expect(button.className).toContain("focus-visible:ring-ring-soft");
+    await expect(button.className).not.toContain("hover:bg-primary/90");
+    await expect(button.className).not.toContain("focus-visible:ring-ring/50");
   },
 };
 
@@ -34,6 +38,12 @@ export const Secondary: Story = {
   args: {
     variant: "secondary",
     children: "Comparer",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button", { name: "Comparer" });
+    await expect(button.className).toContain("hover:bg-secondary-hover");
+    await expect(button.className).not.toContain("hover:bg-secondary/80");
   },
 };
 
@@ -48,6 +58,12 @@ export const Destructive: Story = {
   args: {
     variant: "destructive",
     children: "Supprimer",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button", { name: "Supprimer" });
+    await expect(button.className).toContain("hover:bg-destructive-hover");
+    await expect(button.className).not.toContain("hover:bg-destructive/90");
   },
 };
 

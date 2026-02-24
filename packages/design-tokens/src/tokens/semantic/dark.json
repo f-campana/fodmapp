@@ -21,7 +21,8 @@
         "strong": { "$value": "{base.color.neutral.500}", "$type": "color" }
       },
       "focus": {
-        "ring": { "$value": "{base.color.brand.ringDark}", "$type": "color" }
+        "ring": { "$value": "{base.color.brand.ringDark}", "$type": "color" },
+        "ringSoft": { "$value": "{base.color.brand.ringSoftDark}", "$type": "color" }
       },
       "action": {
         "primary": {
@@ -33,6 +34,11 @@
           "bg": { "$value": "{base.color.neutral.700}", "$type": "color" },
           "bgHover": { "$value": "{base.color.neutral.600}", "$type": "color" },
           "fg": { "$value": "{base.color.neutral.50}", "$type": "color" }
+        },
+        "destructive": {
+          "bg": { "$value": "{base.color.brand.dangerDark}", "$type": "color" },
+          "bgHover": { "$value": "{base.color.brand.dangerStrongDark}", "$type": "color" },
+          "fg": { "$value": "{base.color.brand.dangerForegroundDark}", "$type": "color" }
         }
       },
       "status": {
