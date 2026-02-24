@@ -26,6 +26,9 @@ importers:
 
   apps/storybook:
     dependencies:
+      '@fodmap/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@fodmap/ui':
         specifier: workspace:*
         version: link:../../packages/ui

@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap");
 @import "@fodmap/tailwind-config/shared-styles.css";
 @source "../**/*.{ts,tsx}";
-@source "../../../apps/storybook/stories/**/*.{ts,tsx}";
+@source "../../../../apps/storybook/stories/**/*.{ts,tsx}";
 
 @layer base {
   * {
