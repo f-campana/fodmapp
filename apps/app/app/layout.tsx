@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { getAnalyticsBootstrapStatus } from "../lib/analytics";
+import {
+  getAnalyticsBootstrapStatus,
+  getPlausibleScriptConfig,
+} from "../lib/analytics";
 import { getClerkBootstrapStatus } from "../lib/clerk";
 import { getConsentBootstrapStatus } from "../lib/consent";
 import {
@@ -23,6 +26,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const monitoring = getMonitoringBootstrapStatus();
   const analytics = getAnalyticsBootstrapStatus();
   const consent = getConsentBootstrapStatus();
+  const plausible = getPlausibleScriptConfig(analytics);
 
   captureArchitectureEvent("layout_bootstrap_rendered", {
     auth_provider: auth.provider,
@@ -51,6 +55,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
         data-consent-mode={consent.mode}
         data-consent-configured={String(consent.configured)}
       >
+        {plausible ? (
+          <script
+            defer
+            data-domain={plausible.domain}
+            src={plausible.src}
+          />
+        ) : null}
         {children}
       </body>
     </html>

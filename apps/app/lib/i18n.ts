@@ -52,7 +52,7 @@ const MESSAGES: Record<SupportedLocale, AppMessages> = {
     gated: {
       title: "Espace protege (placeholder)",
       description:
-        "Le framework d'authentification sera branche dans la PR suivante.",
+        "Le runtime auth est cable via env gates; ce scaffold reste en mode placeholder par defaut.",
       authStateLabel: "Etat auth actuel",
       authModeLabel: "Mode auth",
       authConfiguredLabel: "Config auth complete",
@@ -80,7 +80,8 @@ const MESSAGES: Record<SupportedLocale, AppMessages> = {
     },
     gated: {
       title: "Protected area (placeholder)",
-      description: "Auth framework wiring is deferred to the next PR.",
+      description:
+        "Auth runtime is wired behind env gates; this scaffold stays placeholder by default.",
       authStateLabel: "Current auth state",
       authModeLabel: "Auth mode",
       authConfiguredLabel: "Auth fully configured",
