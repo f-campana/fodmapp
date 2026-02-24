@@ -148,3 +148,32 @@ jobs:
           pnpm --filter @fodmap/app test
           pnpm --filter @fodmap/app typecheck
           pnpm --filter @fodmap/app build
+
+  content-scaffolds:
+    name: content-scaffolds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install workspace dependencies
+        run: |
+          pnpm install --frozen-lockfile
+
+      - name: Build and typecheck marketing and research scaffolds
+        run: |
+          pnpm --filter @fodmap/marketing typecheck
+          pnpm --filter @fodmap/marketing build
+          pnpm --filter @fodmap/research typecheck
+          pnpm --filter @fodmap/research build
