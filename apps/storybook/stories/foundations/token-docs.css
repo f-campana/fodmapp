@@ -250,12 +250,13 @@
 
 .fd-tokendocs-groupPanel {
   border-top: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
   transform: translateY(-4px);
   overflow: hidden;
   transition:
-    max-height 200ms cubic-bezier(0.16, 0.75, 0.36, 1),
+    grid-template-rows 200ms cubic-bezier(0.16, 0.75, 0.36, 1),
     opacity 180ms ease,
     transform 200ms ease;
   pointer-events: none;
@@ -263,10 +264,15 @@
 
 .fd-tokendocs-group[data-expanded="true"] .fd-tokendocs-groupPanel,
 .fd-tokendocs-groupPanel[data-expanded="true"] {
-  max-height: 9999px;
+  grid-template-rows: 1fr;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+.fd-tokendocs-groupPanelInner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .fd-tokendocs-empty {
@@ -325,7 +331,7 @@
 }
 
 .fd-tokendocs-headCell.is-right {
-  text-align: left;
+  text-align: right;
 }
 
 .fd-tokendocs-row {
@@ -335,23 +341,17 @@
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   padding: 0.98rem 0.94rem;
   transition:
-    max-height 190ms cubic-bezier(0.16, 0.75, 0.36, 1),
     opacity 140ms ease,
     transform 140ms ease;
-  overflow: hidden;
 }
 
 .fd-tokendocs-group[data-expanded="false"] .fd-tokendocs-row {
-  max-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
   opacity: 0;
   transform: translateY(-3px);
   pointer-events: none;
 }
 
 .fd-tokendocs-group[data-expanded="true"] .fd-tokendocs-row {
-  max-height: 20rem;
   opacity: 1;
   transform: translateY(0);
 }
@@ -382,8 +382,14 @@
 }
 
 .fd-tokendocs-cell.is-right {
-  justify-content: flex-start;
-  text-align: left;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.fd-tokendocs-cell.is-right .fd-tokendocs-cellBody {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
 }
 
 .fd-tokendocs-cellBody {
@@ -526,9 +532,7 @@
   gap: 0.45rem;
   border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
   padding: 0.72rem;
-  overflow: hidden;
   transition:
-    max-height 190ms cubic-bezier(0.16, 0.75, 0.36, 1),
     opacity 160ms ease,
     transform 160ms ease;
 }

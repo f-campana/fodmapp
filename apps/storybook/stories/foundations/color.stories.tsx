@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
 
@@ -555,6 +555,17 @@ export const Showcase: Story = {
     await expect(canvas.getByRole("heading", { name: "Color Tokens" })).toBeInTheDocument();
     await expect(canvas.getByText("Scale Matrix")).toBeInTheDocument();
     await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+
+    const rootStyles = getComputedStyle(document.documentElement);
+    await expect(rootStyles.getPropertyValue("--color-background").trim()).not.toBe("");
+    await expect(rootStyles.getPropertyValue("--color-foreground").trim()).not.toBe("");
+    await expect(rootStyles.getPropertyValue("--color-primary").trim()).not.toBe("");
+
+    const section = canvasElement.querySelector(".fd-tokendocs-section");
+    if (!section) {
+      throw new Error("Expected at least one token section.");
+    }
+    await expect(getComputedStyle(section).backgroundImage).not.toBe("none");
   },
 };
 
@@ -692,6 +703,56 @@ export const Reference: Story = {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("heading", { name: "Color Token Reference" })).toBeInTheDocument();
     await expect(canvas.getByText("Base Color References")).toBeInTheDocument();
+
+    const initiallyOpenBaseGroup =
+      baseColorGroups.find((group) => !group.defaultCollapsed) ?? baseColorGroups[0];
+    const targetBaseGroup =
+      baseColorGroups.find((group) => group.id !== initiallyOpenBaseGroup?.id) ??
+      initiallyOpenBaseGroup;
+
+    if (!initiallyOpenBaseGroup || !targetBaseGroup) {
+      throw new Error("Expected base color groups to be present.");
+    }
+
+    const initialSection = canvasElement.querySelector(
+      `#base-color-grid-${initiallyOpenBaseGroup.id}`,
+    );
+    const targetSection = canvasElement.querySelector(`#base-color-grid-${targetBaseGroup.id}`);
+    if (!initialSection || !targetSection) {
+      throw new Error("Expected base color sections to be present.");
+    }
+
+    await expect(initialSection).toHaveAttribute("data-expanded", "true");
+    if (targetBaseGroup.id !== initiallyOpenBaseGroup.id) {
+      await expect(targetSection).toHaveAttribute("data-expanded", "false");
+    }
+
+    const baseJumpNav = canvas.getByRole("navigation", { name: "Base color group jump links" });
+    const jumpButton = within(baseJumpNav).getByRole("button", {
+      name: targetBaseGroup.label,
+    });
+    await userEvent.click(jumpButton);
+
+    await expect(targetSection).toHaveAttribute("data-expanded", "true");
+    if (targetBaseGroup.id !== initiallyOpenBaseGroup.id) {
+      await expect(initialSection).toHaveAttribute("data-expanded", "false");
+    }
+
+    const targetCopy = targetSection.querySelector(".fd-tokendocs-copy") as HTMLButtonElement | null;
+    if (!targetCopy) {
+      throw new Error("Expected target group copy button to exist.");
+    }
+    await expect(targetCopy).toBeEnabled();
+
+    const targetToggle = targetSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    ) as HTMLButtonElement | null;
+    if (!targetToggle) {
+      throw new Error("Expected target group toggle to exist.");
+    }
+    await userEvent.click(targetToggle);
+    await expect(targetSection).toHaveAttribute("data-expanded", "false");
+    await expect(targetCopy).toBeDisabled();
   },
 };
 

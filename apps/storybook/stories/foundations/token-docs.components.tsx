@@ -35,7 +35,6 @@ interface TokenDataGridProps<Row extends TokenGridRowBase> {
   gridLabel: string;
   columns: TokenGridColumn<Row>[];
   groups: TokenGridGroup<Row>[];
-  mobileMode?: "reflow" | "table";
   accordion?: boolean;
   initialOpenGroupId?: string;
   openGroupId?: string | null;
@@ -193,7 +192,6 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   gridLabel,
   columns,
   groups,
-  mobileMode = "reflow",
   accordion = false,
   initialOpenGroupId,
   openGroupId,
@@ -335,7 +333,6 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
       gridTemplateColumns,
       opacity: expanded ? 1 : 0,
       transform: expanded ? "translateY(0)" : "translateY(-4px)",
-      maxHeight: expanded ? "20rem" : "0px",
       transitionDelay: expanded ? `${Math.min(240, rowIndex * 16)}ms` : "0ms",
       pointerEvents: expanded ? "auto" : "none",
     };
@@ -383,17 +380,12 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   }
 
   function renderMobileRows(rows: Row[], expanded: boolean) {
-    if (mobileMode !== "reflow") {
-      return null;
-    }
-
     return (
       <div className="fd-tokendocs-mobileList" role="list">
         {rows.map((row, rowIndex) => {
           const animationDelay = `${Math.min(260, rowIndex * 24)}ms`;
           const rowStyle: CSSProperties = {
             opacity: expanded ? 1 : 0,
-            maxHeight: expanded ? "20rem" : "0px",
             transform: expanded ? "translateY(0)" : "translateY(-4px)",
             transitionDelay: expanded ? animationDelay : "0ms",
             pointerEvents: expanded ? "auto" : "none",
@@ -479,47 +471,49 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                 data-expanded={expanded ? "true" : "false"}
                 aria-hidden={!expanded}
               >
-                {group.rows.length === 0 ? (
-                  <p className="fd-tokendocs-empty">No rows available.</p>
-                ) : (
-                  <>
-                    <div className="fd-tokendocs-desktop">
-                      <div className="fd-tokendocs-tableScroll">
-                        <div
-                          role="table"
-                          aria-label={`${gridLabel} ${group.label}`}
-                          className="fd-tokendocs-table"
-                        >
+                <div className="fd-tokendocs-groupPanelInner">
+                  {group.rows.length === 0 ? (
+                    <p className="fd-tokendocs-empty">No rows available.</p>
+                  ) : (
+                    <>
+                      <div className="fd-tokendocs-desktop">
+                        <div className="fd-tokendocs-tableScroll">
                           <div
-                            role="row"
-                            className="fd-tokendocs-headRow"
-                            style={{ gridTemplateColumns }}
+                            role="table"
+                            aria-label={`${gridLabel} ${group.label}`}
+                            className="fd-tokendocs-table"
                           >
-                            {columns.map((column) => (
-                              <div
-                                key={`${group.id}:${column.key}`}
-                                role="columnheader"
-                                className={classNames(
-                                  "fd-tokendocs-headCell",
-                                  column.align === "right" ? "is-right" : "is-left",
-                                )}
-                              >
-                                <span>{column.label}</span>
-                              </div>
-                            ))}
-                          </div>
-                          <div role="rowgroup">
-                            {group.rows.map((row, rowIndex) =>
-                              renderDesktopRow(row, rowIndex, expanded),
-                            )}
+                            <div
+                              role="row"
+                              className="fd-tokendocs-headRow"
+                              style={{ gridTemplateColumns }}
+                            >
+                              {columns.map((column) => (
+                                <div
+                                  key={`${group.id}:${column.key}`}
+                                  role="columnheader"
+                                  className={classNames(
+                                    "fd-tokendocs-headCell",
+                                    column.align === "right" ? "is-right" : "is-left",
+                                  )}
+                                >
+                                  <span>{column.label}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <div role="rowgroup">
+                              {group.rows.map((row, rowIndex) =>
+                                renderDesktopRow(row, rowIndex, expanded),
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="fd-tokendocs-mobile">{renderMobileRows(group.rows, expanded)}</div>
-                  </>
-                )}
+                      <div className="fd-tokendocs-mobile">{renderMobileRows(group.rows, expanded)}</div>
+                    </>
+                  )}
+                </div>
               </div>
             </section>
           );

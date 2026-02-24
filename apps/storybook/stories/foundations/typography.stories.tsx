@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
 
@@ -261,6 +261,7 @@ export const Reference: Story = {
                 key: "value",
                 label: "Value",
                 width: "minmax(320px, 1fr)",
+                align: "right",
                 getValue: (row) => row.value,
                 render: (row) => (
                   <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
@@ -282,5 +283,26 @@ export const Reference: Story = {
       canvas.getByRole("heading", { name: "Typography Token Reference" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Typography Primitives")).toBeInTheDocument();
+
+    const familiesSection = canvasElement.querySelector("#typography-grid-families");
+    const sizesSection = canvasElement.querySelector("#typography-grid-sizes");
+    if (!familiesSection || !sizesSection) {
+      throw new Error("Expected typography sections to exist.");
+    }
+
+    await expect(familiesSection).toHaveAttribute("data-expanded", "true");
+    await expect(sizesSection).toHaveAttribute("data-expanded", "false");
+
+    const sizesToggle = sizesSection.querySelector(".fd-tokendocs-groupToggle");
+    if (!sizesToggle) {
+      throw new Error("Expected sizes toggle to exist.");
+    }
+
+    await userEvent.click(sizesToggle);
+    await expect(sizesSection).toHaveAttribute("data-expanded", "true");
+    await expect(familiesSection).toHaveAttribute("data-expanded", "false");
+
+    await userEvent.click(sizesToggle);
+    await expect(sizesSection).toHaveAttribute("data-expanded", "false");
   },
 };
