@@ -1316,9 +1316,9 @@ Locked generation and selection gates:
 Batch03 artifacts:
 
 - generated candidates:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
+  - `etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
 - review packet:
-  - `/Users/fabiencampana/Documents/Fodmap/etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
+  - `etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
 - SQL flow:
   - `phase3_swap_rules_batch03_generate.sql`
   - `phase3_swap_rules_batch03_apply.sql`
