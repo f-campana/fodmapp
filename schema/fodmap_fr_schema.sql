@@ -536,6 +536,76 @@ CREATE TABLE product_allergens (
   PRIMARY KEY (product_id, allergen_code, source_id)
 );
 
+CREATE TABLE barcode_cache_entries (
+  normalized_code TEXT PRIMARY KEY CHECK (
+    normalized_code ~ '^[0-9]{8}$'
+    OR normalized_code ~ '^[0-9]{13}$'
+  ),
+  canonical_format TEXT NOT NULL CHECK (canonical_format IN ('EAN8', 'EAN13')),
+  provider_slug TEXT NOT NULL DEFAULT 'open_food_facts',
+  provider_status TEXT NOT NULL CHECK (provider_status IN ('found', 'not_found', 'error', 'unknown')),
+  provider_payload JSONB,
+  source_code TEXT,
+  product_name_fr TEXT,
+  product_name_en TEXT,
+  brand TEXT,
+  ingredients_text_fr TEXT,
+  categories_tags TEXT[] NOT NULL DEFAULT '{}',
+  countries_tags TEXT[] NOT NULL DEFAULT '{}',
+  fetched_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  last_error_code TEXT,
+  last_error_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT chk_barcode_payload_for_found CHECK (
+    provider_status <> 'found' OR provider_payload IS NOT NULL
+  )
+);
+
+CREATE TABLE barcode_food_links (
+  normalized_code TEXT PRIMARY KEY CHECK (
+    normalized_code ~ '^[0-9]{8}$'
+    OR normalized_code ~ '^[0-9]{13}$'
+  ),
+  food_id UUID NOT NULL REFERENCES foods (food_id) ON DELETE CASCADE,
+  link_method TEXT NOT NULL CHECK (link_method IN ('manual', 'heuristic')),
+  confidence NUMERIC(4,3) CHECK (confidence IS NULL OR (confidence >= 0 AND confidence <= 1)),
+  heuristic_version TEXT,
+  signals_json JSONB,
+  created_by TEXT NOT NULL DEFAULT 'system',
+  updated_by TEXT NOT NULL DEFAULT 'system',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT chk_barcode_link_method_fields CHECK (
+    (
+      link_method = 'manual'
+      AND confidence IS NULL
+      AND heuristic_version IS NULL
+      AND signals_json IS NULL
+    )
+    OR (
+      link_method = 'heuristic'
+      AND confidence IS NOT NULL
+      AND heuristic_version IS NOT NULL
+      AND signals_json IS NOT NULL
+    )
+  )
+);
+
+CREATE TABLE barcode_food_link_events (
+  event_id BIGSERIAL PRIMARY KEY,
+  normalized_code TEXT NOT NULL CHECK (
+    normalized_code ~ '^[0-9]{8}$'
+    OR normalized_code ~ '^[0-9]{13}$'
+  ),
+  event_type TEXT NOT NULL CHECK (event_type IN ('set_manual', 'set_heuristic', 'clear_manual')),
+  food_id UUID REFERENCES foods (food_id) ON DELETE SET NULL,
+  actor TEXT NOT NULL,
+  payload JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE recipes (
   recipe_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   recipe_slug TEXT NOT NULL UNIQUE,
@@ -611,6 +681,9 @@ CREATE INDEX idx_swap_rules_from_food ON swap_rules (from_food_id);
 CREATE INDEX idx_swap_rules_to_food ON swap_rules (to_food_id);
 CREATE INDEX idx_recipe_ingredients_food_id ON recipe_ingredients (food_id);
 CREATE INDEX idx_products_off_code ON products (open_food_facts_code);
+CREATE INDEX idx_barcode_cache_expires_at ON barcode_cache_entries (expires_at);
+CREATE INDEX idx_barcode_food_links_food_id ON barcode_food_links (food_id);
+CREATE INDEX idx_barcode_link_events_code_created_at ON barcode_food_link_events (normalized_code, created_at DESC);
 CREATE INDEX idx_food_names_locale_name ON food_names (locale_code, name);
 CREATE INDEX idx_food_fr_contexts_availability ON food_fr_contexts (availability);
 
