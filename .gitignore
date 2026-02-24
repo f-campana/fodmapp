@@ -11,6 +11,7 @@ coverage/
 storybook-static/
 playwright-report/
 .next/
+.astro/
 *.tsbuildinfo
 packages/design-tokens/.tmp/
 
