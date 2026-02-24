@@ -1286,6 +1286,57 @@ Execution sequence:
 3. `phase3_rollups_6subtype_checks.sql`
 4. `phase3_coverage_batchB_checks.sql`
 
+### 11.11 Systematic swap expansion Batch03 delta (Phase 3.7)
+
+Batch03 is additive to MVP + Batch01 + Batch02 and keeps the same 42-food universe.
+
+Locked Batch03 scope:
+
+- `notes='phase3_batch03_rule'`
+- `rule_key` prefix `B03_`
+- `rule_kind='direct_swap'`
+
+Locked generation and selection gates:
+
+- same universe/rank exclusions as prior batches (ranks `1..42`, rank `2` excluded)
+- conservative level/burden gates (`to` not worse than `from`)
+- same-subtype hard gate:
+  - `from_driver_subtype = to_driver_subtype`
+- open direct-swap exclusions in both directions:
+  - exact `(from,to)`
+  - reverse `(to,from)`
+- culinary compatibility gate:
+  - role overlap required
+  - at least one of flavor/texture/method overlap > 0
+- final candidate count bounded `1..40`
+- per-from cap `<=5`
+- per-to cap `<=5`
+- deterministic ranked backfill
+
+Batch03 artifacts:
+
+- generated candidates:
+  - `etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
+- review packet:
+  - `etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
+- SQL flow:
+  - `phase3_swap_rules_batch03_generate.sql`
+  - `phase3_swap_rules_batch03_apply.sql`
+  - `phase3_swap_rules_batch03_rescore.sql`
+  - `phase3_swap_rules_batch03_activation_apply.sql`
+  - `phase3_swap_rules_batch03_checks.sql`
+
+Batch03 review/activation rules:
+
+- snapshot lock enforced (`scoring_version_snapshot`, `fodmap_safety_score_snapshot`)
+- conservative eligibility re-evaluated at activation time
+- strict second-review policy retained:
+  - `second_review_required=true` approvals need second-review metadata
+  - `second_reviewed_by <> reviewed_by`
+- status mapping:
+  - `approve -> active`
+  - `reject|defer -> draft`
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
