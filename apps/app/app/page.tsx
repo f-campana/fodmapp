@@ -1,8 +1,26 @@
 import Link from "next/link";
 import type { components } from "@fodmap/types";
-import { Badge, Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@fodmap/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@fodmap/ui";
+import {
+  getAnalyticsBootstrapStatus,
+  trackAnalyticsEvent,
+} from "../lib/analytics";
+import { getClerkBootstrapStatus } from "../lib/clerk";
+import { canTrackWithConsent, getConsentBootstrapStatus } from "../lib/consent";
 import { getMessages } from "../lib/i18n";
-import { captureArchitectureEvent } from "../lib/monitoring";
+import {
+  captureArchitectureEvent,
+  getMonitoringBootstrapStatus,
+} from "../lib/monitoring";
 
 type HealthResponse = components["schemas"]["HealthResponse"];
 
@@ -14,7 +32,23 @@ const HEALTH_CONTRACT_SAMPLE: HealthResponse = {
 
 export default function HomePage() {
   const messages = getMessages();
-  captureArchitectureEvent("app_shell_rendered", { route: "/" });
+  const auth = getClerkBootstrapStatus();
+  const monitoring = getMonitoringBootstrapStatus();
+  const analytics = getAnalyticsBootstrapStatus();
+  const consent = getConsentBootstrapStatus();
+
+  const analyticsAllowed = canTrackWithConsent(consent) && analytics.configured;
+  if (analyticsAllowed) {
+    trackAnalyticsEvent("home_page_viewed", { route: "/" });
+  }
+
+  captureArchitectureEvent("app_shell_rendered", {
+    route: "/",
+    auth_configured: String(auth.fullyConfigured),
+    monitoring_configured: String(monitoring.configured),
+    analytics_configured: String(analytics.configured),
+    consent_configured: String(consent.configured),
+  });
 
   return (
     <main className="app-shell">
@@ -36,6 +70,22 @@ export default function HomePage() {
             </code>
           </p>
           <p className="app-shell__eyebrow">{messages.home.routeNote}</p>
+          <p className="app-shell__eyebrow">
+            {messages.home.authLabel}: <code>{auth.provider}</code> ({auth.mode}
+            )
+          </p>
+          <p className="app-shell__eyebrow">
+            {messages.home.monitoringLabel}: <code>{monitoring.provider}</code>{" "}
+            ({monitoring.configured ? "configured" : "placeholder"})
+          </p>
+          <p className="app-shell__eyebrow">
+            {messages.home.analyticsLabel}: <code>{analytics.provider}</code> (
+            {analytics.configured ? "configured" : "placeholder"})
+          </p>
+          <p className="app-shell__eyebrow">
+            {messages.home.consentLabel}: <code>{consent.provider}</code> (
+            {consent.configured ? "configured" : "placeholder"})
+          </p>
         </CardContent>
         <CardFooter>
           <Button asChild>
