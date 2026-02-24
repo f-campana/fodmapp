@@ -287,6 +287,228 @@ ORDER BY
 LIMIT %(limit)s
 """
 
+SQL_GET_BARCODE_CACHE = """
+SELECT
+  normalized_code,
+  canonical_format,
+  provider_slug,
+  provider_status,
+  provider_payload,
+  source_code,
+  product_name_fr,
+  product_name_en,
+  brand,
+  ingredients_text_fr,
+  categories_tags,
+  countries_tags,
+  fetched_at,
+  expires_at,
+  last_error_code,
+  last_error_at
+FROM barcode_cache_entries
+WHERE normalized_code = %(normalized_code)s
+"""
+
+SQL_UPSERT_BARCODE_CACHE = """
+INSERT INTO barcode_cache_entries (
+  normalized_code,
+  canonical_format,
+  provider_slug,
+  provider_status,
+  provider_payload,
+  source_code,
+  product_name_fr,
+  product_name_en,
+  brand,
+  ingredients_text_fr,
+  categories_tags,
+  countries_tags,
+  fetched_at,
+  expires_at,
+  last_error_code,
+  last_error_at
+) VALUES (
+  %(normalized_code)s,
+  %(canonical_format)s,
+  %(provider_slug)s,
+  %(provider_status)s,
+  %(provider_payload)s,
+  %(source_code)s,
+  %(product_name_fr)s,
+  %(product_name_en)s,
+  %(brand)s,
+  %(ingredients_text_fr)s,
+  %(categories_tags)s,
+  %(countries_tags)s,
+  %(fetched_at)s,
+  %(expires_at)s,
+  %(last_error_code)s,
+  %(last_error_at)s
+)
+ON CONFLICT (normalized_code) DO UPDATE SET
+  canonical_format = EXCLUDED.canonical_format,
+  provider_slug = EXCLUDED.provider_slug,
+  provider_status = EXCLUDED.provider_status,
+  provider_payload = EXCLUDED.provider_payload,
+  source_code = EXCLUDED.source_code,
+  product_name_fr = EXCLUDED.product_name_fr,
+  product_name_en = EXCLUDED.product_name_en,
+  brand = EXCLUDED.brand,
+  ingredients_text_fr = EXCLUDED.ingredients_text_fr,
+  categories_tags = EXCLUDED.categories_tags,
+  countries_tags = EXCLUDED.countries_tags,
+  fetched_at = EXCLUDED.fetched_at,
+  expires_at = EXCLUDED.expires_at,
+  last_error_code = EXCLUDED.last_error_code,
+  last_error_at = EXCLUDED.last_error_at
+RETURNING
+  normalized_code,
+  canonical_format,
+  provider_slug,
+  provider_status,
+  provider_payload,
+  source_code,
+  product_name_fr,
+  product_name_en,
+  brand,
+  ingredients_text_fr,
+  categories_tags,
+  countries_tags,
+  fetched_at,
+  expires_at,
+  last_error_code,
+  last_error_at
+"""
+
+SQL_GET_BARCODE_LINK = """
+SELECT
+  l.normalized_code,
+  l.link_method,
+  l.confidence,
+  l.heuristic_version,
+  l.signals_json,
+  f.food_id,
+  f.food_slug,
+  COALESCE(f.canonical_name_fr, f.food_slug) AS canonical_name_fr,
+  COALESCE(f.canonical_name_en, COALESCE(f.canonical_name_fr, f.food_slug)) AS canonical_name_en
+FROM barcode_food_links l
+JOIN foods f ON f.food_id = l.food_id
+WHERE l.normalized_code = %(normalized_code)s
+"""
+
+SQL_GET_FOOD_BY_SLUG = """
+SELECT
+  f.food_id,
+  f.food_slug,
+  COALESCE(f.canonical_name_fr, f.food_slug) AS canonical_name_fr,
+  COALESCE(f.canonical_name_en, COALESCE(f.canonical_name_fr, f.food_slug)) AS canonical_name_en
+FROM foods f
+WHERE f.food_slug = %(food_slug)s
+"""
+
+SQL_UPSERT_MANUAL_BARCODE_LINK = """
+INSERT INTO barcode_food_links (
+  normalized_code,
+  food_id,
+  link_method,
+  confidence,
+  heuristic_version,
+  signals_json,
+  created_by,
+  updated_by
+) VALUES (
+  %(normalized_code)s,
+  %(food_id)s,
+  'manual',
+  NULL,
+  NULL,
+  NULL,
+  %(actor)s,
+  %(actor)s
+)
+ON CONFLICT (normalized_code) DO UPDATE SET
+  food_id = EXCLUDED.food_id,
+  link_method = 'manual',
+  confidence = NULL,
+  heuristic_version = NULL,
+  signals_json = NULL,
+  updated_at = now(),
+  updated_by = EXCLUDED.updated_by
+"""
+
+SQL_DELETE_MANUAL_BARCODE_LINK = """
+DELETE FROM barcode_food_links
+WHERE normalized_code = %(normalized_code)s
+  AND link_method = 'manual'
+"""
+
+SQL_UPSERT_HEURISTIC_BARCODE_LINK = """
+INSERT INTO barcode_food_links (
+  normalized_code,
+  food_id,
+  link_method,
+  confidence,
+  heuristic_version,
+  signals_json,
+  created_by,
+  updated_by
+) VALUES (
+  %(normalized_code)s,
+  %(food_id)s,
+  'heuristic',
+  %(confidence)s,
+  %(heuristic_version)s,
+  %(signals_json)s,
+  %(actor)s,
+  %(actor)s
+)
+ON CONFLICT (normalized_code) DO UPDATE SET
+  food_id = EXCLUDED.food_id,
+  link_method = 'heuristic',
+  confidence = EXCLUDED.confidence,
+  heuristic_version = EXCLUDED.heuristic_version,
+  signals_json = EXCLUDED.signals_json,
+  updated_at = now(),
+  updated_by = EXCLUDED.updated_by
+"""
+
+SQL_INSERT_BARCODE_LINK_EVENT = """
+INSERT INTO barcode_food_link_events (
+  normalized_code,
+  event_type,
+  food_id,
+  actor,
+  payload
+) VALUES (
+  %(normalized_code)s,
+  %(event_type)s,
+  %(food_id)s,
+  %(actor)s,
+  %(payload)s
+)
+"""
+
+SQL_LIST_HEURISTIC_FOOD_CANDIDATES = """
+SELECT
+  f.food_id,
+  f.food_slug,
+  COALESCE(f.canonical_name_fr, f.food_slug) AS canonical_name_fr,
+  COALESCE(f.canonical_name_en, COALESCE(f.canonical_name_fr, f.food_slug)) AS canonical_name_en,
+  ARRAY_REMOVE(ARRAY_AGG(DISTINCT fc.code), NULL) AS category_codes
+FROM foods f
+LEFT JOIN food_category_memberships fcm
+  ON fcm.food_id = f.food_id
+LEFT JOIN food_categories fc
+  ON fc.category_id = fcm.category_id
+WHERE f.status = 'active'
+GROUP BY
+  f.food_id,
+  f.food_slug,
+  f.canonical_name_fr,
+  f.canonical_name_en
+ORDER BY f.food_slug
+"""
+
 
 def fetch_one(conn: Connection, query: str, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     cur = conn.execute(query, params)

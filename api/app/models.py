@@ -7,6 +7,10 @@ from pydantic import BaseModel, Field
 
 FoodLevel = Literal["none", "low", "moderate", "high", "unknown"]
 RuleStatus = Literal["active", "draft"]
+BarcodeCanonicalFormat = Literal["EAN8", "EAN13"]
+BarcodeResolutionStatus = Literal["resolved", "unresolved"]
+BarcodeCacheStatus = Literal["fresh", "stale", "miss"]
+BarcodeLinkMethod = Literal["manual", "heuristic"]
 
 
 class ErrorBody(BaseModel):
@@ -142,3 +146,54 @@ class SwapListResponse(BaseModel):
     applied_filters: AppliedFilters
     items: list[SwapItem]
     total: int
+
+
+class BarcodeProduct(BaseModel):
+    source_code: Optional[str] = None
+    product_name_fr: Optional[str] = None
+    product_name_en: Optional[str] = None
+    brand: Optional[str] = None
+    ingredients_text_fr: Optional[str] = None
+    categories_tags: list[str]
+    countries_tags: list[str]
+
+
+class BarcodeResolvedFood(BaseModel):
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    link_method: BarcodeLinkMethod
+    confidence: Optional[float] = Field(default=None, ge=0, le=1)
+
+
+class BarcodeCandidate(BaseModel):
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    score: float = Field(ge=0, le=1)
+    signal_breakdown: Dict[str, float]
+
+
+class BarcodeLookupResponse(BaseModel):
+    query_code: str
+    normalized_code: str
+    canonical_format: BarcodeCanonicalFormat
+    resolution_status: BarcodeResolutionStatus
+    cache_status: BarcodeCacheStatus
+    product: Optional[BarcodeProduct] = None
+    resolved_food: Optional[BarcodeResolvedFood] = None
+    candidates: list[BarcodeCandidate]
+    provider: str
+    provider_last_synced_at: Optional[datetime] = None
+
+
+class BarcodeLinkMutationRequest(BaseModel):
+    food_slug: str
+
+
+class BarcodeLinkMutationResponse(BaseModel):
+    normalized_code: str
+    canonical_format: BarcodeCanonicalFormat
+    action: Literal["set_manual", "clear_manual"]
+    food_slug: Optional[str] = None
+    removed: Optional[bool] = None

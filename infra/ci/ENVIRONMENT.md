@@ -15,6 +15,15 @@ This document defines environment variables used across the current Python/SQL s
 | `API_DB_URL` | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml` | yes | `postgresql://.../fodmap_test` | Primary FastAPI DB connection string. |
 | `API_NAME` | `api/app/config.py` | no | `fodmap-api` | Health metadata. |
 | `API_VERSION` | `api/app/config.py` | no | `v0` | Health metadata. |
+| `BARCODE_FEATURE_ENABLED` | `api/app/config.py`, barcode public router | no | `false` | Feature flag for public barcode lookup endpoint. |
+| `BARCODE_INTERNAL_ENABLED` | `api/app/config.py`, barcode internal auth/router | no | `false` | Feature flag for internal curation endpoints. |
+| `BARCODE_ADMIN_TOKEN` | `api/app/config.py`, `api/app/auth.py` | yes for internal routes | empty | Static bearer token for `/v0/internal/barcodes/*`. |
+| `OFF_API_BASE_URL` | `api/app/config.py`, `api/app/providers/open_food_facts.py` | no | `https://world.openfoodfacts.org` | Open Food Facts API base URL. |
+| `OFF_USER_AGENT` | `api/app/config.py`, `api/app/providers/open_food_facts.py` | yes in production | `FODMAPPlatform/0.1 (contact@example.com)` | Required custom user-agent for OFF requests. |
+| `OFF_TIMEOUT_SECONDS` | `api/app/config.py`, `api/app/providers/open_food_facts.py` | no | `3` | HTTP timeout for OFF requests. |
+| `BARCODE_CACHE_TTL_HOURS` | `api/app/config.py`, barcode service | no | `168` | Cache TTL for OFF payloads. |
+| `BARCODE_HEURISTIC_THRESHOLD` | `api/app/config.py`, barcode service | no | `0.75` | Minimum score to auto-persist heuristic link. |
+| `BARCODE_HEURISTIC_MARGIN` | `api/app/config.py`, barcode service | no | `0.10` | Minimum gap to second candidate for auto-persist. |
 | `ROOT_DIR` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh` | no | auto-derived from script location | Repo root override for script portability. |
 | `REPLAY_DB` | `etl/phase2/scripts/phase2_replay_from_zero.sh` | no | `fodmap_replay_test` | Replay database name. |
 | `REPLAY_DB_URL` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml` | yes for non-default host/user | `postgresql://.../fodmap_replay_test` | Target DB URL for Phase2 replay. |
