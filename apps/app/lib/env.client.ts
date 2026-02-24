@@ -1,6 +1,6 @@
-function readOptionalEnv(key: string): string | null {
-  const value = process.env[key]?.trim();
-  return value && value.length > 0 ? value : null;
+function readOptionalEnv(value: string | undefined): string | null {
+  const normalized = value?.trim();
+  return normalized && normalized.length > 0 ? normalized : null;
 }
 
 export interface ClientRuntimeEnv {
@@ -13,12 +13,14 @@ export interface ClientRuntimeEnv {
 
 export function getClientRuntimeEnv(): ClientRuntimeEnv {
   return {
-    clerkPublishableKey: readOptionalEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
-    plausibleDomain: readOptionalEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN"),
-    plausibleScriptSrc: readOptionalEnv("NEXT_PUBLIC_PLAUSIBLE_SRC"),
-    axeptioClientId: readOptionalEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID"),
+    clerkPublishableKey: readOptionalEnv(
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    ),
+    plausibleDomain: readOptionalEnv(process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN),
+    plausibleScriptSrc: readOptionalEnv(process.env.NEXT_PUBLIC_PLAUSIBLE_SRC),
+    axeptioClientId: readOptionalEnv(process.env.NEXT_PUBLIC_AXEPTIO_CLIENT_ID),
     axeptioCookiesVersion: readOptionalEnv(
-      "NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION",
+      process.env.NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION,
     ),
   };
 }
