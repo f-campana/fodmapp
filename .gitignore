@@ -10,6 +10,8 @@ dist/
 coverage/
 storybook-static/
 playwright-report/
+.next/
+*.tsbuildinfo
 packages/design-tokens/.tmp/
 
 # logs
