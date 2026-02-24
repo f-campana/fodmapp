@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getAuthMiddlewareMode } from "./lib/clerk";
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const mode = getAuthMiddlewareMode(request.nextUrl.pathname);
   if (mode === "protected-placeholder") {
     return NextResponse.next();
