@@ -13,12 +13,19 @@ interface AppMessages {
     description: string;
     contractLabel: string;
     routeNote: string;
+    authLabel: string;
+    monitoringLabel: string;
+    analyticsLabel: string;
+    consentLabel: string;
     gatedCta: string;
   };
   gated: {
     title: string;
     description: string;
     authStateLabel: string;
+    authModeLabel: string;
+    authConfiguredLabel: string;
+    consentLabel: string;
     backHome: string;
   };
 }
@@ -36,6 +43,10 @@ const MESSAGES: Record<SupportedLocale, AppMessages> = {
       contractLabel: "Contrat API compile via @fodmap/types",
       routeNote:
         "Route publique minimale: / (FR-first). Route espace protegee en placeholder: /espace.",
+      authLabel: "Authentification",
+      monitoringLabel: "Monitoring",
+      analyticsLabel: "Analytics",
+      consentLabel: "Consentement",
       gatedCta: "Voir l'espace placeholder",
     },
     gated: {
@@ -43,6 +54,9 @@ const MESSAGES: Record<SupportedLocale, AppMessages> = {
       description:
         "Le framework d'authentification sera branche dans la PR suivante.",
       authStateLabel: "Etat auth actuel",
+      authModeLabel: "Mode auth",
+      authConfiguredLabel: "Config auth complete",
+      consentLabel: "Consentement analytics",
       backHome: "Retour accueil",
     },
   },
@@ -58,17 +72,26 @@ const MESSAGES: Record<SupportedLocale, AppMessages> = {
       contractLabel: "API contract compiles via @fodmap/types",
       routeNote:
         "Minimum public route: /. Placeholder protected area route: /espace.",
+      authLabel: "Authentication",
+      monitoringLabel: "Monitoring",
+      analyticsLabel: "Analytics",
+      consentLabel: "Consent",
       gatedCta: "Open placeholder area",
     },
     gated: {
       title: "Protected area (placeholder)",
       description: "Auth framework wiring is deferred to the next PR.",
       authStateLabel: "Current auth state",
+      authModeLabel: "Auth mode",
+      authConfiguredLabel: "Auth fully configured",
+      consentLabel: "Analytics consent",
       backHome: "Back to home",
     },
   },
 };
 
-export function getMessages(locale: SupportedLocale = DEFAULT_LOCALE): AppMessages {
+export function getMessages(
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): AppMessages {
   return MESSAGES[locale];
 }
