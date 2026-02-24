@@ -21,6 +21,7 @@ This `/docs` tree captures what has been discussed and established so far for th
   - `current-state-snapshot.md`: what is currently in the repo.
   - `discussion-history.md`: timeline of major discussion points.
   - `pr-sequence-and-gates.md`: recommended sequence and acceptance gates.
+  - `sprint-planning-handoff.md`: handoff brief for the next sprint planning agent.
   - `worktree-playbook.md`: isolated worktree workflow for architecture PRs.
   - `risk-register.md`: near-term risks and mitigations.
 - `frontend/`
