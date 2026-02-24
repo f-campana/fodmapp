@@ -13,6 +13,10 @@ import {
 import {
   asRecord,
   flattenTokenTree,
+  createSortedRows,
+  compareFontWeightRows,
+  compareLineHeightRows,
+  compareLetterSpacingRows,
   tokenPrimitiveToString,
 } from "./token-docs.helpers";
 
@@ -77,17 +81,26 @@ const sizeRows = rowsFor(
   asRecord(typography.fontSize, "base.typography.fontSize"),
   "base.typography.fontSize",
 );
-const weightRows = rowsFor(
-  asRecord(typography.fontWeight, "base.typography.fontWeight"),
-  "base.typography.fontWeight",
+const weightRows = createSortedRows(
+  rowsFor(
+    asRecord(typography.fontWeight, "base.typography.fontWeight"),
+    "base.typography.fontWeight",
+  ),
+  compareFontWeightRows,
 );
-const lineHeightRows = rowsFor(
-  asRecord(typography.lineHeight, "base.typography.lineHeight"),
-  "base.typography.lineHeight",
+const lineHeightRows = createSortedRows(
+  rowsFor(
+    asRecord(typography.lineHeight, "base.typography.lineHeight"),
+    "base.typography.lineHeight",
+  ),
+  compareLineHeightRows,
 );
-const letterSpacingRows = rowsFor(
-  asRecord(typography.letterSpacing, "base.typography.letterSpacing"),
-  "base.typography.letterSpacing",
+const letterSpacingRows = createSortedRows(
+  rowsFor(
+    asRecord(typography.letterSpacing, "base.typography.letterSpacing"),
+    "base.typography.letterSpacing",
+  ),
+  compareLetterSpacingRows,
 );
 
 const lineHeightDefault =
@@ -197,8 +210,9 @@ export const Showcase: Story = {
                     Digestive support rhythm across interface states.
                   </p>
                   <div className="fd-tokendocs-weightBandMeta">
-                    <span className="fd-tokendocs-typoLabel">{row.path.split(".").pop()}</span>
-                    <span className="fd-tokendocs-weightNumeric">{row.value}</span>
+                    <span className="fd-tokendocs-weightTokenMeta">
+                      {row.path.split(".").pop()} / {row.value}
+                    </span>
                   </div>
                 </article>
               ))}

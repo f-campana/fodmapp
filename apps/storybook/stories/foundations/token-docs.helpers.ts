@@ -96,6 +96,129 @@ function parseScaleLike(segment: string): number | null {
   return scaleTokenOrder.xl + parsed - 1;
 }
 
+const FONT_WEIGHT_ORDER = ["regular", "medium", "semibold", "bold"] as const;
+const FONT_WEIGHT_BY_KEY = new Map<string, number>(
+  FONT_WEIGHT_ORDER.map((key, index) => [key, index]),
+);
+
+export interface TokenRowComparator<Row extends { path: string }> {
+  (left: Row, right: Row): number;
+}
+
+export function parseNumericTokenValue(value: string): number | null {
+  const match = value.trim().match(/^(-?\d+(?:\.\d+)?)/);
+  if (!match) {
+    return null;
+  }
+
+  const parsed = Number.parseFloat(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function compareNumericTokenValues(left: string, right: string): number {
+  const leftParsed = parseNumericTokenValue(left);
+  const rightParsed = parseNumericTokenValue(right);
+  if (leftParsed !== null && rightParsed !== null) {
+    return leftParsed - rightParsed;
+  }
+
+  return left.localeCompare(right, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
+export function compareRowPathSuffix(left: { path: string }, right: { path: string }): number {
+  const leftKey = left.path.split(".").pop() ?? left.path;
+  const rightKey = right.path.split(".").pop() ?? right.path;
+  return comparePathSegment(leftKey, rightKey);
+}
+
+export function compareTokenRowsByPathSuffix<Row extends { path: string }>(
+  left: Row,
+  right: Row,
+): number {
+  return compareRowPathSuffix(left, right);
+}
+
+export function sortTokenRowsByPathSuffix<Row extends { path: string }>(
+  rows: readonly Row[],
+): Row[] {
+  return [...rows].sort(compareTokenRowsByPathSuffix);
+}
+
+export function compareFontWeightRows<Row extends { path: string; value: string }>(
+  left: Row,
+  right: Row,
+): number {
+  const leftKey = left.path.split(".").pop();
+  const rightKey = right.path.split(".").pop();
+
+  const leftIndex = leftKey ? FONT_WEIGHT_BY_KEY.get(leftKey) : undefined;
+  const rightIndex = rightKey ? FONT_WEIGHT_BY_KEY.get(rightKey) : undefined;
+
+  if (leftIndex !== undefined && rightIndex !== undefined) {
+    return leftIndex - rightIndex;
+  }
+
+  if (leftIndex !== undefined) {
+    return -1;
+  }
+
+  if (rightIndex !== undefined) {
+    return 1;
+  }
+
+  const leftValue = parseNumericTokenValue(left.value);
+  const rightValue = parseNumericTokenValue(right.value);
+  if (leftValue !== null && rightValue !== null) {
+    return leftValue - rightValue;
+  }
+
+  return comparePathSegment(leftKey ?? left.path, rightKey ?? right.path);
+}
+
+export function compareLineHeightRows<Row extends { path: string; value: string }>(
+  left: Row,
+  right: Row,
+): number {
+  const leftValue = parseNumericTokenValue(left.value);
+  const rightValue = parseNumericTokenValue(right.value);
+
+  if (leftValue !== null && rightValue !== null) {
+    return leftValue - rightValue;
+  }
+
+  return comparePathSegment(
+    left.path.split(".").pop() ?? left.path,
+    right.path.split(".").pop() ?? right.path,
+  );
+}
+
+export function compareLetterSpacingRows<Row extends { path: string; value: string }>(
+  left: Row,
+  right: Row,
+): number {
+  const leftValue = parseNumericTokenValue(left.value);
+  const rightValue = parseNumericTokenValue(right.value);
+
+  if (leftValue !== null && rightValue !== null) {
+    return leftValue - rightValue;
+  }
+
+  return comparePathSegment(
+    left.path.split(".").pop() ?? left.path,
+    right.path.split(".").pop() ?? right.path,
+  );
+}
+
+export function createSortedRows<Row extends { path: string; value: string }>(
+  rows: readonly Row[],
+  comparator: (left: Row, right: Row) => number,
+): Row[] {
+  return [...rows].sort(comparator);
+}
+
 function comparePathSegment(left: string, right: string): number {
   if (left === right) {
     return 0;

@@ -29,15 +29,21 @@ interface MotionLaneRow {
   label: string;
   path: string;
   value: string;
+  hasBaseline: boolean;
   tokenDuration: string;
   tokenEasing: string;
-  baselineDuration: string;
-  baselineEasing: string;
-  baselineDelay: string;
+  tokenStaticLeft?: string;
+  baselineDuration?: string;
+  baselineEasing?: string;
+  baselineDelay?: string;
   tokenDelay: string;
 }
 
-const LANE_DELAY_STEP_MS = 280;
+const SHARED_LANE_DELAY_MS = -560;
+const EASING_SLOW_FACTOR = 10;
+const DURATION_VISUAL_FACTOR = 9;
+const MIN_MOTION_DURATION_MS = 900;
+const MAX_MOTION_DURATION_MS = 3900;
 
 const base = asRecord(tokens.base, "base");
 const motion = asRecord(base.motion, "base.motion");
@@ -70,20 +76,54 @@ function parseDurationMs(value: string): number {
   return Number.isFinite(parsed) ? parsed : 180;
 }
 
-function laneDuration(value: string): string {
+function laneDuration(value: string, factor = DURATION_VISUAL_FACTOR): string {
   const ms = parseDurationMs(value);
-  const scaledMs = Math.round(Math.min(4000, Math.max(900, ms * 8)));
+  const scaledMs = Math.round(
+    Math.min(MAX_MOTION_DURATION_MS, Math.max(MIN_MOTION_DURATION_MS, ms * factor)),
+  );
   return `${scaledMs}ms`;
 }
 
-const durationRows = toRows(
+const durationRows = createOrderedTokenRows(
   asRecord(motion.duration, "base.motion.duration"),
   "base.motion.duration",
+  ["instant", "fast", "normal", "slow", "slower"],
 );
-const easingRows = toRows(
+const easingRows = createOrderedTokenRows(
   asRecord(motion.easing, "base.motion.easing"),
   "base.motion.easing",
+  ["linear", "standard", "accelerated", "decelerated", "emphasized"],
 );
+
+function createOrderedTokenRows(
+  node: unknown,
+  prefix: string,
+  order: string[],
+) {
+  const rows = toRows(node, prefix);
+  const orderMap = new Map(order.map((key, index) => [key, index]));
+
+  return [...rows].sort((left, right) => {
+    const leftKey = left.path.split(".").pop() ?? left.path;
+    const rightKey = right.path.split(".").pop() ?? right.path;
+    const leftIndex = leftKey ? orderMap.get(leftKey) : undefined;
+    const rightIndex = rightKey ? orderMap.get(rightKey) : undefined;
+
+    if (leftIndex !== undefined && rightIndex !== undefined) {
+      return leftIndex - rightIndex;
+    }
+
+    if (leftIndex !== undefined) {
+      return -1;
+    }
+
+    if (rightIndex !== undefined) {
+      return 1;
+    }
+
+    return leftKey.localeCompare(rightKey);
+  });
+}
 
 const standardEasing =
   easingRows.find((row) => row.path.endsWith(".standard"))?.value ?? "linear";
@@ -92,39 +132,41 @@ const normalDuration =
   durationRows.find((row) => row.path.endsWith(".normal"))?.value ??
   durationRows[0]?.value ??
   "180ms";
-const baselineLaneDuration = laneDuration(normalDuration);
+const easingLaneDuration = laneDuration(normalDuration, EASING_SLOW_FACTOR);
 
-const durationLaneRows: MotionLaneRow[] = durationRows.map((row, index) => {
-  const delayMs = -(index * LANE_DELAY_STEP_MS);
+const durationLaneRows: MotionLaneRow[] = durationRows.map((row) => {
+  const durationMs = parseDurationMs(row.value);
+  const isInstant = durationMs === 0;
+  const sharedDelay = `${SHARED_LANE_DELAY_MS}ms`;
 
   return {
     id: `duration:${row.id}`,
     label: row.path.split(".").pop() ?? row.path,
     path: row.path,
     value: row.value,
-    tokenDuration: laneDuration(row.value),
+    hasBaseline: false,
+    tokenDuration: isInstant ? "1ms" : laneDuration(row.value),
     tokenEasing: standardEasing,
-    baselineDuration: baselineLaneDuration,
-    baselineEasing: standardEasing,
-    baselineDelay: `${delayMs}ms`,
-    tokenDelay: `${delayMs}ms`,
+    tokenStaticLeft: isInstant ? "calc(100% - 0.98rem)" : undefined,
+    tokenDelay: sharedDelay,
   };
 });
 
-const easingLaneRows: MotionLaneRow[] = easingRows.map((row, index) => {
-  const delayMs = -((index + durationRows.length) * LANE_DELAY_STEP_MS);
+const easingLaneRows: MotionLaneRow[] = easingRows.map((row) => {
+  const sharedDelay = `${SHARED_LANE_DELAY_MS}ms`;
 
   return {
     id: `easing:${row.id}`,
     label: row.path.split(".").pop() ?? row.path,
     path: row.path,
     value: row.value,
-    tokenDuration: baselineLaneDuration,
+    hasBaseline: true,
+    tokenDuration: easingLaneDuration,
     tokenEasing: row.value,
-    baselineDuration: baselineLaneDuration,
+    baselineDuration: easingLaneDuration,
     baselineEasing,
-    baselineDelay: `${delayMs}ms`,
-    tokenDelay: `${delayMs}ms`,
+    baselineDelay: sharedDelay,
+    tokenDelay: sharedDelay,
   };
 });
 
@@ -145,29 +187,32 @@ const shadowRows = toRows(shadows, "base.shadow");
 const shadowGroups = [{ id: "shadow", label: "Shadow Scale", rows: shadowRows }];
 
 function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
+  const compareClassName = row.hasBaseline
+    ? "fd-tokendocs-motionLaneCompare"
+    : "fd-tokendocs-motionLaneCompare is-token-only";
+  const tokenBallClassName = row.tokenStaticLeft
+    ? "fd-tokendocs-motionLaneBall is-token is-static"
+    : "fd-tokendocs-motionLaneBall is-token";
+  const baselineStyle = row.hasBaseline
+    ? ({
+        "--fd-lane-duration": row.baselineDuration ?? row.tokenDuration,
+        "--fd-lane-easing": row.baselineEasing ?? "linear",
+        "--fd-lane-delay": row.baselineDelay ?? row.tokenDelay,
+      } as CSSProperties)
+    : undefined;
+
   return (
-    <div
-      className="fd-tokendocs-motionLaneCompare"
-      aria-hidden="true"
-      title={`${row.path}: ${row.value}`}
-    >
-      <span className="fd-tokendocs-motionRailRow is-baseline">
-        <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
-          B
+    <div className={compareClassName} aria-hidden="true" title={`${row.path}: ${row.value}`}>
+      {row.hasBaseline ? (
+        <span className="fd-tokendocs-motionRailRow is-baseline">
+          <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
+            B
+          </span>
+          <span className="fd-tokendocs-motionRail is-baseline">
+            <span className="fd-tokendocs-motionLaneBall is-baseline" style={baselineStyle} />
+          </span>
         </span>
-        <span className="fd-tokendocs-motionRail is-baseline">
-          <span
-            className="fd-tokendocs-motionLaneBall is-baseline"
-            style={
-              {
-                "--fd-lane-duration": row.baselineDuration,
-                "--fd-lane-easing": row.baselineEasing,
-                "--fd-lane-delay": row.baselineDelay,
-              } as CSSProperties
-            }
-          />
-        </span>
-      </span>
+      ) : null}
 
       <span className="fd-tokendocs-motionRailRow is-token">
         <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
@@ -175,12 +220,13 @@ function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
         </span>
         <span className="fd-tokendocs-motionRail is-token">
           <span
-            className="fd-tokendocs-motionLaneBall is-token"
+            className={tokenBallClassName}
             style={
               {
                 "--fd-lane-duration": row.tokenDuration,
                 "--fd-lane-easing": row.tokenEasing,
                 "--fd-lane-delay": row.tokenDelay,
+                "--fd-lane-static-left": row.tokenStaticLeft,
               } as CSSProperties
             }
           />
@@ -216,12 +262,12 @@ export const Showcase: Story = {
         >
           <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
             <div className="fd-tokendocs-motionLegend" aria-hidden="true">
-              <span className="fd-tokendocs-motionLegendItem is-baseline">Baseline (neutral)</span>
+              <span className="fd-tokendocs-motionLegendItem is-baseline">Baseline (easing)</span>
               <span className="fd-tokendocs-motionLegendItem is-token">Token timing (accent)</span>
             </div>
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Accent marker uses token duration; neutral marker uses baseline normal duration.
+              Token marker only: compares relative speed across duration tokens.
             </p>
             <div className="fd-tokendocs-motionLanes">
               {durationLaneRows.map((row) => (
@@ -237,7 +283,7 @@ export const Showcase: Story = {
 
             <h3 className="fd-tokendocs-showcaseTitle">Easing Lanes</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Neutral marker is linear baseline, accent marker uses the easing token with same duration.
+              Neutral marker is linear baseline; token marker uses the easing token at the same slower pace.
             </p>
             <div className="fd-tokendocs-motionLanes">
               {easingLaneRows.map((row) => (

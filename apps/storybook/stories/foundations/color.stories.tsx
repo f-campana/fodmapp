@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
@@ -14,6 +14,7 @@ import {
 import {
   asRecord,
   flattenTokenTree,
+  compareNumericTokenValues,
   groupRowsBySegment,
   isColorTokenValue,
   naturalTokenPathCompare,
@@ -75,10 +76,6 @@ function isScaleStep(value: string): boolean {
   return /^\d+$/.test(value);
 }
 
-function sortScaleStep(left: string, right: string): number {
-  return Number.parseInt(left, 10) - Number.parseInt(right, 10);
-}
-
 function familySort(left: string, right: string): number {
   const preferredOrder = ["neutral", "blue", "emerald", "amber", "red"];
   const leftIndex = preferredOrder.indexOf(left);
@@ -124,7 +121,20 @@ for (const entry of coreFamilyEntries) {
 const sharedScaleStops = [...scaleStopCounts.entries()]
   .filter(([, count]) => count >= 2)
   .map(([stop]) => stop)
-  .sort(sortScaleStep);
+  .sort(compareNumericTokenValues);
+
+const sparseScaleStops = Array.from(
+  new Set(
+    coreFamilyEntries.flatMap((entry) =>
+      Object.keys(entry.scale)
+        .filter((key) => isScaleStep(key) && (scaleStopCounts.get(key) ?? 0) < 2)
+        .filter((step) => {
+          const token = entry.scale[step];
+          return typeof token === "string" && isColorTokenValue(token);
+        }),
+    ),
+  ),
+).sort(compareNumericTokenValues);
 
 const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
   const sparseStops = Object.keys(entry.scale)
@@ -136,6 +146,7 @@ const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
         value: typeof token === "string" && isColorTokenValue(token) ? token : "",
       };
     })
+    .sort((left, right) => compareNumericTokenValues(left.step, right.step))
     .filter((item) => item.value);
 
   const values = Object.fromEntries(
@@ -310,6 +321,37 @@ const semanticColorGroups = groupRowsBySegment(
   rows: semanticColorRows.filter((row) => row.path.split(".")[2] === group.id),
 }));
 
+function createInlineSwatch(value: string): ReactNode {
+  return (
+    <>
+      <span
+        className="fd-tokendocs-inlineColorSwatch"
+        style={{ backgroundColor: value }}
+        aria-hidden="true"
+      />
+      <span className="fd-tokendocs-value-plain">{value}</span>
+    </>
+  );
+}
+
+function makeJumpLinkHandler(
+  groupId: string,
+  setGroupId: (value: string | null) => void,
+  prefix: string,
+) {
+  return () => {
+    setGroupId(groupId);
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const target = document.getElementById(`${prefix}-${groupId}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+}
+
 const meta = {
   title: "Foundations/Tokens/Color",
   tags: ["autodocs"],
@@ -327,6 +369,8 @@ export const Showcase: Story = {
   render: () => {
     const matrixStyle = {
       "--fd-color-cols": String(sharedScaleStops.length),
+      "--fd-color-sparse-cols": String(sparseScaleStops.length),
+      "--fd-color-sparse-col-width": "2.55rem",
     } as CSSProperties;
 
     return (
@@ -344,7 +388,7 @@ export const Showcase: Story = {
               Core families on rows, shared scale stops on columns.
             </p>
             <p className="fd-tokendocs-matrixNote">
-              Sparse-only stops (for example `950`) render inline on the owning row.
+              Sparse-only stops (for example `950`) render inline as regular matrix values on the owning row.
             </p>
             <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
               <div className="fd-tokendocs-colorMatrixHead">
@@ -354,29 +398,16 @@ export const Showcase: Story = {
                     {step}
                   </span>
                 ))}
+                {sparseScaleStops.map((step) => (
+                  <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
+                    {step}
+                  </span>
+                ))}
               </div>
               {matrixRows.map((row) => (
                 <div key={row.family} className="fd-tokendocs-colorMatrixRow">
                   <span className="fd-tokendocs-colorFamilyCell">
                     <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
-                    {row.sparseStops.length ? (
-                      <span className="fd-tokendocs-colorSparseList">
-                        {row.sparseStops.map((sparse) => {
-                          const sparsePath = `base.color.${row.family}.${sparse.step}`;
-                          return (
-                            <span key={`${row.family}-${sparse.step}`} className="fd-tokendocs-colorSparseChip">
-                              <span
-                                className="fd-tokendocs-colorSparseSwatch"
-                                style={{ backgroundColor: sparse.value }}
-                                title={`${sparsePath}: ${sparse.value}`}
-                                aria-hidden="true"
-                              />
-                              <span className="fd-tokendocs-colorSparseStep">{sparse.step}</span>
-                            </span>
-                          );
-                        })}
-                      </span>
-                    ) : null}
                   </span>
                   {sharedScaleStops.map((step) => {
                     const value = row.values[step];
@@ -399,6 +430,35 @@ export const Showcase: Story = {
                           title={label}
                           role="img"
                           aria-label={label}
+                        />
+                      </div>
+                    );
+                  })}
+                  {sparseScaleStops.map((step) => {
+                    const sparse = row.sparseStops.find((item) => item.step === step);
+                    const sparseValue = sparse?.value ?? null;
+                    const sparsePath = `base.color.${row.family}.${step}`;
+
+                    return (
+                      <div
+                        key={`${row.family}-${step}`}
+                        className={classNames(
+                          "fd-tokendocs-colorMatrixCell",
+                          sparseValue ? "" : "is-empty",
+                        )}
+                        title={
+                          sparseValue
+                            ? `${sparsePath}: ${sparseValue}`
+                            : `${sparsePath}: no token at this stop`
+                        }
+                      >
+                        <span
+                          className="fd-tokendocs-colorSwatchBlock"
+                          style={sparseValue ? { backgroundColor: sparseValue } : undefined}
+                          role="img"
+                          aria-label={
+                            sparseValue ? `${sparsePath}: ${sparseValue}` : `${sparsePath}: no token`
+                          }
                         />
                       </div>
                     );
@@ -500,6 +560,13 @@ export const Showcase: Story = {
 
 export const Reference: Story = {
   render: () => {
+    const [baseOpenGroupId, setBaseOpenGroupId] = useState<string | null>(
+      baseColorGroups[0]?.id ?? "neutral",
+    );
+    const [semanticOpenGroupId, setSemanticOpenGroupId] = useState<string | null>(
+      semanticColorGroups[0]?.id ?? "action",
+    );
+
     return (
       <TokenDocsPage
         title="Color Token Reference"
@@ -512,13 +579,16 @@ export const Reference: Story = {
           <nav aria-label="Base color group jump links" className="fd-tokendocs-jumpList">
             <span className="fd-tokendocs-jumpLabel">Jump to</span>
             {baseColorGroups.map((group) => (
-              <a
+              <button
                 key={`base-${group.id}`}
-                href={`#base-color-grid-${group.id}`}
                 className="fd-tokendocs-jumpLink"
+                onClick={() =>
+                  makeJumpLinkHandler(group.id, setBaseOpenGroupId, "base-color-grid")()
+                }
+                type="button"
               >
                 {group.label}
-              </a>
+              </button>
             ))}
           </nav>
 
@@ -528,6 +598,8 @@ export const Reference: Story = {
             accordion
             allowCollapseAll
             initialOpenGroupId="neutral"
+            openGroupId={baseOpenGroupId}
+            onOpenGroupChange={setBaseOpenGroupId}
             columns={[
               {
                 key: "path",
@@ -543,7 +615,9 @@ export const Reference: Story = {
                 label: "Color Value",
                 width: "minmax(360px, 1.1fr)",
                 getValue: (row) => row.value,
-                valueMode: "plain",
+                render: (row) => (
+                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.value)}</span>
+                ),
                 copyValue: (row) => row.value,
               },
             ]}
@@ -557,13 +631,16 @@ export const Reference: Story = {
           <nav aria-label="Semantic color group jump links" className="fd-tokendocs-jumpList">
             <span className="fd-tokendocs-jumpLabel">Jump to</span>
             {semanticColorGroups.map((group) => (
-              <a
+              <button
                 key={`semantic-${group.id}`}
-                href={`#semantic-color-grid-${group.id}`}
                 className="fd-tokendocs-jumpLink"
+                onClick={() =>
+                  makeJumpLinkHandler(group.id, setSemanticOpenGroupId, "semantic-color-grid")()
+                }
+                type="button"
               >
                 {group.label}
-              </a>
+              </button>
             ))}
           </nav>
 
@@ -573,6 +650,8 @@ export const Reference: Story = {
             accordion
             allowCollapseAll
             initialOpenGroupId="action"
+            openGroupId={semanticOpenGroupId}
+            onOpenGroupChange={setSemanticOpenGroupId}
             columns={[
               {
                 key: "path",
@@ -588,7 +667,9 @@ export const Reference: Story = {
                 label: "Light",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.light,
-                valueMode: "plain",
+                render: (row) => (
+                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.light)}</span>
+                ),
                 copyValue: (row) => row.light,
               },
               {
@@ -596,7 +677,9 @@ export const Reference: Story = {
                 label: "Dark",
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.dark,
-                valueMode: "plain",
+                render: (row) => (
+                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.dark)}</span>
+                ),
                 copyValue: (row) => row.dark,
               },
             ]}
