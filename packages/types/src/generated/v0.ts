@@ -140,6 +140,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v0/barcodes/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lookup barcode and resolve product/food context */
+        get: operations["getBarcodeLookup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -277,6 +294,52 @@ export interface components {
             items: components["schemas"]["SwapItem"][];
             total: number;
         };
+        /** @enum {string} */
+        BarcodeCanonicalFormat: "EAN8" | "EAN13";
+        /** @enum {string} */
+        BarcodeResolutionStatus: "resolved" | "unresolved";
+        /** @enum {string} */
+        BarcodeCacheStatus: "fresh" | "stale" | "miss";
+        /** @enum {string} */
+        BarcodeLinkMethod: "manual" | "heuristic";
+        BarcodeProduct: {
+            source_code?: string | null;
+            product_name_fr?: string | null;
+            product_name_en?: string | null;
+            brand?: string | null;
+            ingredients_text_fr?: string | null;
+            categories_tags: string[];
+            countries_tags: string[];
+        };
+        BarcodeResolvedFood: {
+            food_slug: string;
+            canonical_name_fr: string;
+            canonical_name_en: string;
+            link_method: components["schemas"]["BarcodeLinkMethod"];
+            confidence?: number | null;
+        };
+        BarcodeCandidate: {
+            food_slug: string;
+            canonical_name_fr: string;
+            canonical_name_en: string;
+            score: number;
+            signal_breakdown: {
+                [key: string]: number;
+            };
+        };
+        BarcodeLookupResponse: {
+            query_code: string;
+            normalized_code: string;
+            canonical_format: components["schemas"]["BarcodeCanonicalFormat"];
+            resolution_status: components["schemas"]["BarcodeResolutionStatus"];
+            cache_status: components["schemas"]["BarcodeCacheStatus"];
+            product?: components["schemas"]["BarcodeProduct"] | null;
+            resolved_food?: components["schemas"]["BarcodeResolvedFood"] | null;
+            candidates: components["schemas"]["BarcodeCandidate"][];
+            provider: string;
+            /** Format: date-time */
+            provider_last_synced_at?: string | null;
+        };
     };
     responses: {
         /** @description Resource not found */
@@ -301,6 +364,8 @@ export interface components {
         LimitQuery: number;
         /** @description Lower bound for `fodmap_safety_score`. */
         MinSafetyScoreQuery: number;
+        /** @description Retail barcode (EAN-8, UPC-A, or EAN-13). */
+        BarcodePath: string;
     };
     requestBodies: never;
     headers: never;
@@ -483,6 +548,48 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+        };
+    };
+    getBarcodeLookup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Retail barcode (EAN-8, UPC-A, or EAN-13). */
+                code: components["parameters"]["BarcodePath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Barcode lookup result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BarcodeLookupResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description Invalid barcode format/check digit */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Provider unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
 }
