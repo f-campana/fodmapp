@@ -23,6 +23,7 @@
     "app:dev": "pnpm --filter @fodmap/app dev",
     "app:build": "pnpm --filter @fodmap/app build",
     "app:typecheck": "pnpm --filter @fodmap/app typecheck",
+    "app:test": "pnpm --filter @fodmap/app test",
     "storybook": "pnpm --filter @fodmap/storybook storybook",
     "storybook:build": "pnpm --filter @fodmap/storybook storybook:build",
     "storybook:test": "pnpm --filter @fodmap/storybook storybook:test",

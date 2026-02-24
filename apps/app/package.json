@@ -7,7 +7,8 @@
     "dev": "pnpm --filter @fodmap/ui build && next dev",
     "build": "pnpm --filter @fodmap/ui build && next build",
     "start": "next start",
-    "typecheck": "pnpm --filter @fodmap/ui build && tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm --filter @fodmap/ui build && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm --filter @fodmap/ui build && vitest run"
   },
   "dependencies": {
     "@fodmap/types": "workspace:*",
@@ -20,6 +21,7 @@
     "@types/node": "25.3.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
   }
 }

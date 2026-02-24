@@ -61,13 +61,17 @@ Exact file touch map:
 9. New: `apps/app/lib/i18n.ts`
 10. New: `apps/app/lib/auth.ts`
 11. New: `apps/app/lib/monitoring.ts`
-12. New: `apps/app/README.md`
-13. Update: `package.json` (root scripts for app convenience)
-14. Update: `.github/workflows/ci.yml` (app scaffold job)
-15. Update: `.gitignore` (`.next/`)
-16. Update: `packages/types/package.json` (explicit package exports for app imports)
-17. Update: `pnpm-lock.yaml` (workspace dependency graph with Next.js app)
-18. Update: `docs/README.md` (index reference to this sprint plan)
+12. New: `apps/app/tests/setup.ts`
+13. New: `apps/app/tests/routes.test.tsx`
+14. New: `apps/app/vitest.config.ts`
+15. New: `apps/app/README.md`
+16. Update: `package.json` (root scripts for app convenience)
+17. Update: `.github/workflows/ci.yml` (app scaffold job)
+18. Update: `.gitignore` (`.next/`)
+19. Update: `packages/types/package.json` (types-only package exports)
+20. Update: `packages/types/README.md` (types-only usage contract)
+21. Update: `pnpm-lock.yaml` (workspace dependency graph with Next.js app)
+22. Update: `docs/README.md` (index reference to this sprint plan)
 
 CI and validation commands:
 
@@ -75,9 +79,10 @@ CI and validation commands:
 2. `pnpm install --frozen-lockfile`
 3. `pnpm openapi:check`
 4. `pnpm --filter @fodmap/ui build`
-5. `pnpm --filter @fodmap/app typecheck`
-6. `pnpm --filter @fodmap/app build`
-7. `pytest -m "not integration" api/tests`
+5. `pnpm --filter @fodmap/app test`
+6. `pnpm --filter @fodmap/app typecheck`
+7. `pnpm --filter @fodmap/app build`
+8. `pytest -m "not integration" api/tests`
 
 Risks and mitigations:
 
@@ -90,11 +95,12 @@ Risks and mitigations:
 
 Acceptance criteria:
 
-1. `apps/app` builds and typechecks in CI and locally.
+1. `apps/app` tests, builds, and typechecks in CI and locally.
 2. Home route renders shared UI components with FR-first copy.
 3. A gated-area stub route exists at `/espace` with placeholder auth state.
 4. A compile-time type from `@fodmap/types` is used in app code.
-5. No ETL, schema SQL, or API runtime behavior files are changed.
+5. Route smoke tests cover `/` and `/espace` placeholder rendering.
+6. No ETL, schema SQL, or API runtime behavior files are changed.
 
 ## PR-2: `apps/app` Cross-Cutting Bootstrap
 

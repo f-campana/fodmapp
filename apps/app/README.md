@@ -9,6 +9,7 @@ Architecture-first Next.js scaffold for the product app.
 3. `@fodmap/ui` component consumption.
 4. `@fodmap/types` contract consumption (compile-time only).
 5. Auth and monitoring stubs only (no provider SDK wiring).
+6. Route smoke tests for `/` and `/espace`.
 
 ## Out Of Scope In This PR
 
