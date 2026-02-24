@@ -1,0 +1,16 @@
+{
+  "name": "@fodmap/content-config",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    "./i18n": {
+      "types": "./src/i18n.ts",
+      "import": "./src/i18n.ts"
+    }
+  },
+  "files": [
+    "src",
+    "README.md"
+  ]
+}
