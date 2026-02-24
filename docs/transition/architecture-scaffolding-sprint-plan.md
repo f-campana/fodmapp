@@ -113,7 +113,7 @@ Scope:
 Exact file touch map:
 
 1. New: `apps/app/instrumentation.ts`
-2. New: `apps/app/middleware.ts`
+2. New: `apps/app/proxy.ts`
 3. New: `apps/app/lib/env.client.ts`
 4. New: `apps/app/lib/env.server.ts`
 5. New: `apps/app/lib/analytics.ts`
