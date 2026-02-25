@@ -7,7 +7,7 @@ Scope: backend API, schema, shared packages, web manual input, native scanner pa
 ## Review Outcome
 
 Status: not merge-ready yet.  
-Main blockers are correctness/observability gaps in barcode lookup behavior and OpenAPI typegen parity.
+Main blockers are correctness/observability gaps in barcode lookup behavior.
 
 ## Findings
 
@@ -74,17 +74,15 @@ Main blockers are correctness/observability gaps in barcode lookup behavior and 
   - Write heuristic event only on material change (`food_id`, `confidence`, `heuristic_version`, `signals_json`).
   - Keep reads idempotent under repeated scans/lookups.
 
-### 6) [P2] OpenAPI-generated TypeScript is out of sync with the spec
+### 6) [Resolved] OpenAPI-generated TypeScript parity restored
 
 - Area: contract/typegen parity
 - Evidence:
-  - `pnpm openapi:check` fails with diff in:
-  - `/Users/fabiencampana/Documents/Fodmap-barcode-v1/packages/types/src/generated/v0.ts`
-- Issue:
-  - Contract check fails and would block CI merge.
-- Recommendation:
-  - Regenerate and commit `packages/types/src/generated/v0.ts`.
-  - Keep `pnpm openapi:check` green before merge.
+  - `pnpm openapi:check` passes.
+  - `/Users/fabiencampana/Documents/Fodmap-barcode-v1/packages/types/src/generated/v0.ts` is in sync with the current spec.
+- Resolution:
+  - Regenerated and committed generated OpenAPI TypeScript output.
+  - CI contract parity is now green for this finding.
 
 ### 7) [P3] Local integration coverage can be silently reduced by table-gated skips
 
@@ -117,6 +115,7 @@ Main blockers are correctness/observability gaps in barcode lookup behavior and 
 - `pnpm --filter @fodmap/barcode-client test`
 - `pnpm --filter @fodmap/barcode-web test`
 - `pnpm --filter @fodmap/barcode-native test`
+- `pnpm openapi:check`
 - `python3 -m pytest -q api/tests` (26 passed, 3 skipped)
 - `pnpm --filter @fodmap/storybook storybook:typecheck`
 - `pnpm --filter @fodmap/storybook storybook:build`
@@ -125,13 +124,9 @@ Main blockers are correctness/observability gaps in barcode lookup behavior and 
 - `pnpm test`
 - `./.github/scripts/quality-gate.sh`
 
-### Failing
-
-- `pnpm openapi:check` (generated types out of sync with OpenAPI spec)
-
 ## Suggested Resolution Order
 
-1. Fix findings 1, 2, 6 first (behavior and merge-blocking parity).
+1. Fix findings 1 and 2 first (behavior and observability correctness).
 2. Fix findings 3, 4, 5 (data integrity and audit quality).
 3. Fix findings 7, 8 (confidence and client resilience).
 
