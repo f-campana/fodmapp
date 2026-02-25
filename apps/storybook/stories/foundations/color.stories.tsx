@@ -58,6 +58,57 @@ interface SemanticPairCard {
   darkFg: string;
 }
 
+const brandPairOrder = [
+  "canvas",
+  "surface",
+  "surfaceStrong",
+  "surfaceMuted",
+  "text",
+  "textMuted",
+  "border",
+  "accent",
+  "accentStrong",
+  "accentForeground",
+  "ring",
+  "ringSoft",
+  "warning",
+  "warningForeground",
+  "danger",
+  "dangerStrong",
+  "dangerForeground",
+] as const;
+
+const semanticPairOrder = [
+  "action.primary",
+  "action.secondary",
+  "action.destructive",
+  "status.info",
+  "status.success",
+  "status.warning",
+  "status.danger",
+] as const;
+
+function compareByPreferredOrder(
+  leftLabel: string,
+  rightLabel: string,
+  preferredOrder: readonly string[],
+): number {
+  const leftIndex = preferredOrder.indexOf(leftLabel);
+  const rightIndex = preferredOrder.indexOf(rightLabel);
+
+  if (leftIndex !== -1 || rightIndex !== -1) {
+    if (leftIndex === -1) {
+      return 1;
+    }
+    if (rightIndex === -1) {
+      return -1;
+    }
+    return leftIndex - rightIndex;
+  }
+
+  return leftLabel.localeCompare(rightLabel);
+}
+
 const base = asRecord(tokens.base, "base");
 const themes = asRecord(tokens.themes, "themes");
 const lightTheme = asRecord(themes.light, "themes.light");
@@ -208,7 +259,7 @@ for (const [key, value] of Object.entries(brandScale)) {
 }
 
 const brandPairs = [...brandPairsMap.values()].sort((left, right) =>
-  left.label.localeCompare(right.label),
+  compareByPreferredOrder(left.label, right.label, brandPairOrder),
 );
 
 const baseColorRows: BaseColorGridRow[] = flattenTokenTree(
@@ -318,7 +369,9 @@ const semanticPairCards: SemanticPairCard[] = semanticColorRows
     };
   })
   .filter((value): value is SemanticPairCard => value !== null)
-  .sort((left, right) => left.label.localeCompare(right.label));
+  .sort((left, right) =>
+    compareByPreferredOrder(left.label, right.label, semanticPairOrder),
+  );
 
 const semanticColorGroups = groupRowsBySegment(
   semanticColorRows.map((row) => ({
