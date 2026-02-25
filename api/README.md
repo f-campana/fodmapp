@@ -11,16 +11,14 @@ Read-only FastAPI service exposing Phase 3 product-layer data:
 
 ```bash
 cd api
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .[dev]
+uv sync --extra dev
 ```
 
 ## Run
 
 ```bash
 API_DB_URL="postgresql://$USER@localhost:5432/fodmap_test" \
-uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 ## Tests
@@ -29,14 +27,14 @@ Contract/unit tests:
 
 ```bash
 cd api
-pytest -m "not integration"
+uv run pytest -m "not integration"
 ```
 
 Integration tests (requires seeded `fodmap_test`):
 
 ```bash
 cd api
-API_DB_URL="postgresql://$USER@localhost:5432/fodmap_test" pytest -m integration
+API_DB_URL="postgresql://$USER@localhost:5432/fodmap_test" uv run pytest -m integration
 ```
 
 ## CI integration profile
