@@ -9,10 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@fodmap/ui";
-import {
-  getAnalyticsBootstrapStatus,
-  trackAnalyticsEvent,
-} from "../../lib/analytics";
+import { AnalyticsPageView } from "../../components/analytics-page-view";
+import { getAnalyticsBootstrapStatus } from "../../lib/analytics";
 import {
   canTrackWithConsent,
   getConsentBootstrapStatus,
@@ -28,10 +26,6 @@ export default async function EspacePage() {
   const consent = getConsentBootstrapStatus();
   const analyticsAllowed = canTrackWithConsent(consent) && analytics.configured;
 
-  if (analyticsAllowed) {
-    trackAnalyticsEvent("gated_placeholder_viewed", { route: "/espace" });
-  }
-
   captureArchitectureEvent("gated_placeholder_rendered", {
     route: "/espace",
     auth_state: auth.state,
@@ -41,6 +35,11 @@ export default async function EspacePage() {
 
   return (
     <main className="app-shell">
+      <AnalyticsPageView
+        enabled={analyticsAllowed}
+        event="gated_placeholder_viewed"
+        route="/espace"
+      />
       <Badge variant="outline">
         {messages.gated.authStateLabel}: {auth.state}
       </Badge>

@@ -5,7 +5,7 @@ import {
   getPlausibleScriptConfig,
 } from "../lib/analytics";
 import { getClerkBootstrapStatus } from "../lib/clerk";
-import { getConsentBootstrapStatus } from "../lib/consent";
+import { canTrackWithConsent, getConsentBootstrapStatus } from "../lib/consent";
 import {
   captureArchitectureEvent,
   getMonitoringBootstrapStatus,
@@ -26,7 +26,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const monitoring = getMonitoringBootstrapStatus();
   const analytics = getAnalyticsBootstrapStatus();
   const consent = getConsentBootstrapStatus();
-  const plausible = getPlausibleScriptConfig(analytics);
+  const analyticsAllowed = analytics.configured && canTrackWithConsent(consent);
+  const plausible = analyticsAllowed ? getPlausibleScriptConfig(analytics) : null;
 
   captureArchitectureEvent("layout_bootstrap_rendered", {
     auth_provider: auth.provider,

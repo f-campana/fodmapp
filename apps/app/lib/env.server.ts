@@ -11,8 +11,12 @@ export interface ServerRuntimeEnv {
 }
 
 export function getServerRuntimeEnv(): ServerRuntimeEnv {
+  const sentryDsnApp =
+    readOptionalEnv("SENTRY_DSN_APP") ??
+    readOptionalEnv("NEXT_PUBLIC_SENTRY_DSN_APP");
+
   return {
-    sentryDsnApp: readOptionalEnv("SENTRY_DSN_APP"),
+    sentryDsnApp,
     clerkSecretKey: readOptionalEnv("CLERK_SECRET_KEY"),
     clerkJwtIssuerDomain: readOptionalEnv("CLERK_JWT_ISSUER_DOMAIN"),
     nodeEnv: process.env.NODE_ENV ?? "development",
@@ -29,6 +33,6 @@ export function getServerFeatureFlags(
 ): ServerFeatureFlags {
   return {
     sentryConfigured: Boolean(env.sentryDsnApp),
-    clerkConfigured: Boolean(env.clerkSecretKey && env.clerkJwtIssuerDomain),
+    clerkConfigured: Boolean(env.clerkSecretKey),
   };
 }

@@ -5,9 +5,10 @@ const AXEPTIO_DEFERRED_REASON =
 
 export interface ConsentBootstrapStatus {
   provider: "axeptio";
-  mode: "disabled" | "deferred-noop";
+  mode: "disabled" | "deferred-noop" | "manual-opt-in";
   configured: boolean;
-  runtimeEnabled: false;
+  runtimeEnabled: boolean;
+  manualOptIn: boolean;
   clientId: string | null;
   cookiesVersion: string | null;
   deferredReason: string | null;
@@ -17,15 +18,21 @@ export function getConsentBootstrapStatus(): ConsentBootstrapStatus {
   const env = getClientRuntimeEnv();
   const flags = getClientFeatureFlags(env);
   const configured = flags.consentConfigured;
+  const manualOptIn = flags.analyticsConsentGranted;
 
   return {
     provider: "axeptio",
-    mode: configured ? "deferred-noop" : "disabled",
+    mode: manualOptIn
+      ? "manual-opt-in"
+      : configured
+        ? "deferred-noop"
+        : "disabled",
     configured,
-    runtimeEnabled: false,
+    runtimeEnabled: manualOptIn,
+    manualOptIn,
     clientId: env.axeptioClientId,
     cookiesVersion: env.axeptioCookiesVersion,
-    deferredReason: configured ? AXEPTIO_DEFERRED_REASON : null,
+    deferredReason: configured && !manualOptIn ? AXEPTIO_DEFERRED_REASON : null,
   };
 }
 

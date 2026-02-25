@@ -10,10 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@fodmap/ui";
-import {
-  getAnalyticsBootstrapStatus,
-  trackAnalyticsEvent,
-} from "../lib/analytics";
+import { AnalyticsPageView } from "../components/analytics-page-view";
+import { getAnalyticsBootstrapStatus } from "../lib/analytics";
 import { getClerkBootstrapStatus } from "../lib/clerk";
 import { canTrackWithConsent, getConsentBootstrapStatus } from "../lib/consent";
 import { getMessages } from "../lib/i18n";
@@ -38,9 +36,6 @@ export default function HomePage() {
   const consent = getConsentBootstrapStatus();
 
   const analyticsAllowed = canTrackWithConsent(consent) && analytics.configured;
-  if (analyticsAllowed) {
-    trackAnalyticsEvent("home_page_viewed", { route: "/" });
-  }
 
   captureArchitectureEvent("app_shell_rendered", {
     route: "/",
@@ -52,6 +47,11 @@ export default function HomePage() {
 
   return (
     <main className="app-shell">
+      <AnalyticsPageView
+        enabled={analyticsAllowed}
+        event="home_page_viewed"
+        route="/"
+      />
       <div className="app-shell__meta">
         <Badge variant="secondary">{messages.meta.phaseBadge}</Badge>
         <p className="app-shell__status">{messages.meta.localeLabel}</p>

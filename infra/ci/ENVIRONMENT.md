@@ -36,14 +36,16 @@ These keys are now actively consumed by `apps/app` runtime adapters. All integra
 
 | Variable                              | Adapter | Required | Behavior when missing |
 | ------------------------------------- | ------- | -------- | --------------------- |
-| `SENTRY_DSN_APP`                      | Sentry (`@sentry/nextjs`) | no | Monitoring adapter stays `disabled`. |
+| `SENTRY_DSN_APP`                      | Sentry (`@sentry/nextjs`) server init | no | Falls back to `NEXT_PUBLIC_SENTRY_DSN_APP`; disabled if both are empty. |
+| `NEXT_PUBLIC_SENTRY_DSN_APP`          | Sentry (`@sentry/nextjs`) client init | no | Client instrumentation stays disabled. |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless all Clerk keys are present. |
-| `CLERK_SECRET_KEY`                    | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless all Clerk keys are present. |
-| `CLERK_JWT_ISSUER_DOMAIN`             | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless all Clerk keys are present. |
+| `CLERK_SECRET_KEY`                    | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless publishable + secret key are both present. |
+| `CLERK_JWT_ISSUER_DOMAIN`             | Clerk (`@clerk/nextjs`) | no | Reserved for JWT issuer/domain checks in future auth hardening. |
 | `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`        | Plausible script + events | no | Analytics adapter stays `disabled`; no script injected. |
 | `NEXT_PUBLIC_PLAUSIBLE_SRC`           | Plausible script + events | no | Defaults to `https://plausible.io/js/script.js`. |
 | `NEXT_PUBLIC_AXEPTIO_CLIENT_ID`       | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
 | `NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION` | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
+| `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED` | Consent fallback gate | no | Defaults to `false`; when `true`, allows analytics runtime for non-production validation until Axeptio is activated. |
 
 ## Reserved Near-Term Variables
 

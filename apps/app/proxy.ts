@@ -17,8 +17,16 @@ async function getClerkProxyHandler(): Promise<ClerkProxyHandler | null> {
 
   cachedClerkProxyHandler = (async () => {
     try {
-      const { clerkMiddleware } = await import("@clerk/nextjs/server");
-      return clerkMiddleware();
+      const { clerkMiddleware, createRouteMatcher } = await import(
+        "@clerk/nextjs/server"
+      );
+      const isProtectedRoute = createRouteMatcher(["/espace(.*)"]);
+
+      return clerkMiddleware(async (auth, request) => {
+        if (isProtectedRoute(request)) {
+          await auth.protect();
+        }
+      });
     } catch {
       return null;
     }
