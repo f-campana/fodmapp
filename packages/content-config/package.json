@@ -12,5 +12,11 @@
   "files": [
     "src",
     "README.md"
-  ]
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
 }

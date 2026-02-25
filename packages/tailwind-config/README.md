@@ -6,6 +6,16 @@ Shared Tailwind v4 adapter stylesheet for FODMAP packages/apps.
 
 - `@fodmap/tailwind-config/shared-styles.css`
 
+## Commands
+
+```bash
+pnpm --filter @fodmap/tailwind-config styles:generate
+pnpm --filter @fodmap/tailwind-config styles:check
+```
+
+`shared-styles.css` is generated from `src/semantic-slot-map.mjs`.
+Do not hand-edit `shared-styles.css`.
+
 ## Responsibilities
 
 - Imports Tailwind v4.

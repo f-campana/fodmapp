@@ -4,6 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build": "pnpm run storybook:build",
+    "typecheck": "pnpm run storybook:typecheck",
+    "test": "pnpm run test:local",
+    "test:local": "pnpm run storybook:build && pnpm run storybook:test",
+    "test:ci": "pnpm run storybook:test",
     "storybook": "pnpm --filter @fodmap/ui build && storybook dev -p 6006 --ci",
     "storybook:build": "pnpm --filter @fodmap/ui build && storybook build",
     "storybook:typecheck": "tsc -p tsconfig.json --noEmit",

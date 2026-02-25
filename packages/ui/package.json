@@ -34,6 +34,7 @@
     "build": "pnpm run clean && pnpm run build:ts && pnpm run build:styles",
     "build:ts": "tsup",
     "build:styles": "tailwindcss --config ./tailwind.config.ts -i ./src/styles/index.css -o ./dist/styles.css --minify",
+    "styles:check": "node ./scripts/check-styles-contract.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

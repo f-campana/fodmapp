@@ -20,8 +20,12 @@ type Story = StoryObj<typeof meta>;
 
 export const WithHint: Story = {
   render: () => (
-    <div className="w-[340px]">
-      <Field id="serving-size" label="Portion" hint="Valeur recommandée en grammes">
+    <div style={{ width: 340 }}>
+      <Field
+        id="serving-size"
+        label="Portion"
+        hint="Valeur recommandée en grammes"
+      >
         <Input placeholder="ex: 75" />
       </Field>
     </div>
@@ -36,7 +40,7 @@ export const WithHint: Story = {
 
 export const WithError: Story = {
   render: () => (
-    <div className="w-[340px]">
+    <div style={{ width: 340 }}>
       <Field id="email" label="Adresse email" error="Format invalide" required>
         <Input placeholder="nom@domaine.fr" />
       </Field>
