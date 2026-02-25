@@ -5,7 +5,7 @@ This runbook captures the manual/local verification steps for the Barcode Featur
 ## 1. Install Dependencies
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap-barcode-v1
+# from repository root on branch codex/barcode-feature-v1
 pnpm install
 python3 -m pip install -e './api[dev]'
 ```
@@ -24,7 +24,7 @@ If any are `null`, local DB schema is behind the branch and must be rebuilt/rese
 ## 3. Start API with Barcode Flags Enabled
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap-barcode-v1/api
+cd api
 API_DB_URL=postgresql://$USER@localhost:5432/fodmap_test \
 BARCODE_FEATURE_ENABLED=true \
 BARCODE_INTERNAL_ENABLED=true \
@@ -74,13 +74,19 @@ curl -s -X DELETE 'http://127.0.0.1:8000/v0/internal/barcodes/036000291452/link'
 From repository root:
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap-barcode-v1
 ./.github/scripts/quality-gate.sh
-pnpm openapi:generate
+pnpm openapi:check
 pnpm typecheck
 pnpm test
 python3 -m pytest -m "not integration" api/tests
 API_DB_URL=postgresql://$USER@localhost:5432/fodmap_test python3 -m pytest -m integration api/tests
+```
+
+If `pnpm openapi:check` fails locally, regenerate then re-check:
+
+```bash
+pnpm openapi:generate
+pnpm openapi:check
 ```
 
 Optional per-package checks:
@@ -97,7 +103,6 @@ pnpm --filter @fodmap/barcode-native test
 Run Storybook locally:
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap-barcode-v1
 pnpm --filter @fodmap/storybook storybook
 ```
 
