@@ -25,6 +25,7 @@ Outputs:
 ```bash
 pnpm --filter @fodmap/ui typecheck
 pnpm --filter @fodmap/ui test
+pnpm --filter @fodmap/ui styles:check
 ```
 
 ## Theme contract
@@ -34,6 +35,9 @@ The stylesheet consumes shared design tokens and supports:
 - system theme by default (no `data-theme` attribute)
 - forced light mode with `data-theme="light"`
 - forced dark mode with `data-theme="dark"`
+
+`@fodmap/ui/styles.css` is a component contract stylesheet only.
+Storybook-only utility classes must not be required or shipped by this package.
 
 ## Component API notes
 

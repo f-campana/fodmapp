@@ -1,7 +1,15 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@fodmap/ui";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@fodmap/ui";
 
 const meta = {
   title: "Primitives/Card",
@@ -15,7 +23,7 @@ type Story = StoryObj<typeof meta>;
 
 export const RecipeCard: Story = {
   render: () => (
-    <Card className="w-[360px]">
+    <Card style={{ width: 360 }}>
       <CardHeader>
         <CardTitle>Galette de sarrasin</CardTitle>
         <CardDescription>Version faible FODMAP</CardDescription>

@@ -36,7 +36,8 @@
 .fd-tokendocs-header {
   display: grid;
   gap: 0.4rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border) 84%, transparent);
   padding-bottom: 0.9rem;
 }
 
@@ -61,13 +62,14 @@
   gap: 0.78rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.95rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface) 88%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted)) 100%
-    );
-  box-shadow: 0 18px 38px -34px color-mix(in oklab, var(--color-foreground) 44%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-surface) 88%, var(--color-background)) 0%,
+    color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted))
+      100%
+  );
+  box-shadow: 0 18px 38px -34px
+    color-mix(in oklab, var(--color-foreground) 44%, transparent);
   padding: 0.88rem;
 }
 
@@ -96,7 +98,11 @@
   gap: 0.66rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.78rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.72rem;
 }
 
@@ -140,7 +146,11 @@
   align-items: center;
   border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface-muted));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 98%,
+    var(--color-surface-muted)
+  );
   padding: 0.14rem 0.48rem;
   font-size: 0.74rem;
   color: var(--color-foreground);
@@ -156,7 +166,11 @@
   gap: 0.62rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.75rem;
-  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 98%,
+    var(--color-surface)
+  );
   padding: 0.55rem;
 }
 
@@ -168,7 +182,11 @@
 .fd-tokendocs-group {
   border: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 98%,
+    var(--color-surface)
+  );
   overflow: hidden;
 }
 
@@ -185,7 +203,11 @@
   justify-content: space-between;
   gap: 0.74rem;
   border: 0;
-  background: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground) 8%);
+  background: color-mix(
+    in oklab,
+    var(--color-background) 92%,
+    var(--color-foreground) 8%
+  );
   padding: 0.6rem 0.74rem;
   text-align: left;
   cursor: pointer;
@@ -203,24 +225,42 @@
 }
 
 .fd-tokendocs-groupToggle[data-expanded="true"] {
-  background: color-mix(in oklab, var(--color-background) 90%, var(--color-foreground) 10%);
+  background: color-mix(
+    in oklab,
+    var(--color-background) 90%,
+    var(--color-foreground) 10%
+  );
 }
 
 .fd-tokendocs-groupToggle[data-expanded="true"]::before {
-  background: color-mix(in oklab, var(--color-muted-foreground) 36%, var(--color-background));
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-border) 72%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-muted-foreground) 36%,
+    var(--color-background)
+  );
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-border) 72%, transparent);
 }
 
 .fd-tokendocs-groupToggle:hover {
-  background: color-mix(in oklab, var(--color-background) 86%, var(--color-foreground) 14%);
+  background: color-mix(
+    in oklab,
+    var(--color-background) 86%,
+    var(--color-foreground) 14%
+  );
 }
 
 .fd-tokendocs-groupToggle[data-expanded="true"]:hover {
-  background: color-mix(in oklab, var(--color-background) 84%, var(--color-foreground) 16%);
+  background: color-mix(
+    in oklab,
+    var(--color-background) 84%,
+    var(--color-foreground) 16%
+  );
 }
 
 .fd-tokendocs-groupToggle:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--color-foreground) 18%, transparent);
+  outline: 2px solid
+    color-mix(in oklab, var(--color-foreground) 18%, transparent);
   outline-offset: -2px;
   box-shadow: none;
 }
@@ -246,7 +286,8 @@
 }
 
 .fd-tokendocs-groupPanel {
-  border-top: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  border-top: 1px solid
+    color-mix(in oklab, var(--color-border) 72%, transparent);
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
@@ -314,8 +355,13 @@
   display: grid;
   align-items: center;
   column-gap: 0.74rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 86%, transparent);
-  background: color-mix(in oklab, var(--color-background) 90%, var(--color-foreground) 10%);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border) 86%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-background) 90%,
+    var(--color-foreground) 10%
+  );
   padding: 0.56rem 0.78rem;
 }
 
@@ -335,7 +381,8 @@
   display: grid;
   align-items: center;
   column-gap: 0.74rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border) 72%, transparent);
   padding: 0.98rem 0.94rem;
   transition:
     opacity 140ms ease,
@@ -402,7 +449,14 @@
 .fd-tokendocs-path {
   display: inline-block;
   max-width: 100%;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.98rem;
   line-height: 1.76;
   color: var(--color-foreground);
@@ -416,7 +470,14 @@
   border-radius: 999px;
   background: color-mix(in oklab, var(--color-surface-muted) 85%, transparent);
   padding: 0.2rem 0.5rem;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.74rem;
   color: var(--color-foreground);
   white-space: nowrap;
@@ -425,7 +486,14 @@
 .fd-tokendocs-value-wrap {
   display: inline-block;
   max-width: 100%;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 1rem;
   line-height: 1.76;
   color: var(--color-foreground);
@@ -461,12 +529,15 @@
   flex-shrink: 0;
   border: 1px solid transparent;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-surface-muted) 76%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 76%,
+    var(--color-background)
+  );
   font-size: 0.64rem;
   line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
-  visibility: hidden;
   opacity: 0;
   pointer-events: none;
   transform: scale(0.96);
@@ -483,7 +554,11 @@
 
 .fd-tokendocs-copy:hover {
   color: var(--color-foreground);
-  background: color-mix(in oklab, var(--color-surface-muted) 92%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 92%,
+    var(--color-background)
+  );
 }
 
 .fd-tokendocs-copy:focus-visible {
@@ -502,7 +577,6 @@
   min-width: 3.6rem;
   padding: 0.14rem 0.2rem;
   border-color: color-mix(in oklab, var(--color-border) 88%, transparent);
-  visibility: visible;
   opacity: 1;
   pointer-events: auto;
   transform: scale(1);
@@ -530,7 +604,6 @@
     min-width: 3.6rem;
     padding: 0.14rem 0.2rem;
     border-color: color-mix(in oklab, var(--color-border) 88%, transparent);
-    visibility: visible;
     opacity: 1;
     pointer-events: auto;
     transform: none;
@@ -544,7 +617,8 @@
 .fd-tokendocs-mobileRow {
   display: grid;
   gap: 0.45rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 90%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border) 90%, transparent);
   padding: 0.72rem;
   transition:
     opacity 160ms ease,
@@ -619,7 +693,10 @@
   display: grid;
   grid-template-columns:
     minmax(6rem, auto) repeat(var(--fd-color-cols, 10), minmax(0, 1fr))
-    repeat(var(--fd-color-sparse-cols, 0), minmax(var(--fd-color-sparse-col-width, 2.55rem), 1fr));
+    repeat(
+      var(--fd-color-sparse-cols, 0),
+      minmax(var(--fd-color-sparse-col-width, 2.55rem), 1fr)
+    );
   align-items: baseline;
   gap: 0.3rem;
 }
@@ -645,7 +722,6 @@
   gap: 0.12rem;
   align-items: baseline;
 }
-
 
 .fd-tokendocs-colorMatrixCell {
   display: grid;
@@ -675,7 +751,11 @@
   gap: 0.34rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.52rem;
 }
 
@@ -721,7 +801,11 @@
   gap: 0.18rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.44rem;
 }
 
@@ -778,7 +862,11 @@
   gap: 0.46rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.7rem;
 }
 
@@ -804,7 +892,14 @@
 
 .fd-tokendocs-typoValue {
   margin: 0;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.7rem;
   line-height: 1.34;
   color: var(--color-muted-foreground);
@@ -823,7 +918,11 @@
   gap: 0.72rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
   border-radius: 0.52rem;
-  background: color-mix(in oklab, var(--color-background) 98%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 98%,
+    var(--color-surface)
+  );
   padding: 0.52rem 0.66rem;
 }
 
@@ -833,7 +932,14 @@
 }
 
 .fd-tokendocs-typeKey {
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.68rem;
   color: var(--color-muted-foreground);
 }
@@ -851,12 +957,12 @@
   gap: 0.3rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
   border-radius: 0.56rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-background) 96%, var(--color-surface)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 28%, var(--color-background)) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-background) 96%, var(--color-surface)) 0%,
+    color-mix(in oklab, var(--color-surface-muted) 28%, var(--color-background))
+      100%
+  );
   padding: 0.54rem 0.6rem;
 }
 
@@ -873,7 +979,14 @@
 }
 
 .fd-tokendocs-weightNumeric {
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.9rem;
   line-height: 1.2;
   color: var(--color-muted-foreground);
@@ -890,7 +1003,14 @@
 }
 
 .fd-tokendocs-spacingLabel {
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.7rem;
   color: var(--color-muted-foreground);
 }
@@ -910,9 +1030,14 @@
   display: grid;
   gap: 0.34rem;
   align-content: start;
-  border: 1px solid color-mix(in oklab, var(--color-primary) 56%, var(--color-border));
+  border: 1px solid
+    color-mix(in oklab, var(--color-primary) 56%, var(--color-border));
   border-radius: 0.58rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.56rem;
 }
 
@@ -934,7 +1059,11 @@
 .fd-tokendocs-stackApplied,
 .fd-tokendocs-breakpointTrack {
   border-color: color-mix(in oklab, var(--color-border) 84%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 66%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 66%,
+    var(--color-background)
+  );
 }
 
 .fd-tokendocs-stackApplied,
@@ -943,12 +1072,12 @@
 .fd-tokendocs-breakpointTrack {
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.62rem;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface-muted) 88%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-surface-muted) 88%, var(--color-background))
+      0%,
+    color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
+  );
 }
 
 .fd-tokendocs-stackApplied {
@@ -965,10 +1094,15 @@
   min-height: 1.24rem;
   border-radius: 0.4rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 74%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 68%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 68%,
+    var(--color-background)
+  );
   color: var(--color-foreground);
   padding-inline: 0.42rem;
-  box-shadow: 0 8px 16px -14px color-mix(in oklab, var(--color-foreground) 48%, transparent);
+  box-shadow: 0 8px 16px -14px
+    color-mix(in oklab, var(--color-foreground) 48%, transparent);
 }
 
 .fd-tokendocs-stackCardTitle {
@@ -995,12 +1129,17 @@
   align-items: center;
   border-radius: 999px;
   border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 86%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 86%,
+    var(--color-background)
+  );
   padding: 0.24rem 0.52rem;
   font-size: 0.73rem;
   font-weight: 700;
   color: var(--color-foreground);
-  box-shadow: 0 10px 18px -14px color-mix(in oklab, var(--color-foreground) 28%, transparent);
+  box-shadow: 0 10px 18px -14px
+    color-mix(in oklab, var(--color-foreground) 28%, transparent);
 }
 
 .fd-tokendocs-latticeApplied {
@@ -1017,11 +1156,16 @@
   justify-content: center;
   border-radius: 0.34rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
-  background: color-mix(in oklab, var(--color-surface-muted) 84%, var(--color-background));
+  background: color-mix(
+    in oklab,
+    var(--color-surface-muted) 84%,
+    var(--color-background)
+  );
   font-size: 0.78rem;
   font-weight: 700;
   min-height: 1.58rem;
-  box-shadow: 0 10px 16px -12px color-mix(in oklab, var(--color-foreground) 20%, transparent);
+  box-shadow: 0 10px 16px -12px
+    color-mix(in oklab, var(--color-foreground) 20%, transparent);
 }
 
 .fd-tokendocs-structShowcase {
@@ -1035,7 +1179,11 @@
   gap: 0.3rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
   border-radius: 0.56rem;
-  background: color-mix(in oklab, var(--color-background) 97%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
   padding: 0.44rem;
 }
 
@@ -1045,14 +1193,17 @@
   border-radius: var(--radius-value, 0rem);
   border: 1px solid color-mix(in oklab, var(--color-border) 74%, transparent);
   box-shadow:
-    inset 0 0 0 1px color-mix(in oklab, var(--color-background) 84%, transparent),
-    0 12px 24px -16px color-mix(in oklab, var(--color-foreground) 44%, transparent);
-  background:
-    linear-gradient(
-      155deg,
-      color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 86%, var(--color-surface-muted)) 100%
-    );
+    inset 0 0 0 1px
+      color-mix(in oklab, var(--color-background) 84%, transparent),
+    0 12px 24px -16px
+      color-mix(in oklab, var(--color-foreground) 44%, transparent);
+  background: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background))
+      0%,
+    color-mix(in oklab, var(--color-background) 86%, var(--color-surface-muted))
+      100%
+  );
 }
 
 .fd-tokendocs-breakpointTrack {
@@ -1061,12 +1212,12 @@
   overflow: hidden;
   padding: 0.14rem;
   border-radius: 999px;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface-muted) 86%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-surface-muted) 86%, var(--color-background))
+      0%,
+    color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
+  );
 }
 
 .fd-tokendocs-breakpointList {
@@ -1173,7 +1324,11 @@
   gap: 0.38rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--color-background) 94%, var(--color-surface-muted));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 94%,
+    var(--color-surface-muted)
+  );
   padding: 0.16rem 0.5rem;
   font-size: 0.74rem;
   color: var(--color-foreground);
@@ -1189,13 +1344,19 @@
 
 .fd-tokendocs-motionLegendItem.is-token::before {
   background: color-mix(in oklab, var(--color-warning) 96%, #000);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-warning) 52%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-warning) 52%, transparent);
 }
 
 .fd-tokendocs-motionLegendItem.is-baseline::before {
-  background: color-mix(in oklab, var(--color-foreground, currentColor) 94%, #000);
+  background: color-mix(
+    in oklab,
+    var(--color-foreground, currentColor) 94%,
+    #000
+  );
   border-color: color-mix(in oklab, var(--color-background) 74%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-foreground, currentColor) 30%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-foreground, currentColor) 30%, transparent);
 }
 
 .fd-tokendocs-motionLanes {
@@ -1213,12 +1374,23 @@
   gap: 0.58rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
   border-radius: 0.62rem;
-  background: color-mix(in oklab, var(--color-background) 95%, var(--color-surface-muted));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 95%,
+    var(--color-surface-muted)
+  );
   padding: 0.5rem 0.56rem;
 }
 
 .fd-tokendocs-motionLaneLabel {
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.7rem;
   color: var(--color-foreground);
   overflow-wrap: anywhere;
@@ -1253,20 +1425,38 @@
   font-weight: 750;
   letter-spacing: 0.03em;
   border: 1px solid color-mix(in oklab, var(--color-border) 58%, transparent);
-  color: color-mix(in oklab, var(--color-background) 92%, var(--color-foreground));
+  color: color-mix(
+    in oklab,
+    var(--color-background) 92%,
+    var(--color-foreground)
+  );
 }
 
 .fd-tokendocs-motionRailRow.is-baseline .fd-tokendocs-motionRailTag {
-  color: color-mix(in oklab, var(--color-background) 96%, var(--color-foreground));
-  background: color-mix(in oklab, var(--color-foreground) 88%, var(--color-background));
+  color: color-mix(
+    in oklab,
+    var(--color-background) 96%,
+    var(--color-foreground)
+  );
+  background: color-mix(
+    in oklab,
+    var(--color-foreground) 88%,
+    var(--color-background)
+  );
   border-color: color-mix(in oklab, var(--color-background) 72%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-foreground) 24%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--color-foreground) 24%, transparent);
 }
 
 .fd-tokendocs-motionRailRow.is-token .fd-tokendocs-motionRailTag {
   color: color-mix(in oklab, var(--color-warning) 88%, #111);
-  background: color-mix(in oklab, var(--color-warning) 28%, var(--color-background));
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-warning) 18%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-warning) 28%,
+    var(--color-background)
+  );
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--color-warning) 18%, transparent);
 }
 
 .fd-tokendocs-motionRail {
@@ -1274,34 +1464,48 @@
   min-height: 1.4rem;
   border-radius: 999px;
   border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--color-border) 84%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background)) 100%
-    );
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-border) 84%, var(--color-background)) 0%,
+    color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background))
+      100%
+  );
   overflow: hidden;
 }
 
 .fd-tokendocs-motionRail.is-baseline {
-  border-color: color-mix(in oklab, var(--color-muted-foreground) 52%, var(--color-border));
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--color-muted-foreground) 30%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-surface-muted) 78%, var(--color-background)) 100%
-    );
+  border-color: color-mix(
+    in oklab,
+    var(--color-muted-foreground) 52%,
+    var(--color-border)
+  );
+  background: linear-gradient(
+    90deg,
+    color-mix(
+        in oklab,
+        var(--color-muted-foreground) 30%,
+        var(--color-background)
+      )
+      0%,
+    color-mix(in oklab, var(--color-surface-muted) 78%, var(--color-background))
+      100%
+  );
 }
 
 .fd-tokendocs-motionRail.is-token {
-  border-color: color-mix(in oklab, var(--color-warning) 68%, var(--color-border));
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--color-warning) 8%, var(--color-surface-muted)) 0%,
-      color-mix(in oklab, var(--color-warning) 15%, var(--color-surface-muted)) 55%,
-      color-mix(in oklab, var(--color-warning) 24%, var(--color-surface-muted)) 100%
-    );
+  border-color: color-mix(
+    in oklab,
+    var(--color-warning) 68%,
+    var(--color-border)
+  );
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-warning) 8%, var(--color-surface-muted)) 0%,
+    color-mix(in oklab, var(--color-warning) 15%, var(--color-surface-muted))
+      55%,
+    color-mix(in oklab, var(--color-warning) 24%, var(--color-surface-muted))
+      100%
+  );
 }
 
 .fd-tokendocs-motionLaneBall {
@@ -1312,10 +1516,17 @@
   height: 0.98rem;
   border-radius: 999px;
   transform: translate(-50%, -50%);
-  border: 1px solid color-mix(in oklab, var(--color-background) 88%, transparent);
-  background: color-mix(in oklab, var(--color-primary) 84%, var(--color-background));
-  box-shadow: 0 8px 16px color-mix(in oklab, var(--color-foreground) 24%, transparent);
-  animation: fd-token-lane-travel var(--fd-lane-duration, var(--fd-motion-duration))
+  border: 1px solid
+    color-mix(in oklab, var(--color-background) 88%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-primary) 84%,
+    var(--color-background)
+  );
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-foreground) 24%, transparent);
+  animation: fd-token-lane-travel
+    var(--fd-lane-duration, var(--fd-motion-duration))
     var(--fd-lane-easing, var(--fd-motion-easing)) infinite;
   animation-delay: var(--fd-lane-delay, var(--fd-motion-delay));
 }
@@ -1324,7 +1535,8 @@
   z-index: 2;
   background: color-mix(in oklab, var(--color-warning) 88%, #111);
   border-color: color-mix(in oklab, var(--color-warning) 78%, transparent);
-  box-shadow: 0 8px 16px color-mix(in oklab, var(--color-warning) 54%, transparent);
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-warning) 54%, transparent);
 }
 
 .fd-tokendocs-motionLaneBall.is-baseline {
@@ -1333,8 +1545,13 @@
   height: 0.98rem;
   border-width: 0;
   border-color: transparent;
-  background: color-mix(in oklab, var(--color-foreground, currentColor) 88%, #000);
-  box-shadow: 0 8px 16px color-mix(in oklab, var(--color-foreground, currentColor) 42%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-foreground, currentColor) 88%,
+    #000
+  );
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-foreground, currentColor) 42%, transparent);
 }
 
 .fd-tokendocs-motionLaneBall.is-baseline::after {
@@ -1395,20 +1612,25 @@
   gap: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
   border-radius: 0.64rem;
-  background: color-mix(in oklab, var(--color-background) 96%, var(--color-surface));
+  background: color-mix(
+    in oklab,
+    var(--color-background) 96%,
+    var(--color-surface)
+  );
   padding: 0.58rem;
 }
 
 .fd-tokendocs-shadowSurface {
   min-height: 3.5rem;
   margin-inline: 0.12rem;
-  box-shadow: 0 16px 28px -22px color-mix(in oklab, var(--color-foreground) 32%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--color-surface-muted) 74%, var(--color-background)) 0%,
-      color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
-    );
+  box-shadow: 0 16px 28px -22px
+    color-mix(in oklab, var(--color-foreground) 32%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-surface-muted) 74%, var(--color-background))
+      0%,
+    color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
+  );
   border-radius: 0.5rem;
   border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
 }
@@ -1420,13 +1642,27 @@
 
 .fd-tokendocs-shadowPath {
   margin: 0;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.7rem;
 }
 
 .fd-tokendocs-shadowValue {
   margin: 0;
-  font-family: var(--font-mono, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
   font-size: 0.68rem;
   line-height: 1.35;
   color: var(--color-muted-foreground);
@@ -1480,7 +1716,6 @@
   .fd-tokendocs-breakpointRow > .fd-tokendocs-breakpointTrack {
     min-height: 1.02rem;
   }
-
 
   .fd-tokendocs-typoSpecimens,
   .fd-tokendocs-brandGrid,

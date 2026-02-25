@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
@@ -110,7 +110,9 @@ const coreFamilyEntries = baseFamilyEntries.filter(
 
 const scaleStopCounts = new Map<string, number>();
 for (const entry of coreFamilyEntries) {
-  for (const stop of Object.keys(entry.scale).filter((key) => isScaleStep(key))) {
+  for (const stop of Object.keys(entry.scale).filter((key) =>
+    isScaleStep(key),
+  )) {
     const token = entry.scale[stop];
     if (typeof token !== "string" || !isColorTokenValue(token)) {
       continue;
@@ -128,7 +130,9 @@ const sparseScaleStops = Array.from(
   new Set(
     coreFamilyEntries.flatMap((entry) =>
       Object.keys(entry.scale)
-        .filter((key) => isScaleStep(key) && (scaleStopCounts.get(key) ?? 0) < 2)
+        .filter(
+          (key) => isScaleStep(key) && (scaleStopCounts.get(key) ?? 0) < 2,
+        )
         .filter((step) => {
           const token = entry.scale[step];
           return typeof token === "string" && isColorTokenValue(token);
@@ -144,7 +148,8 @@ const matrixRows: ColorMatrixRow[] = coreFamilyEntries.map((entry) => {
       const token = entry.scale[step];
       return {
         step,
-        value: typeof token === "string" && isColorTokenValue(token) ? token : "",
+        value:
+          typeof token === "string" && isColorTokenValue(token) ? token : "",
       };
     })
     .sort((left, right) => compareNumericTokenValues(left.step, right.step))
@@ -263,16 +268,18 @@ const semanticAllPaths = [
   ...new Set([...semanticLightByPath.keys(), ...semanticDarkByPath.keys()]),
 ].sort((left, right) => naturalTokenPathCompare(left, right));
 
-const semanticColorRows: SemanticColorGridRow[] = semanticAllPaths.map((path) => {
-  const light = semanticLightByPath.get(path) ?? "-";
-  const dark = semanticDarkByPath.get(path) ?? "-";
-  return {
-    id: path,
-    path,
-    light,
-    dark,
-  };
-});
+const semanticColorRows: SemanticColorGridRow[] = semanticAllPaths.map(
+  (path) => {
+    const light = semanticLightByPath.get(path) ?? "-";
+    const dark = semanticDarkByPath.get(path) ?? "-";
+    return {
+      id: path,
+      path,
+      light,
+      dark,
+    };
+  },
+);
 
 const semanticByPath = new Map(semanticColorRows.map((row) => [row.path, row]));
 const requiredSemanticColorPaths = [
@@ -345,6 +352,8 @@ function makeJumpLinkHandler(
   groupId: string,
   prefix: string,
   onActivateGroup: (groupId: string) => void,
+  beginRequest: () => number,
+  isCurrentRequest: (requestId: number) => boolean,
 ) {
   return () => {
     onActivateGroup(groupId);
@@ -352,12 +361,17 @@ function makeJumpLinkHandler(
       return;
     }
 
+    const requestId = beginRequest();
     let lastTop = Number.NaN;
     let stableFrames = 0;
     let attempts = 0;
     const maxAttempts = 28;
 
     const waitForLayoutSettle = () => {
+      if (!isCurrentRequest(requestId)) {
+        return;
+      }
+
       const target = document.getElementById(`${prefix}-${groupId}`);
       if (!target) {
         return;
@@ -373,7 +387,14 @@ function makeJumpLinkHandler(
       attempts += 1;
 
       if (stableFrames >= 2 || attempts >= maxAttempts) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        const prefersReducedMotion =
+          typeof window !== "undefined" &&
+          typeof window.matchMedia === "function" &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        target.scrollIntoView({
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+          block: "start",
+        });
         return;
       }
 
@@ -414,24 +435,34 @@ export const Showcase: Story = {
           title="Base Color Scales"
           description="Union scale stops are shown in one matrix. Families without a stop keep that slot intentionally empty."
         >
-          <div className="fd-tokendocs-showcase" aria-label="Base color scale matrix">
+          <div
+            className="fd-tokendocs-showcase"
+            aria-label="Base color scale matrix"
+          >
             <h3 className="fd-tokendocs-showcaseTitle">Scale Matrix</h3>
             <p className="fd-tokendocs-showcaseHint">
               Core families on rows, shared scale stops on columns.
             </p>
             <p className="fd-tokendocs-matrixNote">
-              Sparse-only stops (for example `950`) render inline as regular matrix values on the owning row.
+              Sparse-only stops (for example `950`) render inline as regular
+              matrix values on the owning row.
             </p>
             <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
               <div className="fd-tokendocs-colorMatrixHead">
                 <span aria-hidden="true" />
                 {sharedScaleStops.map((step) => (
-                  <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
+                  <span
+                    key={`head-${step}`}
+                    className="fd-tokendocs-colorScaleLabel"
+                  >
                     {step}
                   </span>
                 ))}
                 {sparseScaleStops.map((step) => (
-                  <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
+                  <span
+                    key={`head-${step}`}
+                    className="fd-tokendocs-colorScaleLabel"
+                  >
                     {step}
                   </span>
                 ))}
@@ -439,7 +470,9 @@ export const Showcase: Story = {
               {matrixRows.map((row) => (
                 <div key={row.family} className="fd-tokendocs-colorMatrixRow">
                   <span className="fd-tokendocs-colorFamilyCell">
-                    <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
+                    <span className="fd-tokendocs-colorFamilyLabel">
+                      {row.family}
+                    </span>
                   </span>
                   {sharedScaleStops.map((step) => {
                     const value = row.values[step];
@@ -467,7 +500,9 @@ export const Showcase: Story = {
                     );
                   })}
                   {sparseScaleStops.map((step) => {
-                    const sparse = row.sparseStops.find((item) => item.step === step);
+                    const sparse = row.sparseStops.find(
+                      (item) => item.step === step,
+                    );
                     const sparseValue = sparse?.value ?? null;
                     const sparsePath = `base.color.${row.family}.${step}`;
 
@@ -486,10 +521,16 @@ export const Showcase: Story = {
                       >
                         <span
                           className="fd-tokendocs-colorSwatchBlock"
-                          style={sparseValue ? { backgroundColor: sparseValue } : undefined}
+                          style={
+                            sparseValue
+                              ? { backgroundColor: sparseValue }
+                              : undefined
+                          }
                           role="img"
                           aria-label={
-                            sparseValue ? `${sparsePath}: ${sparseValue}` : `${sparsePath}: no token`
+                            sparseValue
+                              ? `${sparsePath}: ${sparseValue}`
+                              : `${sparsePath}: no token`
                           }
                         />
                       </div>
@@ -508,7 +549,11 @@ export const Showcase: Story = {
                       <span className="fd-tokendocs-brandLabel">Light</span>
                       <span
                         className="fd-tokendocs-brandSwatchBlock"
-                        style={pair.light ? { backgroundColor: pair.light } : undefined}
+                        style={
+                          pair.light
+                            ? { backgroundColor: pair.light }
+                            : undefined
+                        }
                         title={pair.light ?? "Missing value"}
                         role="img"
                         aria-label={`base.color.brand.${pair.label}Light: ${pair.light ?? "missing"}`}
@@ -518,7 +563,9 @@ export const Showcase: Story = {
                       <span className="fd-tokendocs-brandLabel">Dark</span>
                       <span
                         className="fd-tokendocs-brandSwatchBlock"
-                        style={pair.dark ? { backgroundColor: pair.dark } : undefined}
+                        style={
+                          pair.dark ? { backgroundColor: pair.dark } : undefined
+                        }
                         title={pair.dark ?? "Missing value"}
                         role="img"
                         aria-label={`base.color.brand.${pair.label}Dark: ${pair.dark ?? "missing"}`}
@@ -535,10 +582,14 @@ export const Showcase: Story = {
           title="Semantic Color Contract"
           description="Role pairs are presented for quick light/dark scanning with minimal text noise."
         >
-          <div className="fd-tokendocs-showcase" aria-label="Semantic role pair previews">
+          <div
+            className="fd-tokendocs-showcase"
+            aria-label="Semantic role pair previews"
+          >
             <h3 className="fd-tokendocs-showcaseTitle">Semantic Role Pairs</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Each card uses matching `bg` / `fg` pairs to preview contrast across themes.
+              Each card uses matching `bg` / `fg` pairs to preview contrast
+              across themes.
             </p>
             <div className="fd-tokendocs-semanticGrid">
               {semanticPairCards.map((card) => (
@@ -584,20 +635,37 @@ export const Showcase: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole("heading", { name: "Color Tokens" })).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("heading", { name: "Color Tokens" }),
+    ).toBeInTheDocument();
     await expect(canvas.getByText("Scale Matrix")).toBeInTheDocument();
-    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByPlaceholderText(/search token path or value/i),
+    ).not.toBeInTheDocument();
 
     const rootStyles = getComputedStyle(document.documentElement);
-    await expect(rootStyles.getPropertyValue("--color-background").trim()).not.toBe("");
-    await expect(rootStyles.getPropertyValue("--color-foreground").trim()).not.toBe("");
-    await expect(rootStyles.getPropertyValue("--color-primary").trim()).not.toBe("");
-    await expect(rootStyles.getPropertyValue("--color-ring-soft").trim()).not.toBe("");
-    await expect(rootStyles.getPropertyValue("--color-destructive-hover").trim()).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-background").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-foreground").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-primary").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-ring-soft").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-destructive-hover").trim(),
+    ).not.toBe("");
 
     for (const path of requiredSemanticColorPaths) {
       const semanticRow = semanticByPath.get(path);
-      await expect(semanticRow, `Missing semantic token row for ${path}`).toBeDefined();
+      await expect(
+        semanticRow,
+        `Missing semantic token row for ${path}`,
+      ).toBeDefined();
       await expect(
         semanticRow && isColorTokenValue(semanticRow.light),
         `Expected light semantic value for ${path}`,
@@ -623,6 +691,7 @@ export const Showcase: Story = {
 export const Reference: Story = {
   render: () => {
     useTokenDocsResetScrollOnMount();
+    const jumpRequestIdRef = useRef(0);
 
     const [activeGroup, setActiveGroup] = useState<{
       gridId: "base-color-grid" | "semantic-color-grid";
@@ -631,6 +700,15 @@ export const Reference: Story = {
       gridId: "base-color-grid",
       groupId: baseColorGroups[0]?.id ?? "neutral",
     }));
+
+    function beginJumpRequest(): number {
+      jumpRequestIdRef.current += 1;
+      return jumpRequestIdRef.current;
+    }
+
+    function isCurrentJumpRequest(requestId: number): boolean {
+      return jumpRequestIdRef.current === requestId;
+    }
 
     function setPageActiveGroup(
       gridId: "base-color-grid" | "semantic-color-grid",
@@ -652,15 +730,23 @@ export const Reference: Story = {
           title="Base Color References"
           description="Grouped deterministic tables for every base color token."
         >
-          <nav aria-label="Base color group jump links" className="fd-tokendocs-jumpList">
+          <nav
+            aria-label="Base color group jump links"
+            className="fd-tokendocs-jumpList"
+          >
             <span className="fd-tokendocs-jumpLabel">Jump to</span>
             {baseColorGroups.map((group) => (
               <button
                 key={`base-${group.id}`}
                 className="fd-tokendocs-jumpLink"
                 onClick={() =>
-                  makeJumpLinkHandler(group.id, "base-color-grid", (nextGroupId) =>
-                    setPageActiveGroup("base-color-grid", nextGroupId),
+                  makeJumpLinkHandler(
+                    group.id,
+                    "base-color-grid",
+                    (nextGroupId) =>
+                      setPageActiveGroup("base-color-grid", nextGroupId),
+                    beginJumpRequest,
+                    isCurrentJumpRequest,
                   )()
                 }
                 type="button"
@@ -675,8 +761,14 @@ export const Reference: Story = {
             groups={baseColorGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "base-color-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("base-color-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "base-color-grid"
+                ? activeGroup.groupId
+                : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("base-color-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -693,7 +785,9 @@ export const Reference: Story = {
                 width: "minmax(360px, 1.1fr)",
                 getValue: (row) => row.value,
                 render: (row) => (
-                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.value)}</span>
+                  <span className="fd-tokendocs-inlineColorValue">
+                    {createInlineSwatch(row.value)}
+                  </span>
                 ),
                 copyValue: (row) => row.value,
               },
@@ -705,15 +799,23 @@ export const Reference: Story = {
           title="Semantic Color References"
           description="Light/dark semantic contract values grouped by domain."
         >
-          <nav aria-label="Semantic color group jump links" className="fd-tokendocs-jumpList">
+          <nav
+            aria-label="Semantic color group jump links"
+            className="fd-tokendocs-jumpList"
+          >
             <span className="fd-tokendocs-jumpLabel">Jump to</span>
             {semanticColorGroups.map((group) => (
               <button
                 key={`semantic-${group.id}`}
                 className="fd-tokendocs-jumpLink"
                 onClick={() =>
-                  makeJumpLinkHandler(group.id, "semantic-color-grid", (nextGroupId) =>
-                    setPageActiveGroup("semantic-color-grid", nextGroupId),
+                  makeJumpLinkHandler(
+                    group.id,
+                    "semantic-color-grid",
+                    (nextGroupId) =>
+                      setPageActiveGroup("semantic-color-grid", nextGroupId),
+                    beginJumpRequest,
+                    isCurrentJumpRequest,
                   )()
                 }
                 type="button"
@@ -728,8 +830,14 @@ export const Reference: Story = {
             groups={semanticColorGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "semantic-color-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("semantic-color-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "semantic-color-grid"
+                ? activeGroup.groupId
+                : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("semantic-color-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -746,7 +854,9 @@ export const Reference: Story = {
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.light,
                 render: (row) => (
-                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.light)}</span>
+                  <span className="fd-tokendocs-inlineColorValue">
+                    {createInlineSwatch(row.light)}
+                  </span>
                 ),
                 copyValue: (row) => row.light,
               },
@@ -756,7 +866,9 @@ export const Reference: Story = {
                 width: "minmax(320px, 1fr)",
                 getValue: (row) => row.dark,
                 render: (row) => (
-                  <span className="fd-tokendocs-inlineColorValue">{createInlineSwatch(row.dark)}</span>
+                  <span className="fd-tokendocs-inlineColorValue">
+                    {createInlineSwatch(row.dark)}
+                  </span>
                 ),
                 copyValue: (row) => row.dark,
               },
@@ -768,7 +880,9 @@ export const Reference: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole("heading", { name: "Color Token Reference" })).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("heading", { name: "Color Token Reference" }),
+    ).toBeInTheDocument();
     await expect(canvas.getByText("Base Color References")).toBeInTheDocument();
 
     const canonicalBaseGroup = baseColorGroups[0];
@@ -785,7 +899,9 @@ export const Reference: Story = {
       `#semantic-color-grid-${canonicalSemanticGroup.id}`,
     );
     if (!initialSection || !semanticSection) {
-      throw new Error("Expected canonical base and semantic sections to be present.");
+      throw new Error(
+        "Expected canonical base and semantic sections to be present.",
+      );
     }
 
     await expect(initialSection).toHaveAttribute("data-expanded", "true");
@@ -812,10 +928,33 @@ export const Reference: Story = {
     await expect(semanticSection).toHaveAttribute("data-expanded", "true");
     await expect(initialSection).toHaveAttribute("data-expanded", "false");
 
-    const baseJumpNav = canvas.getByRole("navigation", { name: "Base color group jump links" });
+    const baseJumpNav = canvas.getByRole("navigation", {
+      name: "Base color group jump links",
+    });
+    const alternateBaseGroup =
+      baseColorGroups.find((group) => group.id !== canonicalBaseGroup.id) ??
+      canonicalBaseGroup;
+    const alternateBaseSection = canvasElement.querySelector(
+      `#base-color-grid-${alternateBaseGroup.id}`,
+    );
+    if (!alternateBaseSection) {
+      throw new Error("Expected alternate base section to be present.");
+    }
+    const alternateBaseButton = within(baseJumpNav).getByRole("button", {
+      name: alternateBaseGroup.label,
+    });
     const restoreBaseButton = within(baseJumpNav).getByRole("button", {
       name: canonicalBaseGroup.label,
     });
+
+    await userEvent.click(restoreBaseButton);
+    await userEvent.click(alternateBaseButton);
+    await expect(alternateBaseSection).toHaveAttribute("data-expanded", "true");
+
+    if (alternateBaseGroup.id !== canonicalBaseGroup.id) {
+      await expect(initialSection).toHaveAttribute("data-expanded", "false");
+    }
+
     await userEvent.click(restoreBaseButton);
 
     await expect(initialSection).toHaveAttribute("data-expanded", "true");
@@ -828,7 +967,9 @@ export const Reference: Story = {
       ".fd-tokendocs-copy",
     ) as HTMLButtonElement | null;
     if (!canonicalValueCluster || !canonicalCopy) {
-      throw new Error("Expected canonical value cluster and copy button to exist.");
+      throw new Error(
+        "Expected canonical value cluster and copy button to exist.",
+      );
     }
     await expect(canonicalCopy).toBeEnabled();
 
@@ -840,12 +981,27 @@ export const Reference: Story = {
     }
     await expect(canonicalPathCopy).toBeEnabled();
 
+    restoreBaseButton.focus();
+    let reachedPathCopy = false;
+    for (let tabCount = 0; tabCount < 80; tabCount += 1) {
+      await userEvent.tab();
+      if (document.activeElement === canonicalPathCopy) {
+        reachedPathCopy = true;
+        break;
+      }
+    }
+
+    await expect(reachedPathCopy).toBe(true);
+    await expect(canonicalPathCopy).toHaveFocus();
+
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
   },
 };
 
-function classNames(...classes: Array<string | false | null | undefined>): string {
+function classNames(
+  ...classes: Array<string | false | null | undefined>
+): string {
   return classes.filter(Boolean).join(" ");
 }

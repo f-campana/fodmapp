@@ -20,13 +20,16 @@ This is preferred over choosing only one package type.
 ## `packages/design-tokens`
 
 Purpose:
+
 - Own semantic and raw tokens (color, type, spacing, radius, shadow, motion).
 
 Outputs:
+
 - machine-readable tokens (JSON/TS)
 - CSS variable bundle (light/dark)
 
 Rules:
+
 - no component classes
 - no app logic
 - semver bump when token contract changes
@@ -34,42 +37,57 @@ Rules:
 ## `packages/tailwind-config`
 
 Purpose:
+
 - Provide shared Tailwind v4 entry CSS for apps/packages.
 
 Contents:
-- `shared-styles.css` with:
+
+- generated `shared-styles.css` with:
   - `@import "tailwindcss";`
   - token CSS import from `@fodmap/design-tokens`
-  - optional shared utilities/components layers
+  - semantic runtime alias block (`@layer base`)
+  - semantic Tailwind slot block (`@theme inline`)
+- source-of-truth mapping in `src/semantic-slot-map.mjs`
 
 Rules:
+
 - thin adapter only
 - avoid duplicating token values here
+- regenerate/check via:
+  - `pnpm --filter @fodmap/tailwind-config styles:generate`
+  - `pnpm --filter @fodmap/tailwind-config styles:check`
 
 ## `packages/ui`
 
 Purpose:
+
 - shadcn-based primitives and composed UI components.
 
 Rules:
+
 - consume semantic token classes/variables only
 - component variants with CVA
 - no hardcoded palette literals in components
 
-## Suggested Initial Layout
+## Current Layout
 
 ```text
 packages/
   design-tokens/
     src/tokens/*
-    src/build/*
-    dist/css/variables.css
-    dist/json/tokens.json
+    src/generated/tokens.css
+    src/generated/tokens.json
+    src/generated/tokens.js
+    src/generated/tokens.d.ts
+    scripts/generate.mjs
   tailwind-config/
+    src/semantic-slot-map.mjs
+    scripts/generate-shared-styles.mjs
     package.json
     shared-styles.css
   ui/
-    src/components/*
+    src/components/ui/*
+    src/components/field.tsx
     src/styles/index.css
 ```
 
