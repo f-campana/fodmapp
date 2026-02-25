@@ -37,6 +37,23 @@ export function useTokenDocsResetScrollOnMount(): void {
       return;
     }
 
+    if (window.location.hash) {
+      return;
+    }
+
+    const navigationEntries =
+      typeof window.performance.getEntriesByType === "function"
+        ? window.performance.getEntriesByType("navigation")
+        : [];
+    const navigationType =
+      navigationEntries.length > 0 && "type" in navigationEntries[0]
+        ? (navigationEntries[0] as PerformanceNavigationTiming).type
+        : undefined;
+
+    if (navigationType === "back_forward") {
+      return;
+    }
+
     const frame = window.requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     });
@@ -64,7 +81,9 @@ function classNames(
   return classes.filter(Boolean).join(" ");
 }
 
-function valueModeForColumn<Row>(column: TokenGridColumn<Row>): ColumnValueMode {
+function valueModeForColumn<Row>(
+  column: TokenGridColumn<Row>,
+): ColumnValueMode {
   return column.valueMode ?? "plain";
 }
 
@@ -132,7 +151,8 @@ function CopyButton({
     window.setTimeout(() => setStatus("idle"), 1200);
   }
 
-  const display = status === "idle" ? "Copy" : status === "copied" ? "Copied" : "Error";
+  const display =
+    status === "idle" ? "Copy" : status === "copied" ? "Copied" : "Error";
 
   return (
     <button
@@ -140,8 +160,6 @@ function CopyButton({
       onClick={handleCopy}
       className="fd-tokendocs-copy"
       disabled={disabled}
-      aria-hidden={disabled ? "true" : undefined}
-      tabIndex={disabled ? -1 : 0}
       aria-label={`Copy ${label}`}
       data-state={status}
     >
@@ -228,12 +246,13 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
     if (accordion) {
       const validIds = new Set(groupList.map((group) => group.id));
       const resolvedRequestedId =
-        requestedOpenGroupId !== undefined
-          ? requestedOpenGroupId
-          : undefined;
+        requestedOpenGroupId !== undefined ? requestedOpenGroupId : undefined;
 
       if (resolvedRequestedId !== undefined) {
-        if (resolvedRequestedId !== null && !validIds.has(resolvedRequestedId)) {
+        if (
+          resolvedRequestedId !== null &&
+          !validIds.has(resolvedRequestedId)
+        ) {
           return Object.fromEntries(
             groupList.map((group) => [
               group.id,
@@ -245,7 +264,8 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
         if (resolvedRequestedId === null) {
           if (!allowCollapseAllOverride) {
             const defaultOpenId =
-              groupList.find((group) => !group.defaultCollapsed)?.id ?? groupList[0]?.id;
+              groupList.find((group) => !group.defaultCollapsed)?.id ??
+              groupList[0]?.id;
             return Object.fromEntries(
               groupList.map((group) => [group.id, group.id === defaultOpenId]),
             );
@@ -257,17 +277,24 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
         }
 
         return Object.fromEntries(
-          groupList.map((group) => [group.id, group.id === resolvedRequestedId]),
+          groupList.map((group) => [
+            group.id,
+            group.id === resolvedRequestedId,
+          ]),
         );
       }
 
       const preservedOpenId =
-        previous && Object.keys(previous).find((id) => previous[id] && validIds.has(id));
+        previous &&
+        Object.keys(previous).find((id) => previous[id] && validIds.has(id));
       const defaultOpenId =
-        groupList.find((group) => !group.defaultCollapsed)?.id ?? groupList[0]?.id;
+        groupList.find((group) => !group.defaultCollapsed)?.id ??
+        groupList[0]?.id;
       const openId = preservedOpenId ?? defaultOpenId;
 
-      return Object.fromEntries(groupList.map((group) => [group.id, group.id === openId]));
+      return Object.fromEntries(
+        groupList.map((group) => [group.id, group.id === openId]),
+      );
     }
 
     return Object.fromEntries(
@@ -278,13 +305,14 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
     );
   }
 
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() =>
-    createInitialExpandedState(
-      groups,
-      undefined,
-      isControlled ? openGroupId : initialOpenGroupId,
-      allowCollapseAll,
-    ),
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    () =>
+      createInitialExpandedState(
+        groups,
+        undefined,
+        isControlled ? openGroupId : initialOpenGroupId,
+        allowCollapseAll,
+      ),
   );
 
   useEffect(() => {
@@ -296,7 +324,14 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
         allowCollapseAll,
       ),
     );
-  }, [groups, accordion, initialOpenGroupId, isControlled, openGroupId, allowCollapseAll]);
+  }, [
+    groups,
+    accordion,
+    initialOpenGroupId,
+    isControlled,
+    openGroupId,
+    allowCollapseAll,
+  ]);
 
   const gridTemplateColumns = columns
     .map((column) => column.width ?? "minmax(220px, 1fr)")
@@ -328,7 +363,8 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
         ...state,
         [groupId]: !state[groupId],
       };
-      const openGroupId = Object.keys(nextState).find((id) => nextState[id]) ?? null;
+      const openGroupId =
+        Object.keys(nextState).find((id) => nextState[id]) ?? null;
       onOpenGroupChange?.(openGroupId);
       return nextState;
     });
@@ -415,48 +451,55 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
           };
 
           return (
-          <article
-            key={row.id}
-            className="fd-tokendocs-mobileRow"
-            role="listitem"
-            style={rowStyle}
-          >
-            {columns.map((column) => {
-              const raw = column.getValue(row);
-              const copyValue = column.copyValue ? column.copyValue(row) : raw;
-              const valueMode = valueModeForColumn(column);
+            <article
+              key={row.id}
+              className="fd-tokendocs-mobileRow"
+              role="listitem"
+              style={rowStyle}
+            >
+              {columns.map((column) => {
+                const raw = column.getValue(row);
+                const copyValue = column.copyValue
+                  ? column.copyValue(row)
+                  : raw;
+                const valueMode = valueModeForColumn(column);
 
-              return (
-                <div key={`${row.id}:${column.key}:mobile`} className="fd-tokendocs-mobileField">
-                  <span className="fd-tokendocs-mobileKey">{column.mobileLabel ?? column.label}</span>
-                  <div className="fd-tokendocs-mobileValue">
-                    <div
-                      className={classNames(
-                        "fd-tokendocs-mobileValueCluster",
-                        column.align === "right" && "is-right",
-                      )}
-                    >
+                return (
+                  <div
+                    key={`${row.id}:${column.key}:mobile`}
+                    className="fd-tokendocs-mobileField"
+                  >
+                    <span className="fd-tokendocs-mobileKey">
+                      {column.mobileLabel ?? column.label}
+                    </span>
+                    <div className="fd-tokendocs-mobileValue">
                       <div
                         className={classNames(
-                          "fd-tokendocs-mobileValueBody",
-                          valueMode === "wrap" && "is-wrap",
+                          "fd-tokendocs-mobileValueCluster",
+                          column.align === "right" && "is-right",
                         )}
                       >
-                        {renderCellValue(column, row)}
+                        <div
+                          className={classNames(
+                            "fd-tokendocs-mobileValueBody",
+                            valueMode === "wrap" && "is-wrap",
+                          )}
+                        >
+                          {renderCellValue(column, row)}
+                        </div>
+                        {copyValue ? (
+                          <CopyButton
+                            text={copyValue}
+                            label={`${column.label} ${row.path}`}
+                            disabled={!expanded}
+                          />
+                        ) : null}
                       </div>
-                      {copyValue ? (
-                        <CopyButton
-                          text={copyValue}
-                          label={`${column.label} ${row.path}`}
-                          disabled={!expanded}
-                        />
-                      ) : null}
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </article>
+                );
+              })}
+            </article>
           );
         })}
       </div>
@@ -489,10 +532,14 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                 <span>
                   <span className="fd-tokendocs-groupLabel">{group.label}</span>
                   {group.description ? (
-                    <span className="fd-tokendocs-groupDescription">{group.description}</span>
+                    <span className="fd-tokendocs-groupDescription">
+                      {group.description}
+                    </span>
                   ) : null}
                 </span>
-                <span className="fd-tokendocs-groupCount">{group.rows.length} rows</span>
+                <span className="fd-tokendocs-groupCount">
+                  {group.rows.length} rows
+                </span>
               </button>
 
               <div
@@ -524,7 +571,9 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                                   role="columnheader"
                                   className={classNames(
                                     "fd-tokendocs-headCell",
-                                    column.align === "right" ? "is-right" : "is-left",
+                                    column.align === "right"
+                                      ? "is-right"
+                                      : "is-left",
                                   )}
                                 >
                                   <span>{column.label}</span>
@@ -540,7 +589,9 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
                         </div>
                       </div>
 
-                      <div className="fd-tokendocs-mobile">{renderMobileRows(group.rows, expanded)}</div>
+                      <div className="fd-tokendocs-mobile">
+                        {renderMobileRows(group.rows, expanded)}
+                      </div>
                     </>
                   )}
                 </div>

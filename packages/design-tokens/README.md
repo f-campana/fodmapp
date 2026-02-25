@@ -15,6 +15,8 @@ Canonical design token source for FODMAP frontend packages.
 - `src/generated/tokens.js`
 - `src/generated/tokens.d.ts`
 
+`src/generated` is the public artifact contract for this package.
+
 Color values in generated outputs are serialized as `oklch(...)`.
 
 ## Color Source Schema

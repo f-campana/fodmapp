@@ -129,19 +129,24 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      - name: Verify Tailwind shared style mapping is up to date
+        run: |
+          pnpm --filter @fodmap/tailwind-config styles:check
+
       - name: Build and validate UI package
         run: |
           pnpm --filter @fodmap/ui build
+          pnpm --filter @fodmap/ui styles:check
           pnpm --filter @fodmap/ui typecheck
           pnpm --filter @fodmap/ui test
 
       - name: Typecheck Storybook sources
         run: |
-          pnpm --filter @fodmap/storybook storybook:typecheck
+          pnpm --filter @fodmap/storybook typecheck
 
       - name: Build Storybook
         run: |
-          pnpm --filter @fodmap/storybook storybook:build
+          pnpm --filter @fodmap/storybook build
 
       - name: Install Chromium for Storybook tests
         run: |
@@ -149,7 +154,7 @@ jobs:
 
       - name: Run Storybook interaction and a11y tests
         run: |
-          pnpm --filter @fodmap/storybook storybook:test
+          pnpm --filter @fodmap/storybook test:ci
 
   app-scaffold:
     name: app-scaffold
