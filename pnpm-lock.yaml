@@ -142,8 +142,6 @@ importers:
         specifier: 7.3.1
         version: 7.3.1(@types/node@25.3.0)(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2)
 
-  packages/content-config: {}
-
   packages/barcode-client:
     dependencies:
       '@fodmap/barcode-core':
@@ -155,7 +153,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.0.18
-        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)(yaml@2.8.2)
 
   packages/barcode-core:
     devDependencies:
@@ -164,7 +162,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.0.18
-        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)(yaml@2.8.2)
 
   packages/barcode-native:
     dependencies:
@@ -198,7 +196,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.0.18
-        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)(yaml@2.8.2)
 
   packages/barcode-web:
     dependencies:
@@ -235,7 +233,9 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 4.0.18
-        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)
+        version: 4.0.18(@types/node@25.3.0)(jiti@2.6.1)(jsdom@28.1.0)(lightningcss@1.31.1)(yaml@2.8.2)
+
+  packages/content-config: {}
 
   packages/design-tokens:
     devDependencies:
