@@ -45,7 +45,7 @@ jobs:
 
       - name: Verify OpenAPI generated types are up to date
         run: |
-          turbo run openapi:check --filter=@fodmap/types
+          pnpm turbo run openapi:check --filter=@fodmap/types
 
   design-tokens:
     name: design-tokens
@@ -71,11 +71,11 @@ jobs:
 
       - name: Verify generated token artifacts are up to date
         run: |
-          turbo run tokens:check --filter=@fodmap/design-tokens
+          pnpm turbo run tokens:check --filter=@fodmap/design-tokens
 
       - name: Build design token artifacts
         run: |
-          turbo run build --filter=@fodmap/design-tokens
+          pnpm turbo run build --filter=@fodmap/design-tokens
 
   ui-foundation:
     name: ui-foundation
@@ -101,19 +101,19 @@ jobs:
 
       - name: Verify Tailwind shared style mapping is up to date
         run: |
-          turbo run styles:check --filter=@fodmap/tailwind-config
+          pnpm turbo run styles:check --filter=@fodmap/tailwind-config
 
       - name: Build and validate UI package
         run: |
-          turbo run build typecheck test --filter=@fodmap/ui
+          pnpm turbo run build typecheck test --filter=@fodmap/ui
 
       - name: Typecheck Storybook sources
         run: |
-          turbo run typecheck --filter=@fodmap/storybook
+          pnpm turbo run typecheck --filter=@fodmap/storybook
 
       - name: Build Storybook
         run: |
-          turbo run storybook:build --filter=@fodmap/storybook
+          pnpm turbo run storybook:build --filter=@fodmap/storybook
 
       - name: Install Chromium for Storybook tests
         run: |
@@ -121,7 +121,7 @@ jobs:
 
       - name: Run Storybook interaction and a11y tests
         run: |
-          turbo run storybook:test --filter=@fodmap/storybook
+          pnpm turbo run storybook:test --filter=@fodmap/storybook
 
   app-scaffold:
     name: app-scaffold
@@ -147,7 +147,7 @@ jobs:
 
       - name: Test, build, and typecheck app scaffold
         run: |
-          turbo run test typecheck build --filter=@fodmap/app
+          pnpm turbo run test typecheck build --filter=@fodmap/app
 
   content-scaffolds:
     name: content-scaffolds
@@ -173,4 +173,4 @@ jobs:
 
       - name: Build and typecheck marketing and research scaffolds
         run: |
-          turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
+          pnpm turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
