@@ -30,27 +30,34 @@ This document defines environment variables used across the current Python/SQL s
 | `CIQUAL_GRP_XML`  | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim_grp` XML override.                     |
 | `SEED_DB_URL`     | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml`                                                  | yes for non-arg usage         | `postgresql://.../fodmap_test`        | Phase3 seed DB connection string.                   |
 
-## Reserved Near-Term Variables (Bootstrap Stubs Allowed)
+## App Runtime Integration Variables (`apps/app`)
 
-These placeholders are for upcoming platform transition work. Frontend keys may be read by `apps/app` bootstrap stubs, but no production provider SDK wiring is enabled yet.
+These keys are now actively consumed by `apps/app` runtime adapters. All integrations are env-gated and default to safe no-op/disabled behavior when values are missing.
 
-| Variable                              | Intended future owner   | Purpose                                                  |
-| ------------------------------------- | ----------------------- | -------------------------------------------------------- |
-| `NEON_API_KEY`                        | Infra/CI                | Neon API authentication.                                 |
-| `NEON_PROJECT_ID`                     | Infra/CI                | Neon project target for branch workflow.                 |
-| `NEON_BRANCH_PROD`                    | Infra/CI                | Production branch name (`main`).                         |
-| `NEON_BRANCH_STAGING`                 | Infra/CI                | Persistent staging branch name (`staging`).              |
-| `NEON_DATABASE_URL_PROD`              | Infra/CI                | Production database URL.                                 |
-| `NEON_DATABASE_URL_STAGING`           | Infra/CI                | Staging database URL.                                    |
-| `SENTRY_DSN_API`                      | API                     | API Sentry DSN.                                          |
-| `SENTRY_DSN_APP`                      | Frontend                | App Sentry DSN.                                          |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   | Frontend                | Clerk public key for browser runtime.                    |
-| `CLERK_SECRET_KEY`                    | Frontend backend/server | Clerk secret key.                                        |
-| `CLERK_JWT_ISSUER_DOMAIN`             | Frontend backend/server | Clerk issuer domain for JWT verification.                |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`        | Frontend                | Plausible site domain used by analytics bootstrap stubs. |
-| `NEXT_PUBLIC_PLAUSIBLE_SRC`           | Frontend                | Plausible script URL override for bootstrap stubs.       |
-| `NEXT_PUBLIC_AXEPTIO_CLIENT_ID`       | Frontend                | Axeptio client id used by consent bootstrap stubs.       |
-| `NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION` | Frontend                | Axeptio cookie version used by consent bootstrap stubs.  |
+| Variable                              | Adapter | Required | Behavior when missing |
+| ------------------------------------- | ------- | -------- | --------------------- |
+| `SENTRY_DSN_APP`                      | Sentry (`@sentry/nextjs`) server init | no | Falls back to `NEXT_PUBLIC_SENTRY_DSN_APP`; disabled if both are empty. |
+| `NEXT_PUBLIC_SENTRY_DSN_APP`          | Sentry (`@sentry/nextjs`) client init | no | Client instrumentation stays disabled. |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`   | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless all Clerk keys are present. |
+| `CLERK_SECRET_KEY`                    | Clerk (`@clerk/nextjs`) | conditional | Auth adapter stays `disabled` unless publishable + secret key are both present. |
+| `CLERK_JWT_ISSUER_DOMAIN`             | Clerk (`@clerk/nextjs`) | no | Reserved for JWT issuer/domain checks in future auth hardening. |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`        | Plausible script + events | no | Analytics adapter stays `disabled`; no script injected. |
+| `NEXT_PUBLIC_PLAUSIBLE_SRC`           | Plausible script + events | no | Defaults to `https://plausible.io/js/script.js`. |
+| `NEXT_PUBLIC_AXEPTIO_CLIENT_ID`       | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
+| `NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION` | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
+| `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED` | Consent fallback gate | no | Defaults to `false`; can enable analytics runtime only in non-production validation. Production runtime ignores `true` until Axeptio activation. |
+
+## Reserved Near-Term Variables
+
+| Variable                    | Intended future owner | Purpose                                  |
+| --------------------------- | --------------------- | ---------------------------------------- |
+| `NEON_API_KEY`              | Infra/CI              | Neon API authentication.                 |
+| `NEON_PROJECT_ID`           | Infra/CI              | Neon project target for branch workflow. |
+| `NEON_BRANCH_PROD`          | Infra/CI              | Production branch name (`main`).         |
+| `NEON_BRANCH_STAGING`       | Infra/CI              | Persistent staging branch name (`staging`). |
+| `NEON_DATABASE_URL_PROD`    | Infra/CI              | Production database URL.                 |
+| `NEON_DATABASE_URL_STAGING` | Infra/CI              | Staging database URL.                    |
+| `SENTRY_DSN_API`            | API                   | API Sentry DSN.                          |
 
 ## Operational Notes
 

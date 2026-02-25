@@ -10,10 +10,10 @@ describe("apps/app scaffold routes", () => {
     expect(html).toContain("Socle app Next.js en place");
     expect(html).toContain("fodmap-api@v0");
     expect(html).toContain("Authentification");
-    expect(html).toContain("clerk-deferred");
-    expect(html).toContain("sentry-deferred");
-    expect(html).toContain("plausible-deferred");
-    expect(html).toContain("axeptio-deferred");
+    expect(html).toContain("clerk");
+    expect(html).toContain("sentry");
+    expect(html).toContain("plausible");
+    expect(html).toContain("axeptio");
     expect(html).toContain('href="/espace"');
   });
 
@@ -23,7 +23,7 @@ describe("apps/app scaffold routes", () => {
     expect(html).toContain("Espace protege (placeholder)");
     expect(html).toContain("Etat auth actuel");
     expect(html).toContain("placeholder");
-    expect(html).toContain("clerk-deferred");
+    expect(html).toContain("clerk");
     expect(html).toContain("Mode auth");
     expect(html).toContain("Config auth complete");
     expect(html).toContain("Consentement analytics");

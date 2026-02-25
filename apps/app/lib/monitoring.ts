@@ -1,4 +1,4 @@
-import { captureSentryStubEvent, getSentryBootstrapStatus } from "./sentry";
+import { captureSentryEvent, getSentryBootstrapStatus } from "./sentry";
 
 export type MonitoringEvent =
   | "layout_bootstrap_rendered"
@@ -6,8 +6,8 @@ export type MonitoringEvent =
   | "gated_placeholder_rendered";
 
 export interface MonitoringBootstrapStatus {
-  provider: "sentry-deferred";
-  mode: "stub";
+  provider: "sentry";
+  mode: "disabled" | "runtime";
   configured: boolean;
 }
 
@@ -25,9 +25,9 @@ export function captureArchitectureEvent(
   event: MonitoringEvent,
   attributes: Record<string, string> = {},
 ): void {
-  captureSentryStubEvent(event, attributes);
+  captureSentryEvent(event, attributes);
 
   if (process.env.NODE_ENV !== "production") {
-    console.info(`[monitoring-stub] ${event}`, attributes);
+    console.info(`[monitoring-runtime] ${event}`, attributes);
   }
 }
