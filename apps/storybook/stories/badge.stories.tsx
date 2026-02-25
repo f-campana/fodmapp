@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { expect, within } from "storybook/test";
 
 import { Badge } from "@fodmap/ui";
 
@@ -22,12 +23,24 @@ export const Secondary: Story = {
     variant: "secondary",
     children: "Secondaire",
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText("Secondaire");
+    await expect(badge.className).toContain("hover:bg-secondary-hover");
+    await expect(badge.className).not.toContain("hover:bg-secondary/80");
+  },
 };
 
 export const Destructive: Story = {
   args: {
     variant: "destructive",
     children: "Alerte",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText("Alerte");
+    await expect(badge.className).toContain("hover:bg-destructive-hover");
+    await expect(badge.className).not.toContain("hover:bg-destructive/80");
   },
 };
 

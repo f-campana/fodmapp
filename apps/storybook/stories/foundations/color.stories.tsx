@@ -275,6 +275,12 @@ const semanticColorRows: SemanticColorGridRow[] = semanticAllPaths.map((path) =>
 });
 
 const semanticByPath = new Map(semanticColorRows.map((row) => [row.path, row]));
+const requiredSemanticColorPaths = [
+  "semantic.color.focus.ringSoft",
+  "semantic.color.action.destructive.bg",
+  "semantic.color.action.destructive.bgHover",
+  "semantic.color.action.destructive.fg",
+] as const;
 
 const semanticPairCards: SemanticPairCard[] = semanticColorRows
   .filter((row) => row.path.endsWith(".bg"))
@@ -586,6 +592,21 @@ export const Showcase: Story = {
     await expect(rootStyles.getPropertyValue("--color-background").trim()).not.toBe("");
     await expect(rootStyles.getPropertyValue("--color-foreground").trim()).not.toBe("");
     await expect(rootStyles.getPropertyValue("--color-primary").trim()).not.toBe("");
+    await expect(rootStyles.getPropertyValue("--color-ring-soft").trim()).not.toBe("");
+    await expect(rootStyles.getPropertyValue("--color-destructive-hover").trim()).not.toBe("");
+
+    for (const path of requiredSemanticColorPaths) {
+      const semanticRow = semanticByPath.get(path);
+      await expect(semanticRow, `Missing semantic token row for ${path}`).toBeDefined();
+      await expect(
+        semanticRow && isColorTokenValue(semanticRow.light),
+        `Expected light semantic value for ${path}`,
+      ).toBe(true);
+      await expect(
+        semanticRow && isColorTokenValue(semanticRow.dark),
+        `Expected dark semantic value for ${path}`,
+      ).toBe(true);
+    }
 
     const section = canvasElement.querySelector(".fd-tokendocs-section");
     if (!section) {

@@ -3,6 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
   "scripts": {
     "openapi:generate": "openapi-typescript ../../api/openapi/v0.yaml -o src/generated/v0.ts",
     "openapi:check": "pnpm run openapi:generate && git diff --exit-code -- src/generated/v0.ts",

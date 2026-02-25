@@ -39,9 +39,9 @@ This document defines environment variables used across the current Python/SQL s
 | `CIQUAL_GRP_XML` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml` | no | exported by fetch script in CI | CIQUAL `alim_grp` XML override. |
 | `SEED_DB_URL` | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml` | yes for non-arg usage | `postgresql://.../fodmap_test` | Phase3 seed DB connection string. |
 
-## Reserved Near-Term Variables (Not Wired Yet)
+## Reserved Near-Term Variables (Bootstrap Stubs Allowed)
 
-These are placeholders for upcoming platform transition work. They are intentionally not consumed by current runtime code.
+These placeholders are for upcoming platform transition work. Frontend keys may be read by `apps/app` bootstrap stubs, but no production provider SDK wiring is enabled yet.
 
 | Variable | Intended future owner | Purpose |
 | --- | --- | --- |
@@ -56,6 +56,10 @@ These are placeholders for upcoming platform transition work. They are intention
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Frontend | Clerk public key for browser runtime. |
 | `CLERK_SECRET_KEY` | Frontend backend/server | Clerk secret key. |
 | `CLERK_JWT_ISSUER_DOMAIN` | Frontend backend/server | Clerk issuer domain for JWT verification. |
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Frontend | Plausible site domain used by analytics bootstrap stubs. |
+| `NEXT_PUBLIC_PLAUSIBLE_SRC` | Frontend | Plausible script URL override for bootstrap stubs. |
+| `NEXT_PUBLIC_AXEPTIO_CLIENT_ID` | Frontend | Axeptio client id used by consent bootstrap stubs. |
+| `NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION` | Frontend | Axeptio cookie version used by consent bootstrap stubs. |
 
 ## Operational Notes
 

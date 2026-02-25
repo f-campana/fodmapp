@@ -35,3 +35,20 @@ This timeline captures key points agreed during architecture planning and review
 - Tailwind v4 selected.
 - shadcn/ui selected as accelerator for base primitives.
 - Decision: use both token source package and shared Tailwind CSS package, not one or the other.
+
+## Phase 7: Data-Engine Expansion And Coverage Uplift
+
+- Batch01/Batch02/Batch03 direct-swap pipelines were implemented and activated under strict human gates.
+- Coverage uplift sprints A/B/C were executed with research-led evidence protocols and explicit audit artifacts.
+- The global `known_subtypes_count=1` bucket was reduced from `21` to `0`.
+- Batch03 added active rules, while preserving strict second-review policy.
+
+## Phase 8: Ceiling Confirmation And Pause
+
+- Batch04 feasibility probe (post Batch C) confirmed:
+  - 10 candidates
+  - 10 require second review
+  - 0 single-review eligible
+- Conclusion: data-engine expansion reached a policy ceiling without second-review capacity.
+- Operational state is intentionally paused with one open blocker:
+  - issue #26 (deferred activation requiring independent second reviewer).
