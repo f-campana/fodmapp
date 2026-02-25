@@ -1,6 +1,6 @@
 # Current State Snapshot
 
-Snapshot date: 2026-02-24
+Snapshot date: 2026-02-25
 
 ## Repository Baseline (`main`)
 
@@ -14,6 +14,10 @@ Snapshot date: 2026-02-24
   - `packages/design-tokens`
   - `packages/tailwind-config`
   - `apps/storybook`
+- App and content scaffolds are merged on `main`:
+  - `apps/app`
+  - `apps/marketing`
+  - `apps/research`
 - Types contract package is present:
   - `packages/types/src/generated/v0.ts`
   - `packages/types/src/index.ts`
@@ -23,8 +27,8 @@ Snapshot date: 2026-02-24
   - `openapi-types` stale-check
   - `design-tokens`
   - `ui-foundation`
-  - `api-tests`
-  - `api-integration-seeded`
+  - `app-scaffold`
+  - `content-scaffolds`
 - Environment contract docs are present:
   - `.env.example`
   - `infra/ci/ENVIRONMENT.md`
@@ -60,6 +64,9 @@ Snapshot date: 2026-02-24
   - `api/tests/test_health.py`
 - OpenAPI-generated TS contract + stale-check CI is merged.
 - UI foundation/token architecture is merged on `main`.
+- App runtime integration baseline is merged on `main`:
+  - env-gated Clerk/Sentry/Plausible adapters in `apps/app`
+  - fail-closed auth runtime bootstrap hardening
 
 ## Unresolved Structural Items
 
@@ -67,13 +74,10 @@ Snapshot date: 2026-02-24
   - `etl/phase3/sql/phase3_rollups_compute.sql`
 - No migration framework/config (`dbmate`) is merged yet.
 - Evidence artifacts remain physically under `etl/phase2` and `etl/phase3` trees.
-- Product app shells are not scaffolded yet:
-  - `apps/app`
-  - `apps/marketing`
-  - `apps/research`
 - Second-review bottleneck remains external and blocks deferred activation throughput.
+- Consent provider activation remains deferred (`Axeptio` stays no-op/deferred mode).
 
 ## Worktree Usage
 
-- No active requirement for the previous UI-foundation isolated worktree; that scope is merged.
-- For future concurrent tracks, continue using dedicated worktrees to keep data-engine and product/frontend changes isolated.
+- Dedicated worktrees remain the active operating model for concurrent architecture, barcode, and research tracks.
+- Keep one concern per branch/worktree to preserve reviewability and avoid cross-track collisions.

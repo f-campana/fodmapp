@@ -21,8 +21,8 @@ Status definitions:
 | ADR-007 | `/v0/health` must reflect DB readiness | Implemented | Returns `503` on DB outage |
 | ADR-008 | Use `dbmate` for SQL-first migration workflow | Planned | Tool choice converged; timing remains gated |
 | ADR-009 | Neon branch policy (`main` prod, `staging`, `pr-*`) | Planned | Not wired yet |
-| ADR-010 | Next.js app + Astro marketing/research split | Planned | No app scaffolds merged yet |
-| ADR-011 | Clerk (EU), Sentry, Plausible, Axeptio as cross-cutting frontend stack | Planned | To be wired during app skeleton phase |
+| ADR-010 | Next.js app + Astro marketing/research split | Implemented | `apps/app`, `apps/marketing`, and `apps/research` scaffolds are merged on `main` |
+| ADR-011 | Clerk (EU), Sentry, Plausible, Axeptio as cross-cutting frontend stack | In progress | Env-gated runtime baseline landed for Clerk/Sentry/Plausible; Axeptio remains deferred/no-op pending activation readiness |
 | ADR-012 | Start UI library from shadcn/ui primitives and iterate | Implemented | `packages/ui` + Storybook foundations are merged on `main` |
 | ADR-013 | Tailwind v4 strategy uses both `design-tokens` and Tailwind shared package | Implemented | `design-tokens` and `tailwind-config` packages are merged and consumed |
 | ADR-014 | Keep strict second-review policy (no waiver) | Implemented | Enforced by batch activation SQL checks; deferred queue tracked in issue #26 |
@@ -36,8 +36,8 @@ Status definitions:
 - Trigger option B: proactive setup before first change.
 - Current leaning: introduce when first schema migration is required by platform work.
 
-2. When to scaffold frontend apps:
-- Trigger after shared UI/token foundation is stable and API contract consumption is ready.
+2. When to move from scaffolds to first product flow:
+- Trigger when first persona/route flow is locked and can be delivered on `apps/app` without coupling to blocked data-engine activations.
 
 3. When to convert rollup refresh to publish/swap:
 - Must happen before live traffic depends on uninterrupted refresh windows.
