@@ -3,18 +3,39 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "storybook-static/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false,
       "outputs": []
     },
     "storybook": {
       "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
       "outputs": []
     },
     "storybook:build": {
       "dependsOn": ["^build"],
-      "outputs": ["apps/storybook/storybook-static/**"]
+      "outputs": ["storybook-static/**"]
     },
     "storybook:test": {
       "dependsOn": ["storybook:build"],
+      "cache": false,
+      "outputs": []
+    },
+    "openapi:check": {
+      "outputs": []
+    },
+    "tokens:check": {
+      "outputs": []
+    },
+    "styles:check": {
       "outputs": []
     }
   }
