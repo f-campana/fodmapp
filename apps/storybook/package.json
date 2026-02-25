@@ -9,8 +9,8 @@
     "test": "pnpm run test:local",
     "test:local": "pnpm run storybook:build && pnpm run storybook:test",
     "test:ci": "pnpm run storybook:test",
-    "storybook": "pnpm --filter @fodmap/ui build && storybook dev -p 6006 --ci",
-    "storybook:build": "pnpm --filter @fodmap/ui build && storybook build",
+    "storybook": "storybook dev -p 6006 --ci",
+    "storybook:build": "storybook build",
     "storybook:typecheck": "tsc -p tsconfig.json --noEmit",
     "storybook:serve": "http-server ./storybook-static -p 6006 -a 127.0.0.1 --silent",
     "storybook:test": "start-server-and-test \"pnpm storybook:serve\" http://127.0.0.1:6006 \"test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\""
