@@ -124,7 +124,7 @@ jobs:
 
       - name: Run Storybook interaction and a11y tests
         run: |
-          pnpm --filter @fodmap/storybook test
+          pnpm --filter @fodmap/storybook test:ci
 
   app-scaffold:
     name: app-scaffold

@@ -13,6 +13,7 @@ const bannedSelectors = [
   ".w-\\[360px\\]",
   ".hover\\:bg-primary\\/90:hover",
   ".hover\\:bg-secondary\\/80:hover",
+  ".hover\\:bg-destructive\\/80:hover",
   ".hover\\:bg-destructive\\/90:hover",
   ".focus-visible\\:ring-ring\\/50:focus-visible",
 ];

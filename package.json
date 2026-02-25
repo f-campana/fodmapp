@@ -11,7 +11,8 @@
     "lint": "pnpm format:check",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "pnpm --filter @fodmap/ui test && pnpm --filter @fodmap/storybook test && pnpm --filter @fodmap/app test",
+    "test": "pnpm --filter @fodmap/ui test && pnpm --filter @fodmap/app test",
+    "test:storybook": "pnpm --filter @fodmap/storybook test",
     "typecheck": "pnpm --filter @fodmap/content-config typecheck && pnpm --filter @fodmap/types typecheck && pnpm --filter @fodmap/ui typecheck && pnpm --filter @fodmap/storybook typecheck && pnpm --filter @fodmap/app typecheck && pnpm --filter @fodmap/marketing typecheck && pnpm --filter @fodmap/research typecheck",
     "tokens:generate": "pnpm --filter @fodmap/design-tokens tokens:generate",
     "tokens:check": "pnpm --filter @fodmap/design-tokens tokens:check",
@@ -32,7 +33,7 @@
     "research:typecheck": "pnpm --filter @fodmap/research typecheck",
     "storybook": "pnpm --filter @fodmap/storybook storybook",
     "storybook:build": "pnpm --filter @fodmap/storybook storybook:build",
-    "storybook:test": "pnpm --filter @fodmap/storybook storybook:test",
+    "storybook:test": "pnpm --filter @fodmap/storybook test:ci",
     "check:all": "./.github/scripts/quality-gate.sh && pnpm openapi:check && pnpm tokens:check && pnpm tailwind:styles:check && pnpm ui:build && pnpm ui:styles:check && pnpm ui:typecheck && pnpm ui:test && pnpm --filter @fodmap/storybook typecheck && pnpm storybook:build && pnpm storybook:test && pnpm app:test && pnpm app:typecheck && pnpm app:build && pnpm marketing:typecheck && pnpm marketing:build && pnpm research:typecheck && pnpm research:build",
     "changeset": "changeset",
     "version-packages": "changeset version"
