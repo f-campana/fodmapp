@@ -45,7 +45,7 @@ These keys are now actively consumed by `apps/app` runtime adapters. All integra
 | `NEXT_PUBLIC_PLAUSIBLE_SRC`           | Plausible script + events | no | Defaults to `https://plausible.io/js/script.js`. |
 | `NEXT_PUBLIC_AXEPTIO_CLIENT_ID`       | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
 | `NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION` | Axeptio consent | no | Consent adapter remains `deferred-noop` (runtime activation deferred). |
-| `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED` | Consent fallback gate | no | Defaults to `false`; when `true`, allows analytics runtime for non-production validation until Axeptio is activated. |
+| `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED` | Consent fallback gate | no | Defaults to `false`; can enable analytics runtime only in non-production validation. Production runtime ignores `true` until Axeptio activation. |
 
 ## Reserved Near-Term Variables
 

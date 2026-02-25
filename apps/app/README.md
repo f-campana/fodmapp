@@ -35,4 +35,5 @@ Architecture-first Next.js scaffold for the product app.
 1. Missing env keys must never break build/start/tests.
 2. Adapters switch to `disabled` or `deferred-noop` modes by default.
 3. Plausible script injection requires consent gate (`NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED=true`) until Axeptio runtime activation.
-4. `/` and `/espace` remain renderable without provider accounts or paid subscriptions.
+4. Manual consent override is hard-disabled in production even if `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED=true`.
+5. `/` and `/espace` remain renderable without provider accounts or paid subscriptions.

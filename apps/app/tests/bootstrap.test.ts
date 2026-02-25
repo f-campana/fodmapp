@@ -74,6 +74,22 @@ describe("cross-cutting runtime adapters", () => {
     expect(canTrackWithConsent(consent)).toBe(true);
   });
 
+  it("keeps manual consent override disabled in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
+    vi.stubEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID", "axeptio-client");
+    vi.stubEnv("NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION", "v1");
+    vi.stubEnv("NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED", "true");
+
+    const consent = getConsentBootstrapStatus();
+
+    expect(consent.manualOptInRequested).toBe(true);
+    expect(consent.manualOptIn).toBe(false);
+    expect(consent.mode).toBe("deferred-noop");
+    expect(canTrackWithConsent(consent)).toBe(false);
+    expect(consent.deferredReason).toContain("disabled in production");
+  });
+
   it("keeps middleware route protection in placeholder mode when env is missing", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
