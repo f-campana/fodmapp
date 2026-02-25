@@ -127,14 +127,14 @@ jobs:
           PGPORT: 5432
           PSQL_BIN: psql
         run: |
-          etl/phase2/scripts/phase2_replay_from_zero.sh
+          uv run --project api bash etl/phase2/scripts/phase2_replay_from_zero.sh
 
       - name: Seed Phase3 product layer
         env:
           SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
           PSQL_BIN: psql
         run: |
-          etl/phase3/scripts/phase3_seed_for_api_ci.sh
+          uv run --project api bash etl/phase3/scripts/phase3_seed_for_api_ci.sh
 
       - name: Sanity assert seeded state via psql
         run: |
