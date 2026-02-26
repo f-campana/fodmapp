@@ -3,5 +3,12 @@ declare module "jest-axe" {
     node: Element | DocumentFragment,
     config?: unknown,
   ): Promise<unknown>;
-  export const toHaveNoViolations: (options?: unknown) => void;
+  export const toHaveNoViolations: {
+    [key: string]: (...args: unknown[]) => {
+      pass: boolean;
+      message: () => string;
+      actual: unknown;
+      expected?: unknown;
+    };
+  };
 }
