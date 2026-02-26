@@ -1,0 +1,33 @@
+.fd-research-reporting-head {
+  display: grid;
+  gap: var(--fd-base-space-2, 0.5rem);
+  margin-bottom: var(--fd-base-space-6, 1.5rem);
+}
+
+.fd-research-reporting-eyebrow {
+  margin: 0;
+  color: var(--color-text-muted, #64748b);
+  font: var(--fd-base-typography-font-weight-bold, 700)
+    var(--fd-base-typography-font-size-xs, 0.75rem)
+    var(--font-body, "Source Sans 3", Arial, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: var(--fd-base-typography-letter-spacing-wider, 0.025em);
+}
+
+.fd-research-reporting-title {
+  margin: 0;
+  color: var(--color-text, #0f172a);
+  font: var(--fd-base-typography-font-weight-bold, 700)
+    var(--fd-base-typography-font-size-4xl, 2.25rem)
+    / var(--fd-base-typography-line-height-tight, 1.2)
+    var(--font-display, "Cormorant Garamond", serif);
+}
+
+.fd-research-reporting-subtitle {
+  margin: 0;
+  color: var(--color-text-muted, #334155);
+  font: var(--fd-base-typography-font-weight-medium, 500)
+    var(--fd-base-typography-font-size-sm, 0.875rem)
+    / var(--fd-base-typography-line-height-relaxed, 1.625)
+    var(--font-body, "Source Sans 3", Arial, sans-serif);
+}

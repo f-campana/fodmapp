@@ -1,0 +1,26 @@
+---
+import { getReportingCopy } from "@fodmap/content-config/i18n";
+import "@fodmap/reporting/styles.css";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { loadReportingBaselineRun, renderReportingBaselineDashboard } from "../lib/reporting";
+import "../styles/reporting.css";
+
+const locale = "fr";
+const copy = getReportingCopy(locale);
+const run = loadReportingBaselineRun();
+const dashboardHtml = renderReportingBaselineDashboard(run);
+---
+
+<BaseLayout
+  title={copy.pageTitle}
+  description={copy.pageDescription}
+  locale={locale}
+>
+  <header class="fd-research-reporting-head">
+    <p class="fd-research-reporting-eyebrow">{copy.baselineLabel}</p>
+    <h1 class="fd-research-reporting-title">{copy.heading}</h1>
+    <p class="fd-research-reporting-subtitle">{copy.subheading}</p>
+  </header>
+
+  <div set:html={dashboardHtml} />
+</BaseLayout>

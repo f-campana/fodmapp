@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@fodmap/content-config": "workspace:*",
+    "@fodmap/design-tokens": "workspace:*",
+    "@fodmap/reporting": "workspace:*",
+    "@fodmap/ui": "workspace:*",
     "astro": "5.17.3"
   },
   "devDependencies": {
