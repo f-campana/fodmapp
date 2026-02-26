@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import path from "node:path";
+
+function logLine(message) {
+  process.stdout.write(`${message}\n`);
+}
+
+function failLine(message) {
+  process.stderr.write(`${message}\n`);
+}
 
 function isValidRevision(revision) {
   if (!revision) {
@@ -49,7 +57,7 @@ if (
   !isValidRevision(baseSha) ||
   !isValidRevision(headSha)
 ) {
-  console.error(
+  failLine(
     "[changeset-check] Unable to resolve required git refs for changeset validation.",
   );
   process.exit(1);
@@ -63,12 +71,12 @@ function hasWorkspaceOrReleasableChanges(files) {
     "turbo.json",
   ]);
 
-  const changedPackagesOrApps = files.some(
-    (file) => file.startsWith("packages/") || file.startsWith("apps/"),
-  );
-  const changedReleasableRootFiles = files.some((file) =>
-    releasableRootFiles.has(file),
-  );
+  const changedPackagesOrApps = files.some((file) => {
+    return file.startsWith("packages/") || file.startsWith("apps/");
+  });
+  const changedReleasableRootFiles = files.some((file) => {
+    return releasableRootFiles.has(file);
+  });
 
   return {
     shouldCheck: changedPackagesOrApps || changedReleasableRootFiles,
@@ -147,7 +155,7 @@ function parseStatusOutput(sinceSha) {
   let payload;
   try {
     payload = JSON.parse(readFileSync(statusPath, "utf8"));
-  } catch (err) {
+  } catch {
     throw new Error(`Unable to parse changeset status JSON at ${statusPath}`);
   } finally {
     rmSync(statusPath, { force: true });
@@ -168,7 +176,7 @@ try {
   const changes = hasWorkspaceOrReleasableChanges(changedFiles);
 
   if (!changes.shouldCheck) {
-    console.log(
+    logLine(
       "[changeset-check] No workspace or releasable root changes detected. Skipping.",
     );
     process.exit(0);
@@ -178,9 +186,8 @@ try {
   const releases = Array.isArray(status?.releases) ? status.releases : [];
 
   if (!releases.length) {
-    writeFileSync(
-      1,
-      "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.\n",
+    failLine(
+      "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.",
     );
     process.exit(1);
   }
@@ -189,9 +196,15 @@ try {
     releases
       .flatMap((entry) => {
         const names = [];
-        if (entry.name) names.push(entry.name);
-        if (entry.packageName) names.push(entry.packageName);
-        if (entry.pkgName) names.push(entry.pkgName);
+        if (entry.name) {
+          names.push(entry.name);
+        }
+        if (entry.packageName) {
+          names.push(entry.packageName);
+        }
+        if (entry.pkgName) {
+          names.push(entry.pkgName);
+        }
         if (entry.pkgDir && entry.pkgDir.startsWith("packages/")) {
           const manifestPath = path.join(
             process.cwd(),
@@ -205,7 +218,9 @@ try {
             }
           }
         }
-        if (entry.package && entry.package.name) names.push(entry.package.name);
+        if (entry.package && entry.package.name) {
+          names.push(entry.package.name);
+        }
         return names;
       })
       .filter(Boolean),
@@ -219,17 +234,17 @@ try {
     );
 
     if (missing.length > 0) {
-      writeFileSync(
-        1,
-        `[changeset-check] Missing changeset coverage for: ${missing.join(", ")}\nChanged files: ${changedFiles.join(", ")}\n`,
+      failLine(
+        `[changeset-check] Missing changeset coverage for: ${missing.join(", ")}`,
       );
+      failLine(`Changed files: ${changedFiles.join(", ")}`);
       process.exit(1);
     }
   }
 
-  console.log("[changeset-check] Changeset coverage looks valid.");
+  logLine("[changeset-check] Changeset coverage looks valid.");
   process.exit(0);
 } catch (error) {
-  console.error(`[changeset-check] ${error.message || "Command failed"}`);
+  failLine(`[changeset-check] ${error.message || "Command failed"}`);
   process.exit(1);
 }
