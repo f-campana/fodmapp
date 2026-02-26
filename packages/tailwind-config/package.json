@@ -11,7 +11,7 @@
     "README.md"
   ],
   "scripts": {
-    "styles:generate": "node ./scripts/generate-shared-styles.mjs",
+    "styles:generate": "node ./scripts/generate-shared-styles.mjs && pnpm prettier --write shared-styles.css",
     "styles:check": "pnpm run styles:generate && git diff --exit-code -- shared-styles.css"
   },
   "dependencies": {
