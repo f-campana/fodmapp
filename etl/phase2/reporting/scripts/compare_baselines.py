@@ -97,9 +97,7 @@ def _get_path(payload: Dict[str, Any], dotted: str) -> Any:
     return cursor
 
 
-def _semantic_projection(
-    figure: Dict[str, Any], figure_id: str, policy: Dict[str, Any]
-) -> Dict[str, Any]:
+def _semantic_projection(figure: Dict[str, Any], figure_id: str, policy: Dict[str, Any]) -> Dict[str, Any]:
     default_cfg = policy.get("default", {})
     figure_cfg = (policy.get("figures", {}) or {}).get(figure_id, {})
 
@@ -113,9 +111,7 @@ def _semantic_projection(
     return projection
 
 
-def _full_projection(
-    figure: Dict[str, Any], ignore_paths: Iterable[str]
-) -> Dict[str, Any]:
+def _full_projection(figure: Dict[str, Any], ignore_paths: Iterable[str]) -> Dict[str, Any]:
     projection = dict(figure)
     for dotted in ignore_paths:
         parts = dotted.split(".")
@@ -167,7 +163,9 @@ def main() -> int:
     run_figures = {f["figure_id"]: f for f in run.get("figures", [])}
     baseline_figures = {f["figure_id"]: f for f in baseline.get("figures", [])}
 
-    figure_scope = set(baseline_figures.keys()) if args.mode == "now" else set(run_figures.keys()) | set(baseline_figures.keys())
+    figure_scope = (
+        set(baseline_figures.keys()) if args.mode == "now" else set(run_figures.keys()) | set(baseline_figures.keys())
+    )
 
     full_ignore = []
     if args.compare_scope == "full":

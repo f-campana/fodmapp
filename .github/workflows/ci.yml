@@ -51,6 +51,35 @@ jobs:
         run: |
           pnpm lint:ci
 
+  python-lint:
+    name: python-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run Python lint checks
+        run: |
+          pnpm python:ci
+
   openapi-types:
     name: openapi-types
     runs-on: ubuntu-latest

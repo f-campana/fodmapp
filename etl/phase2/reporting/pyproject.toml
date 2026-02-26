@@ -7,13 +7,17 @@ dependencies = []
 
 [project.optional-dependencies]
 lint = [
-  "pyyaml==6.0.2",
+  "ruff>=0.6.0,<1.0.0",
   "jsonschema==4.23.0",
-]
-
-ci = [
   "pyyaml==6.0.2",
+]
+ci = [
   "jsonschema==4.23.0",
   "openpyxl",
   "psycopg2-binary",
 ]
+
+[tool.ruff]
+line-length = 120
+lint.select = ["E", "F", "I"]
+target-version = "py312"
