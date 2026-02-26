@@ -8,9 +8,9 @@ dependencies = []
 [project.optional-dependencies]
 lint = [
   "ruff>=0.6.0,<1.0.0",
+  "pyyaml==6.0.2",
 ]
 ci = [
-  "pyyaml==6.0.2",
   "jsonschema==4.23.0",
   "openpyxl",
   "psycopg2-binary",
