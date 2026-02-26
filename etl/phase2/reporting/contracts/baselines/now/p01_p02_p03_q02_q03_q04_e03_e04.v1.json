@@ -425,13 +425,13 @@
       }
     }
   ],
-  "generated_at_utc": "2026-02-25T22:36:10Z",
+  "generated_at_utc": "2026-02-26T14:30:04Z",
   "git_sha": "placeholder",
   "run_id": "baseline-now-v1",
   "schema_version": "phase2-reporting-bundle-v1",
   "source_db_ref": "fixture://now-set",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:f206cf90b04a210276e4eb26228e001eb6c1ea4475fd2a8f6ca5b1ce5ce2cd45",
+    "api/app/sql.py": "sha256:4407949a9647e8fcd25bbcaba55235ed9e542165d96acfcb1debd9584aaeddeb",
     "api/tests/test_swaps.py": "sha256:33261a9ff863019697d7242700188c84dd783bacb46edb6869aa4524c3171c65",
     "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73",
     "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
