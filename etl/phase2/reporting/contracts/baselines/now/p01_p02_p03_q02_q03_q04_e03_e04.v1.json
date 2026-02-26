@@ -11,9 +11,7 @@
         "row_count": 1,
         "sha256": "sha256:b29153059cf407289f41b9c8e658b2f8826325c1ddd7a37bbea71c5364c37020"
       },
-      "contract_refs": [
-        "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
-      ],
+      "contract_refs": ["etl/phase3/sql/phase3_rollups_6subtype_checks.sql"],
       "figure_id": "E-03_threshold_provenance_completeness",
       "hard_gate": "pass",
       "metrics": {

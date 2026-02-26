@@ -22,15 +22,18 @@ Enable frontend delivery in parallel with data-engine work, without changing API
 ## Inputs Required From Platform Side
 
 1. Stable OpenAPI source of truth:
+
 - `api/openapi/v0.yaml`
 - generated package: `packages/types`
 
 2. Package conventions:
+
 - `@fodmap/ui` export strategy
 - token package contracts
 - shared Tailwind CSS contract
 
 3. Non-functional expectations:
+
 - FR-first, EN-ready i18n model
 - accessibility baseline
 - monitoring/error boundaries integration points

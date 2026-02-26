@@ -1,6 +1,7 @@
 # Phase 3.6 Coverage Uplift Batch A (Top-6 Targets)
 
 ## Scope
+
 Target foods prioritized by `to_candidate_frequency` from batch01+batch02 generated pools:
 
 1. rank 18 `pois-chiche-appertise-egoutte`
@@ -13,6 +14,7 @@ Target foods prioritized by `to_candidate_frequency` from batch01+batch02 genera
 Each food was audited across missing subtype cells (5 per food, 30 total).
 
 ## Method
+
 1. Baseline missing-subtype inventory extracted from `v_phase3_rollup_subtype_levels_latest`.
 2. Source pass executed in two layers:
    - CIQUAL 2025 public table (English workbook, 2025-11-03), including close cooked-variant rows where exact rows were missing.
@@ -24,21 +26,25 @@ Each food was audited across missing subtype cells (5 per food, 30 total).
    - unresolved cells remain blocked with explicit `blocked_reason`.
 
 ## Outcomes
+
 - Missing subtype cells reviewed: **30**
 - `measurement_found=true`: **15**
 - `measurement_found=false` (blocked): **15**
 
 Newly promoted rows in second pass:
+
 - plant lactose-zero inference rows for ranks 7/18/21/38
 - proxy total-polyol derived sorbitol/mannitol rows for:
   - rank 18 from CIQUAL `20507` (boiled chickpea proxy)
   - rank 21 from CIQUAL `20360` (cooked lentil average proxy)
 
 Exact CIQUAL rows retained from first pass:
+
 - rank 11: lactose, sorbitol, mannitol
 - rank 12: fructose (excess upper bound), lactose, sorbitol, mannitol
 
 Still blocked after second pass:
+
 - rank 18: fructan, fructose
 - rank 21: fructan, fructose
 - rank 38: fructan, fructose, gos, sorbitol
@@ -47,6 +53,7 @@ Still blocked after second pass:
 - rank 12: gos
 
 ## Deliverables
+
 1. Research matrix: `etl/phase3/research/phase3_coverage_batchA_matrix_v1.csv`
 2. Curated ingestion input: `etl/phase3/data/phase3_coverage_batchA_measurements_v1.csv`
 3. Apply/check SQL:

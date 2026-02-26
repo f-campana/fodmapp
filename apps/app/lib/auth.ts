@@ -25,7 +25,10 @@ interface ClerkAuthModule {
 }
 
 export type ClerkAuthModuleLoader = () => Promise<ClerkAuthModule>;
-export type AuthRuntimeFailureReporter = (reason: string, error?: unknown) => void;
+export type AuthRuntimeFailureReporter = (
+  reason: string,
+  error?: unknown,
+) => void;
 
 function getAuthErrorMessage(error: unknown): string {
   if (error instanceof Error) {
@@ -48,7 +51,10 @@ function reportAuthRuntimeFailure(reason: string, error?: unknown): void {
   });
 
   if (process.env.NODE_ENV !== "production") {
-    console.error("[auth-runtime] context failed", { reason, error: errorMessage });
+    console.error("[auth-runtime] context failed", {
+      reason,
+      error: errorMessage,
+    });
   }
 }
 

@@ -128,7 +128,10 @@ export function compareNumericTokenValues(left: string, right: string): number {
   });
 }
 
-export function compareRowPathSuffix(left: { path: string }, right: { path: string }): number {
+export function compareRowPathSuffix(
+  left: { path: string },
+  right: { path: string },
+): number {
   const leftKey = left.path.split(".").pop() ?? left.path;
   const rightKey = right.path.split(".").pop() ?? right.path;
   return comparePathSegment(leftKey, rightKey);
@@ -147,10 +150,9 @@ export function sortTokenRowsByPathSuffix<Row extends { path: string }>(
   return [...rows].sort(compareTokenRowsByPathSuffix);
 }
 
-export function compareFontWeightRows<Row extends { path: string; value: string }>(
-  left: Row,
-  right: Row,
-): number {
+export function compareFontWeightRows<
+  Row extends { path: string; value: string },
+>(left: Row, right: Row): number {
   const leftKey = left.path.split(".").pop();
   const rightKey = right.path.split(".").pop();
 
@@ -178,10 +180,9 @@ export function compareFontWeightRows<Row extends { path: string; value: string 
   return comparePathSegment(leftKey ?? left.path, rightKey ?? right.path);
 }
 
-export function compareLineHeightRows<Row extends { path: string; value: string }>(
-  left: Row,
-  right: Row,
-): number {
+export function compareLineHeightRows<
+  Row extends { path: string; value: string },
+>(left: Row, right: Row): number {
   const leftValue = parseNumericTokenValue(left.value);
   const rightValue = parseNumericTokenValue(right.value);
 
@@ -195,10 +196,9 @@ export function compareLineHeightRows<Row extends { path: string; value: string 
   );
 }
 
-export function compareLetterSpacingRows<Row extends { path: string; value: string }>(
-  left: Row,
-  right: Row,
-): number {
+export function compareLetterSpacingRows<
+  Row extends { path: string; value: string },
+>(left: Row, right: Row): number {
   const leftValue = parseNumericTokenValue(left.value);
   const rightValue = parseNumericTokenValue(right.value);
 

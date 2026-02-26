@@ -27,11 +27,23 @@ export interface FieldProps {
   children: FieldControl;
 }
 
-function mergeDescribedBy(existing: string | undefined, incoming: string | undefined): string | undefined {
+function mergeDescribedBy(
+  existing: string | undefined,
+  incoming: string | undefined,
+): string | undefined {
   return [existing, incoming].filter(Boolean).join(" ").trim() || undefined;
 }
 
-export function Field({ label, id, hint, error, required, className, labelClassName, children }: FieldProps) {
+export function Field({
+  label,
+  id,
+  hint,
+  error,
+  required,
+  className,
+  labelClassName,
+  children,
+}: FieldProps) {
   const child = Children.only(children) as ReactNode;
 
   if (!isValidElement<ControlProps>(child)) {
@@ -40,7 +52,9 @@ export function Field({ label, id, hint, error, required, className, labelClassN
 
   const controlId = child.props.id ?? id;
   if (!controlId) {
-    throw new Error("Field requires either an `id` prop or a child with an `id`.");
+    throw new Error(
+      "Field requires either an `id` prop or a child with an `id`.",
+    );
   }
 
   const hintId = hint ? `${controlId}-hint` : undefined;
@@ -49,7 +63,10 @@ export function Field({ label, id, hint, error, required, className, labelClassN
 
   const control = cloneElement(child, {
     id: controlId,
-    "aria-describedby": mergeDescribedBy(child.props["aria-describedby"], describedBy),
+    "aria-describedby": mergeDescribedBy(
+      child.props["aria-describedby"],
+      describedBy,
+    ),
     "aria-invalid": error ? true : child.props["aria-invalid"],
   });
 
@@ -57,13 +74,22 @@ export function Field({ label, id, hint, error, required, className, labelClassN
     <div className={cn("grid gap-1.5", className)}>
       <label
         htmlFor={controlId}
-        className={cn("text-sm font-semibold tracking-wide text-(--color-text)", labelClassName)}
+        className={cn(
+          "text-sm font-semibold tracking-wide text-(--color-text)",
+          labelClassName,
+        )}
       >
         {label}
-        {required ? <span className="ml-1 text-(--color-danger)">*</span> : null}
+        {required ? (
+          <span className="ml-1 text-(--color-danger)">*</span>
+        ) : null}
       </label>
       {control}
-      {hint ? <p id={hintId} className="text-xs text-(--color-text-muted)">{hint}</p> : null}
+      {hint ? (
+        <p id={hintId} className="text-xs text-(--color-text-muted)">
+          {hint}
+        </p>
+      ) : null}
       {error ? (
         <p id={errorId} className="text-xs font-medium text-(--color-danger)">
           {error}

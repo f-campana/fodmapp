@@ -26,18 +26,22 @@ This document tracks what is already landed and what remains as the next gated o
 ## Next Options (When Planning Resumes)
 
 1. Reviewer-unblock path (non-code + activation pass)
+
 - Scope: resolve issue #26 by completing required second reviews and running batch activation checks.
 - Gate: deferred approvals activate cleanly with snapshot and second-review invariants.
 
 2. Product/frontend path (with current 30 active rules)
+
 - Scope: start first app shell/flow consuming `@fodmap/types` and API v0.
 - Gate: agreed first persona + flow spec; route-level integration tests green.
 
 3. Platform hardening path
+
 - Scope: rollup publish/swap hardening (`phase3_rollups_compute.sql`) before user-facing traffic.
 - Gate: atomic refresh behavior with no API contract break.
 
 4. Migration path (`dbmate`) on first schema-change sprint
+
 - Scope: migration baseline + CI migration smoke apply.
 - Gate: fresh DB migration apply success; canonical schema sync policy documented.
 

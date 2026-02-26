@@ -3,6 +3,7 @@
 This runbook defines pod-wave execution after rank2 garlic powder quarantine.
 
 ## Pod model
+
 - Fructan pod
 - GOS pod
 - Polyol pod
@@ -10,6 +11,7 @@ This runbook defines pod-wave execution after rank2 garlic powder quarantine.
 No pod writes directly without human review of decision/data artifacts.
 
 ## Wave order
+
 1. `fructan_wave01` ranks `3,6,7,8,9,10`
 2. `fructan_wave02` ranks `11,12,13,16,17`
 3. `gos_wave01` ranks `18,19,20,21,22,23`
@@ -20,6 +22,7 @@ No pod writes directly without human review of decision/data artifacts.
 Note: rank `34` is intentionally excluded because it is already resolved and ingested.
 
 ## Artifact locations
+
 - Wave manifest:
   `etl/phase2/decisions/phase2_wave_manifest.csv`
 - Decisions:
@@ -36,6 +39,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   `etl/phase2/sql/phase2_<wave_key>_checks.sql`
 
 ## Wave execution contract (active)
+
 - `fructan_wave01` executed (mutating, all rows `create_new_food`).
 - `fructan_wave02` executed (mutating, all rows `create_new_food`).
 - `gos_wave01` executed (mutating, mixed mode):
@@ -98,6 +102,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
   - replay-gap remediation is now the immediate follow-up sprint after Phase 2 completion
 
 ## Required review gates per wave
+
 1. Every rank in wave has a decision: `resolve_existing`, `create_new_food`, or `blocked`.
 2. `resolve_existing`: `candidate_ciqual_code` and notes are present (`candidate_food_id` is optional metadata only).
 3. `create_new_food`: slug, FR name, EN name (when straightforward), preparation state are present.
@@ -105,6 +110,7 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 5. Current measurement + threshold for non-blocked rows before promotion.
 
 ## Execution loop
+
 1. Fill decision ledger and data files for the wave.
 2. Run `phase2_<wave_key>_apply.sql`.
 3. Run `phase2_<wave_key>_checks.sql`.
@@ -115,9 +121,11 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 ## Replay-gap remediation workflow (from-zero deterministic replay)
 
 Replay runner:
+
 - `etl/phase2/scripts/phase2_replay_from_zero.sh`
 
 Replay sequence (locked):
+
 1. Drop/create replay DB.
 2. Apply canonical schema.
 3. Run CIQUAL ETL load.
@@ -131,12 +139,14 @@ Replay sequence (locked):
 11. Run final deterministic gate (`phase2_replay_final_checks.sql`).
 
 Replay determinism contract:
+
 - Functional invariants must match expected final state.
 - UUID identity equality across fresh databases is not required.
 - `resolve_existing` is CIQUAL-code-led with uniqueness guard (`COUNT(DISTINCT food_id)=1`).
 - Batch10 is rank-authoritative (`food_id` column can be blank in CSV).
 
 Final invariant highlights:
+
 - `phase2_priority_foods`: `42` total, `42` resolved, `0` unresolved.
 - gap completion:
   - fructan `17/17/16/0/1`
@@ -150,9 +160,11 @@ Final invariant highlights:
 ## Product-layer handoff
 
 Phase 2 data foundation now feeds Phase 3 SQL product-layer work:
+
 - `etl/phase3/PRODUCT_LAYER_RUNBOOK.md`
 
 Phase 3 executes:
+
 - culinary trait curation for priority ranks `1..42`
 - target-subtype rollups (MVP, partial overall semantics)
 - initial draft swap rules with contexts and scores

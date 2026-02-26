@@ -35,11 +35,14 @@
 9. [now][M] Add SQL extractor set for DB full-lane collection
    - `p01`..`e04` extractor SQL files
 10. [now][M] Add reporting module README and plan cross-links
-   - execution notes for run modes and manual refresh process.
+
+- execution notes for run modes and manual refresh process.
+
 11. [now][M] Add acceptance checklist
-   - parser fail-loud coverage (unknown source/missing scalar/empty now row)
-   - Q-03 reviewed-snapshot scope non-empty
-   - E-04 frozen mode + source stage fields fixed.
+
+- parser fail-loud coverage (unknown source/missing scalar/empty now row)
+- Q-03 reviewed-snapshot scope non-empty
+- E-04 frozen mode + source stage fields fixed.
 
 ## Next set (deferred)
 

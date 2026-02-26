@@ -2,7 +2,15 @@ import { render, screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { describe, expect, it } from "vitest";
 
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./card";
 
 describe("Card", () => {
   it("renders composed card parts", () => {

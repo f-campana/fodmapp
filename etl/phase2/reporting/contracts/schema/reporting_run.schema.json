@@ -32,31 +32,17 @@
     },
     "source_db_meta": {
       "type": "object",
-      "required": [
-        "kind",
-        "host",
-        "database",
-        "redacted"
-      ],
+      "required": ["kind", "host", "database", "redacted"],
       "properties": {
         "kind": {
           "type": "string",
-          "enum": [
-            "fixture",
-            "db"
-          ]
+          "enum": ["fixture", "db"]
         },
         "host": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "database": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "redacted": {
           "type": "boolean"

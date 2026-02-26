@@ -10,10 +10,22 @@
       },
       "easing": {
         "linear": { "$value": "linear", "$type": "cubicBezier" },
-        "standard": { "$value": "cubic-bezier(0.2, 0, 0, 1)", "$type": "cubicBezier" },
-        "emphasized": { "$value": "cubic-bezier(0.2, 0, 0, 1.1)", "$type": "cubicBezier" },
-        "decelerated": { "$value": "cubic-bezier(0, 0, 0, 1)", "$type": "cubicBezier" },
-        "accelerated": { "$value": "cubic-bezier(0.3, 0, 1, 1)", "$type": "cubicBezier" }
+        "standard": {
+          "$value": "cubic-bezier(0.2, 0, 0, 1)",
+          "$type": "cubicBezier"
+        },
+        "emphasized": {
+          "$value": "cubic-bezier(0.2, 0, 0, 1.1)",
+          "$type": "cubicBezier"
+        },
+        "decelerated": {
+          "$value": "cubic-bezier(0, 0, 0, 1)",
+          "$type": "cubicBezier"
+        },
+        "accelerated": {
+          "$value": "cubic-bezier(0.3, 0, 1, 1)",
+          "$type": "cubicBezier"
+        }
       }
     }
   }

@@ -30,9 +30,13 @@ describe("Button", () => {
     );
 
     expect(screen.getByRole("button", { name: "Default" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Secondary" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Secondary" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Outline" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Destructive" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Destructive" }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ghost" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Link" })).toBeInTheDocument();
   });
@@ -44,7 +48,10 @@ describe("Button", () => {
       </Button>,
     );
 
-    expect(screen.getByRole("link", { name: "Ingrédients" })).toHaveAttribute("href", "/ingredients");
+    expect(screen.getByRole("link", { name: "Ingrédients" })).toHaveAttribute(
+      "href",
+      "/ingredients",
+    );
   });
 
   it("has no obvious a11y violations", async () => {

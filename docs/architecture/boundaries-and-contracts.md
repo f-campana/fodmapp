@@ -11,11 +11,11 @@ The transition objective is to preserve scientific rigor while making serving la
 
 ## Layer Model
 
-| Layer | Purpose | Current Location | Contract |
-| --- | --- | --- | --- |
-| Evidence | Research sources, review packets, gate decisions | `etl/phase2/decisions`, `etl/phase3/decisions`, `etl/phase3/data` | Additive updates, explicit review traceability, gate-order compliance |
-| Knowledge | Compiled validated state in PostgreSQL | `schema/fodmap_fr_schema.sql`, Phase2/Phase3 SQL pipelines | Deterministic replay/seed, SQL contracts, no destructive historical rewrite |
-| Serving | Read models via API and later frontend consumers | `api/` (FastAPI), `api/openapi/v0.yaml` | OpenAPI contract is source of truth, read-only serving behavior |
+| Layer     | Purpose                                          | Current Location                                                  | Contract                                                                    |
+| --------- | ------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Evidence  | Research sources, review packets, gate decisions | `etl/phase2/decisions`, `etl/phase3/decisions`, `etl/phase3/data` | Additive updates, explicit review traceability, gate-order compliance       |
+| Knowledge | Compiled validated state in PostgreSQL           | `schema/fodmap_fr_schema.sql`, Phase2/Phase3 SQL pipelines        | Deterministic replay/seed, SQL contracts, no destructive historical rewrite |
+| Serving   | Read models via API and later frontend consumers | `api/` (FastAPI), `api/openapi/v0.yaml`                           | OpenAPI contract is source of truth, read-only serving behavior             |
 
 ## Current Data/Serving Contracts (Implemented)
 

@@ -13,21 +13,38 @@ describe("Field", () => {
       </Field>,
     );
 
-    expect(screen.getByLabelText("Adresse email")).toHaveAttribute("id", "email");
+    expect(screen.getByLabelText("Adresse email")).toHaveAttribute(
+      "id",
+      "email",
+    );
   });
 
   it("exposes hint and error through aria-describedby", () => {
     render(
-      <Field id="quantity" label="Quantité" hint="En grammes" error="Valeur requise">
+      <Field
+        id="quantity"
+        label="Quantité"
+        hint="En grammes"
+        error="Valeur requise"
+      >
         <Input />
       </Field>,
     );
 
     const input = screen.getByLabelText("Quantité");
-    expect(input).toHaveAttribute("aria-describedby", "quantity-hint quantity-error");
+    expect(input).toHaveAttribute(
+      "aria-describedby",
+      "quantity-hint quantity-error",
+    );
     expect(input).toHaveAttribute("aria-invalid", "true");
-    expect(screen.getByText("En grammes")).toHaveAttribute("id", "quantity-hint");
-    expect(screen.getByText("Valeur requise")).toHaveAttribute("id", "quantity-error");
+    expect(screen.getByText("En grammes")).toHaveAttribute(
+      "id",
+      "quantity-hint",
+    );
+    expect(screen.getByText("Valeur requise")).toHaveAttribute(
+      "id",
+      "quantity-error",
+    );
   });
 
   it("has no obvious a11y violations", async () => {

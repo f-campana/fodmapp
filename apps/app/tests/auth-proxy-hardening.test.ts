@@ -38,12 +38,9 @@ describe("auth runtime hardening", () => {
     configureClerkRuntimeEnv();
     const reportFailure = vi.fn();
 
-    const auth = await getAuthContext(
-      async () => {
-        throw new Error("clerk unavailable");
-      },
-      reportFailure,
-    );
+    const auth = await getAuthContext(async () => {
+      throw new Error("clerk unavailable");
+    }, reportFailure);
 
     expect(auth.state).toBe("error");
     expect(auth.mode).toBe("runtime");

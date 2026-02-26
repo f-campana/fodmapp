@@ -1,15 +1,18 @@
 # Turborepo Skill Invocation Guide
 
 ## Skill Files
+
 - Official baseline: `skills/turborepo-official/SKILL.md`
 - Scale overlay: `skills/turborepo-scale-patterns/SKILL.md`
 - Fodmap custom overlay: `skills/turborepo-fodmap-custom/SKILL.md`
 
 ## Activation Note
+
 These files are versioned in-repo. If a Codex session does not list them as available skills,
 install/sync them into `$CODEX_HOME/skills` first, then use the profile shortcuts below.
 
 ## Profile Shortcuts
+
 1. Official baseline: `$turborepo`
 2. Scale patterns: `$turborepo-scale-patterns`
 3. Fodmap policy+domain overlay (default): `$turborepo-fodmap-custom`
@@ -17,6 +20,7 @@ install/sync them into `$CODEX_HOME/skills` first, then use the profile shortcut
 ## Copy/Paste Prompt Templates
 
 ### 1) Official Turborepo Mechanics
+
 ```text
 Use $turborepo.
 Goal: <what to change in turbo.json/package scripts/CI>.
@@ -28,6 +32,7 @@ Deliver:
 ```
 
 ### 2) Large Monorepo Optimization
+
 ```text
 Use $turborepo-scale-patterns.
 Context: medium/large monorepo; preserve existing style unless I ask migration.
@@ -40,6 +45,7 @@ Deliver:
 ```
 
 ### 3) Fodmap Policy + Domain Guardrails (Default)
+
 ```text
 Use $turborepo-fodmap-custom.
 Task: <repo change>.
@@ -52,6 +58,7 @@ Deliver exactly those reporting sections.
 ```
 
 ## Findings-First Weekly Audit Prompt (No Edits)
+
 ```text
 Use $turborepo-fodmap-custom.
 Audit our Turborepo structure, scripts, and setup end-to-end.
@@ -61,14 +68,17 @@ Then propose a minimal-diff remediation plan and validation commands.
 ```
 
 ## High-Signal One-Liners
+
 1. `Use $turborepo to add a type-check task with correct outputs/env and wire scripts.`
 2. `Use $turborepo-scale-patterns to reduce CI scope with safe --filter strategies, minimal diff only.`
 3. `Use $turborepo-fodmap-custom to update swap activation flow while enforcing snapshot lock + reporting checklist.`
 
 ## Weekly Automation (Recommended)
+
 Use Codex automation as the easiest path first. Keep OpenClaw as optional orchestration later.
 
 Suggested recurring automation payload:
+
 ```text
 Name: Weekly Turbo Audit
 Schedule: every Monday at 09:00 local time
@@ -82,6 +92,7 @@ Return sections: findings by severity, minimal remediation plan, validation comm
 ```
 
 ## OpenClaw vs Codex Automation
+
 - Start with Codex automation: fastest setup, native to your current workflow.
 - Add OpenClaw later if you want:
   - cross-repo scheduling
