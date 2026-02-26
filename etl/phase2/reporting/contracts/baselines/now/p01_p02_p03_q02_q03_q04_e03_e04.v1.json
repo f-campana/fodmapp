@@ -1,0 +1,458 @@
+{
+  "artifact": {
+    "out_path": "baseline://etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json",
+    "sha256": "sha256:08fa84b748daaa0f8ba518fa77c43a202871894e4f1ec89759600b1f530ad660"
+  },
+  "contract_version": "v1",
+  "figures": [
+    {
+      "artifact": {
+        "path": "baseline://now/E-03_threshold_provenance_completeness.json",
+        "row_count": 1,
+        "sha256": "sha256:b29153059cf407289f41b9c8e658b2f8826325c1ddd7a37bbea71c5364c37020"
+      },
+      "contract_refs": [
+        "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
+      ],
+      "figure_id": "E-03_threshold_provenance_completeness",
+      "hard_gate": "pass",
+      "metrics": {
+        "default_threshold_share": 0.17,
+        "invalid_rows_total": 0,
+        "invalid_threshold_source_rows": 0,
+        "missing_default_threshold_citation_rows": 0
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/E-04_rank2_quarantine_case_study.json",
+        "row_count": 1,
+        "sha256": "sha256:f05af69b948fee0a171789f748f75bfca47b7625b5deddf871364713b8dda2ab"
+      },
+      "contract_refs": [
+        "etl/phase2/sql/phase2_post_batch10_checks.sql",
+        "etl/phase2/sql/phase2_post_quarantine_checks.sql"
+      ],
+      "figure_id": "E-04_rank2_quarantine_case_study",
+      "hard_gate": "pass",
+      "metrics": {
+        "cohort_note_count": 1,
+        "mode": "frozen_case_study",
+        "post_batch10_readiness_rows": 9,
+        "rank2_current_target_measurements_expected": 0,
+        "source_stage": "post_batch10"
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/P-01_stage_progression_contract_curve.json",
+        "row_count": 6,
+        "sha256": "sha256:3ff794df053a369f8ff54f9d94bbb49c7078cf872e8735378c91eeec8f06aefb"
+      },
+      "contract_refs": [
+        "etl/phase2/POD_WAVES_RUNBOOK.md",
+        "etl/phase2/decisions/phase2_wave_manifest.csv",
+        "etl/phase2/sql/phase2_replay_final_checks.sql"
+      ],
+      "figure_id": "P-01_stage_progression_contract_curve",
+      "hard_gate": "pass",
+      "metrics": {
+        "baseline_resolved": 0,
+        "baseline_unresolved": 42,
+        "contract_ref": "etl/phase2/POD_WAVES_RUNBOOK.md",
+        "stages": [
+          {
+            "delta_resolved_rows": 16,
+            "delta_unresolved_rows": -16,
+            "executed": true,
+            "expected_resolved_rows": 16,
+            "expected_unresolved_rows": 26,
+            "resolved_rows": 16,
+            "stage_id": "fructan_wave01",
+            "unresolved_rows": 26
+          },
+          {
+            "delta_resolved_rows": 5,
+            "delta_unresolved_rows": -5,
+            "executed": true,
+            "expected_resolved_rows": 21,
+            "expected_unresolved_rows": 21,
+            "resolved_rows": 21,
+            "stage_id": "fructan_wave02",
+            "unresolved_rows": 21
+          },
+          {
+            "delta_resolved_rows": 6,
+            "delta_unresolved_rows": -6,
+            "executed": true,
+            "expected_resolved_rows": 27,
+            "expected_unresolved_rows": 15,
+            "resolved_rows": 27,
+            "stage_id": "gos_wave01",
+            "unresolved_rows": 15
+          },
+          {
+            "delta_resolved_rows": 6,
+            "delta_unresolved_rows": -6,
+            "executed": true,
+            "expected_resolved_rows": 33,
+            "expected_unresolved_rows": 9,
+            "resolved_rows": 33,
+            "stage_id": "gos_wave02",
+            "unresolved_rows": 9
+          },
+          {
+            "delta_resolved_rows": 6,
+            "delta_unresolved_rows": -6,
+            "executed": true,
+            "expected_resolved_rows": 39,
+            "expected_unresolved_rows": 3,
+            "resolved_rows": 39,
+            "stage_id": "polyol_wave01",
+            "unresolved_rows": 3
+          },
+          {
+            "delta_resolved_rows": 3,
+            "delta_unresolved_rows": -3,
+            "executed": true,
+            "expected_resolved_rows": 42,
+            "expected_unresolved_rows": 0,
+            "resolved_rows": 42,
+            "stage_id": "polyol_wave02",
+            "unresolved_rows": 0
+          }
+        ]
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/P-02_candidate_pool_split_by_stage.json",
+        "row_count": 6,
+        "sha256": "sha256:40e5ce7227d9523aa4de73cbf4bd27440ef9108d3a0bfc9b9ae10f1a1cb99160"
+      },
+      "contract_refs": [
+        "etl/phase2/sql/phase2_fructan_wave01_checks.sql",
+        "etl/phase2/sql/phase2_fructan_wave02_checks.sql",
+        "etl/phase2/sql/phase2_gos_wave01_checks.sql",
+        "etl/phase2/sql/phase2_gos_wave02_checks.sql",
+        "etl/phase2/sql/phase2_polyol_wave01_checks.sql",
+        "etl/phase2/sql/phase2_polyol_wave02_checks.sql"
+      ],
+      "figure_id": "P-02_candidate_pool_split_by_stage",
+      "hard_gate": "pass",
+      "metrics": {
+        "stages": [
+          {
+            "pool_closure_rate": 0.6154,
+            "stage_id": "fructan_wave01",
+            "unresolved_rows": 26,
+            "with_candidates_rows": 16,
+            "without_candidates_rows": 10
+          },
+          {
+            "pool_closure_rate": 0.7143,
+            "stage_id": "fructan_wave02",
+            "unresolved_rows": 21,
+            "with_candidates_rows": 15,
+            "without_candidates_rows": 6
+          },
+          {
+            "pool_closure_rate": 0.6,
+            "stage_id": "gos_wave01",
+            "unresolved_rows": 15,
+            "with_candidates_rows": 9,
+            "without_candidates_rows": 6
+          },
+          {
+            "pool_closure_rate": 0.6667,
+            "stage_id": "gos_wave02",
+            "unresolved_rows": 9,
+            "with_candidates_rows": 6,
+            "without_candidates_rows": 3
+          },
+          {
+            "pool_closure_rate": 0.3333,
+            "stage_id": "polyol_wave01",
+            "unresolved_rows": 3,
+            "with_candidates_rows": 1,
+            "without_candidates_rows": 2
+          },
+          {
+            "pool_closure_rate": 1.0,
+            "stage_id": "polyol_wave02",
+            "unresolved_rows": 0,
+            "with_candidates_rows": 0,
+            "without_candidates_rows": 0
+          }
+        ],
+        "total_with_candidates": 47,
+        "total_without_candidates": 27
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/P-03_gap_completion_matrix.json",
+        "row_count": 4,
+        "sha256": "sha256:3d78c078ff5aa96c543b7feb40a7694a3d979611a61eeb65d283a52be7842c9b"
+      },
+      "contract_refs": [
+        "etl/phase2/sql/phase2_post_batch10_checks.sql",
+        "etl/phase2/sql/phase2_replay_final_checks.sql",
+        "etl/phase2/sql/phase2_scaffold_views.sql"
+      ],
+      "figure_id": "P-03_gap_completion_matrix",
+      "hard_gate": "pass",
+      "metrics": {
+        "bucket_rows": [
+          {
+            "bucket": "fructan/fructan",
+            "completed_rows": 16,
+            "completion_ratio": 0.941,
+            "pending_measurement_rows": 1,
+            "priority_rows": 17,
+            "readiness_gap": 1,
+            "resolved_rows": 17,
+            "unresolved_rows": 0
+          },
+          {
+            "bucket": "gos/gos",
+            "completed_rows": 12,
+            "completion_ratio": 1,
+            "pending_measurement_rows": 0,
+            "priority_rows": 12,
+            "readiness_gap": 0,
+            "resolved_rows": 12,
+            "unresolved_rows": 0
+          },
+          {
+            "bucket": "polyol/sorbitol",
+            "completed_rows": 7,
+            "completion_ratio": 1,
+            "pending_measurement_rows": 0,
+            "priority_rows": 7,
+            "readiness_gap": 0,
+            "resolved_rows": 7,
+            "unresolved_rows": 0
+          },
+          {
+            "bucket": "polyol/mannitol",
+            "completed_rows": 6,
+            "completion_ratio": 1,
+            "pending_measurement_rows": 0,
+            "priority_rows": 6,
+            "readiness_gap": 0,
+            "resolved_rows": 6,
+            "unresolved_rows": 0
+          }
+        ],
+        "completion_ratio": 1,
+        "readiness_gap": 1
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/Q-02_critical_contract_scorecard.json",
+        "row_count": 1,
+        "sha256": "sha256:8b542c60423e9b15f02a62f4e7b6d0b6a9339ba4d3fe413feab8a4b7da8f2d62"
+      },
+      "contract_refs": [
+        "api/app/sql.py",
+        "etl/phase2/sql/phase2_replay_final_checks.sql",
+        "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
+      ],
+      "figure_id": "Q-02_critical_contract_scorecard",
+      "hard_gate": "pass",
+      "metrics": {
+        "contract_checks": {
+          "phase2_ok": true,
+          "phase3_ok": true,
+          "rank2_api_ok": true
+        },
+        "phase2_gap_tuples": [
+          {
+            "bucket": "fructan/fructan",
+            "ok": true,
+            "tuple": {
+              "resolved": 17,
+              "total": 17,
+              "unresolved": 0
+            }
+          },
+          {
+            "bucket": "gos/gos",
+            "ok": true,
+            "tuple": {
+              "resolved": 12,
+              "total": 12,
+              "unresolved": 0
+            }
+          },
+          {
+            "bucket": "polyol/sorbitol",
+            "ok": true,
+            "tuple": {
+              "resolved": 7,
+              "total": 7,
+              "unresolved": 0
+            }
+          },
+          {
+            "bucket": "polyol/mannitol",
+            "ok": true,
+            "tuple": {
+              "resolved": 6,
+              "total": 6,
+              "unresolved": 0
+            }
+          }
+        ],
+        "phase2_priority_tuple": {
+          "resolved": 42,
+          "total": 42,
+          "unresolved": 0
+        },
+        "phase3_rollup_row_count": 42,
+        "swap_status_tuple": {
+          "active": 11,
+          "draft": 1
+        }
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/Q-03_snapshot_lock_drift_panel.json",
+        "row_count": 1,
+        "sha256": "sha256:af2e1ed9355aff8d82588f7964df780d35d4d3d363887b9cf8a1a3ac43dd92ab"
+      },
+      "contract_refs": [
+        "etl/phase3/PRODUCT_LAYER_RUNBOOK.md",
+        "etl/phase3/sql/phase3_swap_activation_apply.sql"
+      ],
+      "figure_id": "Q-03_snapshot_lock_drift_panel",
+      "hard_gate": "pass",
+      "metrics": {
+        "approve_for_ineligible_rows": 0,
+        "auto_eligible_mismatch_rows": 0,
+        "fodmap_safety_score_snapshot_actual": "0.500",
+        "reviewed_snapshot_rows": 8,
+        "scoring_version_snapshot_actual": "v3.1b",
+        "snapshot_mismatch_rows": 0
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    },
+    {
+      "artifact": {
+        "path": "baseline://now/Q-04_rank2_exclusion_audit.json",
+        "row_count": 1,
+        "sha256": "sha256:4eb9d0abe4cd6909f081c6c714e4b1f786f39d4a24ce4da9a6030d687c9e4923"
+      },
+      "contract_refs": [
+        "api/app/sql.py",
+        "api/tests/test_swaps.py",
+        "etl/phase2/sql/phase2_post_quarantine_checks.sql",
+        "etl/phase2/sql/phase2_replay_final_checks.sql"
+      ],
+      "figure_id": "Q-04_rank2_exclusion_audit",
+      "hard_gate": "pass",
+      "metrics": {
+        "api_rank2_leak_rows": 0,
+        "overall_pass": true,
+        "phase2_rank2_current_target_measurements": 0,
+        "phase3_rules_touching_rank2": 0
+      },
+      "payload_version": "v1",
+      "schema_version": "1.0.0",
+      "status": "pass",
+      "validation": {
+        "error_count": 0,
+        "errors": [],
+        "ok": true
+      }
+    }
+  ],
+  "generated_at_utc": "2026-02-25T22:36:10Z",
+  "git_sha": "placeholder",
+  "run_id": "baseline-now-v1",
+  "schema_version": "phase2-reporting-bundle-v1",
+  "source_db_ref": "fixture://now-set",
+  "source_file_hashes": {
+    "api/app/sql.py": "sha256:f206cf90b04a210276e4eb26228e001eb6c1ea4475fd2a8f6ca5b1ce5ce2cd45",
+    "api/tests/test_swaps.py": "sha256:33261a9ff863019697d7242700188c84dd783bacb46edb6869aa4524c3171c65",
+    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73",
+    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
+    "etl/phase2/sql/phase2_fructan_wave01_checks.sql": "sha256:6ca454f9ff037ffd3c38fb81bfddb0677217131b04aa7279fde3bbc1bd70c1a3",
+    "etl/phase2/sql/phase2_fructan_wave02_checks.sql": "sha256:d64e25e14880955033a52c4bf78c16f7b5aabebe8f41abd5f1ac3a9c1aac7d95",
+    "etl/phase2/sql/phase2_gos_wave01_checks.sql": "sha256:e2f94d8ab521ffceeb65d337c875fe13f7d72238747e080a7a1850d978c44d2d",
+    "etl/phase2/sql/phase2_gos_wave02_checks.sql": "sha256:4a5a3b8840374d0711c045ff1461c316c6a234f0a840e8238bf8e95ed806fa1a",
+    "etl/phase2/sql/phase2_polyol_wave01_checks.sql": "sha256:4975c15a8f63777c66ed9fae1861fbd52b174d6b45366565195b50b7980bbecc",
+    "etl/phase2/sql/phase2_polyol_wave02_checks.sql": "sha256:08b8b2264438f5c02b3180bbee96eed45f0146d875b52d03d05ddebe5fea81de",
+    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:bfe7df545a9f5a23988d6d63a689fae550e7ae79274cd14b4a1e11d124aeefba",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
+    "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:f9162b414cb016bd170642fbfab6fc251bc96e00378bd2372b0d63c11b5a8053",
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a",
+    "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:0f82a61fe2c057b46f4b2a3d4ee694331a7e757e2db067b7d6e8ff54b4b505c4"
+  },
+  "summary": {
+    "now_set_fail_count": 0,
+    "now_set_ok": true,
+    "now_set_warn_count": 0,
+    "snapshot_drift_count": 0
+  },
+  "trigger": "manual_baseline_update"
+}

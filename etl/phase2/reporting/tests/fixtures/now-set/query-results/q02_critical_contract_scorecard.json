@@ -1,0 +1,70 @@
+{
+  "contract_refs": [
+    "etl/phase2/sql/phase2_replay_final_checks.sql",
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql",
+    "api/app/sql.py"
+  ],
+  "figure_id": "Q-02_critical_contract_scorecard",
+  "fixture_id": "Q-02",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "api/app/sql.py": "sha256:TODO",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO",
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "contract_checks": {
+      "phase2_ok": true,
+      "phase3_ok": true,
+      "rank2_api_ok": true
+    },
+    "phase2_gap_tuples": [
+      {
+        "bucket": "fructan/fructan",
+        "ok": true,
+        "tuple": {
+          "resolved": 17,
+          "total": 17,
+          "unresolved": 0
+        }
+      },
+      {
+        "bucket": "gos/gos",
+        "ok": true,
+        "tuple": {
+          "resolved": 12,
+          "total": 12,
+          "unresolved": 0
+        }
+      },
+      {
+        "bucket": "polyol/sorbitol",
+        "ok": true,
+        "tuple": {
+          "resolved": 7,
+          "total": 7,
+          "unresolved": 0
+        }
+      },
+      {
+        "bucket": "polyol/mannitol",
+        "ok": true,
+        "tuple": {
+          "resolved": 6,
+          "total": 6,
+          "unresolved": 0
+        }
+      }
+    ],
+    "phase2_priority_tuple": {
+      "resolved": 42,
+      "total": 42,
+      "unresolved": 0
+    },
+    "phase3_rollup_row_count": 42,
+    "swap_status_tuple": {
+      "active": 11,
+      "draft": 1
+    }
+  }
+}

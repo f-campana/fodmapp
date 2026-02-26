@@ -35,6 +35,8 @@ etl/ciqual/__pycache__/
 
 # local data files
 etl/ciqual/data/
+etl/phase2/reporting/out/runs/
+!etl/phase2/reporting/out/.gitkeep
 
 # editors and system files
 .idea/

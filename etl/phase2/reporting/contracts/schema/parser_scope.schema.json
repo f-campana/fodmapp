@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "phase2_reporting_parser_scope",
+  "type": "object",
+  "required": [
+    "parser_version",
+    "allowed",
+    "disallowed_patterns",
+    "fail_loud",
+    "figure_metrics"
+  ],
+  "properties": {
+    "parser_version": {
+      "type": "string"
+    },
+    "allowed": {
+      "type": "object",
+      "required": [
+        "exact_files",
+        "allow_patterns"
+      ],
+      "properties": {
+        "exact_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_patterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "disallowed_patterns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fail_loud": {
+      "type": "object",
+      "required": [
+        "unknown_file",
+        "missing_metric",
+        "missing_scalar_row",
+        "null_or_empty_scalar",
+        "duplicate_scalar",
+        "unexpected_column",
+        "unexpected_figure_contract"
+      ],
+      "properties": {
+        "unknown_file": {
+          "type": "boolean"
+        },
+        "missing_metric": {
+          "type": "boolean"
+        },
+        "missing_scalar_row": {
+          "type": "boolean"
+        },
+        "null_or_empty_scalar": {
+          "type": "boolean"
+        },
+        "duplicate_scalar": {
+          "type": "boolean"
+        },
+        "unexpected_column": {
+          "type": "boolean"
+        },
+        "unexpected_figure_contract": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "figure_metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "figure_id",
+          "source_file",
+          "expected_rows",
+          "required_fields"
+        ],
+        "properties": {
+          "figure_id": {
+            "type": "string"
+          },
+          "source_file": {
+            "type": "string"
+          },
+          "expected_rows": {
+            "type": "string",
+            "enum": ["scalar", "series"]
+          },
+          "required_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

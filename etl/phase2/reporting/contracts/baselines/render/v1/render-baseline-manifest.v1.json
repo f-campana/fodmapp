@@ -1,0 +1,87 @@
+{
+  "schema_version": "phase2-render-baseline-manifest-v1",
+  "generated_at_utc": "2026-02-25T22:36:11.215Z",
+  "source_run": {
+    "run_id": "baseline-now-v1",
+    "git_sha": "placeholder",
+    "source_db_ref": "fixture://now-set",
+    "contract_version": "v1"
+  },
+  "contract_refs": [
+    "api/app/sql.py",
+    "api/tests/test_swaps.py",
+    "etl/phase2/decisions/phase2_wave_manifest.csv",
+    "etl/phase2/POD_WAVES_RUNBOOK.md",
+    "etl/phase2/sql/phase2_fructan_wave01_checks.sql",
+    "etl/phase2/sql/phase2_fructan_wave02_checks.sql",
+    "etl/phase2/sql/phase2_gos_wave01_checks.sql",
+    "etl/phase2/sql/phase2_gos_wave02_checks.sql",
+    "etl/phase2/sql/phase2_polyol_wave01_checks.sql",
+    "etl/phase2/sql/phase2_polyol_wave02_checks.sql",
+    "etl/phase2/sql/phase2_post_batch10_checks.sql",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql",
+    "etl/phase2/sql/phase2_replay_final_checks.sql",
+    "etl/phase2/sql/phase2_scaffold_views.sql",
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md",
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql",
+    "etl/phase3/sql/phase3_swap_activation_apply.sql"
+  ],
+  "scientific": [
+    {
+      "figure_id": "P-01_stage_progression_contract_curve",
+      "file": "fig_A_pipeline_progression.svg",
+      "title": "Pipeline Progression",
+      "sha256": "sha256:fe45ab9731aedb88629caef1dbf2a4a58167640e359e77c901ae162e905136b5"
+    },
+    {
+      "figure_id": "P-02_candidate_pool_split_by_stage",
+      "file": "fig_B_candidate_pool_evolution.svg",
+      "title": "Candidate Pool Evolution",
+      "sha256": "sha256:04671207055bd6b967103c56fb94beeab9ef31ad6fd3ca8ccd3d556b50ecefbc"
+    },
+    {
+      "figure_id": "P-03_gap_completion_matrix",
+      "file": "fig_C_gap_completion_heatmap.svg",
+      "title": "Gap Completion Matrix",
+      "sha256": "sha256:363f0b5eab4329a7ca56379a6471c5629330d1fcac0964d3961f803577d7eba0"
+    },
+    {
+      "figure_id": "Q-02_critical_contract_scorecard",
+      "file": "fig_D_status_distribution.svg",
+      "title": "Critical Contract Scorecard",
+      "sha256": "sha256:b823aec5cbd43b105997b2908064379b66c99cf0b3bbd1713b69940c323f991c"
+    },
+    {
+      "figure_id": "Q-03_snapshot_lock_drift_panel",
+      "file": "fig_E_evidence_quality.svg",
+      "title": "Snapshot Lock Drift",
+      "sha256": "sha256:6b0ae6b8ae24a76f0bdd63dee315386d8a19c555985e5b28486235119abb069f"
+    },
+    {
+      "figure_id": "Q-04_rank2_exclusion_audit",
+      "file": "fig_F_serving_load_vs_thresholds.svg",
+      "title": "Rank2 Exclusion Audit",
+      "sha256": "sha256:c965da8524d1f415feaaf21af363f24d095cfae32bf6634ec35fac7b58b142e2"
+    },
+    {
+      "figure_id": "E-03_threshold_provenance_completeness",
+      "file": "fig_G_source_provenance.svg",
+      "title": "Threshold Provenance",
+      "sha256": "sha256:6a3692d2f5e910e1d18df5d7cb06ce562276f491f78af4f94dc41e6bd539131a"
+    },
+    {
+      "figure_id": "E-04_rank2_quarantine_case_study",
+      "file": "fig_H_quarantine_impact.svg",
+      "title": "Quarantine Case Study",
+      "sha256": "sha256:ec84ff703ae587671bcb9a23a95d2efd7c9a26f3aa62af11eba4721cdd72580c"
+    }
+  ],
+  "public": [
+    {
+      "artifact_id": "phase2_dashboard_html",
+      "file": "phase2_dashboard.html",
+      "title": "Phase 2 Reporting Dashboard",
+      "sha256": "sha256:7f30454d51e762896f0ec0252ff988ad6c0bc2661eced2fc6d9af8d1fe9c9a16"
+    }
+  ]
+}

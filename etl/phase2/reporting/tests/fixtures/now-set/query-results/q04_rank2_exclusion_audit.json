@@ -1,0 +1,23 @@
+{
+  "contract_refs": [
+    "etl/phase2/sql/phase2_replay_final_checks.sql",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql",
+    "api/tests/test_swaps.py",
+    "api/app/sql.py"
+  ],
+  "figure_id": "Q-04_rank2_exclusion_audit",
+  "fixture_id": "Q-04",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "api/app/sql.py": "sha256:TODO",
+    "api/tests/test_swaps.py": "sha256:TODO",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "api_rank2_leak_rows": 0,
+    "overall_pass": true,
+    "phase2_rank2_current_target_measurements": 0,
+    "phase3_rules_touching_rank2": 0
+  }
+}
