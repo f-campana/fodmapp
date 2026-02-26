@@ -1,10 +1,38 @@
-name: Phase 2 Reporting
+name: phase2-reporting
 
 on:
   pull_request:
+    paths:
+      - "etl/phase2/**"
+      - "etl/phase3/**"
+      - "api/**"
+      - "schema/**"
+      - "packages/reporting/**"
+      - "packages/content-config/**"
+      - "apps/research/**"
+      - "apps/storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/phase2-reporting.yml"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/ci.yml"
   push:
     branches:
       - "main"
+    paths:
+      - "etl/phase2/**"
+      - "etl/phase3/**"
+      - "api/**"
+      - "schema/**"
+      - "packages/reporting/**"
+      - "packages/content-config/**"
+      - "apps/research/**"
+      - "apps/storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/phase2-reporting.yml"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
     inputs:
       force_full_run:
@@ -30,92 +58,26 @@ on:
         required: false
         default: ""
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 permissions:
   contents: read
 
-env:
-  PHASE2_FULL_RUN_ENFORCE: ${{ vars.PHASE2_FULL_RUN_ENFORCE || 'false' }}
-
 jobs:
-  scope:
-    name: Phase 2 Reporting Scope
-    runs-on: ubuntu-latest
-    outputs:
-      relevant: ${{ steps.detect.outputs.relevant }}
-      changed_files: ${{ steps.detect.outputs.changed_files }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Detect reporting scope changes
-        id: detect
-        run: |
-          set -euo pipefail
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "relevant=true" >> "$GITHUB_OUTPUT"
-            echo "changed_files=workflow_dispatch" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            base_sha="${{ github.event.pull_request.base.sha }}"
-            head_sha="${{ github.event.pull_request.head.sha }}"
-            diff_range="${base_sha}...${head_sha}"
-          else
-            before_sha="${{ github.event.before }}"
-            after_sha="${{ github.sha }}"
-            if [ "$before_sha" = "0000000000000000000000000000000000000000" ]; then
-              echo "relevant=true" >> "$GITHUB_OUTPUT"
-              echo "changed_files=first_main_push" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            diff_range="${before_sha}...${after_sha}"
-          fi
-
-          changed_files="$(git diff --name-only "$diff_range")"
-          relevant="false"
-
-          while IFS= read -r file; do
-            case "$file" in
-              etl/phase2/*|etl/phase3/*|api/*|schema/*|packages/reporting/*|packages/content-config/*|apps/research/*|apps/storybook/*|package.json|pnpm-lock.yaml|.github/workflows/phase2-reporting.yml|.github/workflows/api.yml|.github/workflows/ci.yml)
-                relevant="true"
-                break
-                ;;
-            esac
-          done <<< "$changed_files"
-
-          echo "relevant=$relevant" >> "$GITHUB_OUTPUT"
-          {
-            echo "changed_files<<EOF"
-            printf '%s\n' "$changed_files"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
   contract-lint:
-    needs: [scope]
-    if: needs.scope.outputs.relevant == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install lint dependencies
         run: |
-          cd etl/phase2/reporting
-          uv sync --extra lint --locked
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0
       - name: Validate reporting contracts and workflow
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/contract_lint.py \
+          python etl/phase2/reporting/scripts/contract_lint.py \
             --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
             --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
             --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
@@ -125,24 +87,17 @@ jobs:
             --workflow .github/workflows/phase2-reporting.yml
 
   figure-collect-smoke:
-    needs: [scope, contract-lint]
+    needs: [contract-lint]
     if: |
-      needs.scope.outputs.relevant == 'true' &&
-      (
-        github.event_name == 'pull_request' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
-      )
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
-        with:
-          python-version: "3.12"
       - name: Collect now-set figures from fixtures
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
+          python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode smoke \
             --figures now \
             --source fixture \
@@ -157,25 +112,22 @@ jobs:
           if-no-files-found: error
 
   baseline-compare-smoke:
-    needs: [scope, contract-lint, figure-collect-smoke]
+    needs: [contract-lint, figure-collect-smoke]
     if: |
-      needs.scope.outputs.relevant == 'true' &&
-      (
-        github.event_name == 'pull_request' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
-      )
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install compare dependencies
         run: |
-          cd etl/phase2/reporting
-          uv sync --extra lint --locked
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2
       - name: Download now-set artifacts
         uses: actions/download-artifact@v4
         with:
@@ -183,7 +135,7 @@ jobs:
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Baseline compare now-set (semantic)
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
+          python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -198,13 +150,10 @@ jobs:
           if-no-files-found: error
 
   render-smoke:
-    needs: [scope, baseline-compare-smoke]
+    needs: [baseline-compare-smoke]
     if: |
-      needs.scope.outputs.relevant == 'true' &&
-      (
-        github.event_name == 'pull_request' ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
-      )
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -214,7 +163,7 @@ jobs:
         with:
           node-version: "22"
       - name: Setup pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10.29.3
       - name: Install dependencies
@@ -257,14 +206,11 @@ jobs:
           if-no-files-found: error
 
   full-run-ramp:
-    needs: [scope, contract-lint]
+    needs: [contract-lint]
     if: |
-      needs.scope.outputs.relevant == 'true' &&
-      (
-        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-        (github.event_name == 'workflow_dispatch' && github.event.inputs.force_full_run == 'true' && github.event.inputs.baseline_update != 'true')
-      )
-    continue-on-error: ${{ vars.PHASE2_FULL_RUN_ENFORCE != 'true' }}
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_full_run == 'true' && github.event.inputs.baseline_update != 'true')
+    continue-on-error: true
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -291,8 +237,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Setup Node
@@ -300,26 +246,9 @@ jobs:
         with:
           node-version: "22"
       - name: Setup pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10.29.3
-      - name: Report full-run enforcement mode
-        run: |
-          set -euo pipefail
-
-          if [ "$PHASE2_FULL_RUN_ENFORCE" = "true" ]; then
-            mode_label="blocking"
-            echo "[Phase 2 Reporting] Full-run enforcement is enabled; compare failures are blocking."
-          else
-            mode_label="non-blocking-ramp"
-            echo "[Phase 2 Reporting] Full-run enforcement is disabled; compare failures are non-blocking ramp signals."
-          fi
-
-          {
-            echo "### Phase 2 Reporting full-run mode"
-            echo "- Enforcement: \`$mode_label\`"
-            echo "- Source: repository variable \`PHASE2_FULL_RUN_ENFORCE=$PHASE2_FULL_RUN_ENFORCE\`"
-          } >> "$GITHUB_STEP_SUMMARY"
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Install system PostgreSQL client
@@ -328,8 +257,8 @@ jobs:
           sudo apt-get install -y postgresql-client
       - name: Install full-run dependencies
         run: |
-          cd etl/phase2/reporting
-          uv sync --extra ci --locked
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
         uses: actions/cache@v4
         with:
@@ -346,14 +275,14 @@ jobs:
           done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
       - name: Replay + seed full pipeline
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/replay_seed.py \
+          python etl/phase2/reporting/scripts/replay_seed.py \
             --trigger full \
             --replay-db-url "$REPLAY_DB_URL" \
             --seed-db-url "$SEED_DB_URL" \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Collect now-set from DB
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
+          python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode full \
             --figures now \
             --source db \
@@ -362,9 +291,9 @@ jobs:
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --trigger "${{ github.event_name == 'workflow_dispatch' && 'manual_full' || 'main_full' }}"
       - name: Baseline compare now-set (semantic, non-blocking ramp)
-        continue-on-error: ${{ vars.PHASE2_FULL_RUN_ENFORCE != 'true' }}
+        continue-on-error: true
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
+          python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -385,7 +314,7 @@ jobs:
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Render baseline compare (non-blocking ramp)
-        continue-on-error: ${{ vars.PHASE2_FULL_RUN_ENFORCE != 'true' }}
+        continue-on-error: true
         run: |
           pnpm --filter @fodmap/reporting render:compare -- \
             --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
@@ -402,7 +331,7 @@ jobs:
           if-no-files-found: warn
 
   baseline-update:
-    needs: [scope, contract-lint]
+    needs: [contract-lint]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update == 'true'
     runs-on: ubuntu-latest
     services:
@@ -430,8 +359,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Setup Node
@@ -439,7 +368,7 @@ jobs:
         with:
           node-version: "22"
       - name: Setup pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10.29.3
       - name: Install dependencies
@@ -466,8 +395,8 @@ jobs:
           sudo apt-get install -y postgresql-client
       - name: Install baseline-update dependencies
         run: |
-          cd etl/phase2/reporting
-          uv sync --extra ci --locked
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
         uses: actions/cache@v4
         with:
@@ -484,14 +413,14 @@ jobs:
           done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
       - name: Replay + seed baseline-update pipeline
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/replay_seed.py \
+          python etl/phase2/reporting/scripts/replay_seed.py \
             --trigger manual_baseline_update \
             --replay-db-url "$REPLAY_DB_URL" \
             --seed-db-url "$SEED_DB_URL" \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Collect now-set from DB for baseline update
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
+          python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode full \
             --figures now \
             --source db \
@@ -501,7 +430,7 @@ jobs:
             --trigger manual_baseline_update
       - name: Refresh baseline artifacts (controlled scope)
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/refresh_baselines.py \
+          python etl/phase2/reporting/scripts/refresh_baselines.py \
             --mode baseline_update \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --baseline-path etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -520,7 +449,7 @@ jobs:
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Re-run contract lint after baseline refresh
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/contract_lint.py \
+          python etl/phase2/reporting/scripts/contract_lint.py \
             --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
             --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
             --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
@@ -530,7 +459,7 @@ jobs:
             --workflow .github/workflows/phase2-reporting.yml
       - name: Verify refreshed metric baseline matches generated run
         run: |
-          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
+          python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -570,101 +499,3 @@ jobs:
             etl/phase2/reporting/contracts/baselines/render/v1/public/phase2_dashboard.html
             etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json
           if-no-files-found: error
-
-  phase2-reporting-gate:
-    name: Phase 2 Reporting Gate
-    if: ${{ always() }}
-    needs:
-      - scope
-      - contract-lint
-      - figure-collect-smoke
-      - baseline-compare-smoke
-      - render-smoke
-      - full-run-ramp
-      - baseline-update
-    runs-on: ubuntu-latest
-    env:
-      EVENT_NAME: ${{ github.event_name }}
-      RELEVANT_SCOPE: ${{ needs.scope.outputs.relevant }}
-      BASELINE_UPDATE: ${{ github.event.inputs.baseline_update || 'false' }}
-      FORCE_FULL_RUN: ${{ github.event.inputs.force_full_run || 'false' }}
-      ENFORCE_FULL_RUN: ${{ vars.PHASE2_FULL_RUN_ENFORCE || 'false' }}
-      CONTRACT_LINT_RESULT: ${{ needs.contract-lint.result }}
-      FIGURE_COLLECT_SMOKE_RESULT: ${{ needs.figure-collect-smoke.result }}
-      BASELINE_COMPARE_SMOKE_RESULT: ${{ needs.baseline-compare-smoke.result }}
-      RENDER_SMOKE_RESULT: ${{ needs.render-smoke.result }}
-      FULL_RUN_RAMP_RESULT: ${{ needs.full-run-ramp.result }}
-      BASELINE_UPDATE_RESULT: ${{ needs.baseline-update.result }}
-    steps:
-      - name: Evaluate Phase 2 Reporting Gate
-        run: |
-          set -euo pipefail
-
-          check_success() {
-            local check_name="$1"
-            local check_result="$2"
-
-            if [ "$check_result" != "success" ]; then
-              echo "::error::${check_name} result was '${check_result}'."
-              exit 1
-            fi
-          }
-
-          echo "Event: $EVENT_NAME"
-          echo "Relevant scope: $RELEVANT_SCOPE"
-          echo "Baseline update input: $BASELINE_UPDATE"
-          echo "Force full run input: $FORCE_FULL_RUN"
-          echo "PHASE2_FULL_RUN_ENFORCE: $ENFORCE_FULL_RUN"
-
-          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ "$BASELINE_UPDATE" = "true" ]; then
-            check_success "baseline-update" "$BASELINE_UPDATE_RESULT"
-            echo "Phase 2 Reporting Gate passed: baseline update lane."
-            exit 0
-          fi
-
-          if [ "$RELEVANT_SCOPE" != "true" ]; then
-            echo "Phase 2 Reporting Gate passed: out-of-scope changes."
-            exit 0
-          fi
-
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            check_success "contract-lint" "$CONTRACT_LINT_RESULT"
-            check_success "figure-collect-smoke" "$FIGURE_COLLECT_SMOKE_RESULT"
-            check_success "baseline-compare-smoke" "$BASELINE_COMPARE_SMOKE_RESULT"
-            check_success "render-smoke" "$RENDER_SMOKE_RESULT"
-            echo "Phase 2 Reporting Gate passed: pull_request smoke lane."
-            exit 0
-          fi
-
-          if [ "$EVENT_NAME" = "push" ]; then
-            check_success "contract-lint" "$CONTRACT_LINT_RESULT"
-            if [ "$ENFORCE_FULL_RUN" = "true" ]; then
-              check_success "full-run-ramp" "$FULL_RUN_RAMP_RESULT"
-            else
-              echo "Non-blocking ramp mode; full-run-ramp result='$FULL_RUN_RAMP_RESULT'."
-            fi
-            echo "Phase 2 Reporting Gate passed: push lane."
-            exit 0
-          fi
-
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            check_success "contract-lint" "$CONTRACT_LINT_RESULT"
-
-            if [ "$FORCE_FULL_RUN" = "true" ]; then
-              if [ "$ENFORCE_FULL_RUN" = "true" ]; then
-                check_success "full-run-ramp" "$FULL_RUN_RAMP_RESULT"
-              else
-                echo "Non-blocking ramp mode; full-run-ramp result='$FULL_RUN_RAMP_RESULT'."
-              fi
-            else
-              check_success "figure-collect-smoke" "$FIGURE_COLLECT_SMOKE_RESULT"
-              check_success "baseline-compare-smoke" "$BASELINE_COMPARE_SMOKE_RESULT"
-              check_success "render-smoke" "$RENDER_SMOKE_RESULT"
-            fi
-
-            echo "Phase 2 Reporting Gate passed: workflow_dispatch lane."
-            exit 0
-          fi
-
-          echo "::error::Unsupported event '$EVENT_NAME' for Phase 2 Reporting Gate evaluation."
-          exit 1

@@ -1,68 +1,68 @@
 generated_version: v1
 generated_by: phase2-reporting-plan-v4
-generated_at_utc: "2026-02-25T00:00:00Z"
+generated_at_utc: '2026-02-25T00:00:00Z'
 source_inputs:
-  - path: etl/phase2/POD_WAVES_RUNBOOK.md
-    sha256: sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73
-  - path: etl/phase2/decisions/phase2_wave_manifest.csv
-    sha256: sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e
-  - path: etl/phase2/sql/phase2_replay_final_checks.sql
-    sha256: sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f
+- path: etl/phase2/POD_WAVES_RUNBOOK.md
+  sha256: sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73
+- path: etl/phase2/decisions/phase2_wave_manifest.csv
+  sha256: sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e
+- path: etl/phase2/sql/phase2_replay_final_checks.sql
+  sha256: sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f
 executed_stage_order:
-  - id: fructan_wave01
-    order: 1
-    source_file: etl/phase2/sql/phase2_fructan_wave01_checks.sql
-    resolved_rows: 16
-    unresolved_rows: 26
-    threshold_set_rows: 6
-    candidate_pool:
-      with_candidates_rows: 16
-      without_candidates_rows: 10
-  - id: fructan_wave02
-    order: 2
-    source_file: etl/phase2/sql/phase2_fructan_wave02_checks.sql
-    resolved_rows: 21
-    unresolved_rows: 21
-    threshold_set_rows: 5
-    candidate_pool:
-      with_candidates_rows: 15
-      without_candidates_rows: 6
-  - id: gos_wave01
-    order: 3
-    source_file: etl/phase2/sql/phase2_gos_wave01_checks.sql
-    resolved_rows: 27
-    unresolved_rows: 15
-    threshold_set_rows: 6
-    candidate_pool:
-      with_candidates_rows: 9
-      without_candidates_rows: 6
-  - id: gos_wave02
-    order: 4
-    source_file: etl/phase2/sql/phase2_gos_wave02_checks.sql
-    resolved_rows: 33
-    unresolved_rows: 9
-    threshold_set_rows: 6
-    candidate_pool:
-      with_candidates_rows: 6
-      without_candidates_rows: 3
-  - id: polyol_wave01
-    order: 5
-    source_file: etl/phase2/sql/phase2_polyol_wave01_checks.sql
-    resolved_rows: 39
-    unresolved_rows: 3
-    threshold_set_rows: 6
-    candidate_pool:
-      with_candidates_rows: 1
-      without_candidates_rows: 2
-  - id: polyol_wave02
-    order: 6
-    source_file: etl/phase2/sql/phase2_polyol_wave02_checks.sql
-    resolved_rows: 42
-    unresolved_rows: 0
-    threshold_set_rows: 3
-    candidate_pool:
-      with_candidates_rows: 0
-      without_candidates_rows: 0
+- id: fructan_wave01
+  order: 1
+  source_file: etl/phase2/sql/phase2_fructan_wave01_checks.sql
+  resolved_rows: 16
+  unresolved_rows: 26
+  threshold_set_rows: 6
+  candidate_pool:
+    with_candidates_rows: 16
+    without_candidates_rows: 10
+- id: fructan_wave02
+  order: 2
+  source_file: etl/phase2/sql/phase2_fructan_wave02_checks.sql
+  resolved_rows: 21
+  unresolved_rows: 21
+  threshold_set_rows: 5
+  candidate_pool:
+    with_candidates_rows: 15
+    without_candidates_rows: 6
+- id: gos_wave01
+  order: 3
+  source_file: etl/phase2/sql/phase2_gos_wave01_checks.sql
+  resolved_rows: 27
+  unresolved_rows: 15
+  threshold_set_rows: 6
+  candidate_pool:
+    with_candidates_rows: 9
+    without_candidates_rows: 6
+- id: gos_wave02
+  order: 4
+  source_file: etl/phase2/sql/phase2_gos_wave02_checks.sql
+  resolved_rows: 33
+  unresolved_rows: 9
+  threshold_set_rows: 6
+  candidate_pool:
+    with_candidates_rows: 6
+    without_candidates_rows: 3
+- id: polyol_wave01
+  order: 5
+  source_file: etl/phase2/sql/phase2_polyol_wave01_checks.sql
+  resolved_rows: 39
+  unresolved_rows: 3
+  threshold_set_rows: 6
+  candidate_pool:
+    with_candidates_rows: 1
+    without_candidates_rows: 2
+- id: polyol_wave02
+  order: 6
+  source_file: etl/phase2/sql/phase2_polyol_wave02_checks.sql
+  resolved_rows: 42
+  unresolved_rows: 0
+  threshold_set_rows: 3
+  candidate_pool:
+    with_candidates_rows: 0
+    without_candidates_rows: 0
 final_contract:
   total_rows: 42
   resolved_rows: 42

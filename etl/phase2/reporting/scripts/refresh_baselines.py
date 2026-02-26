@@ -12,6 +12,7 @@ from typing import Any, Dict, List
 
 import yaml
 
+
 ALLOWED_WRITES = {
     "etl/phase2/reporting/contracts/generated/*.generated.yaml",
     "etl/phase2/reporting/contracts/baselines/**/*.json",
@@ -102,10 +103,8 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
         raise ValueError(f"figure {figure_id} missing metrics object")
 
     contract_refs = figure.get("contract_refs")
-    if (
-        not isinstance(contract_refs, list)
-        or not contract_refs
-        or not all(isinstance(x, str) and x for x in contract_refs)
+    if not isinstance(contract_refs, list) or not contract_refs or not all(
+        isinstance(x, str) and x for x in contract_refs
     ):
         raise ValueError(f"figure {figure_id} must include non-empty contract_refs")
 
@@ -121,13 +120,17 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
         "artifact": {
             "path": f"baseline://now/{figure_id}.json",
             "sha256": _sha256_json(metrics),
-            "row_count": int((figure.get("artifact") or {}).get("row_count", _stable_row_count(figure_id, metrics))),
+            "row_count": int(
+                (figure.get("artifact") or {}).get("row_count", _stable_row_count(figure_id, metrics))
+            ),
         },
     }
     return normalized
 
 
-def _refresh_source_hashes(source_file_hashes: Dict[str, Any], repo_root: pathlib.Path) -> Dict[str, str]:
+def _refresh_source_hashes(
+    source_file_hashes: Dict[str, Any], repo_root: pathlib.Path
+) -> Dict[str, str]:
     refreshed: Dict[str, str] = {}
     for raw_path, raw_digest in sorted(source_file_hashes.items()):
         if not isinstance(raw_path, str) or not raw_path:
@@ -140,7 +143,9 @@ def _refresh_source_hashes(source_file_hashes: Dict[str, Any], repo_root: pathli
     return refreshed
 
 
-def _refresh_stage_contract_hashes(stage_contracts: Dict[str, Any], repo_root: pathlib.Path) -> int:
+def _refresh_stage_contract_hashes(
+    stage_contracts: Dict[str, Any], repo_root: pathlib.Path
+) -> int:
     updated = 0
     source_inputs = stage_contracts.get("source_inputs")
     if not isinstance(source_inputs, list):
@@ -287,7 +292,9 @@ def main() -> int:
     required_write_paths = [baseline_rel, stage_rel]
     if args.refresh_render_baselines:
         render_svg_probe = f"{render_scientific_rel.rstrip('/')}/probe.svg"
-        required_write_paths.extend([render_svg_probe, render_dashboard_rel, render_manifest_rel])
+        required_write_paths.extend(
+            [render_svg_probe, render_dashboard_rel, render_manifest_rel]
+        )
 
     for rel_path in required_write_paths:
         if not _path_allowed(rel_path, list(ALLOWED_WRITES)):
