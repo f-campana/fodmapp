@@ -15,7 +15,7 @@ Apply these instructions to the whole repository root.
 - Keep PR titles semantic (Conventional Commit style).
 - Keep PRs focused and small.
 - Run the quality command before requesting merge:
-  - `./.github/scripts/quality-gate.sh`
+  - `./.github/scripts/quality-gate.sh` (run with `--full` for full format/lint/tests/typecheck/build checks)
 - Watch for CI completion, when all green ask before merge
 
 ## Safety Rules
