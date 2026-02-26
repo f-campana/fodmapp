@@ -107,6 +107,10 @@ jobs:
         run: |
           pnpm turbo run build typecheck test --filter=@fodmap/ui
 
+      - name: Verify UI style contract
+        run: |
+          pnpm turbo run styles:check --filter=@fodmap/ui
+
       - name: Typecheck Storybook sources
         run: |
           pnpm turbo run typecheck --filter=@fodmap/storybook
