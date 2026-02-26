@@ -1,0 +1,19 @@
+[project]
+name = "phase2-reporting"
+version = "0.0.0"
+description = "Phase 2 reporting tooling dependencies for CI"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+lint = [
+  "pyyaml==6.0.2",
+  "jsonschema==4.23.0",
+]
+
+ci = [
+  "pyyaml==6.0.2",
+  "jsonschema==4.23.0",
+  "openpyxl",
+  "psycopg2-binary",
+]

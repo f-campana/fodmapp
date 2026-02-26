@@ -67,17 +67,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
       - name: Install lint dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml==6.0.2 jsonschema==4.23.0
+          cd etl/phase2/reporting
+          uv sync --extra lint --locked
       - name: Validate reporting contracts and workflow
         run: |
-          python etl/phase2/reporting/scripts/contract_lint.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/contract_lint.py \
             --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
             --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
             --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
@@ -95,9 +95,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
       - name: Collect now-set figures from fixtures
         run: |
-          python etl/phase2/reporting/scripts/collect_reporting.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode smoke \
             --figures now \
             --source fixture \
@@ -120,14 +124,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
       - name: Install compare dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml==6.0.2
+          cd etl/phase2/reporting
+          uv sync --extra lint --locked
       - name: Download now-set artifacts
         uses: actions/download-artifact@v4
         with:
@@ -135,7 +139,7 @@ jobs:
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Baseline compare now-set (semantic)
         run: |
-          python etl/phase2/reporting/scripts/compare_baselines.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -236,8 +240,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
       - name: Setup Node
@@ -256,8 +260,8 @@ jobs:
           sudo apt-get install -y postgresql-client
       - name: Install full-run dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
+          cd etl/phase2/reporting
+          uv sync --extra ci --locked
       - name: Cache CIQUAL data
         uses: actions/cache@v4
         with:
@@ -274,14 +278,14 @@ jobs:
           done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
       - name: Replay + seed full pipeline
         run: |
-          python etl/phase2/reporting/scripts/replay_seed.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/replay_seed.py \
             --trigger full \
             --replay-db-url "$REPLAY_DB_URL" \
             --seed-db-url "$SEED_DB_URL" \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Collect now-set from DB
         run: |
-          python etl/phase2/reporting/scripts/collect_reporting.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode full \
             --figures now \
             --source db \
@@ -292,7 +296,7 @@ jobs:
       - name: Baseline compare now-set (semantic, non-blocking ramp)
         continue-on-error: true
         run: |
-          python etl/phase2/reporting/scripts/compare_baselines.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -357,8 +361,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.12"
       - name: Setup Node
@@ -393,8 +397,8 @@ jobs:
           sudo apt-get install -y postgresql-client
       - name: Install baseline-update dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
+          cd etl/phase2/reporting
+          uv sync --extra ci --locked
       - name: Cache CIQUAL data
         uses: actions/cache@v4
         with:
@@ -411,14 +415,14 @@ jobs:
           done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
       - name: Replay + seed baseline-update pipeline
         run: |
-          python etl/phase2/reporting/scripts/replay_seed.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/replay_seed.py \
             --trigger manual_baseline_update \
             --replay-db-url "$REPLAY_DB_URL" \
             --seed-db-url "$SEED_DB_URL" \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Collect now-set from DB for baseline update
         run: |
-          python etl/phase2/reporting/scripts/collect_reporting.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/collect_reporting.py \
             --mode full \
             --figures now \
             --source db \
@@ -428,7 +432,7 @@ jobs:
             --trigger manual_baseline_update
       - name: Refresh baseline artifacts (controlled scope)
         run: |
-          python etl/phase2/reporting/scripts/refresh_baselines.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/refresh_baselines.py \
             --mode baseline_update \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --baseline-path etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
@@ -447,7 +451,7 @@ jobs:
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Re-run contract lint after baseline refresh
         run: |
-          python etl/phase2/reporting/scripts/contract_lint.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/contract_lint.py \
             --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
             --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
             --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
@@ -457,7 +461,7 @@ jobs:
             --workflow .github/workflows/phase2-reporting.yml
       - name: Verify refreshed metric baseline matches generated run
         run: |
-          python etl/phase2/reporting/scripts/compare_baselines.py \
+          uv run --project etl/phase2/reporting python etl/phase2/reporting/scripts/compare_baselines.py \
             --mode now \
             --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \

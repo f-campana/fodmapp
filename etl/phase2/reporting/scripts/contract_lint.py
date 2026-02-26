@@ -281,7 +281,10 @@ def validate_workflow(workflow: Dict[str, Any]) -> None:
     joined = "\n".join(run_lines)
     if "contract_lint.py" not in joined:
         fail("workflow contract-lint job must invoke scripts/contract_lint.py")
-    if "pip install pyyaml==6.0.2 jsonschema==4.23.0" not in joined:
+    has_legacy_pip = "pip install pyyaml==6.0.2 jsonschema==4.23.0" in joined
+    has_uv_lint = "uv sync" in joined and "--extra lint" in joined
+    has_uv_ci = "uv sync" in joined and "--extra ci" in joined
+    if not (has_legacy_pip or has_uv_lint or has_uv_ci):
         fail("workflow contract-lint must install pinned pyyaml/jsonschema")
 
 
