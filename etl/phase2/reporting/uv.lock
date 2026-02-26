@@ -69,10 +69,9 @@ ci = [
     { name = "jsonschema" },
     { name = "openpyxl" },
     { name = "psycopg2-binary" },
-    { name = "pyyaml" },
 ]
 lint = [
-    { name = "pyyaml", specifier = "==6.0.2" },
+    { name = "pyyaml" },
     { name = "ruff" },
 ]
 
@@ -81,7 +80,6 @@ requires-dist = [
     { name = "jsonschema", marker = "extra == 'ci'", specifier = "==4.23.0" },
     { name = "openpyxl", marker = "extra == 'ci'" },
     { name = "psycopg2-binary", marker = "extra == 'ci'" },
-    { name = "pyyaml", marker = "extra == 'ci'", specifier = "==6.0.2" },
     { name = "pyyaml", marker = "extra == 'lint'", specifier = "==6.0.2" },
     { name = "ruff", marker = "extra == 'lint'", specifier = ">=0.6.0,<1.0.0" },
 ]
