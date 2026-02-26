@@ -50,7 +50,7 @@ jobs:
       - name: Run JavaScript lint
         run: |
           pnpm lint:ci
-          
+
   python-lint:
     name: python-lint
     runs-on: ubuntu-latest
