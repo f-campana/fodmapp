@@ -1,5 +1,5 @@
 ---
-"fodmap-platform": patch
+"@fodmap/ui": patch
 ---
 
 Add governance and contributor-facing updates that enforce changeset requirements for package/app changes, including:
