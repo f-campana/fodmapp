@@ -4,8 +4,8 @@ import {
   parseReportingRun,
   renderDashboardFragment,
   renderScientificSvgBundle,
-  SCIENTIFIC_FIGURE_ORDER,
   sampleReportingRun,
+  SCIENTIFIC_FIGURE_ORDER,
 } from "./index";
 
 describe("reporting renderer package", () => {

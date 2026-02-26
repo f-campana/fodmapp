@@ -1,3 +1,4 @@
+import { logInfo } from "./logger";
 import { captureSentryEvent, getSentryBootstrapStatus } from "./sentry";
 
 export type MonitoringEvent =
@@ -27,7 +28,5 @@ export function captureArchitectureEvent(
 ): void {
   captureSentryEvent(event, attributes);
 
-  if (process.env.NODE_ENV !== "production") {
-    console.info(`[monitoring-runtime] ${event}`, attributes);
-  }
+  logInfo(`[monitoring-runtime] ${event}`, attributes);
 }

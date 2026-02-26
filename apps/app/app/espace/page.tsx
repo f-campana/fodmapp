@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import {
   Badge,
   Button,
@@ -9,13 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@fodmap/ui";
+
 import { AnalyticsPageView } from "../../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../../lib/analytics";
+import { getAuthContext } from "../../lib/auth";
 import {
   canTrackWithConsent,
   getConsentBootstrapStatus,
 } from "../../lib/consent";
-import { getAuthContext } from "../../lib/auth";
 import { getMessages } from "../../lib/i18n";
 import { captureArchitectureEvent } from "../../lib/monitoring";
 

@@ -1,5 +1,5 @@
-import { buildFigureModels } from "../models/build-figure-models";
 import type { ReportingRun, ScientificFigureFile } from "../contracts";
+import { buildFigureModels } from "../models/build-figure-models";
 
 export interface ScientificRenderOptions {
   width?: number;

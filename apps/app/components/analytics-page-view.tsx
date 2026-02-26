@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { trackAnalyticsEvent } from "../lib/analytics";
 
 interface AnalyticsPageViewProps {

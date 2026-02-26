@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import type { components } from "@fodmap/types";
 import {
   Badge,
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@fodmap/ui";
+
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
 import { getClerkBootstrapStatus } from "../lib/clerk";

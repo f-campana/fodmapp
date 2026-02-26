@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
 import Color from "colorjs.io";
 import tinycolor from "tinycolor2";
 
@@ -75,7 +76,7 @@ function validateBaseColorTokens() {
 
   function validateColorLeaf(tokenPath, value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
-      errors.push(`${tokenPath}: expected \"$value\" to be an object.`);
+      errors.push(`${tokenPath}: expected "$value" to be an object.`);
       return;
     }
 
@@ -83,7 +84,7 @@ function validateBaseColorTokens() {
 
     if (colorSpace !== "oklch") {
       errors.push(
-        `${tokenPath}: expected colorSpace=\"oklch\", received ${JSON.stringify(colorSpace)}.`,
+        `${tokenPath}: expected colorSpace="oklch", received ${JSON.stringify(colorSpace)}.`,
       );
     }
 

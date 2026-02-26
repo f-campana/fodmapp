@@ -4,485 +4,485 @@
  */
 
 export interface paths {
-    "/v0/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Liveness/metadata probe */
-        get: operations["getHealth"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/v0/health": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/foods": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Search foods by slug or canonical names */
-        get: operations["searchFoods"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Liveness/metadata probe */
+    get: operations["getHealth"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/foods": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/foods/{food_slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Food metadata by slug */
-        get: operations["getFoodBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Search foods by slug or canonical names */
+    get: operations["searchFoods"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/foods/{food_slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/foods/{food_slug}/rollup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Latest full 6-subtype rollup by food slug
-         * @description Returns latest full rollup projection from `v_phase3_rollups_latest_full`.
-         *     Includes coverage and provenance fields.
-         */
-        get: operations["getFoodRollupBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Food metadata by slug */
+    get: operations["getFoodBySlug"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/foods/{food_slug}/rollup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/foods/{food_slug}/subtypes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Per-subtype levels and thresholds for a food */
-        get: operations["getFoodSubtypesBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /**
+     * Latest full 6-subtype rollup by food slug
+     * @description Returns latest full rollup projection from `v_phase3_rollups_latest_full`.
+     *     Includes coverage and provenance fields.
+     */
+    get: operations["getFoodRollupBySlug"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/foods/{food_slug}/subtypes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/foods/{food_slug}/traits": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Culinary trait profile for a food */
-        get: operations["getFoodTraitsBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Per-subtype levels and thresholds for a food */
+    get: operations["getFoodSubtypesBySlug"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/foods/{food_slug}/traits": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/v0/swaps": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Active swap recommendations for a source food
-         * @description Filters:
-         *     - active rules only
-         *     - `from` slug is required
-         *     - optional score floor (`min_safety_score`)
-         *
-         *     Sort order (deterministic):
-         *     1) `fodmap_safety_score` DESC
-         *     2) `overall_score` DESC
-         *     3) `to_overall_level` ASC severity (`none`, `low`, `moderate`, `high`, `unknown`)
-         *     4) `coverage_ratio` DESC
-         *     5) `to_food_slug` ASC
-         */
-        get: operations["listSwaps"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Culinary trait profile for a food */
+    get: operations["getFoodTraitsBySlug"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/swaps": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    /**
+     * Active swap recommendations for a source food
+     * @description Filters:
+     *     - active rules only
+     *     - `from` slug is required
+     *     - optional score floor (`min_safety_score`)
+     *
+     *     Sort order (deterministic):
+     *     1) `fodmap_safety_score` DESC
+     *     2) `overall_score` DESC
+     *     3) `to_overall_level` ASC severity (`none`, `low`, `moderate`, `high`, `unknown`)
+     *     4) `coverage_ratio` DESC
+     *     5) `to_food_slug` ASC
+     */
+    get: operations["listSwaps"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** @enum {string} */
-        FoodLevel: "none" | "low" | "moderate" | "high" | "unknown";
-        /** @enum {string} */
-        RuleStatus: "active" | "draft";
-        HealthResponse: {
-            /** @enum {string} */
-            status: "ok";
-            /** @example fodmap-api */
-            service: string;
-            /** @example v0 */
-            version: string;
-            /** Format: date-time */
-            timestamp?: string;
-        };
-        ErrorResponse: {
-            error: {
-                /** @example not_found */
-                code: string;
-                message: string;
-            };
-        };
-        FoodIdentity: {
-            food_slug: string;
-            canonical_name_fr: string;
-            canonical_name_en: string;
-        };
-        FoodResponse: components["schemas"]["FoodIdentity"] & {
-            preparation_state?: string | null;
-            status?: string | null;
-            source_slug?: string | null;
-        };
-        FoodSearchItem: components["schemas"]["FoodIdentity"] & {
-            overall_level?: components["schemas"]["FoodLevel"];
-            driver_subtype?: string | null;
-            coverage_ratio?: number | null;
-            /** Format: date-time */
-            rollup_computed_at?: string | null;
-        };
-        FoodSearchResponse: {
-            query: string;
-            limit: number;
-            items: components["schemas"]["FoodSearchItem"][];
-            total: number;
-        };
-        FoodRollupResponse: {
-            food_slug: string;
-            canonical_name_fr: string;
-            canonical_name_en: string;
-            rollup_serving_g?: number | null;
-            overall_level: components["schemas"]["FoodLevel"];
-            /** @description Driver subtype code when applicable. */
-            driver_subtype?: string | null;
-            known_subtypes_count: number;
-            coverage_ratio: number;
-            /** @description Rollup source slug. */
-            source_slug: string;
-            /** Format: date-time */
-            rollup_computed_at: string;
-            /** @description Included when relevant to downstream swap scoring context. */
-            scoring_version?: string | null;
-        };
-        FoodSubtypeItem: {
-            subtype_code: string;
-            subtype_level: components["schemas"]["FoodLevel"];
-            amount_g_per_serving?: number | null;
-            comparator?: string | null;
-            low_max_g?: number | null;
-            moderate_max_g?: number | null;
-            burden_ratio?: number | null;
-            signal_source_kind?: string | null;
-            signal_source_slug?: string | null;
-            threshold_source_slug?: string | null;
-            is_default_threshold: boolean;
-            is_polyol_proxy: boolean;
-            rollup_serving_g?: number | null;
-            /** Format: date-time */
-            computed_at: string;
-        };
-        FoodSubtypeListResponse: {
-            food_slug: string;
-            canonical_name_fr: string;
-            canonical_name_en: string;
-            items: components["schemas"]["FoodSubtypeItem"][];
-            total: number;
-        };
-        TraitLabel: {
-            code: string;
-            label_fr?: string | null;
-            label_en?: string | null;
-        };
-        FoodTraitsResponse: {
-            food_slug: string;
-            canonical_name_fr: string;
-            canonical_name_en: string;
-            source_slug: string;
-            culinary_roles?: components["schemas"]["TraitLabel"][];
-            flavor_profiles?: components["schemas"]["TraitLabel"][];
-            texture_profiles?: components["schemas"]["TraitLabel"][];
-            cooking_behaviors?: components["schemas"]["TraitLabel"][];
-            cuisine_affinities?: components["schemas"]["TraitLabel"][];
-        };
-        SwapItem: {
-            from_food_slug: string;
-            to_food_slug: string;
-            from_food_name_fr?: string | null;
-            from_food_name_en?: string | null;
-            to_food_name_fr?: string | null;
-            to_food_name_en?: string | null;
-            instruction_fr: string;
-            instruction_en: string;
-            from_overall_level: components["schemas"]["FoodLevel"];
-            to_overall_level: components["schemas"]["FoodLevel"];
-            driver_subtype: string | null;
-            from_burden_ratio: number | null;
-            to_burden_ratio: number | null;
-            coverage_ratio: number;
-            fodmap_safety_score: number;
-            overall_score: number;
-            rule_status: components["schemas"]["RuleStatus"];
-            scoring_version: string;
-            source_slug?: string;
-            /** Format: date-time */
-            rollup_computed_at: string;
-        };
-        SwapListResponse: {
-            from_food_slug: string;
-            applied_filters?: {
-                limit?: number;
-                min_safety_score?: number;
-            };
-            items: components["schemas"]["SwapItem"][];
-            total: number;
-        };
+  schemas: {
+    /** @enum {string} */
+    FoodLevel: "none" | "low" | "moderate" | "high" | "unknown";
+    /** @enum {string} */
+    RuleStatus: "active" | "draft";
+    HealthResponse: {
+      /** @enum {string} */
+      status: "ok";
+      /** @example fodmap-api */
+      service: string;
+      /** @example v0 */
+      version: string;
+      /** Format: date-time */
+      timestamp?: string;
     };
-    responses: {
-        /** @description Resource not found */
-        NotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
+    ErrorResponse: {
+      error: {
+        /** @example not_found */
+        code: string;
+        message: string;
+      };
     };
-    parameters: {
-        /** @description Stable unique food slug (`foods.food_slug`). */
-        FoodSlugPath: string;
-        /** @description Case-insensitive food search string. */
-        FoodSearchQuery: string;
-        /** @description Maximum number of food results. */
-        FoodSearchLimitQuery: number;
-        /** @description Source food slug. */
-        FromSlugQuery: string;
-        LimitQuery: number;
-        /** @description Lower bound for `fodmap_safety_score`. */
-        MinSafetyScoreQuery: number;
+    FoodIdentity: {
+      food_slug: string;
+      canonical_name_fr: string;
+      canonical_name_en: string;
     };
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    FoodResponse: components["schemas"]["FoodIdentity"] & {
+      preparation_state?: string | null;
+      status?: string | null;
+      source_slug?: string | null;
+    };
+    FoodSearchItem: components["schemas"]["FoodIdentity"] & {
+      overall_level?: components["schemas"]["FoodLevel"];
+      driver_subtype?: string | null;
+      coverage_ratio?: number | null;
+      /** Format: date-time */
+      rollup_computed_at?: string | null;
+    };
+    FoodSearchResponse: {
+      query: string;
+      limit: number;
+      items: components["schemas"]["FoodSearchItem"][];
+      total: number;
+    };
+    FoodRollupResponse: {
+      food_slug: string;
+      canonical_name_fr: string;
+      canonical_name_en: string;
+      rollup_serving_g?: number | null;
+      overall_level: components["schemas"]["FoodLevel"];
+      /** @description Driver subtype code when applicable. */
+      driver_subtype?: string | null;
+      known_subtypes_count: number;
+      coverage_ratio: number;
+      /** @description Rollup source slug. */
+      source_slug: string;
+      /** Format: date-time */
+      rollup_computed_at: string;
+      /** @description Included when relevant to downstream swap scoring context. */
+      scoring_version?: string | null;
+    };
+    FoodSubtypeItem: {
+      subtype_code: string;
+      subtype_level: components["schemas"]["FoodLevel"];
+      amount_g_per_serving?: number | null;
+      comparator?: string | null;
+      low_max_g?: number | null;
+      moderate_max_g?: number | null;
+      burden_ratio?: number | null;
+      signal_source_kind?: string | null;
+      signal_source_slug?: string | null;
+      threshold_source_slug?: string | null;
+      is_default_threshold: boolean;
+      is_polyol_proxy: boolean;
+      rollup_serving_g?: number | null;
+      /** Format: date-time */
+      computed_at: string;
+    };
+    FoodSubtypeListResponse: {
+      food_slug: string;
+      canonical_name_fr: string;
+      canonical_name_en: string;
+      items: components["schemas"]["FoodSubtypeItem"][];
+      total: number;
+    };
+    TraitLabel: {
+      code: string;
+      label_fr?: string | null;
+      label_en?: string | null;
+    };
+    FoodTraitsResponse: {
+      food_slug: string;
+      canonical_name_fr: string;
+      canonical_name_en: string;
+      source_slug: string;
+      culinary_roles?: components["schemas"]["TraitLabel"][];
+      flavor_profiles?: components["schemas"]["TraitLabel"][];
+      texture_profiles?: components["schemas"]["TraitLabel"][];
+      cooking_behaviors?: components["schemas"]["TraitLabel"][];
+      cuisine_affinities?: components["schemas"]["TraitLabel"][];
+    };
+    SwapItem: {
+      from_food_slug: string;
+      to_food_slug: string;
+      from_food_name_fr?: string | null;
+      from_food_name_en?: string | null;
+      to_food_name_fr?: string | null;
+      to_food_name_en?: string | null;
+      instruction_fr: string;
+      instruction_en: string;
+      from_overall_level: components["schemas"]["FoodLevel"];
+      to_overall_level: components["schemas"]["FoodLevel"];
+      driver_subtype: string | null;
+      from_burden_ratio: number | null;
+      to_burden_ratio: number | null;
+      coverage_ratio: number;
+      fodmap_safety_score: number;
+      overall_score: number;
+      rule_status: components["schemas"]["RuleStatus"];
+      scoring_version: string;
+      source_slug?: string;
+      /** Format: date-time */
+      rollup_computed_at: string;
+    };
+    SwapListResponse: {
+      from_food_slug: string;
+      applied_filters?: {
+        limit?: number;
+        min_safety_score?: number;
+      };
+      items: components["schemas"]["SwapItem"][];
+      total: number;
+    };
+  };
+  responses: {
+    /** @description Resource not found */
+    NotFound: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+  };
+  parameters: {
+    /** @description Stable unique food slug (`foods.food_slug`). */
+    FoodSlugPath: string;
+    /** @description Case-insensitive food search string. */
+    FoodSearchQuery: string;
+    /** @description Maximum number of food results. */
+    FoodSearchLimitQuery: number;
+    /** @description Source food slug. */
+    FromSlugQuery: string;
+    LimitQuery: number;
+    /** @description Lower bound for `fodmap_safety_score`. */
+    MinSafetyScoreQuery: number;
+  };
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getHealth: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HealthResponse"];
-                };
-            };
-            /** @description Database unavailable */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
+  getHealth: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    searchFoods: {
-        parameters: {
-            query: {
-                /** @description Case-insensitive food search string. */
-                q: components["parameters"]["FoodSearchQuery"];
-                /** @description Maximum number of food results. */
-                limit?: components["parameters"]["FoodSearchLimitQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Food search results */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FoodSearchResponse"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["HealthResponse"];
         };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
     };
-    getFoodBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Stable unique food slug (`foods.food_slug`). */
-                food_slug: components["parameters"]["FoodSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Food found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FoodResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
+  };
+  searchFoods: {
+    parameters: {
+      query: {
+        /** @description Case-insensitive food search string. */
+        q: components["parameters"]["FoodSearchQuery"];
+        /** @description Maximum number of food results. */
+        limit?: components["parameters"]["FoodSearchLimitQuery"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getFoodRollupBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Stable unique food slug (`foods.food_slug`). */
-                food_slug: components["parameters"]["FoodSlugPath"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Food search results */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Rollup found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FoodRollupResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
+        content: {
+          "application/json": components["schemas"]["FoodSearchResponse"];
         };
+      };
     };
-    getFoodSubtypesBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Stable unique food slug (`foods.food_slug`). */
-                food_slug: components["parameters"]["FoodSlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Subtype-level breakdown found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FoodSubtypeListResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
+  };
+  getFoodBySlug: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Stable unique food slug (`foods.food_slug`). */
+        food_slug: components["parameters"]["FoodSlugPath"];
+      };
+      cookie?: never;
     };
-    getFoodTraitsBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Stable unique food slug (`foods.food_slug`). */
-                food_slug: components["parameters"]["FoodSlugPath"];
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Food found */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Traits found */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FoodTraitsResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
+        content: {
+          "application/json": components["schemas"]["FoodResponse"];
         };
+      };
+      404: components["responses"]["NotFound"];
     };
-    listSwaps: {
-        parameters: {
-            query: {
-                /** @description Source food slug. */
-                from: components["parameters"]["FromSlugQuery"];
-                limit?: components["parameters"]["LimitQuery"];
-                /** @description Lower bound for `fodmap_safety_score`. */
-                min_safety_score?: components["parameters"]["MinSafetyScoreQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Swap results */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SwapListResponse"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-        };
+  };
+  getFoodRollupBySlug: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Stable unique food slug (`foods.food_slug`). */
+        food_slug: components["parameters"]["FoodSlugPath"];
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      /** @description Rollup found */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FoodRollupResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  getFoodSubtypesBySlug: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Stable unique food slug (`foods.food_slug`). */
+        food_slug: components["parameters"]["FoodSlugPath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Subtype-level breakdown found */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FoodSubtypeListResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  getFoodTraitsBySlug: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Stable unique food slug (`foods.food_slug`). */
+        food_slug: components["parameters"]["FoodSlugPath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Traits found */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FoodTraitsResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  listSwaps: {
+    parameters: {
+      query: {
+        /** @description Source food slug. */
+        from: components["parameters"]["FromSlugQuery"];
+        limit?: components["parameters"]["LimitQuery"];
+        /** @description Lower bound for `fodmap_safety_score`. */
+        min_safety_score?: components["parameters"]["MinSafetyScoreQuery"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Swap results */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SwapListResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
 }

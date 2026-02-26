@@ -1,5 +1,5 @@
-import { buildFigureModels } from "../models/build-figure-models";
 import type { ReportingRun } from "../contracts";
+import { buildFigureModels } from "../models/build-figure-models";
 
 export interface DashboardRenderOptions {
   title?: string;

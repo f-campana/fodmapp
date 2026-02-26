@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { expect, userEvent, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
@@ -13,11 +14,11 @@ import {
 } from "./token-docs.components";
 import {
   asRecord,
-  flattenTokenTree,
-  createSortedRows,
   compareFontWeightRows,
-  compareLineHeightRows,
   compareLetterSpacingRows,
+  compareLineHeightRows,
+  createSortedRows,
+  flattenTokenTree,
   tokenPrimitiveToString,
 } from "./token-docs.helpers";
 
@@ -152,6 +153,55 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function TypographyReferenceStory() {
+  useTokenDocsResetScrollOnMount();
+
+  return (
+    <TokenDocsPage
+      title="Typography Token Reference"
+      subtitle="Exact token paths and values for implementation and QA checks."
+    >
+      <TokenSection
+        title="Typography Primitives"
+        description="Grouped deterministic tables for all typography token domains."
+      >
+        <TokenDataGrid
+          gridLabel="typography-grid"
+          groups={groups}
+          accordion
+          allowCollapseAll={false}
+          initialOpenGroupId="families"
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(360px, 1.8fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "value",
+              label: "Value",
+              width: "minmax(320px, 1fr)",
+              align: "right",
+              getValue: (row) => row.value,
+              render: (row) => (
+                <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
+                  {formatTypographyReferenceValue(row)}
+                </span>
+              ),
+              valueMode: "plain",
+              copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+    </TokenDocsPage>
+  );
+}
+
 export const Showcase: Story = {
   render: () => {
     return (
@@ -259,54 +309,7 @@ export const Showcase: Story = {
 };
 
 export const Reference: Story = {
-  render: () => {
-    useTokenDocsResetScrollOnMount();
-
-    return (
-      <TokenDocsPage
-        title="Typography Token Reference"
-        subtitle="Exact token paths and values for implementation and QA checks."
-      >
-        <TokenSection
-          title="Typography Primitives"
-          description="Grouped deterministic tables for all typography token domains."
-        >
-          <TokenDataGrid
-            gridLabel="typography-grid"
-            groups={groups}
-            accordion
-            allowCollapseAll={false}
-            initialOpenGroupId="families"
-            columns={[
-              {
-                key: "path",
-                label: "Token Path",
-                width: "minmax(360px, 1.8fr)",
-                getValue: (row) => row.path,
-                render: (row) => <TokenPathText value={row.path} />,
-                valueMode: "plain",
-                copyValue: (row) => row.path,
-              },
-              {
-                key: "value",
-                label: "Value",
-                width: "minmax(320px, 1fr)",
-                align: "right",
-                getValue: (row) => row.value,
-                render: (row) => (
-                  <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
-                    {formatTypographyReferenceValue(row)}
-                  </span>
-                ),
-                valueMode: "plain",
-                copyValue: (row) => row.value,
-              },
-            ]}
-          />
-        </TokenSection>
-      </TokenDocsPage>
-    );
-  },
+  render: () => <TypographyReferenceStory />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
