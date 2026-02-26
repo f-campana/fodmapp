@@ -47,7 +47,9 @@
     "storybook:test": "pnpm --filter @fodmap/storybook test:ci",
     "check:all": "./.github/scripts/quality-gate.sh && pnpm lint:ci && pnpm python:ci && pnpm openapi:check && pnpm tokens:check && pnpm tailwind:styles:check && pnpm ui:build && pnpm ui:styles:check && pnpm ui:typecheck && pnpm ui:test && pnpm --filter @fodmap/storybook typecheck && pnpm storybook:build && pnpm storybook:test && pnpm app:test && pnpm app:typecheck && pnpm app:build && pnpm marketing:typecheck && pnpm marketing:build && pnpm research:typecheck && pnpm research:build",
     "changeset": "changeset",
-    "version-packages": "changeset version"
+    "version-packages": "changeset version",
+    "changeset:ci:status": "node .github/scripts/check-pr-changesets.mjs",
+    "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
   },
   "devDependencies": {
     "@fodmap/eslint-config": "workspace:*",
