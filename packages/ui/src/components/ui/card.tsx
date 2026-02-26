@@ -23,7 +23,10 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6", className)}
+    className={cn(
+      "grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 p-6",
+      className,
+    )}
     {...props}
   />
 ));
@@ -35,7 +38,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
+    className={cn("leading-none font-semibold tracking-tight", className)}
     {...props}
   />
 ));
@@ -59,7 +62,10 @@ const CardAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("col-start-2 row-span-2 row-start-1 self-start justify-self-end", className)}
+    className={cn(
+      "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+      className,
+    )}
     {...props}
   />
 ));
@@ -85,4 +91,12 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardAction, CardContent };
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardAction,
+  CardContent,
+};

@@ -9,7 +9,13 @@ const __filename = fileURLToPath(import.meta.url);
 const packageRoot = path.resolve(path.dirname(__filename), "..");
 const generatedDir = path.join(packageRoot, "src", "generated");
 const tempBuildDir = path.join(packageRoot, ".tmp", "style-dictionary");
-const baseColorTokensFile = path.join(packageRoot, "src", "tokens", "base", "color.json");
+const baseColorTokensFile = path.join(
+  packageRoot,
+  "src",
+  "tokens",
+  "base",
+  "color.json",
+);
 
 const aliasMap = [
   ["--color-bg", "--fd-semantic-color-background-canvas"],
@@ -30,19 +36,29 @@ const aliasMap = [
   ["--color-danger-hover", "--fd-semantic-color-action-destructive-bg-hover"],
   ["--color-danger-foreground", "--fd-semantic-color-status-danger-fg"],
   ["--font-body", "--fd-semantic-typography-font-family-body"],
-  ["--font-display", "--fd-semantic-typography-font-family-display"]
+  ["--font-display", "--fd-semantic-typography-font-family-display"],
 ];
 
 function runBuild(target) {
-  execFileSync("pnpm", ["exec", "style-dictionary", "build", "--config", "./style-dictionary.config.mjs"], {
-    cwd: packageRoot,
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      FD_BUILD_TARGET: target,
-      FD_OUTPUT_PATH: tempBuildDir
-    }
-  });
+  execFileSync(
+    "pnpm",
+    [
+      "exec",
+      "style-dictionary",
+      "build",
+      "--config",
+      "./style-dictionary.config.mjs",
+    ],
+    {
+      cwd: packageRoot,
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        FD_BUILD_TARGET: target,
+        FD_OUTPUT_PATH: tempBuildDir,
+      },
+    },
+  );
 }
 
 function readJson(filename) {
@@ -66,11 +82,19 @@ function validateBaseColorTokens() {
     const { colorSpace, components, hex } = value;
 
     if (colorSpace !== "oklch") {
-      errors.push(`${tokenPath}: expected colorSpace=\"oklch\", received ${JSON.stringify(colorSpace)}.`);
+      errors.push(
+        `${tokenPath}: expected colorSpace=\"oklch\", received ${JSON.stringify(colorSpace)}.`,
+      );
     }
 
-    if (!Array.isArray(components) || components.length !== 3 || components.some((component) => !isFiniteNumber(component))) {
-      errors.push(`${tokenPath}: expected components to be [L, C, H] finite numbers.`);
+    if (
+      !Array.isArray(components) ||
+      components.length !== 3 ||
+      components.some((component) => !isFiniteNumber(component))
+    ) {
+      errors.push(
+        `${tokenPath}: expected components to be [L, C, H] finite numbers.`,
+      );
       return;
     }
 
@@ -89,7 +113,9 @@ function validateBaseColorTokens() {
     }
 
     if (typeof hex !== "string" || !/^#[0-9a-f]{6}$/.test(hex)) {
-      errors.push(`${tokenPath}: hex must be lowercase #rrggbb, received ${JSON.stringify(hex)}.`);
+      errors.push(
+        `${tokenPath}: hex must be lowercase #rrggbb, received ${JSON.stringify(hex)}.`,
+      );
       return;
     }
 
@@ -99,10 +125,15 @@ function validateBaseColorTokens() {
     }
 
     try {
-      const roundTripHex = new Color("oklch", [l, c, h]).to("srgb").toString({ format: "hex" }).toLowerCase();
+      const roundTripHex = new Color("oklch", [l, c, h])
+        .to("srgb")
+        .toString({ format: "hex" })
+        .toLowerCase();
 
       if (roundTripHex !== hex) {
-        errors.push(`${tokenPath}: hex mismatch, expected ${hex} from source but roundtrip produced ${roundTripHex}.`);
+        errors.push(
+          `${tokenPath}: hex mismatch, expected ${hex} from source but roundtrip produced ${roundTripHex}.`,
+        );
       }
     } catch (error) {
       const details = error instanceof Error ? error.message : String(error);
@@ -128,7 +159,9 @@ function validateBaseColorTokens() {
   walk(source, []);
 
   if (errors.length > 0) {
-    throw new Error(`Base color token preflight failed:\n${errors.map((error) => `- ${error}`).join("\n")}`);
+    throw new Error(
+      `Base color token preflight failed:\n${errors.map((error) => `- ${error}`).join("\n")}`,
+    );
   }
 }
 
@@ -156,8 +189,12 @@ function validateSemanticTokenParity(lightTokens, darkTokens) {
   const darkSemantic = darkTokens.semantic ?? darkTokens;
   const lightPaths = new Set(collectLeafTokenPaths(lightSemantic));
   const darkPaths = new Set(collectLeafTokenPaths(darkSemantic));
-  const onlyLight = [...lightPaths].filter((path) => !darkPaths.has(path)).sort();
-  const onlyDark = [...darkPaths].filter((path) => !lightPaths.has(path)).sort();
+  const onlyLight = [...lightPaths]
+    .filter((path) => !darkPaths.has(path))
+    .sort();
+  const onlyDark = [...darkPaths]
+    .filter((path) => !lightPaths.has(path))
+    .sort();
 
   if (onlyLight.length === 0 && onlyDark.length === 0) {
     return;
@@ -166,11 +203,15 @@ function validateSemanticTokenParity(lightTokens, darkTokens) {
   const details = [];
 
   if (onlyLight.length > 0) {
-    details.push(`- Paths present only in light semantic tokens:\n${onlyLight.map((path) => `  - ${path}`).join("\n")}`);
+    details.push(
+      `- Paths present only in light semantic tokens:\n${onlyLight.map((path) => `  - ${path}`).join("\n")}`,
+    );
   }
 
   if (onlyDark.length > 0) {
-    details.push(`- Paths present only in dark semantic tokens:\n${onlyDark.map((path) => `  - ${path}`).join("\n")}`);
+    details.push(
+      `- Paths present only in dark semantic tokens:\n${onlyDark.map((path) => `  - ${path}`).join("\n")}`,
+    );
   }
 
   throw new Error(`Semantic token parity check failed:\n${details.join("\n")}`);
@@ -189,7 +230,9 @@ function extractVariableDeclarations(cssText) {
 function buildAliasDeclarations(definedVariables) {
   return aliasMap.map(([legacyName, canonicalName]) => {
     if (!definedVariables.has(canonicalName)) {
-      throw new Error(`Missing canonical variable ${canonicalName} required for alias ${legacyName}`);
+      throw new Error(
+        `Missing canonical variable ${canonicalName} required for alias ${legacyName}`,
+      );
     }
 
     return `${legacyName}: var(${canonicalName});`;
@@ -197,22 +240,40 @@ function buildAliasDeclarations(definedVariables) {
 }
 
 function formatBlock(selector, declarations, colorScheme) {
-  const definedVariables = new Set(declarations.map((line) => line.slice(0, line.indexOf(":"))));
+  const definedVariables = new Set(
+    declarations.map((line) => line.slice(0, line.indexOf(":"))),
+  );
   const aliasDeclarations = buildAliasDeclarations(definedVariables);
-  const allLines = [...declarations, `color-scheme: ${colorScheme};`, ...aliasDeclarations];
+  const allLines = [
+    ...declarations,
+    `color-scheme: ${colorScheme};`,
+    ...aliasDeclarations,
+  ];
 
   return `${selector} {\n${allLines.map((line) => `  ${line}`).join("\n")}\n}`;
 }
 
 function formatMediaBlock(selector, declarations, colorScheme) {
-  const definedVariables = new Set(declarations.map((line) => line.slice(0, line.indexOf(":"))));
+  const definedVariables = new Set(
+    declarations.map((line) => line.slice(0, line.indexOf(":"))),
+  );
   const aliasDeclarations = buildAliasDeclarations(definedVariables);
-  const allLines = [...declarations, `color-scheme: ${colorScheme};`, ...aliasDeclarations];
+  const allLines = [
+    ...declarations,
+    `color-scheme: ${colorScheme};`,
+    ...aliasDeclarations,
+  ];
 
   return `@media (prefers-color-scheme: dark) {\n  ${selector} {\n${allLines.map((line) => `    ${line}`).join("\n")}\n  }\n}`;
 }
 
-function writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, darkCss) {
+function writeGeneratedFiles(
+  baseTokens,
+  lightTokens,
+  darkTokens,
+  lightCss,
+  darkCss,
+) {
   const lightVariables = extractVariableDeclarations(lightCss);
   const darkVariables = extractVariableDeclarations(darkCss);
 
@@ -220,23 +281,23 @@ function writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, dark
     base: baseTokens.base ?? baseTokens,
     themes: {
       light: {
-        semantic: lightTokens.semantic ?? lightTokens
+        semantic: lightTokens.semantic ?? lightTokens,
       },
       dark: {
-        semantic: darkTokens.semantic ?? darkTokens
-      }
-    }
+        semantic: darkTokens.semantic ?? darkTokens,
+      },
+    },
   };
 
   const css = [
     "/* This file is generated by packages/design-tokens/scripts/generate.mjs. Do not edit directly. */",
     "",
-    formatBlock(":root, [data-theme=\"light\"]", lightVariables, "light"),
+    formatBlock(':root, [data-theme="light"]', lightVariables, "light"),
     "",
-    formatBlock("[data-theme=\"dark\"]", darkVariables, "dark"),
+    formatBlock('[data-theme="dark"]', darkVariables, "dark"),
     "",
     formatMediaBlock(":root:not([data-theme])", darkVariables, "dark"),
-    ""
+    "",
   ].join("\n");
 
   const json = `${JSON.stringify(mergedTokens, null, 2)}\n`;
@@ -248,7 +309,7 @@ function writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, dark
     `export const tokens = ${JSON.stringify(mergedTokens, null, 2)};`,
     "",
     "export default tokens;",
-    ""
+    "",
   ].join("\n");
   const dts = [
     "/**",
@@ -266,7 +327,7 @@ function writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, dark
     "}",
     "export declare const tokens: DesignTokens;",
     "export default tokens;",
-    ""
+    "",
   ].join("\n");
 
   mkdirSync(generatedDir, { recursive: true });

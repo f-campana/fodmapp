@@ -23,12 +23,12 @@ Architecture-first Next.js scaffold for the product app.
 
 ## Runtime Integration Matrix
 
-| Provider | Adapter mode | Implemented now | Account/paid constraints |
-| --- | --- | --- | --- |
-| Clerk | Env-gated runtime (`@clerk/nextjs`) | Yes, when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` are set | Requires Clerk account and keys to activate runtime auth context and `/espace` protection. |
-| Sentry | Env-gated runtime (`@sentry/nextjs`) | Yes, server (`SENTRY_DSN_APP`) and client (`NEXT_PUBLIC_SENTRY_DSN_APP`) instrumentation are wired | Requires Sentry project/DSN to send events; app remains no-op without DSN. |
-| Plausible | Env-gated runtime script + event API | Yes, when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` and consent gate are enabled | Can run with hosted or self-hosted script; no paid plan required for baseline usage. |
-| Axeptio | Deferred no-op adapter | No (deferred) | Deferred until account-level Axeptio project setup and consent taxonomy/legal validation are available. |
+| Provider  | Adapter mode                         | Implemented now                                                                                    | Account/paid constraints                                                                                |
+| --------- | ------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Clerk     | Env-gated runtime (`@clerk/nextjs`)  | Yes, when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` are set                         | Requires Clerk account and keys to activate runtime auth context and `/espace` protection.              |
+| Sentry    | Env-gated runtime (`@sentry/nextjs`) | Yes, server (`SENTRY_DSN_APP`) and client (`NEXT_PUBLIC_SENTRY_DSN_APP`) instrumentation are wired | Requires Sentry project/DSN to send events; app remains no-op without DSN.                              |
+| Plausible | Env-gated runtime script + event API | Yes, when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` and consent gate are enabled                              | Can run with hosted or self-hosted script; no paid plan required for baseline usage.                    |
+| Axeptio   | Deferred no-op adapter               | No (deferred)                                                                                      | Deferred until account-level Axeptio project setup and consent taxonomy/legal validation are available. |
 
 ## Zero-Credential Behavior Contract
 

@@ -86,7 +86,9 @@ const spacingShowcaseRows = spacingRows.filter((row) => {
   return SHOWCASE_STOPS.includes(key);
 });
 
-const spacingReferenceGroups = [{ id: "spacing", label: "Spacing", rows: spacingRows }];
+const spacingReferenceGroups = [
+  { id: "spacing", label: "Spacing", rows: spacingRows },
+];
 
 const layoutReferenceGroups = [
   { id: "radius", label: "Radius", rows: radiusRows },
@@ -120,23 +122,38 @@ export const Showcase: Story = {
           title="Spacing Scale"
           description="Value-first cards keep token context with larger visual contrast and stronger delta cues."
         >
-          <div className="fd-tokendocs-showcase fd-tokendocs-spacingShowcaseRoot" aria-label="Spacing visual showcase">
-            <h3 className="fd-tokendocs-showcaseTitle">Vertical Stack Rhythm</h3>
+          <div
+            className="fd-tokendocs-showcase fd-tokendocs-spacingShowcaseRoot"
+            aria-label="Spacing visual showcase"
+          >
+            <h3 className="fd-tokendocs-showcaseTitle">
+              Vertical Stack Rhythm
+            </h3>
             <div className="fd-tokendocs-spacingShowcaseModule">
               <p className="fd-tokendocs-showcaseHint">
-                Same four surface cards scale consistently; only gap changes are the signal.
+                Same four surface cards scale consistently; only gap changes are
+                the signal.
               </p>
             </div>
             <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <article key={`${row.id}-stack`} className="fd-tokendocs-spacingDemoCard">
+                <article
+                  key={`${row.id}-stack`}
+                  className="fd-tokendocs-spacingDemoCard"
+                >
                   <div className="fd-tokendocs-spacingDemoMeta">
                     <span className="fd-tokendocs-spacingLabel">
                       {stripPathPrefix(row.path, "base.space")}
                     </span>
-                    <span className="fd-tokendocs-spacingDemoValueText">{row.value}</span>
+                    <span className="fd-tokendocs-spacingDemoValueText">
+                      {row.value}
+                    </span>
                   </div>
-                  <div className="fd-tokendocs-stackApplied" style={{ gap: row.value }} aria-hidden="true">
+                  <div
+                    className="fd-tokendocs-stackApplied"
+                    style={{ gap: row.value }}
+                    aria-hidden="true"
+                  >
                     <div className="fd-tokendocs-stackAppliedCard">Header</div>
                     <div className="fd-tokendocs-stackAppliedCard">Body</div>
                     <div className="fd-tokendocs-stackAppliedCard">Summary</div>
@@ -149,19 +166,29 @@ export const Showcase: Story = {
             <h3 className="fd-tokendocs-showcaseTitle">Inline Cluster</h3>
             <div className="fd-tokendocs-spacingShowcaseModule">
               <p className="fd-tokendocs-showcaseHint">
-                Chips scale out from compact to relaxed spacing with fixed anchor bounds.
+                Chips scale out from compact to relaxed spacing with fixed
+                anchor bounds.
               </p>
             </div>
             <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <article key={`${row.id}-cluster`} className="fd-tokendocs-spacingDemoCard">
+                <article
+                  key={`${row.id}-cluster`}
+                  className="fd-tokendocs-spacingDemoCard"
+                >
                   <div className="fd-tokendocs-spacingDemoMeta">
                     <span className="fd-tokendocs-spacingLabel">
                       {stripPathPrefix(row.path, "base.space")}
                     </span>
-                    <span className="fd-tokendocs-spacingDemoValueText">{row.value}</span>
+                    <span className="fd-tokendocs-spacingDemoValueText">
+                      {row.value}
+                    </span>
                   </div>
-                  <div className="fd-tokendocs-clusterApplied" style={{ gap: row.value }} aria-hidden="true">
+                  <div
+                    className="fd-tokendocs-clusterApplied"
+                    style={{ gap: row.value }}
+                    aria-hidden="true"
+                  >
                     <span className="fd-tokendocs-chip">Safe</span>
                     <span className="fd-tokendocs-chip">Review</span>
                     <span className="fd-tokendocs-chip">Plan</span>
@@ -176,19 +203,29 @@ export const Showcase: Story = {
             <h3 className="fd-tokendocs-showcaseTitle">Card Lattice Gutter</h3>
             <div className="fd-tokendocs-spacingShowcaseModule">
               <p className="fd-tokendocs-showcaseHint">
-                Filled cards and expanding gutters make lattice density differences obvious.
+                Filled cards and expanding gutters make lattice density
+                differences obvious.
               </p>
             </div>
             <div className="fd-tokendocs-spacingDemoGrid">
               {spacingShowcaseRows.map((row) => (
-                <article key={`${row.id}-lattice`} className="fd-tokendocs-spacingDemoCard">
+                <article
+                  key={`${row.id}-lattice`}
+                  className="fd-tokendocs-spacingDemoCard"
+                >
                   <div className="fd-tokendocs-spacingDemoMeta">
                     <span className="fd-tokendocs-spacingLabel">
                       {stripPathPrefix(row.path, "base.space")}
                     </span>
-                    <span className="fd-tokendocs-spacingDemoValueText">{row.value}</span>
+                    <span className="fd-tokendocs-spacingDemoValueText">
+                      {row.value}
+                    </span>
                   </div>
-                  <div className="fd-tokendocs-latticeApplied" style={{ gap: row.value }} aria-hidden="true">
+                  <div
+                    className="fd-tokendocs-latticeApplied"
+                    style={{ gap: row.value }}
+                    aria-hidden="true"
+                  >
                     <span className="fd-tokendocs-latticeCard">A</span>
                     <span className="fd-tokendocs-latticeCard">B</span>
                     <span className="fd-tokendocs-latticeCard">C</span>
@@ -206,21 +243,33 @@ export const Showcase: Story = {
           title="Layout and Structural Scales"
           description="Radius and breakpoints remain compact while sharpening interpretation at a glance."
         >
-          <div className="fd-tokendocs-showcase" aria-label="Structural token showcase">
+          <div
+            className="fd-tokendocs-showcase"
+            aria-label="Structural token showcase"
+          >
             <h3 className="fd-tokendocs-showcaseTitle">Radius Preview</h3>
             <div className="fd-tokendocs-structShowcase">
               {radiusRows.map((row) => {
                 const tokenKey = stripPathPrefix(row.path, "base.radius");
                 return (
-                  <article key={`${row.id}-radius`} className="fd-tokendocs-radiusCard">
+                  <article
+                    key={`${row.id}-radius`}
+                    className="fd-tokendocs-radiusCard"
+                  >
                     <div className="fd-tokendocs-spacingDemoMeta">
-                      <span className="fd-tokendocs-spacingLabel">{tokenKey}</span>
-                      <span className="fd-tokendocs-spacingDemoValueText">{row.value}</span>
+                      <span className="fd-tokendocs-spacingLabel">
+                        {tokenKey}
+                      </span>
+                      <span className="fd-tokendocs-spacingDemoValueText">
+                        {row.value}
+                      </span>
                     </div>
                     <div
                       className="fd-tokendocs-radiusSwatch"
                       style={{
-                        ["--radius-value" as string]: normalizeRadiusValue(row.value),
+                        ["--radius-value" as string]: normalizeRadiusValue(
+                          row.value,
+                        ),
                       }}
                       role="img"
                       aria-label={`${row.path}: ${row.value}`}
@@ -233,20 +282,25 @@ export const Showcase: Story = {
             <h3 className="fd-tokendocs-showcaseTitle">Breakpoint Ladder</h3>
             <div className="fd-tokendocs-breakpointList">
               {breakpointRows.map((row) => (
-                <div key={`${row.id}-breakpoint`} className="fd-tokendocs-breakpointRow">
+                <div
+                  key={`${row.id}-breakpoint`}
+                  className="fd-tokendocs-breakpointRow"
+                >
                   <span className="fd-tokendocs-breakpointHeader">
                     <span className="fd-tokendocs-spacingLabel">
                       {stripPathPrefix(row.path, "base.breakpoint")}
                     </span>
-                  <span className="fd-tokendocs-breakpointMinWidth">
-                    min: {row.value}
-                  </span>
+                    <span className="fd-tokendocs-breakpointMinWidth">
+                      min: {row.value}
+                    </span>
                   </span>
                   <div
                     className="fd-tokendocs-breakpointTrack"
-                    style={{
-                      "--fd-breakpoint-ticks": String(BREAKPOINT_TICKS),
-                    } as CSSProperties}
+                    style={
+                      {
+                        "--fd-breakpoint-ticks": String(BREAKPOINT_TICKS),
+                      } as CSSProperties
+                    }
                     aria-hidden="true"
                   >
                     <span className="fd-tokendocs-breakpointTicks">
@@ -263,7 +317,9 @@ export const Showcase: Story = {
                     </span>
                     <span
                       className="fd-tokendocs-breakpointBar"
-                      style={{ width: `${toPercent(row.value, maxBreakpointValue)}%` }}
+                      style={{
+                        width: `${toPercent(row.value, maxBreakpointValue)}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -281,7 +337,9 @@ export const Showcase: Story = {
     ).toBeInTheDocument();
     await expect(canvas.getByText("Vertical Stack Rhythm")).toBeInTheDocument();
     await expect(canvas.getByText("Card Lattice Gutter")).toBeInTheDocument();
-    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByPlaceholderText(/search token path or value/i),
+    ).not.toBeInTheDocument();
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -326,8 +384,12 @@ export const Reference: Story = {
             groups={spacingReferenceGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "spacing-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("spacing-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "spacing-grid" ? activeGroup.groupId : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("spacing-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -360,8 +422,12 @@ export const Reference: Story = {
             groups={layoutReferenceGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "layout-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("layout-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "layout-grid" ? activeGroup.groupId : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("layout-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -403,7 +469,9 @@ export const Reference: Story = {
       throw new Error("Expected spacing section to exist.");
     }
     const spacingPaths = Array.from(
-      spacingSection.querySelectorAll(".fd-tokendocs-desktop .fd-tokendocs-row .fd-tokendocs-path"),
+      spacingSection.querySelectorAll(
+        ".fd-tokendocs-desktop .fd-tokendocs-row .fd-tokendocs-path",
+      ),
     )
       .map((node) => node.textContent?.trim() ?? "")
       .filter(Boolean);
@@ -415,7 +483,9 @@ export const Reference: Story = {
     ]);
 
     const radiusSection = canvasElement.querySelector("#layout-grid-radius");
-    const borderWidthSection = canvasElement.querySelector("#layout-grid-border-width");
+    const borderWidthSection = canvasElement.querySelector(
+      "#layout-grid-border-width",
+    );
     if (!radiusSection || !borderWidthSection) {
       throw new Error("Expected layout sections to exist.");
     }

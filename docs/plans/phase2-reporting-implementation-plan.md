@@ -21,6 +21,7 @@
 - CI entrypoint (`.github/workflows/phase2-reporting.yml`)
 
 The design is **contract-first and parser-hard**:
+
 - Parser can only consume allowlisted source files/patterns.
 - Report outputs must validate against JSON schemas.
 - Baselines are committed so PR review can detect drift on deterministic values.
@@ -124,6 +125,7 @@ Baseline drift policy:
 `workflow_dispatch` input `baseline_update=true` enables controlled baseline refresh.
 
 Hard guardrails:
+
 - `--` clean tree required before any file write.
 - `--` approval inputs required:
   - `baseline_update_confirmed` (boolean, explicit reviewer ack)
@@ -165,6 +167,7 @@ Defines strict payload shape for now-set figures:
 ### `etl/phase2/reporting/contracts/schema/reporting_run.schema.json`
 
 Run-level schema covering:
+
 - `run_id`
 - `schema_version`
 - `generated_at_utc`
@@ -178,6 +181,7 @@ Run-level schema covering:
 ### `etl/phase2/reporting/contracts/schema/parser_scope.schema.json`
 
 Machine schema for parser scope configuration:
+
 - exact files list
 - glob patterns
 - allow/deny semantics
@@ -190,6 +194,7 @@ Workflow: `.github/workflows/phase2-reporting.yml`
 ### PR / default-manual lane
 
 Jobs:
+
 1. `contract-lint`
 2. `figure-collect-smoke` (fixture-based)
 3. `baseline-compare-now-only`
@@ -198,6 +203,7 @@ Jobs:
 No replay or seed in this lane.
 
 PR trigger path filters:
+
 - `etl/phase2/**`
 - `etl/phase3/**`
 - `api/**`
@@ -211,6 +217,7 @@ PR trigger path filters:
 ### main / manual full lane
 
 Jobs:
+
 1. `contract-lint`
 2. `full-run-ramp`:
    - replay + seed
@@ -224,9 +231,11 @@ Jobs:
 ## 6) Smoke fixture contract
 
 PR and default `workflow_dispatch` smoke mode uses:
+
 - `/Users/fabiencampana/Documents/Fodmap-reporting-plan/etl/phase2/reporting/tests/fixtures/now-set/query-results/*.json`
 
 Each fixture MUST include:
+
 - `source_file_hashes` map
 - query payload for the target figure only
 - scalar completeness for now-set figure.
@@ -270,15 +279,18 @@ Policy: committed baseline changes are the only durable output for drift review;
 ## 9) Test plan
 
 ### Schema + contract
+
 - JSON schema validation for reporting_run + per-figure payloads
 - parser scope validation using strict allowlist
 
 ### Baseline + drift
+
 - exact integer comparison
 - epsilon float compare with `1e-6`
 - hard fail if `Q-03` reviewed scope is empty
 
 ### Behavioral
+
 - frozen case-study hard checks:
   - `mode == frozen_case_study`
   - `source_stage == post_batch10`

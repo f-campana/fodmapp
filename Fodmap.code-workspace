@@ -2,8 +2,8 @@
   "folders": [
     {
       "name": "Fodmap",
-      "path": "."
-    }
+      "path": ".",
+    },
   ],
   "settings": {
     "typescript.tsdk": "node_modules/typescript/lib",
@@ -11,20 +11,16 @@
     "npm.packageManager": "pnpm",
     "files.associations": {
       "*.css": "tailwindcss",
-      "turbo.json": "jsonc"
+      "turbo.json": "jsonc",
     },
     "editor.quickSuggestions": {
-      "strings": "on"
+      "strings": "on",
     },
-    "tailwindCSS.classFunctions": [
-      "cn",
-      "cva",
-      "clsx"
-    ],
+    "tailwindCSS.classFunctions": ["cn", "cva", "clsx"],
     "tailwindCSS.experimental.configFile": "packages/tailwind-config/shared-styles.css",
     "tailwindCSS.hovers": true,
     "tailwindCSS.suggestions": true,
-    "tailwindCSS.codeActions": true
+    "tailwindCSS.codeActions": true,
   },
   "extensions": {
     "recommendations": [
@@ -36,7 +32,7 @@
       "ms-python.python",
       "eamodio.gitlens",
       "github.vscode-github-actions",
-      "yoavbls.pretty-ts-errors"
-    ]
-  }
+      "yoavbls.pretty-ts-errors",
+    ],
+  },
 }

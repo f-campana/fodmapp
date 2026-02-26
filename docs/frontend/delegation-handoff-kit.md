@@ -18,19 +18,23 @@ Build the design system and frontend foundation that can consume existing API co
 ## What We Must Provide To Them
 
 1. Contract and architecture docs:
+
 - `docs/architecture/boundaries-and-contracts.md`
 - `docs/architecture/decision-register.md`
 
 2. API contract source:
+
 - `api/openapi/v0.yaml`
 - `packages/types`
 
 3. Delivery conventions:
+
 - isolated worktree usage
 - branch naming (`codex/*`)
 - CI gates and quality checks
 
 4. Product constraints:
+
 - FR-first, EN-ready
 - accessibility baseline
 - deterministic API contract consumption
@@ -38,14 +42,17 @@ Build the design system and frontend foundation that can consume existing API co
 ## Requested Deliverables Per Sprint
 
 1. Design deliverables:
+
 - token spec update
 - component spec delta
 
 2. Code deliverables:
+
 - PR with scoped package/app changes
 - stories/tests included
 
 3. Validation deliverables:
+
 - local command results
 - CI status
 - known gaps and follow-up list

@@ -187,18 +187,11 @@
         },
         "status": {
           "type": "string",
-          "enum": [
-            "pass",
-            "warn",
-            "fail"
-          ]
+          "enum": ["pass", "warn", "fail"]
         },
         "hard_gate": {
           "type": "string",
-          "enum": [
-            "pass",
-            "fail"
-          ]
+          "enum": ["pass", "fail"]
         },
         "contract_refs": {
           "type": "array",
@@ -209,9 +202,7 @@
         },
         "validation": {
           "type": "object",
-          "required": [
-            "ok"
-          ],
+          "required": ["ok"],
           "properties": {
             "ok": {
               "type": "boolean"
@@ -230,11 +221,7 @@
         },
         "artifact": {
           "type": "object",
-          "required": [
-            "path",
-            "sha256",
-            "row_count"
-          ],
+          "required": ["path", "sha256", "row_count"],
           "properties": {
             "path": {
               "type": "string"
@@ -451,11 +438,7 @@
     },
     "P03_metrics": {
       "type": "object",
-      "required": [
-        "bucket_rows",
-        "completion_ratio",
-        "readiness_gap"
-      ],
+      "required": ["bucket_rows", "completion_ratio", "readiness_gap"],
       "properties": {
         "bucket_rows": {
           "type": "array",

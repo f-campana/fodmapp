@@ -5,6 +5,7 @@ This runbook defines the SQL-first product-layer execution on top of completed P
 ## Scope
 
 Phase 3.0/3.1a/3.1b/3.2a/3.3/3.4/3.6/3.7 includes:
+
 - culinary trait curation for priority ranks `1..42`
 - full 6-subtype source-scoped rollups in `food_fodmap_rollups`
 - latest rollup interfaces with coverage metadata
@@ -16,6 +17,7 @@ Phase 3.0/3.1a/3.1b/3.2a/3.3/3.4/3.6/3.7 includes:
 - 3.2a read-only FastAPI v0 endpoints using slug-based contracts
 
 Out of scope:
+
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
 
@@ -37,6 +39,7 @@ Out of scope:
 ## Artifacts
 
 Data files:
+
 - `etl/phase3/data/phase3_food_culinary_roles_v1.csv`
 - `etl/phase3/data/phase3_food_flavor_profiles_v1.csv`
 - `etl/phase3/data/phase3_food_texture_profiles_v1.csv`
@@ -58,6 +61,7 @@ Data files:
 - `etl/phase3/decisions/phase3_swap_batch03_review_v1.csv`
 
 SQL files:
+
 - `etl/phase3/sql/phase3_traits_apply.sql`
 - `etl/phase3/sql/phase3_rollups_compute.sql`
 - `etl/phase3/sql/phase3_swap_rules_apply.sql`
@@ -91,6 +95,7 @@ SQL files:
 - `etl/phase3/scripts/phase3_swap_batch01_draft_instructions.py`
 
 API files:
+
 - `api/openapi/v0.yaml`
 - `api/app/main.py`
 - `api/app/routers/health.py`
@@ -148,6 +153,7 @@ Batch01 execution (after MVP is stable):
 ## Rollup Semantics (3.1a Full Rollups)
 
 Rollups evaluate all six subtypes (`fructan`, `gos`, `sorbitol`, `mannitol`, `fructose` excess, `lactose`) with worst-known severity semantics:
+
 - coverage metrics are explicit: `known_subtypes_count`, `coverage_ratio`
 - `none` is only allowed with full 6/6 coverage and all subtype levels `none`
 - partial coverage + all-known-none is coerced to `unknown`
@@ -157,10 +163,12 @@ Rollups evaluate all six subtypes (`fructan`, `gos`, `sorbitol`, `mannitol`, `fr
 - threshold precedence: food-specific first, then global defaults (`phase3_rollup_default_thresholds_v1.csv`)
 
 Read interfaces:
+
 - `v_phase3_rollup_subtype_levels_latest`
 - `v_phase3_rollups_latest_full`
 
 Pipeline-managed snapshot artifacts:
+
 - `phase3_subtype_levels_snapshot`
 - `phase3_rollups_snapshot`
 - both tables are rebuilt by `etl/phase3/sql/phase3_rollups_compute.sql`
@@ -168,6 +176,7 @@ Pipeline-managed snapshot artifacts:
 - if upstream measurements/thresholds/nutrient links change, rerun rollup compute to avoid stale reads
 
 Coverage baseline note:
+
 - snapshot `1/6:21, 3/6:6, 4/6:10, 5/6:5` is a pre-3.1a baseline diagnostic
 - unchanged inputs keep coverage distribution unchanged
 - coverage increases only when new linked signals are added (new subtype measurements and/or nutrient linkage)
@@ -176,10 +185,12 @@ Coverage baseline note:
 ## 3.1b Swap Activation
 
 3.1b is a two-gate process:
+
 - Gate A (`phase3_swap_rules_rescore.sql`): recompute `fodmap_safety_score` for the 12 MVP rules from full rollups and export a review packet CSV.
 - Gate B (`phase3_swap_activation_apply.sql`): apply human-reviewed `approve/reject` decisions and activate only eligible rules.
 
 Scoring/eligibility specifics:
+
 - unknown rollup endpoint (`from` or `to`) short-circuits recomputed `fodmap_safety_score` to `0.000`
 - unknown endpoint rows are always `auto_eligible=false`
 - conservative eligibility requires:
@@ -189,6 +200,7 @@ Scoring/eligibility specifics:
   - recomputed score `>= 0.500`
 
 CSV handoff contract:
+
 - Gate A writes:
   `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
   via `\copy (SELECT ...) TO ... CSV HEADER`
@@ -202,6 +214,7 @@ CSV handoff contract:
 ## 3.2a API Read Layer
 
 v0 endpoints:
+
 - `GET /v0/foods?q={text}&limit={1..50}`
 - `GET /v0/health`
 - `GET /v0/foods/{food_slug}`
@@ -211,6 +224,7 @@ v0 endpoints:
 - `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
 
 v0 API contracts:
+
 - public identity uses `food_slug` only
 - responses return both FR/EN fields; no locale negotiation
 - swaps return only `active` rules
@@ -222,6 +236,7 @@ v0 API contracts:
   - `to_food_slug ASC`
 
 Data freshness / dependency note:
+
 - API rollup fields read from `v_phase3_rollups_latest_full`
 - this view depends on pipeline-managed snapshots:
   - `phase3_subtype_levels_snapshot`
@@ -231,6 +246,7 @@ Data freshness / dependency note:
   - rerun `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
 
 Subtype endpoint payload contract:
+
 - `subtype_code`, `subtype_level`
 - `amount_g_per_serving`, `comparator`
 - `low_max_g`, `moderate_max_g`
@@ -242,6 +258,7 @@ Subtype endpoint payload contract:
 ## 3.3 Batch01 Systematic Expansion
 
 Batch01 introduces systematic candidate generation over the locked 42-food universe:
+
 - pair scope = ranks `1..42` excluding rank `2`
 - conservative pre-filter:
   - endpoints known
@@ -254,12 +271,14 @@ Batch01 introduces systematic candidate generation over the locked 42-food unive
   - `0.05 * method_match_score`
 
 Selection policy:
+
 - provisional global top 40
 - post-selection per-source cap `<= 5`
 - ranked waitlist backfill while preserving cap
 - final selected count `1..40`
 
 Review policy:
+
 - strict two-tier gate (`second_review_required`) when:
   - `to_coverage_ratio < 0.50`, or
   - `fodmap_safety_score < 0.60`, or
@@ -271,9 +290,11 @@ Review policy:
 ## 3.4 Batch02 Systematic Expansion (Pre-Activation)
 
 Batch02 extends systematic generation with an additional hard safety contract for direct swaps:
+
 - `from_driver_subtype = to_driver_subtype` (no penalty fallback, hard exclusion)
 
 Batch02 generation scope:
+
 - candidate universe restricted to ranks `1..42`, excluding rank `2`
 - pair exclusions applied before ranking:
   - exact open direct-swap pair already exists
@@ -282,6 +303,7 @@ Batch02 generation scope:
 - selection remains bounded `1..40` with post-top40 per-from and per-to caps (`<=5`) and deterministic backfill
 
 Batch02 artifacts:
+
 - generated CSV:
   - `etl/phase3/data/phase3_swap_rules_batch02_generated_v1.csv`
 - review CSV:
@@ -294,21 +316,25 @@ Batch02 artifacts:
   - `phase3_swap_rules_batch02_checks.sql`
 
 Audit columns exported for review and checks:
+
 - `from_driver_subtype`
 - `to_driver_subtype`
 
 Execution stop gate for Phase 3.4:
+
 - run generate -> apply -> rescore -> checks
 - stop before activation and hand off the review packet for human decisions
 
 ## 3.7 Batch03 Direct-Swap Expansion (Single-Review Activation Path)
 
 Batch03 extends the Batch02 contract with a new additive scope:
+
 - `notes='phase3_batch03_rule'`
 - `rule_key` prefix `B03_`
 - `rule_kind='direct_swap'`
 
 Locked generation gates:
+
 - universe restricted to ranks `1..42`, excluding rank `2`
 - conservative severity and burden gates:
   - `to_severity <= from_severity`
@@ -328,6 +354,7 @@ Locked generation gates:
   - deterministic backfill
 
 Batch03 artifacts:
+
 - generated CSV:
   - `etl/phase3/data/phase3_swap_rules_batch03_generated_v1.csv`
 - review CSV:
@@ -340,6 +367,7 @@ Batch03 artifacts:
   - `phase3_swap_rules_batch03_checks.sql`
 
 Review and activation contract:
+
 - Gate A exports blank human decision metadata.
 - Gate B enforces snapshot lock and conservative re-evaluation.
 - Strict second-review policy remains:

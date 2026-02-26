@@ -13,7 +13,7 @@ This document defines the canonical SQL contract for the FODMAP planner and swap
 ## 2) Locked modeling decisions
 
 1. Six FODMAP subtypes remain unchanged:
-`fructose`, `lactose`, `fructan`, `gos`, `sorbitol`, `mannitol`
+   `fructose`, `lactose`, `fructan`, `gos`, `sorbitol`, `mannitol`
 2. `polyols` is not a separate subtype (avoid double counting with sorbitol and mannitol).
 3. Excess fructose is a derived signal, not a new subtype.
 4. Swap rules remain first-class edges (`swap_rules`, `swap_rule_contexts`, `swap_rule_scores`).
@@ -140,21 +140,21 @@ Practical examples:
 
 This section maps canonical SQL fields to common JSON payload fields used in app/API models.
 
-| JSON concept | Canonical SQL source |
-|---|---|
-| `id`, names, scientific name | `foods` + `food_names` |
-| `category`, `subcategory` | `food_category_memberships` + `food_categories` |
-| `fodmap_profile.<subtype>` measurements | `food_fodmap_measurements` |
-| subtype serving thresholds | `food_fodmap_thresholds` |
-| fructose excess signal | `v_food_excess_fructose_latest` |
-| overall level | `food_fodmap_rollups` |
-| culinary roles/flavors/textures/behavior | trait lookup tables + canonical food_* junctions |
-| cuisines | `food_cuisine_affinities` + `cuisine_tags` |
-| swaps and scoring | `swap_rules`, `swap_rule_contexts`, `swap_rule_scores` |
-| FR availability/seasonality | `food_fr_contexts` |
-| provenance and confidence | `sources` + per-observation source links |
-| allergens | `eu_allergens` + `food_allergens` |
-| recipe FR/EN text | `recipes`, `recipe_ingredients`, `recipe_steps` |
+| JSON concept                             | Canonical SQL source                                   |
+| ---------------------------------------- | ------------------------------------------------------ |
+| `id`, names, scientific name             | `foods` + `food_names`                                 |
+| `category`, `subcategory`                | `food_category_memberships` + `food_categories`        |
+| `fodmap_profile.<subtype>` measurements  | `food_fodmap_measurements`                             |
+| subtype serving thresholds               | `food_fodmap_thresholds`                               |
+| fructose excess signal                   | `v_food_excess_fructose_latest`                        |
+| overall level                            | `food_fodmap_rollups`                                  |
+| culinary roles/flavors/textures/behavior | trait lookup tables + canonical food\_\* junctions     |
+| cuisines                                 | `food_cuisine_affinities` + `cuisine_tags`             |
+| swaps and scoring                        | `swap_rules`, `swap_rule_contexts`, `swap_rule_scores` |
+| FR availability/seasonality              | `food_fr_contexts`                                     |
+| provenance and confidence                | `sources` + per-observation source links               |
+| allergens                                | `eu_allergens` + `food_allergens`                      |
+| recipe FR/EN text                        | `recipes`, `recipe_ingredients`, `recipe_steps`        |
 
 ## 8) P0 implementation order after hardening
 

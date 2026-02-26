@@ -8,11 +8,13 @@ Use shadcn/ui to accelerate initial component delivery, then progressively speci
 
 1. Configure monorepo-ready `components.json` for UI workspace and consuming app workspace.
 2. Start with minimal primitives:
+
 - `Button`
 - `Input`
 - `Badge`
 - `Card`
 - `Field`
+
 3. Add Storybook stories for default and edge states.
 4. Add unit and a11y tests for each primitive.
 

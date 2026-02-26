@@ -2,33 +2,66 @@
   "semantic": {
     "color": {
       "background": {
-        "canvas": { "$value": "{base.color.brand.canvasLight}", "$type": "color" }
+        "canvas": {
+          "$value": "{base.color.brand.canvasLight}",
+          "$type": "color"
+        }
       },
       "surface": {
-        "default": { "$value": "{base.color.brand.surfaceLight}", "$type": "color" },
-        "raised": { "$value": "{base.color.brand.surfaceStrongLight}", "$type": "color" },
-        "muted": { "$value": "{base.color.brand.surfaceMutedLight}", "$type": "color" },
+        "default": {
+          "$value": "{base.color.brand.surfaceLight}",
+          "$type": "color"
+        },
+        "raised": {
+          "$value": "{base.color.brand.surfaceStrongLight}",
+          "$type": "color"
+        },
+        "muted": {
+          "$value": "{base.color.brand.surfaceMutedLight}",
+          "$type": "color"
+        },
         "inverse": { "$value": "{base.color.neutral.900}", "$type": "color" }
       },
       "text": {
-        "primary": { "$value": "{base.color.brand.textLight}", "$type": "color" },
-        "muted": { "$value": "{base.color.brand.textMutedLight}", "$type": "color" },
+        "primary": {
+          "$value": "{base.color.brand.textLight}",
+          "$type": "color"
+        },
+        "muted": {
+          "$value": "{base.color.brand.textMutedLight}",
+          "$type": "color"
+        },
         "inverse": { "$value": "{base.color.neutral.50}", "$type": "color" }
       },
       "border": {
-        "default": { "$value": "{base.color.brand.borderLight}", "$type": "color" },
+        "default": {
+          "$value": "{base.color.brand.borderLight}",
+          "$type": "color"
+        },
         "subtle": { "$value": "{base.color.neutral.200}", "$type": "color" },
         "strong": { "$value": "{base.color.neutral.400}", "$type": "color" }
       },
       "focus": {
         "ring": { "$value": "{base.color.brand.ringLight}", "$type": "color" },
-        "ringSoft": { "$value": "{base.color.brand.ringSoftLight}", "$type": "color" }
+        "ringSoft": {
+          "$value": "{base.color.brand.ringSoftLight}",
+          "$type": "color"
+        }
       },
       "action": {
         "primary": {
-          "bg": { "$value": "{base.color.brand.accentLight}", "$type": "color" },
-          "bgHover": { "$value": "{base.color.brand.accentStrongLight}", "$type": "color" },
-          "fg": { "$value": "{base.color.brand.accentForegroundLight}", "$type": "color" }
+          "bg": {
+            "$value": "{base.color.brand.accentLight}",
+            "$type": "color"
+          },
+          "bgHover": {
+            "$value": "{base.color.brand.accentStrongLight}",
+            "$type": "color"
+          },
+          "fg": {
+            "$value": "{base.color.brand.accentForegroundLight}",
+            "$type": "color"
+          }
         },
         "secondary": {
           "bg": { "$value": "{base.color.neutral.100}", "$type": "color" },
@@ -36,9 +69,18 @@
           "fg": { "$value": "{base.color.neutral.900}", "$type": "color" }
         },
         "destructive": {
-          "bg": { "$value": "{base.color.brand.dangerLight}", "$type": "color" },
-          "bgHover": { "$value": "{base.color.brand.dangerStrongLight}", "$type": "color" },
-          "fg": { "$value": "{base.color.brand.dangerForegroundLight}", "$type": "color" }
+          "bg": {
+            "$value": "{base.color.brand.dangerLight}",
+            "$type": "color"
+          },
+          "bgHover": {
+            "$value": "{base.color.brand.dangerStrongLight}",
+            "$type": "color"
+          },
+          "fg": {
+            "$value": "{base.color.brand.dangerForegroundLight}",
+            "$type": "color"
+          }
         }
       },
       "status": {
@@ -51,20 +93,38 @@
           "fg": { "$value": "{base.color.neutral.50}", "$type": "color" }
         },
         "warning": {
-          "bg": { "$value": "{base.color.brand.warningLight}", "$type": "color" },
-          "fg": { "$value": "{base.color.brand.warningForegroundLight}", "$type": "color" }
+          "bg": {
+            "$value": "{base.color.brand.warningLight}",
+            "$type": "color"
+          },
+          "fg": {
+            "$value": "{base.color.brand.warningForegroundLight}",
+            "$type": "color"
+          }
         },
         "danger": {
-          "bg": { "$value": "{base.color.brand.dangerLight}", "$type": "color" },
-          "fg": { "$value": "{base.color.brand.dangerForegroundLight}", "$type": "color" }
+          "bg": {
+            "$value": "{base.color.brand.dangerLight}",
+            "$type": "color"
+          },
+          "fg": {
+            "$value": "{base.color.brand.dangerForegroundLight}",
+            "$type": "color"
+          }
         }
       }
     },
     "typography": {
       "font": {
         "family": {
-          "body": { "$value": "{base.typography.fontFamily.body}", "$type": "fontFamily" },
-          "display": { "$value": "{base.typography.fontFamily.display}", "$type": "fontFamily" }
+          "body": {
+            "$value": "{base.typography.fontFamily.body}",
+            "$type": "fontFamily"
+          },
+          "display": {
+            "$value": "{base.typography.fontFamily.display}",
+            "$type": "fontFamily"
+          }
         }
       }
     },
@@ -79,8 +139,14 @@
       "section": { "$value": "{base.space.10}", "$type": "dimension" }
     },
     "motion": {
-      "interactiveDuration": { "$value": "{base.motion.duration.fast}", "$type": "duration" },
-      "interactiveEasing": { "$value": "{base.motion.easing.standard}", "$type": "cubicBezier" }
+      "interactiveDuration": {
+        "$value": "{base.motion.duration.fast}",
+        "$type": "duration"
+      },
+      "interactiveEasing": {
+        "$value": "{base.motion.easing.standard}",
+        "$type": "cubicBezier"
+      }
     }
   }
 }

@@ -19,9 +19,8 @@ async function getClerkProxyHandler(): Promise<ClerkProxyHandler | null> {
 
   cachedClerkProxyHandler = (async () => {
     try {
-      const { clerkMiddleware, createRouteMatcher } = await import(
-        "@clerk/nextjs/server"
-      );
+      const { clerkMiddleware, createRouteMatcher } =
+        await import("@clerk/nextjs/server");
       const isProtectedRoute = createRouteMatcher(["/espace(.*)"]);
 
       return clerkMiddleware(async (auth, request) => {
@@ -64,7 +63,10 @@ function reportProxyRuntimeFailure(reason: string, error?: unknown): void {
   });
 
   if (process.env.NODE_ENV !== "production") {
-    console.error("[auth-runtime] proxy failed", { reason, error: errorMessage });
+    console.error("[auth-runtime] proxy failed", {
+      reason,
+      error: errorMessage,
+    });
   }
 }
 

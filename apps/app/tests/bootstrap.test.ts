@@ -107,6 +107,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
 
     expect(getAuthMiddlewareMode("/espace")).toBe("protected-runtime");
-    expect(getAuthMiddlewareMode("/espace/preferences")).toBe("protected-runtime");
+    expect(getAuthMiddlewareMode("/espace/preferences")).toBe(
+      "protected-runtime",
+    );
   });
 });

@@ -80,7 +80,10 @@ function parseDurationMs(value: string): number {
 function laneDuration(value: string, factor = DURATION_VISUAL_FACTOR): string {
   const ms = parseDurationMs(value);
   const scaledMs = Math.round(
-    Math.min(MAX_MOTION_DURATION_MS, Math.max(MIN_MOTION_DURATION_MS, ms * factor)),
+    Math.min(
+      MAX_MOTION_DURATION_MS,
+      Math.max(MIN_MOTION_DURATION_MS, ms * factor),
+    ),
   );
   return `${scaledMs}ms`;
 }
@@ -185,7 +188,9 @@ const motionGroups = [
 ];
 
 const shadowRows = toRows(shadows, "base.shadow");
-const shadowGroups = [{ id: "shadow", label: "Shadow Scale", rows: shadowRows }];
+const shadowGroups = [
+  { id: "shadow", label: "Shadow Scale", rows: shadowRows },
+];
 
 function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
   const compareClassName = row.hasBaseline
@@ -203,14 +208,21 @@ function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
     : undefined;
 
   return (
-    <div className={compareClassName} aria-hidden="true" title={`${row.path}: ${row.value}`}>
+    <div
+      className={compareClassName}
+      aria-hidden="true"
+      title={`${row.path}: ${row.value}`}
+    >
       {row.hasBaseline ? (
         <span className="fd-tokendocs-motionRailRow is-baseline">
           <span className="fd-tokendocs-motionRailTag" aria-hidden="true">
             B
           </span>
           <span className="fd-tokendocs-motionRail is-baseline">
-            <span className="fd-tokendocs-motionLaneBall is-baseline" style={baselineStyle} />
+            <span
+              className="fd-tokendocs-motionLaneBall is-baseline"
+              style={baselineStyle}
+            />
           </span>
         </span>
       ) : null}
@@ -261,10 +273,17 @@ export const Showcase: Story = {
           title="Motion Lanes"
           description="Token timing behavior rendered passively: duration rows compare speed, easing rows compare token output against linear baseline."
         >
-          <div className="fd-tokendocs-showcase fd-tokendocs-motionLab" aria-label="Motion lane previews">
+          <div
+            className="fd-tokendocs-showcase fd-tokendocs-motionLab"
+            aria-label="Motion lane previews"
+          >
             <div className="fd-tokendocs-motionLegend" aria-hidden="true">
-              <span className="fd-tokendocs-motionLegendItem is-baseline">Baseline (easing)</span>
-              <span className="fd-tokendocs-motionLegendItem is-token">Token timing (accent)</span>
+              <span className="fd-tokendocs-motionLegendItem is-baseline">
+                Baseline (easing)
+              </span>
+              <span className="fd-tokendocs-motionLegendItem is-token">
+                Token timing (accent)
+              </span>
             </div>
             <h3 className="fd-tokendocs-showcaseTitle">Duration Lanes</h3>
             <p className="fd-tokendocs-showcaseHint">
@@ -273,7 +292,9 @@ export const Showcase: Story = {
             <div className="fd-tokendocs-motionLanes">
               {durationLaneRows.map((row) => (
                 <div key={row.id} className="fd-tokendocs-motionLaneRow">
-                  <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
+                  <span className="fd-tokendocs-motionLaneLabel">
+                    {row.label}
+                  </span>
                   <MotionLaneCompare row={row} />
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -284,12 +305,15 @@ export const Showcase: Story = {
 
             <h3 className="fd-tokendocs-showcaseTitle">Easing Lanes</h3>
             <p className="fd-tokendocs-showcaseHint">
-              Neutral marker is linear baseline; token marker uses the easing token at the same slower pace.
+              Neutral marker is linear baseline; token marker uses the easing
+              token at the same slower pace.
             </p>
             <div className="fd-tokendocs-motionLanes">
               {easingLaneRows.map((row) => (
                 <div key={row.id} className="fd-tokendocs-motionLaneRow">
-                  <span className="fd-tokendocs-motionLaneLabel">{row.label}</span>
+                  <span className="fd-tokendocs-motionLaneLabel">
+                    {row.label}
+                  </span>
                   <MotionLaneCompare row={row} />
                   <span className="fd-tokendocs-motionLaneValue">
                     <TokenValuePill value={row.value} />
@@ -304,11 +328,19 @@ export const Showcase: Story = {
           title="Shadows"
           description="Elevation values rendered on larger surfaces for clearer depth comparison."
         >
-          <div className="fd-tokendocs-showcase" aria-label="Shadow depth preview">
-            <h3 className="fd-tokendocs-showcaseTitle">Depth Surface Showcase</h3>
+          <div
+            className="fd-tokendocs-showcase"
+            aria-label="Shadow depth preview"
+          >
+            <h3 className="fd-tokendocs-showcaseTitle">
+              Depth Surface Showcase
+            </h3>
             <div className="fd-tokendocs-shadowShowcase">
               {shadowRows.map((row) => (
-                <article key={`${row.id}-showcase`} className="fd-tokendocs-shadowCard">
+                <article
+                  key={`${row.id}-showcase`}
+                  className="fd-tokendocs-shadowCard"
+                >
                   <div
                     className="fd-tokendocs-shadowSurface"
                     style={{ boxShadow: row.value }}
@@ -334,29 +366,39 @@ export const Showcase: Story = {
       canvas.getByRole("heading", { name: "Motion & Effects Tokens" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Motion Lanes")).toBeInTheDocument();
-    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByPlaceholderText(/search token path or value/i),
+    ).not.toBeInTheDocument();
 
-    const laneGroups = canvasElement.querySelectorAll(".fd-tokendocs-motionLanes");
+    const laneGroups = canvasElement.querySelectorAll(
+      ".fd-tokendocs-motionLanes",
+    );
     await expect(laneGroups.length).toBeGreaterThanOrEqual(2);
 
     const durationLanes = laneGroups[0];
     const easingLanes = laneGroups[1];
 
     await expect(
-      durationLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-baseline").length,
+      durationLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-baseline")
+        .length,
     ).toBe(0);
     await expect(
-      durationLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-token").length,
+      durationLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-token")
+        .length,
     ).toBe(durationLaneRows.length);
     await expect(
-      durationLanes.querySelectorAll(".fd-tokendocs-motionLaneBall.is-token.is-static").length,
+      durationLanes.querySelectorAll(
+        ".fd-tokendocs-motionLaneBall.is-token.is-static",
+      ).length,
     ).toBe(1);
 
     await expect(
-      easingLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-baseline").length,
+      easingLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-baseline")
+        .length,
     ).toBe(easingLaneRows.length);
     await expect(
-      easingLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-token").length,
+      easingLanes.querySelectorAll(".fd-tokendocs-motionRailRow.is-token")
+        .length,
     ).toBe(easingLaneRows.length);
 
     if (document.activeElement instanceof HTMLElement) {
@@ -402,8 +444,12 @@ export const Reference: Story = {
             groups={motionGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "motion-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("motion-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "motion-grid" ? activeGroup.groupId : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("motion-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -435,8 +481,12 @@ export const Reference: Story = {
             groups={shadowGroups}
             accordion
             allowCollapseAll
-            openGroupId={activeGroup.gridId === "shadow-grid" ? activeGroup.groupId : null}
-            onOpenGroupChange={(groupId) => setPageActiveGroup("shadow-grid", groupId)}
+            openGroupId={
+              activeGroup.gridId === "shadow-grid" ? activeGroup.groupId : null
+            }
+            onOpenGroupChange={(groupId) =>
+              setPageActiveGroup("shadow-grid", groupId)
+            }
             columns={[
               {
                 key: "path",
@@ -468,7 +518,9 @@ export const Reference: Story = {
     ).toBeInTheDocument();
     await expect(canvas.getByText("Motion References")).toBeInTheDocument();
 
-    const durationsSection = canvasElement.querySelector("#motion-grid-durations");
+    const durationsSection = canvasElement.querySelector(
+      "#motion-grid-durations",
+    );
     const easingSection = canvasElement.querySelector("#motion-grid-easing");
     const shadowSection = canvasElement.querySelector("#shadow-grid-shadow");
     if (!durationsSection || !easingSection || !shadowSection) {
@@ -479,7 +531,9 @@ export const Reference: Story = {
     await expect(easingSection).toHaveAttribute("data-expanded", "false");
     await expect(shadowSection).toHaveAttribute("data-expanded", "false");
 
-    const easingToggle = easingSection.querySelector(".fd-tokendocs-groupToggle");
+    const easingToggle = easingSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    );
     if (!easingToggle) {
       throw new Error("Expected easing toggle to exist.");
     }
@@ -493,7 +547,9 @@ export const Reference: Story = {
     await expect(easingSection).toHaveAttribute("data-expanded", "true");
     await expect(durationsSection).toHaveAttribute("data-expanded", "false");
 
-    const shadowToggle = shadowSection.querySelector(".fd-tokendocs-groupToggle");
+    const shadowToggle = shadowSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    );
     if (!shadowToggle) {
       throw new Error("Expected shadow toggle to exist.");
     }
@@ -502,7 +558,9 @@ export const Reference: Story = {
     await expect(easingSection).toHaveAttribute("data-expanded", "false");
     await expect(durationsSection).toHaveAttribute("data-expanded", "false");
 
-    const durationsToggle = durationsSection.querySelector(".fd-tokendocs-groupToggle");
+    const durationsToggle = durationsSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    );
     if (!durationsToggle) {
       throw new Error("Expected durations toggle to exist.");
     }

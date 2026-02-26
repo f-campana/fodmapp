@@ -12,7 +12,8 @@ export interface ClerkBootstrapStatus {
 export function getClerkBootstrapStatus(): ClerkBootstrapStatus {
   const clientFlags = getClientFeatureFlags();
   const serverFlags = getServerFeatureFlags();
-  const fullyConfigured = clientFlags.clerkConfigured && serverFlags.clerkConfigured;
+  const fullyConfigured =
+    clientFlags.clerkConfigured && serverFlags.clerkConfigured;
 
   return {
     provider: "clerk",
@@ -33,7 +34,9 @@ export function getAuthMiddlewareMode(
   status: ClerkBootstrapStatus = getClerkBootstrapStatus(),
 ): AuthMiddlewareMode {
   if (pathname.startsWith("/espace")) {
-    return status.fullyConfigured ? "protected-runtime" : "protected-placeholder";
+    return status.fullyConfigured
+      ? "protected-runtime"
+      : "protected-placeholder";
   }
 
   return "public-pass-through";

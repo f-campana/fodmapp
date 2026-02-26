@@ -14,25 +14,25 @@
 
 ## 2. Validated nutrient mapping
 
-| CIQUAL code | Nutrient | Column |
-|---|---|---|
-| 32210 | Fructose | 20 |
-| 32220 | Galactose | 21 |
-| 32250 | Glucose | 22 |
-| 32410 | Lactose | 23 |
-| 34000 | Polyols total | 28 |
-| 32000 | Sugars total | 19 |
+| CIQUAL code | Nutrient      | Column |
+| ----------- | ------------- | ------ |
+| 32210       | Fructose      | 20     |
+| 32220       | Galactose     | 21     |
+| 32250       | Glucose       | 22     |
+| 32410       | Lactose       | 23     |
+| 34000       | Polyols total | 28     |
+| 32000       | Sugars total  | 19     |
 
 ## 3. Coverage snapshot
 
-| Nutrient | Foods with data | Coverage |
-|---|---:|---:|
-| Fructose | 1,836 | 52.7% |
-| Galactose | 1,179 (numeric+<value+trace) | 21.3% |
-| Glucose | 1,878 | 53.9% |
-| Lactose | 1,680 | 48.2% |
-| Polyols (total) | 3,036 (numeric+trace) | 87.1% |
-| Sugars | 3,261 (numeric+trace) | 93.6% |
+| Nutrient        |              Foods with data | Coverage |
+| --------------- | ---------------------------: | -------: |
+| Fructose        |                        1,836 |    52.7% |
+| Galactose       | 1,179 (numeric+<value+trace) |    21.3% |
+| Glucose         |                        1,878 |    53.9% |
+| Lactose         |                        1,680 |    48.2% |
+| Polyols (total) |        3,036 (numeric+trace) |    87.1% |
+| Sugars          |        3,261 (numeric+trace) |    93.6% |
 
 Comparator-preserving ingestion remains required due to high `< value` and `trace` frequency.
 

@@ -163,16 +163,24 @@ export const Showcase: Story = {
           title="Typography Showcase"
           description="Token-driven specimens with tighter hierarchy and less repetitive vertical flow."
         >
-          <div className="fd-tokendocs-showcase fd-tokendocs-typoShowcase" aria-label="Typography specimens">
+          <div
+            className="fd-tokendocs-showcase fd-tokendocs-typoShowcase"
+            aria-label="Typography specimens"
+          >
             <h3 className="fd-tokendocs-showcaseTitle">Family Specimens</h3>
             <div className="fd-tokendocs-typoSpecimens">
               {familyRows.map((row) => (
                 <article key={row.id} className="fd-tokendocs-typoCard">
-                  <p className="fd-tokendocs-typoSample" style={{ fontFamily: row.value }}>
+                  <p
+                    className="fd-tokendocs-typoSample"
+                    style={{ fontFamily: row.value }}
+                  >
                     Digestive support starts with readable hierarchy.
                   </p>
                   <div className="fd-tokendocs-typoMeta">
-                    <span className="fd-tokendocs-typoLabel">{row.path.split(".").pop()}</span>
+                    <span className="fd-tokendocs-typoLabel">
+                      {row.path.split(".").pop()}
+                    </span>
                     <p className="fd-tokendocs-typoValue">{row.value}</p>
                   </div>
                 </article>
@@ -182,8 +190,13 @@ export const Showcase: Story = {
             <h3 className="fd-tokendocs-showcaseTitle">Type Waterfall</h3>
             <div className="fd-tokendocs-typeScaleList">
               {sizeShowcaseRows.map((row) => (
-                <div key={`${row.id}-sample`} className="fd-tokendocs-typeScaleItem">
-                  <span className="fd-tokendocs-typeKey">{row.path.split(".").pop()}</span>
+                <div
+                  key={`${row.id}-sample`}
+                  className="fd-tokendocs-typeScaleItem"
+                >
+                  <span className="fd-tokendocs-typeKey">
+                    {row.path.split(".").pop()}
+                  </span>
                   <p
                     className="fd-tokendocs-typeSample"
                     style={{
@@ -199,9 +212,15 @@ export const Showcase: Story = {
             </div>
 
             <h3 className="fd-tokendocs-showcaseTitle">Weight Spectrum</h3>
-            <div className="fd-tokendocs-weightBand" aria-label="Typography weight comparison">
+            <div
+              className="fd-tokendocs-weightBand"
+              aria-label="Typography weight comparison"
+            >
               {weightRows.map((row) => (
-                <article key={`${row.id}-weight`} className="fd-tokendocs-weightBandCell">
+                <article
+                  key={`${row.id}-weight`}
+                  className="fd-tokendocs-weightBandCell"
+                >
                   <p
                     className="fd-tokendocs-weightCellSample"
                     style={{
@@ -225,9 +244,13 @@ export const Showcase: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole("heading", { name: "Typography Tokens" })).toBeInTheDocument();
+    await expect(
+      canvas.getByRole("heading", { name: "Typography Tokens" }),
+    ).toBeInTheDocument();
     await expect(canvas.getByText("Type Waterfall")).toBeInTheDocument();
-    await expect(canvas.queryByPlaceholderText(/search token path or value/i)).not.toBeInTheDocument();
+    await expect(
+      canvas.queryByPlaceholderText(/search token path or value/i),
+    ).not.toBeInTheDocument();
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
@@ -291,7 +314,9 @@ export const Reference: Story = {
     ).toBeInTheDocument();
     await expect(canvas.getByText("Typography Primitives")).toBeInTheDocument();
 
-    const familiesSection = canvasElement.querySelector("#typography-grid-families");
+    const familiesSection = canvasElement.querySelector(
+      "#typography-grid-families",
+    );
     const sizesSection = canvasElement.querySelector("#typography-grid-sizes");
     if (!familiesSection || !sizesSection) {
       throw new Error("Expected typography sections to exist.");
@@ -313,7 +338,9 @@ export const Reference: Story = {
     await expect(sizesSection).toHaveAttribute("data-expanded", "true");
     await expect(familiesSection).toHaveAttribute("data-expanded", "false");
 
-    const familiesToggle = familiesSection.querySelector(".fd-tokendocs-groupToggle");
+    const familiesToggle = familiesSection.querySelector(
+      ".fd-tokendocs-groupToggle",
+    );
     if (!familiesToggle) {
       throw new Error("Expected families toggle to exist.");
     }

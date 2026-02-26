@@ -21,10 +21,13 @@ export function getSentryBootstrapStatus(): SentryBootstrapStatus {
   };
 }
 
-let sentryModulePromise: Promise<typeof import("@sentry/nextjs") | null> | null =
-  null;
+let sentryModulePromise: Promise<
+  typeof import("@sentry/nextjs") | null
+> | null = null;
 
-async function loadSentryModule(): Promise<typeof import("@sentry/nextjs") | null> {
+async function loadSentryModule(): Promise<
+  typeof import("@sentry/nextjs") | null
+> {
   if (sentryModulePromise) {
     return sentryModulePromise;
   }
@@ -42,7 +45,9 @@ export async function initializeSentryBootstrap(): Promise<SentryBootstrapStatus
   const sentry = await loadSentryModule();
   if (!sentry) {
     if (process.env.NODE_ENV !== "production") {
-      console.warn("[sentry-runtime] module load failed, falling back to no-op");
+      console.warn(
+        "[sentry-runtime] module load failed, falling back to no-op",
+      );
     }
     return status;
   }

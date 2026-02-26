@@ -3,11 +3,13 @@
 All pod waves are proposal-only. Do not apply SQL until human review signs off each ledger.
 
 Decision values:
+
 - `resolve_existing`
 - `create_new_food`
 - `blocked`
 
 Required review gates before apply:
+
 1. Every rank in the wave has one non-empty decision.
 2. `resolve_existing` rows include `candidate_ciqual_code` (candidate UUID is optional metadata).
 3. `create_new_food` rows include slug, FR name, EN name (when straightforward), preparation state.

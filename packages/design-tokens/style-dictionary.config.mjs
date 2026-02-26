@@ -6,11 +6,15 @@ const outputPath = process.env.FD_OUTPUT_PATH ?? "src/generated/tmp/";
 const buildPath = outputPath.endsWith("/") ? outputPath : `${outputPath}/`;
 
 const semanticFilter = (token) => token.path[0] === "semantic";
-const cssTransforms = StyleDictionary.hooks.transformGroups[transformGroups.css].map((transform) =>
-  transform === transforms.colorCss ? transforms.colorOklch : transform
+const cssTransforms = StyleDictionary.hooks.transformGroups[
+  transformGroups.css
+].map((transform) =>
+  transform === transforms.colorCss ? transforms.colorOklch : transform,
 );
-const jsTransforms = StyleDictionary.hooks.transformGroups[transformGroups.js].map((transform) =>
-  transform === transforms.colorHex ? transforms.colorOklch : transform
+const jsTransforms = StyleDictionary.hooks.transformGroups[
+  transformGroups.js
+].map((transform) =>
+  transform === transforms.colorHex ? transforms.colorOklch : transform,
 );
 
 const configs = {
@@ -23,11 +27,11 @@ const configs = {
         files: [
           {
             destination: "base.json",
-            format: "json/nested"
-          }
-        ]
-      }
-    }
+            format: "json/nested",
+          },
+        ],
+      },
+    },
   },
   light: {
     source: ["src/tokens/base/**/*.json", "src/tokens/semantic/light.json"],
@@ -41,10 +45,10 @@ const configs = {
             destination: "light.css",
             format: "css/variables",
             options: {
-              selector: ":root, [data-theme=\"light\"]"
-            }
-          }
-        ]
+              selector: ':root, [data-theme="light"]',
+            },
+          },
+        ],
       },
       json: {
         transforms: jsTransforms,
@@ -53,11 +57,11 @@ const configs = {
           {
             destination: "light.semantic.json",
             format: "json/nested",
-            filter: semanticFilter
-          }
-        ]
-      }
-    }
+            filter: semanticFilter,
+          },
+        ],
+      },
+    },
   },
   dark: {
     source: ["src/tokens/base/**/*.json", "src/tokens/semantic/dark.json"],
@@ -71,10 +75,10 @@ const configs = {
             destination: "dark.css",
             format: "css/variables",
             options: {
-              selector: "[data-theme=\"dark\"]"
-            }
-          }
-        ]
+              selector: '[data-theme="dark"]',
+            },
+          },
+        ],
       },
       json: {
         transforms: jsTransforms,
@@ -83,21 +87,23 @@ const configs = {
           {
             destination: "dark.semantic.json",
             format: "json/nested",
-            filter: semanticFilter
-          }
-        ]
-      }
-    }
-  }
+            filter: semanticFilter,
+          },
+        ],
+      },
+    },
+  },
 };
 
 const config = configs[target];
 
 if (!config) {
-  throw new Error(`Unknown FD_BUILD_TARGET \"${target}\". Expected one of: ${Object.keys(configs).join(", ")}`);
+  throw new Error(
+    `Unknown FD_BUILD_TARGET \"${target}\". Expected one of: ${Object.keys(configs).join(", ")}`,
+  );
 }
 
 export default {
   usesDtcg: true,
-  ...config
+  ...config,
 };

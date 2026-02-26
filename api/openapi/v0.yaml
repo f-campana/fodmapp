@@ -33,18 +33,18 @@ paths:
       summary: Liveness/metadata probe
       operationId: getHealth
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthResponse'
-        '503':
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
           description: Database unavailable
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /v0/foods:
     get:
@@ -52,15 +52,15 @@ paths:
       summary: Search foods by slug or canonical names
       operationId: searchFoods
       parameters:
-        - $ref: '#/components/parameters/FoodSearchQuery'
-        - $ref: '#/components/parameters/FoodSearchLimitQuery'
+        - $ref: "#/components/parameters/FoodSearchQuery"
+        - $ref: "#/components/parameters/FoodSearchLimitQuery"
       responses:
-        '200':
+        "200":
           description: Food search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodSearchResponse'
+                $ref: "#/components/schemas/FoodSearchResponse"
 
   /v0/foods/{food_slug}:
     get:
@@ -68,16 +68,16 @@ paths:
       summary: Food metadata by slug
       operationId: getFoodBySlug
       parameters:
-        - $ref: '#/components/parameters/FoodSlugPath'
+        - $ref: "#/components/parameters/FoodSlugPath"
       responses:
-        '200':
+        "200":
           description: Food found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FoodResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /v0/foods/{food_slug}/rollup:
     get:
@@ -88,16 +88,16 @@ paths:
         Returns latest full rollup projection from `v_phase3_rollups_latest_full`.
         Includes coverage and provenance fields.
       parameters:
-        - $ref: '#/components/parameters/FoodSlugPath'
+        - $ref: "#/components/parameters/FoodSlugPath"
       responses:
-        '200':
+        "200":
           description: Rollup found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodRollupResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FoodRollupResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /v0/foods/{food_slug}/subtypes:
     get:
@@ -105,16 +105,16 @@ paths:
       summary: Per-subtype levels and thresholds for a food
       operationId: getFoodSubtypesBySlug
       parameters:
-        - $ref: '#/components/parameters/FoodSlugPath'
+        - $ref: "#/components/parameters/FoodSlugPath"
       responses:
-        '200':
+        "200":
           description: Subtype-level breakdown found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodSubtypeListResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FoodSubtypeListResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /v0/foods/{food_slug}/traits:
     get:
@@ -122,16 +122,16 @@ paths:
       summary: Culinary trait profile for a food
       operationId: getFoodTraitsBySlug
       parameters:
-        - $ref: '#/components/parameters/FoodSlugPath'
+        - $ref: "#/components/parameters/FoodSlugPath"
       responses:
-        '200':
+        "200":
           description: Traits found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodTraitsResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/FoodTraitsResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /v0/swaps:
     get:
@@ -151,18 +151,18 @@ paths:
         4) `coverage_ratio` DESC
         5) `to_food_slug` ASC
       parameters:
-        - $ref: '#/components/parameters/FromSlugQuery'
-        - $ref: '#/components/parameters/LimitQuery'
-        - $ref: '#/components/parameters/MinSafetyScoreQuery'
+        - $ref: "#/components/parameters/FromSlugQuery"
+        - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/MinSafetyScoreQuery"
       responses:
-        '200':
+        "200":
           description: Swap results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SwapListResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/SwapListResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
 components:
   parameters:
@@ -229,7 +229,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
     FoodLevel:
@@ -273,8 +273,7 @@ components:
 
     FoodIdentity:
       type: object
-      required:
-        [food_slug, canonical_name_fr, canonical_name_en]
+      required: [food_slug, canonical_name_fr, canonical_name_en]
       properties:
         food_slug:
           type: string
@@ -285,7 +284,7 @@ components:
 
     FoodResponse:
       allOf:
-        - $ref: '#/components/schemas/FoodIdentity'
+        - $ref: "#/components/schemas/FoodIdentity"
         - type: object
           properties:
             preparation_state:
@@ -300,11 +299,11 @@ components:
 
     FoodSearchItem:
       allOf:
-        - $ref: '#/components/schemas/FoodIdentity'
+        - $ref: "#/components/schemas/FoodIdentity"
         - type: object
           properties:
             overall_level:
-              $ref: '#/components/schemas/FoodLevel'
+              $ref: "#/components/schemas/FoodLevel"
               nullable: true
             driver_subtype:
               type: string
@@ -330,7 +329,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/FoodSearchItem'
+            $ref: "#/components/schemas/FoodSearchItem"
         total:
           type: integer
           minimum: 0
@@ -357,7 +356,7 @@ components:
           type: number
           nullable: true
         overall_level:
-          $ref: '#/components/schemas/FoodLevel'
+          $ref: "#/components/schemas/FoodLevel"
         driver_subtype:
           type: string
           nullable: true
@@ -393,7 +392,7 @@ components:
         subtype_code:
           type: string
         subtype_level:
-          $ref: '#/components/schemas/FoodLevel'
+          $ref: "#/components/schemas/FoodLevel"
         amount_g_per_serving:
           type: number
           nullable: true
@@ -442,7 +441,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/FoodSubtypeItem'
+            $ref: "#/components/schemas/FoodSubtypeItem"
         total:
           type: integer
           minimum: 0
@@ -475,23 +474,23 @@ components:
         culinary_roles:
           type: array
           items:
-            $ref: '#/components/schemas/TraitLabel'
+            $ref: "#/components/schemas/TraitLabel"
         flavor_profiles:
           type: array
           items:
-            $ref: '#/components/schemas/TraitLabel'
+            $ref: "#/components/schemas/TraitLabel"
         texture_profiles:
           type: array
           items:
-            $ref: '#/components/schemas/TraitLabel'
+            $ref: "#/components/schemas/TraitLabel"
         cooking_behaviors:
           type: array
           items:
-            $ref: '#/components/schemas/TraitLabel'
+            $ref: "#/components/schemas/TraitLabel"
         cuisine_affinities:
           type: array
           items:
-            $ref: '#/components/schemas/TraitLabel'
+            $ref: "#/components/schemas/TraitLabel"
 
     SwapItem:
       type: object
@@ -533,9 +532,9 @@ components:
         instruction_en:
           type: string
         from_overall_level:
-          $ref: '#/components/schemas/FoodLevel'
+          $ref: "#/components/schemas/FoodLevel"
         to_overall_level:
-          $ref: '#/components/schemas/FoodLevel'
+          $ref: "#/components/schemas/FoodLevel"
         driver_subtype:
           type: string
           nullable: true
@@ -558,7 +557,7 @@ components:
           minimum: 0
           maximum: 1
         rule_status:
-          $ref: '#/components/schemas/RuleStatus'
+          $ref: "#/components/schemas/RuleStatus"
         scoring_version:
           type: string
         source_slug:
@@ -583,7 +582,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/SwapItem'
+            $ref: "#/components/schemas/SwapItem"
         total:
           type: integer
           minimum: 0

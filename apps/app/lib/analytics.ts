@@ -66,7 +66,11 @@ export function trackAnalyticsEvent(
 
   if (typeof window === "undefined") {
     if (process.env.NODE_ENV !== "production") {
-      console.info("[analytics-runtime] skipped server event", event, attributes);
+      console.info(
+        "[analytics-runtime] skipped server event",
+        event,
+        attributes,
+      );
     }
     return;
   }
@@ -77,6 +81,10 @@ export function trackAnalyticsEvent(
   }
 
   if (process.env.NODE_ENV !== "production") {
-    console.info("[analytics-runtime] plausible queue unavailable", event, attributes);
+    console.info(
+      "[analytics-runtime] plausible queue unavailable",
+      event,
+      attributes,
+    );
   }
 }

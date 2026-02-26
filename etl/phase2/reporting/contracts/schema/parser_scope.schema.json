@@ -15,10 +15,7 @@
     },
     "allowed": {
       "type": "object",
-      "required": [
-        "exact_files",
-        "allow_patterns"
-      ],
+      "required": ["exact_files", "allow_patterns"],
       "properties": {
         "exact_files": {
           "type": "array",
