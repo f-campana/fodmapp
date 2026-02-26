@@ -8,7 +8,6 @@ from typing import Any, Dict, Iterable, List, Set
 import yaml
 from jsonschema import Draft202012Validator, RefResolver
 
-
 NOW_SET_FIGURES = {
     "P-01_stage_progression_contract_curve",
     "P-02_candidate_pool_split_by_stage",
@@ -113,7 +112,9 @@ def validate_policy(policy: Dict[str, Any]) -> None:
     if bad_types:
         fail(f"policy.parser.fail_loud keys must be boolean: {sorted(bad_types)}")
 
-    if "etl/phase2/reporting/contracts/baselines/**/*.json" not in (policy.get("baseline", {}) or {}).get("pattern", ""):
+    if "etl/phase2/reporting/contracts/baselines/**/*.json" not in (policy.get("baseline", {}) or {}).get(
+        "pattern", ""
+    ):
         fail("baseline pattern must target contracts/baselines/**/*.json")
 
     render_baseline = policy.get("render_baseline")
@@ -129,7 +130,10 @@ def validate_policy(policy: Dict[str, Any]) -> None:
     missing_render = required_render_keys - set(render_baseline.keys())
     if missing_render:
         fail(f"policy.render_baseline missing keys: {sorted(missing_render)}")
-    if not isinstance(render_baseline.get("scientific_files"), list) or len(render_baseline.get("scientific_files", [])) != 8:
+    if (
+        not isinstance(render_baseline.get("scientific_files"), list)
+        or len(render_baseline.get("scientific_files", [])) != 8
+    ):
         fail("policy.render_baseline.scientific_files must contain exactly 8 filenames")
 
 
@@ -246,7 +250,11 @@ def validate_fixtures(fixtures_dir: pathlib.Path) -> None:
             fail(f"fixture source_file_hashes must be non-empty object: {path}")
 
         contract_refs = payload.get("contract_refs")
-        if not isinstance(contract_refs, list) or not contract_refs or not all(isinstance(x, str) and x for x in contract_refs):
+        if (
+            not isinstance(contract_refs, list)
+            or not contract_refs
+            or not all(isinstance(x, str) and x for x in contract_refs)
+        ):
             fail(f"fixture contract_refs must be non-empty string list: {path}")
 
     missing = NOW_SET_FIGURES - seen
@@ -261,7 +269,7 @@ def validate_workflow(workflow: Dict[str, Any]) -> None:
     workflow_on = workflow.get("on")
     if workflow_on is None and True in workflow:
         workflow_on = workflow.get(True)
-    dispatch_inputs = (((workflow_on or {}).get("workflow_dispatch") or {}).get("inputs") or {})
+    dispatch_inputs = ((workflow_on or {}).get("workflow_dispatch") or {}).get("inputs") or {}
     if not isinstance(dispatch_inputs, dict):
         fail("workflow_dispatch.inputs must be a mapping")
 

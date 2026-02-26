@@ -2,7 +2,7 @@
 
 ## Status
 - Baseline phase (`main`) is merged.
-- This worktree is dedicated to planning and preparing the next phase without affecting baseline policy.
+- This worktree is dedicated to implementing the next phase follow-up while keeping JS/TS baseline policy untouched.
 - Branch: `codex/eslint-baseline-next-phase`
 - Source base: `/Users/fabiencampana/Documents/Fodmap-eslint-next-phase`
 
@@ -33,7 +33,7 @@ Python quality tooling parity and enforcement consistency with the merged JS/TS 
 - Gate behavior remains CI-first: warnings treated as failures in CI.
 - Changes should be incrementally introduced to preserve recoverability.
 
-## Proposed phase 1 (planning and baseline capture)
+## Proposed phase 1 (planning and baseline capture)  ✅ COMPLETE
 - Inventory current Python tooling, packaging, and script boundaries:
   - `uv`/`poetry`/`pip` usage, lockfile model, Python interpreter matrix.
   - Existing Python style checks and existing pre-commit or CI hooks.
@@ -71,3 +71,14 @@ Python quality tooling parity and enforcement consistency with the merged JS/TS 
 - Python checks run and pass on `main` in CI with no soft-fail tolerance.
 - JS/TS baseline remains unchanged and green.
 - Phase-2 and phase-3 decisions recorded in `docs/transition` with explicit risk log and migration notes.
+
+## Phase 1 completion update
+- Confirmed Python tooling inventory and explicit `uv` lockfile usage were documented as in-scope.
+- Added `ruff` as the Python baseline candidate with initial `tool.ruff` config in:
+  - `api/pyproject.toml`
+  - `etl/phase2/reporting/pyproject.toml`
+- Added dependency entries and generated lock updates in `api/uv.lock` and `etl/phase2/reporting/uv.lock`.
+- Added execution surfaces:
+  - Root scripts: `python:lint:api`, `python:lint:reporting`, `python:lint`, `python:ci`.
+  - CI job: `python-lint` in `.github/workflows/ci.yml` with `pnpm python:ci`.
+- Baseline validation state: `pnpm python:ci` currently passes after import ordering and line-length normalization in targeted scripts.

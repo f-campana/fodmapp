@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Query, Request
 
+from app import sql
 from app.db import Database
 from app.errors import not_found, rollup_not_available
 from app.models import (
@@ -14,7 +15,6 @@ from app.models import (
     FoodTraitsResponse,
     TraitLabel,
 )
-from app import sql
 
 router = APIRouter(prefix="/v0/foods", tags=["foods"])
 
