@@ -44,8 +44,11 @@ feat(schema): add source confidence index
    - `pnpm lint:llm` for LLM-authored code (warnings as hard failures in CI for `lint:llm:ci`)
    - `pnpm typecheck`
    - `pnpm test`
-   - `pnpm test:storybook`
-   - `pnpm check:all`
+
+- `pnpm test:storybook`
+- `pnpm check:all`
+
+Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are now blocked until `./.github/scripts/quality-gate.sh --full` passes.
 
 ## Root Command Contract
 
