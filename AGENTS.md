@@ -20,6 +20,14 @@ Apply these instructions to the whole repository root.
 - Do not use destructive git commands (`reset --hard`, `clean -fd`) without explicit approval.
 - Do not commit secrets or credentials.
 
+## Worktree Operating Model
+- Keep `/Users/fabiencampana/Documents/Fodmap` (main worktree) clean at all times.
+- Do feature work only in dedicated worktrees on scoped branches.
+- Keep one initiative per worktree; if scope expands, split to a new worktree/branch.
+- Treat on-hold tracks as frozen; do not rebase, force-push, or resume without explicit approval.
+- Keep live worktree/branch intent and blockers in:
+  - `docs/ops/worktree-status.md`
+
 ## Phase 3 Data Contract
 
 ### Gate Flow (must follow)
