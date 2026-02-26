@@ -1,0 +1,27 @@
+@import "@fodmap/design-tokens/css";
+@import "@fodmap/ui/styles.css";
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-bg, #f8fafc);
+  color: var(--color-text, #111827);
+}
+
+body {
+  font-family: var(--font-body, "Source Sans 3", Arial, sans-serif);
+}
+
+.fd-research-shell {
+  width: min(1220px, 100% - 48px);
+  margin: 0 auto;
+  padding-block: var(--fd-base-space-10, 2.5rem);
+}
+
+a {
+  color: var(--color-primary, #0f766e);
+}

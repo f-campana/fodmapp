@@ -1,5 +1,6 @@
 ---
 import type { Locale } from "@fodmap/content-config/i18n";
+import "../styles/global.css";
 
 interface Props {
   title: string;
@@ -11,7 +12,7 @@ const { title, description, locale = "fr" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -19,7 +20,7 @@ const { title, description, locale = "fr" } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <main>
+    <main class="fd-research-shell">
       <slot />
     </main>
   </body>
