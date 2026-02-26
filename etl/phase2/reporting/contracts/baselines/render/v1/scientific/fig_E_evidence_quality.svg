@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="Figure E Snapshot Lock Drift">
+<title>Figure E Snapshot Lock Drift</title>
+<defs>
+<style><![CDATA[
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
+.grid{stroke:#d7e0eb;stroke-width:1;}
+.axis{stroke:#64748b;stroke-width:1.2;}
+]]></style>
+</defs>
+<rect x="0" y="0" width="1200" height="420" fill="#f8fafc"/>
+<text class="title" x="24" y="36">E - Snapshot Lock Drift</text>
+<text class="subtitle" x="24" y="58">Source: Q-03_snapshot_lock_drift_panel</text>
+<text class="label" x="270" y="118" text-anchor="end">reviewed_snapshot_rows</text>
+<rect x="280" y="102" width="840" height="20" fill="#0ea5e9"/>
+<text class="value" x="1128" y="118">8</text>
+<text class="label" x="270" y="176" text-anchor="end">snapshot_mismatch_rows</text>
+<rect x="280" y="160" width="0" height="20" fill="#ef4444"/>
+<text class="value" x="288" y="176">0</text>
+<text class="label" x="270" y="234" text-anchor="end">auto_eligible_mismatch_rows</text>
+<rect x="280" y="218" width="0" height="20" fill="#f59e0b"/>
+<text class="value" x="288" y="234">0</text>
+<text class="label" x="270" y="292" text-anchor="end">approve_for_ineligible_rows</text>
+<rect x="280" y="276" width="0" height="20" fill="#dc2626"/>
+<text class="value" x="288" y="292">0</text>
+<text class="mono" x="24" y="376">scoring_version_snapshot_actual=v3.1b</text>
+<text class="mono" x="24" y="396">fodmap_safety_score_snapshot_actual=0.500</text>
+</svg>

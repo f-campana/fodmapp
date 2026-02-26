@@ -1,0 +1,82 @@
+{
+  "contract_refs": [
+    "etl/phase2/POD_WAVES_RUNBOOK.md",
+    "etl/phase2/decisions/phase2_wave_manifest.csv",
+    "etl/phase2/sql/phase2_replay_final_checks.sql"
+  ],
+  "figure_id": "P-01_stage_progression_contract_curve",
+  "fixture_id": "P-01",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:TODO",
+    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:TODO",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "baseline_resolved": 0,
+    "baseline_unresolved": 42,
+    "contract_ref": "etl/phase2/POD_WAVES_RUNBOOK.md",
+    "stages": [
+      {
+        "delta_resolved_rows": 16,
+        "delta_unresolved_rows": -16,
+        "executed": true,
+        "expected_resolved_rows": 16,
+        "expected_unresolved_rows": 26,
+        "resolved_rows": 16,
+        "stage_id": "fructan_wave01",
+        "unresolved_rows": 26
+      },
+      {
+        "delta_resolved_rows": 5,
+        "delta_unresolved_rows": -5,
+        "executed": true,
+        "expected_resolved_rows": 21,
+        "expected_unresolved_rows": 21,
+        "resolved_rows": 21,
+        "stage_id": "fructan_wave02",
+        "unresolved_rows": 21
+      },
+      {
+        "delta_resolved_rows": 6,
+        "delta_unresolved_rows": -6,
+        "executed": true,
+        "expected_resolved_rows": 27,
+        "expected_unresolved_rows": 15,
+        "resolved_rows": 27,
+        "stage_id": "gos_wave01",
+        "unresolved_rows": 15
+      },
+      {
+        "delta_resolved_rows": 6,
+        "delta_unresolved_rows": -6,
+        "executed": true,
+        "expected_resolved_rows": 33,
+        "expected_unresolved_rows": 9,
+        "resolved_rows": 33,
+        "stage_id": "gos_wave02",
+        "unresolved_rows": 9
+      },
+      {
+        "delta_resolved_rows": 6,
+        "delta_unresolved_rows": -6,
+        "executed": true,
+        "expected_resolved_rows": 39,
+        "expected_unresolved_rows": 3,
+        "resolved_rows": 39,
+        "stage_id": "polyol_wave01",
+        "unresolved_rows": 3
+      },
+      {
+        "delta_resolved_rows": 3,
+        "delta_unresolved_rows": -3,
+        "executed": true,
+        "expected_resolved_rows": 42,
+        "expected_unresolved_rows": 0,
+        "resolved_rows": 42,
+        "stage_id": "polyol_wave02",
+        "unresolved_rows": 0
+      }
+    ]
+  }
+}

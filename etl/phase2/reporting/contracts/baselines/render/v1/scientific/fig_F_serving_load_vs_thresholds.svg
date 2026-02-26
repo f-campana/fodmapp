@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="Figure F Rank2 Exclusion Audit">
+<title>Figure F Rank2 Exclusion Audit</title>
+<defs>
+<style><![CDATA[
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
+.grid{stroke:#d7e0eb;stroke-width:1;}
+.axis{stroke:#64748b;stroke-width:1.2;}
+]]></style>
+</defs>
+<rect x="0" y="0" width="1200" height="420" fill="#f8fafc"/>
+<text class="title" x="24" y="36">F - Rank2 Exclusion Audit</text>
+<text class="subtitle" x="24" y="58">Source: Q-04_rank2_exclusion_audit</text>
+<text class="label" x="40" y="122">phase2_rank2_current_target_measurements</text>
+<rect x="40" y="128" width="3" height="16" fill="#ef4444"/>
+<text class="value" x="51" y="141">0</text>
+<text class="label" x="40" y="194">phase3_rules_touching_rank2</text>
+<rect x="40" y="200" width="3" height="16" fill="#f59e0b"/>
+<text class="value" x="51" y="213">0</text>
+<text class="label" x="40" y="266">api_rank2_leak_rows</text>
+<rect x="40" y="272" width="3" height="16" fill="#dc2626"/>
+<text class="value" x="51" y="285">0</text>
+<rect x="40" y="330" width="560" height="56" fill="#ffffff" stroke="#cbd5e1"/>
+<text class="subtitle" x="56" y="354">overall_pass=true</text>
+<text class="mono" x="56" y="376">Gate policy: no rank2 path in active API surface</text>
+</svg>

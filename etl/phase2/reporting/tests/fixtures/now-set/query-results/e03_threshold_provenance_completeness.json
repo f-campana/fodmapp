@@ -1,0 +1,17 @@
+{
+  "contract_refs": [
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
+  ],
+  "figure_id": "E-03_threshold_provenance_completeness",
+  "fixture_id": "E-03",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "default_threshold_share": 0.17,
+    "invalid_rows_total": 0,
+    "invalid_threshold_source_rows": 0,
+    "missing_default_threshold_citation_rows": 0
+  }
+}

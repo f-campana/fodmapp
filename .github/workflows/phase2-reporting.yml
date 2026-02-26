@@ -1,0 +1,498 @@
+name: phase2-reporting
+
+on:
+  pull_request:
+    paths:
+      - "etl/phase2/**"
+      - "etl/phase3/**"
+      - "api/**"
+      - "schema/**"
+      - "packages/reporting/**"
+      - "packages/content-config/**"
+      - "apps/research/**"
+      - "apps/storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/phase2-reporting.yml"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/ci.yml"
+  push:
+    branches:
+      - "main"
+    paths:
+      - "etl/phase2/**"
+      - "etl/phase3/**"
+      - "api/**"
+      - "schema/**"
+      - "packages/reporting/**"
+      - "packages/content-config/**"
+      - "apps/research/**"
+      - "apps/storybook/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/phase2-reporting.yml"
+      - ".github/workflows/api.yml"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+    inputs:
+      force_full_run:
+        description: "Force full replay+seed path on manual run"
+        type: boolean
+        default: false
+      baseline_update:
+        description: "Enable controlled baseline refresh mode"
+        type: boolean
+        default: false
+      baseline_update_confirmed:
+        description: "Explicit confirmation that baseline update was authorized by a reviewer"
+        type: boolean
+        default: false
+      baseline_update_approved_by:
+        description: "Name or ticket id for manual baseline approval"
+        type: string
+        required: false
+        default: ""
+      run_id:
+        description: "Optional reporting run id override"
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  contract-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lint dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0
+      - name: Validate reporting contracts and workflow
+        run: |
+          python etl/phase2/reporting/scripts/contract_lint.py \
+            --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
+            --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
+            --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
+            --parser-scope-schema etl/phase2/reporting/contracts/schema/parser_scope.schema.json \
+            --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --fixtures-dir etl/phase2/reporting/tests/fixtures/now-set/query-results \
+            --workflow .github/workflows/phase2-reporting.yml
+
+  figure-collect-smoke:
+    needs: [contract-lint]
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Collect now-set figures from fixtures
+        run: |
+          python etl/phase2/reporting/scripts/collect_reporting.py \
+            --mode smoke \
+            --figures now \
+            --source fixture \
+            --fixture-dir etl/phase2/reporting/tests/fixtures/now-set/query-results \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
+            --trigger pr_smoke
+      - name: Upload now-set artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporting-now-set-${{ github.run_id }}
+          path: etl/phase2/reporting/out/runs/${{ github.run_id }}
+          if-no-files-found: error
+
+  baseline-compare-smoke:
+    needs: [contract-lint, figure-collect-smoke]
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install compare dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2
+      - name: Download now-set artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: reporting-now-set-${{ github.run_id }}
+          path: etl/phase2/reporting/out/runs/${{ github.run_id }}
+      - name: Baseline compare now-set (semantic)
+        run: |
+          python etl/phase2/reporting/scripts/compare_baselines.py \
+            --mode now \
+            --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
+            --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --float-eps 1e-6 \
+            --compare-scope semantic \
+            --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
+      - name: Upload baseline diff
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporting-baseline-diff-${{ github.run_id }}
+          path: etl/phase2/reporting/out/runs/${{ github.run_id }}/baseline-diff.json
+          if-no-files-found: error
+
+  render-smoke:
+    needs: [baseline-compare-smoke]
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Download now-set artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: reporting-now-set-${{ github.run_id }}
+          path: etl/phase2/reporting/out/runs/${{ github.run_id }}
+      - name: Render scientific baseline artifacts (smoke)
+        run: |
+          pnpm --filter @fodmap/reporting render:scientific -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+      - name: Render public dashboard baseline artifact (smoke)
+        run: |
+          pnpm --filter @fodmap/reporting render:dashboard -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+      - name: Compare render outputs against committed baseline
+        run: |
+          pnpm --filter @fodmap/reporting render:compare -- \
+            --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
+            --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
+            --mode semantic \
+            --float-eps 1e-6 \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
+      - name: Upload render smoke artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporting-render-smoke-${{ github.run_id }}
+          path: |
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
+          if-no-files-found: error
+
+  full-run-ramp:
+    needs: [contract-lint]
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_full_run == 'true' && github.event.inputs.baseline_update != 'true')
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fodmap_reporting_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fodmap_reporting_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      PGUSER: postgres
+      PGHOST: localhost
+      PGPORT: 5432
+      PSQL_BIN: psql
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install system PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Install full-run dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
+      - name: Cache CIQUAL data
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/ciqual-data
+          key: ciqual-2025-5555c572-e0b1de25-e216928b
+      - name: Fetch CIQUAL files (pinned + checksum-verified)
+        run: |
+          while IFS= read -r line; do
+            case "$line" in
+              CIQUAL_XLSX=*|CIQUAL_ALIM_XML=*|CIQUAL_GRP_XML=*)
+                echo "$line" >> "$GITHUB_ENV"
+                ;;
+            esac
+          done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
+      - name: Replay + seed full pipeline
+        run: |
+          python etl/phase2/reporting/scripts/replay_seed.py \
+            --trigger full \
+            --replay-db-url "$REPLAY_DB_URL" \
+            --seed-db-url "$SEED_DB_URL" \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
+      - name: Collect now-set from DB
+        run: |
+          python etl/phase2/reporting/scripts/collect_reporting.py \
+            --mode full \
+            --figures now \
+            --source db \
+            --db-url "$API_DB_URL" \
+            --sql-dir etl/phase2/reporting/sql \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
+            --trigger "${{ github.event_name == 'workflow_dispatch' && 'manual_full' || 'main_full' }}"
+      - name: Baseline compare now-set (semantic, non-blocking ramp)
+        continue-on-error: true
+        run: |
+          python etl/phase2/reporting/scripts/compare_baselines.py \
+            --mode now \
+            --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }} \
+            --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --float-eps 1e-6 \
+            --compare-scope semantic \
+            --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
+      - name: Render scientific baseline artifacts (full lane)
+        run: |
+          pnpm --filter @fodmap/reporting render:scientific -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+      - name: Render public dashboard baseline artifact (full lane)
+        run: |
+          pnpm --filter @fodmap/reporting render:dashboard -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+      - name: Render baseline compare (non-blocking ramp)
+        continue-on-error: true
+        run: |
+          pnpm --filter @fodmap/reporting render:compare -- \
+            --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
+            --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
+            --mode semantic \
+            --float-eps 1e-6 \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
+      - name: Upload full-run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporting-full-run-${{ github.run_id }}
+          path: etl/phase2/reporting/out/runs/${{ github.run_id }}
+          if-no-files-found: warn
+
+  baseline-update:
+    needs: [contract-lint]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fodmap_reporting_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fodmap_reporting_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_reporting_ci
+      PGUSER: postgres
+      PGHOST: localhost
+      PGPORT: 5432
+      PSQL_BIN: psql
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Enforce explicit approval
+        run: |
+          if [ "${{ github.event.inputs.baseline_update_confirmed }}" != "true" ]; then
+            echo "baseline_update requires baseline_update_confirmed == true."
+            exit 1
+          fi
+          if [ -z "${{ github.event.inputs.baseline_update_approved_by }}" ]; then
+            echo "baseline_update is true but baseline_update_approved_by is empty."
+            exit 1
+          fi
+      - name: Enforce clean working tree
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Working tree is dirty. baseline_update requires a clean tree."
+            exit 1
+          fi
+      - name: Install system PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Install baseline-update dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
+      - name: Cache CIQUAL data
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/ciqual-data
+          key: ciqual-2025-5555c572-e0b1de25-e216928b
+      - name: Fetch CIQUAL files (pinned + checksum-verified)
+        run: |
+          while IFS= read -r line; do
+            case "$line" in
+              CIQUAL_XLSX=*|CIQUAL_ALIM_XML=*|CIQUAL_GRP_XML=*)
+                echo "$line" >> "$GITHUB_ENV"
+                ;;
+            esac
+          done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
+      - name: Replay + seed baseline-update pipeline
+        run: |
+          python etl/phase2/reporting/scripts/replay_seed.py \
+            --trigger manual_baseline_update \
+            --replay-db-url "$REPLAY_DB_URL" \
+            --seed-db-url "$SEED_DB_URL" \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
+      - name: Collect now-set from DB for baseline update
+        run: |
+          python etl/phase2/reporting/scripts/collect_reporting.py \
+            --mode full \
+            --figures now \
+            --source db \
+            --db-url "$API_DB_URL" \
+            --sql-dir etl/phase2/reporting/sql \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
+            --trigger manual_baseline_update
+      - name: Refresh baseline artifacts (controlled scope)
+        run: |
+          python etl/phase2/reporting/scripts/refresh_baselines.py \
+            --mode baseline_update \
+            --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --baseline-path etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --stage-contracts-path etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml \
+            --repo-root . \
+            --run-notes "${{ github.event.inputs.baseline_update_approved_by }}" \
+            --allow-writes \
+            --writable-glob "etl/phase2/reporting/contracts/generated/*.generated.yaml" \
+            --writable-glob "etl/phase2/reporting/contracts/baselines/**/*.json" \
+            --writable-glob "etl/phase2/reporting/contracts/baselines/render/**/*.svg" \
+            --writable-glob "etl/phase2/reporting/contracts/baselines/render/**/*.html" \
+            --refresh-render-baselines \
+            --render-scientific-dir etl/phase2/reporting/contracts/baselines/render/v1/scientific \
+            --render-dashboard-file etl/phase2/reporting/contracts/baselines/render/v1/public/phase2_dashboard.html \
+            --render-manifest-path etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
+      - name: Re-run contract lint after baseline refresh
+        run: |
+          python etl/phase2/reporting/scripts/contract_lint.py \
+            --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml \
+            --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json \
+            --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json \
+            --parser-scope-schema etl/phase2/reporting/contracts/schema/parser_scope.schema.json \
+            --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --fixtures-dir etl/phase2/reporting/tests/fixtures/now-set/query-results \
+            --workflow .github/workflows/phase2-reporting.yml
+      - name: Verify refreshed metric baseline matches generated run
+        run: |
+          python etl/phase2/reporting/scripts/compare_baselines.py \
+            --mode now \
+            --run-artifact etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json \
+            --float-eps 1e-6 \
+            --compare-scope semantic \
+            --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
+      - name: Re-render run outputs for render drift verification
+        run: |
+          pnpm --filter @fodmap/reporting render:scientific -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+          pnpm --filter @fodmap/reporting render:dashboard -- \
+            --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
+            --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
+      - name: Verify refreshed render baseline matches generated run
+        run: |
+          pnpm --filter @fodmap/reporting render:compare -- \
+            --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
+            --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
+            --mode semantic \
+            --float-eps 1e-6 \
+            --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
+      - name: Upload baseline update artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporting-baseline-update-${{ github.run_id }}
+          path: |
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/baseline-refresh-log.json
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/baseline-diff.json
+            etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
+            etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json
+            etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml
+            etl/phase2/reporting/contracts/baselines/render/v1/scientific
+            etl/phase2/reporting/contracts/baselines/render/v1/public/phase2_dashboard.html
+            etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json
+          if-no-files-found: error
