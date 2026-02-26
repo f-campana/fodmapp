@@ -1,5 +1,10 @@
 {
-  "changelog": "@changesets/cli/changelog",
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "f-campana/Fodmap"
+    }
+  ],
   "commit": false,
   "fixed": [],
   "linked": [],

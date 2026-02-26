@@ -2,14 +2,10 @@ name: Changeset PR gate
 
 on:
   pull_request:
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "package.json"
-      - "pnpm-workspace.yaml"
-      - "pnpm-lock.yaml"
-      - "turbo.json"
-      - ".changeset/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: read
