@@ -71,6 +71,7 @@ ci = [
     { name = "psycopg2-binary" },
 ]
 lint = [
+    { name = "jsonschema" },
     { name = "pyyaml" },
     { name = "ruff" },
 ]
@@ -78,6 +79,7 @@ lint = [
 [package.metadata]
 requires-dist = [
     { name = "jsonschema", marker = "extra == 'ci'", specifier = "==4.23.0" },
+    { name = "jsonschema", marker = "extra == 'lint'", specifier = "==4.23.0" },
     { name = "openpyxl", marker = "extra == 'ci'" },
     { name = "psycopg2-binary", marker = "extra == 'ci'" },
     { name = "pyyaml", marker = "extra == 'lint'", specifier = "==6.0.2" },
