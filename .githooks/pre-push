@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+printf '[HOOK] Running full quality gate before push...\n'
+"$repo_root/.github/scripts/quality-gate.sh" --full
+printf '[HOOK] Full quality gate passed.\n'

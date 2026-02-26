@@ -7,6 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "hook:install": "git config core.hooksPath .githooks",
     "build": "turbo run build",
     "lint": "pnpm format:check && pnpm lint:js",
     "lint:js": "pnpm exec eslint .",
@@ -22,6 +23,7 @@
     "format:check": "prettier --check .",
     "test": "turbo run test --filter=@fodmap/ui --filter=@fodmap/app",
     "test:storybook": "pnpm --filter @fodmap/storybook test",
+    "prepare": "pnpm hook:install",
     "typecheck": "pnpm --filter @fodmap/content-config typecheck && pnpm --filter @fodmap/types typecheck && pnpm --filter @fodmap/ui typecheck && pnpm --filter @fodmap/reporting typecheck && pnpm --filter @fodmap/storybook typecheck && pnpm --filter @fodmap/app typecheck && pnpm --filter @fodmap/marketing typecheck && pnpm --filter @fodmap/research typecheck",
     "tokens:generate": "pnpm --filter @fodmap/design-tokens tokens:generate",
     "tokens:check": "turbo run tokens:check --filter=@fodmap/design-tokens",
