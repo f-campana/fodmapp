@@ -1,6 +1,7 @@
-import { useState, type CSSProperties } from "react";
+import { type CSSProperties, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { expect, userEvent, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
@@ -258,6 +259,110 @@ const meta = {
   },
 } satisfies Meta;
 
+function MotionReferenceStory() {
+  useTokenDocsResetScrollOnMount();
+
+  const [activeGroup, setActiveGroup] = useState<{
+    gridId: "motion-grid" | "shadow-grid";
+    groupId: string;
+  }>(() => ({
+    gridId: "motion-grid",
+    groupId: motionGroups[0]?.id ?? "durations",
+  }));
+
+  function setPageActiveGroup(
+    gridId: "motion-grid" | "shadow-grid",
+    groupId: string | null,
+  ) {
+    if (!groupId) {
+      return;
+    }
+
+    setActiveGroup({ gridId, groupId });
+  }
+
+  return (
+    <TokenDocsPage
+      title="Motion & Effects Token Reference"
+      subtitle="Exact duration, easing, and shadow token references for implementation and QA."
+    >
+      <TokenSection
+        title="Motion References"
+        description="Grouped duration and easing path/value references."
+      >
+        <TokenDataGrid
+          gridLabel="motion-grid"
+          groups={motionGroups}
+          accordion
+          allowCollapseAll
+          openGroupId={
+            activeGroup.gridId === "motion-grid" ? activeGroup.groupId : null
+          }
+          onOpenGroupChange={(groupId) =>
+            setPageActiveGroup("motion-grid", groupId)
+          }
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(340px, 1.7fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "value",
+              label: "Value",
+              width: "minmax(320px, 1fr)",
+              getValue: (row) => row.value,
+              valueMode: "plain",
+              copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+
+      <TokenSection
+        title="Shadow References"
+        description="Grouped path/value references for shadow scales."
+      >
+        <TokenDataGrid
+          gridLabel="shadow-grid"
+          groups={shadowGroups}
+          accordion
+          allowCollapseAll
+          openGroupId={
+            activeGroup.gridId === "shadow-grid" ? activeGroup.groupId : null
+          }
+          onOpenGroupChange={(groupId) =>
+            setPageActiveGroup("shadow-grid", groupId)
+          }
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(320px, 1.5fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "value",
+              label: "Shadow Value",
+              width: "minmax(420px, 1.4fr)",
+              getValue: (row) => row.value,
+              valueMode: "plain",
+              copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+    </TokenDocsPage>
+  );
+}
+
 export default meta;
 
 type Story = StoryObj<typeof meta>;
@@ -408,109 +513,7 @@ export const Showcase: Story = {
 };
 
 export const Reference: Story = {
-  render: () => {
-    useTokenDocsResetScrollOnMount();
-
-    const [activeGroup, setActiveGroup] = useState<{
-      gridId: "motion-grid" | "shadow-grid";
-      groupId: string;
-    }>(() => ({
-      gridId: "motion-grid",
-      groupId: motionGroups[0]?.id ?? "durations",
-    }));
-
-    function setPageActiveGroup(
-      gridId: "motion-grid" | "shadow-grid",
-      groupId: string | null,
-    ) {
-      if (!groupId) {
-        return;
-      }
-
-      setActiveGroup({ gridId, groupId });
-    }
-
-    return (
-      <TokenDocsPage
-        title="Motion & Effects Token Reference"
-        subtitle="Exact duration, easing, and shadow token references for implementation and QA."
-      >
-        <TokenSection
-          title="Motion References"
-          description="Grouped duration and easing path/value references."
-        >
-          <TokenDataGrid
-            gridLabel="motion-grid"
-            groups={motionGroups}
-            accordion
-            allowCollapseAll
-            openGroupId={
-              activeGroup.gridId === "motion-grid" ? activeGroup.groupId : null
-            }
-            onOpenGroupChange={(groupId) =>
-              setPageActiveGroup("motion-grid", groupId)
-            }
-            columns={[
-              {
-                key: "path",
-                label: "Token Path",
-                width: "minmax(340px, 1.7fr)",
-                getValue: (row) => row.path,
-                render: (row) => <TokenPathText value={row.path} />,
-                valueMode: "plain",
-                copyValue: (row) => row.path,
-              },
-              {
-                key: "value",
-                label: "Value",
-                width: "minmax(320px, 1fr)",
-                getValue: (row) => row.value,
-                valueMode: "plain",
-                copyValue: (row) => row.value,
-              },
-            ]}
-          />
-        </TokenSection>
-
-        <TokenSection
-          title="Shadow References"
-          description="Grouped path/value references for shadow scales."
-        >
-          <TokenDataGrid
-            gridLabel="shadow-grid"
-            groups={shadowGroups}
-            accordion
-            allowCollapseAll
-            openGroupId={
-              activeGroup.gridId === "shadow-grid" ? activeGroup.groupId : null
-            }
-            onOpenGroupChange={(groupId) =>
-              setPageActiveGroup("shadow-grid", groupId)
-            }
-            columns={[
-              {
-                key: "path",
-                label: "Token Path",
-                width: "minmax(320px, 1.5fr)",
-                getValue: (row) => row.path,
-                render: (row) => <TokenPathText value={row.path} />,
-                valueMode: "plain",
-                copyValue: (row) => row.path,
-              },
-              {
-                key: "value",
-                label: "Shadow Value",
-                width: "minmax(420px, 1.4fr)",
-                getValue: (row) => row.value,
-                valueMode: "plain",
-                copyValue: (row) => row.value,
-              },
-            ]}
-          />
-        </TokenSection>
-      </TokenDocsPage>
-    );
-  },
+  render: () => <MotionReferenceStory />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(

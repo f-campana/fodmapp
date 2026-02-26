@@ -4,7 +4,9 @@ import {
   type NextRequest,
   NextResponse,
 } from "next/server";
+
 import { getAuthMiddlewareMode } from "./lib/clerk";
+import { logError } from "./lib/logger";
 import { captureSentryEvent } from "./lib/sentry";
 
 type ClerkProxyHandler = NextMiddleware;
@@ -62,12 +64,7 @@ function reportProxyRuntimeFailure(reason: string, error?: unknown): void {
     error_message: errorMessage,
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.error("[auth-runtime] proxy failed", {
-      reason,
-      error: errorMessage,
-    });
-  }
+  logError("[auth-runtime] proxy failed", { reason, error: errorMessage });
 }
 
 function getAuthUnavailableResponse(): NextResponse {

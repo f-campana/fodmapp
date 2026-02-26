@@ -6,6 +6,7 @@ node_modules/
 
 # build outputs and caches
 .turbo/
+.eslintcache
 dist/
 coverage/
 storybook-static/

@@ -1,4 +1,5 @@
 import { getClientFeatureFlags, getClientRuntimeEnv } from "./env.client";
+import { logDebug } from "./logger";
 
 const DEFAULT_PLAUSIBLE_SRC = "https://plausible.io/js/script.js";
 
@@ -65,13 +66,7 @@ export function trackAnalyticsEvent(
   }
 
   if (typeof window === "undefined") {
-    if (process.env.NODE_ENV !== "production") {
-      console.info(
-        "[analytics-runtime] skipped server event",
-        event,
-        attributes,
-      );
-    }
+    logDebug("[analytics-runtime] skipped server event", event, attributes);
     return;
   }
 
@@ -80,11 +75,9 @@ export function trackAnalyticsEvent(
     return;
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    console.info(
-      "[analytics-runtime] plausible queue unavailable",
-      event,
-      attributes,
-    );
-  }
+  logDebug(
+    "[analytics-runtime] plausible queue unavailable",
+    event,
+    attributes,
+  );
 }

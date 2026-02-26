@@ -40,6 +40,8 @@ feat(schema): add source confidence index
 4. Run and report:
    - `./.github/scripts/quality-gate.sh`
    - `pnpm lint`
+   - `pnpm lint:ci` for warning-fail-fast PR validation
+   - `pnpm lint:llm` for LLM-authored code (warnings as hard failures in CI for `lint:llm:ci`)
    - `pnpm typecheck`
    - `pnpm test`
    - `pnpm test:storybook`

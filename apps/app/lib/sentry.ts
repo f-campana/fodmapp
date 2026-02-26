@@ -1,4 +1,5 @@
 import { getServerFeatureFlags, getServerRuntimeEnv } from "./env.server";
+import { logDebug, logInfo, logWarn } from "./logger";
 
 export interface SentryBootstrapStatus {
   provider: "sentry";
@@ -44,11 +45,7 @@ export async function initializeSentryBootstrap(): Promise<SentryBootstrapStatus
 
   const sentry = await loadSentryModule();
   if (!sentry) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn(
-        "[sentry-runtime] module load failed, falling back to no-op",
-      );
-    }
+    logWarn("[sentry-runtime] module load failed, falling back to no-op");
     return status;
   }
 
@@ -59,14 +56,12 @@ export async function initializeSentryBootstrap(): Promise<SentryBootstrapStatus
     enabled: true,
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.info("[sentry-runtime] initialized", {
-      provider: status.provider,
-      mode: status.mode,
-      dsnConfigured: status.dsnConfigured,
-      nodeEnv: status.nodeEnv,
-    });
-  }
+  logInfo("[sentry-runtime] initialized", {
+    provider: status.provider,
+    mode: status.mode,
+    dsnConfigured: status.dsnConfigured,
+    nodeEnv: status.nodeEnv,
+  });
 
   return status;
 }
@@ -98,9 +93,7 @@ export function captureSentryEvent(
   event: string,
   attributes: Record<string, string> = {},
 ): void {
-  if (process.env.NODE_ENV !== "production") {
-    console.info("[sentry-runtime] event", event, attributes);
-  }
+  logDebug("[sentry-runtime] event", event, attributes);
 
   void captureSentryRuntimeEvent(event, attributes);
 }

@@ -1,5 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 
 import "./token-docs.css";
 
@@ -99,6 +98,71 @@ function renderValueByMode(value: string, mode: ColumnValueMode): ReactNode {
   return <TokenValuePill value={value} />;
 }
 
+function createInitialExpandedState<Row extends TokenGridRowBase>(
+  accordion: boolean,
+  groupList: TokenGridGroup<Row>[],
+  previous?: Record<string, boolean>,
+  requestedOpenGroupId?: string | null,
+  allowCollapseAllOverride = true,
+): Record<string, boolean> {
+  if (groupList.length === 0) {
+    return {};
+  }
+
+  if (accordion) {
+    const validIds = new Set(groupList.map((group) => group.id));
+    const resolvedRequestedId =
+      requestedOpenGroupId !== undefined ? requestedOpenGroupId : undefined;
+
+    if (resolvedRequestedId !== undefined) {
+      if (resolvedRequestedId !== null && !validIds.has(resolvedRequestedId)) {
+        return Object.fromEntries(
+          groupList.map((group) => [
+            group.id,
+            !allowCollapseAllOverride ? group.id === groupList[0]?.id : false,
+          ]),
+        );
+      }
+
+      if (resolvedRequestedId === null) {
+        if (!allowCollapseAllOverride) {
+          const defaultOpenId =
+            groupList.find((group) => !group.defaultCollapsed)?.id ??
+            groupList[0]?.id;
+          return Object.fromEntries(
+            groupList.map((group) => [group.id, group.id === defaultOpenId]),
+          );
+        }
+
+        return Object.fromEntries(groupList.map((group) => [group.id, false]));
+      }
+
+      return Object.fromEntries(
+        groupList.map((group) => [group.id, group.id === resolvedRequestedId]),
+      );
+    }
+
+    const preservedOpenId =
+      previous &&
+      Object.keys(previous).find((id) => previous[id] && validIds.has(id));
+    const defaultOpenId =
+      groupList.find((group) => !group.defaultCollapsed)?.id ??
+      groupList[0]?.id;
+    const openId = preservedOpenId ?? defaultOpenId;
+
+    return Object.fromEntries(
+      groupList.map((group) => [group.id, group.id === openId]),
+    );
+  }
+
+  return Object.fromEntries(
+    groupList.map((group) => [
+      group.id,
+      previous?.[group.id] ?? !group.defaultCollapsed,
+    ]),
+  );
+}
+
 async function copyText(text: string): Promise<boolean> {
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
     try {
@@ -157,7 +221,9 @@ function CopyButton({
   return (
     <button
       type="button"
-      onClick={handleCopy}
+      onClick={() => {
+        void handleCopy();
+      }}
       className="fd-tokendocs-copy"
       disabled={disabled}
       aria-label={`Copy ${label}`}
@@ -233,81 +299,10 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   allowCollapseAll = true,
 }: TokenDataGridProps<Row>) {
   const isControlled = openGroupId !== undefined;
-  function createInitialExpandedState(
-    groupList: TokenGridGroup<Row>[],
-    previous?: Record<string, boolean>,
-    requestedOpenGroupId?: string | null,
-    allowCollapseAllOverride = true,
-  ): Record<string, boolean> {
-    if (groupList.length === 0) {
-      return {};
-    }
-
-    if (accordion) {
-      const validIds = new Set(groupList.map((group) => group.id));
-      const resolvedRequestedId =
-        requestedOpenGroupId !== undefined ? requestedOpenGroupId : undefined;
-
-      if (resolvedRequestedId !== undefined) {
-        if (
-          resolvedRequestedId !== null &&
-          !validIds.has(resolvedRequestedId)
-        ) {
-          return Object.fromEntries(
-            groupList.map((group) => [
-              group.id,
-              !allowCollapseAllOverride ? group.id === groupList[0]?.id : false,
-            ]),
-          );
-        }
-
-        if (resolvedRequestedId === null) {
-          if (!allowCollapseAllOverride) {
-            const defaultOpenId =
-              groupList.find((group) => !group.defaultCollapsed)?.id ??
-              groupList[0]?.id;
-            return Object.fromEntries(
-              groupList.map((group) => [group.id, group.id === defaultOpenId]),
-            );
-          }
-
-          return Object.fromEntries(
-            groupList.map((group) => [group.id, false]),
-          );
-        }
-
-        return Object.fromEntries(
-          groupList.map((group) => [
-            group.id,
-            group.id === resolvedRequestedId,
-          ]),
-        );
-      }
-
-      const preservedOpenId =
-        previous &&
-        Object.keys(previous).find((id) => previous[id] && validIds.has(id));
-      const defaultOpenId =
-        groupList.find((group) => !group.defaultCollapsed)?.id ??
-        groupList[0]?.id;
-      const openId = preservedOpenId ?? defaultOpenId;
-
-      return Object.fromEntries(
-        groupList.map((group) => [group.id, group.id === openId]),
-      );
-    }
-
-    return Object.fromEntries(
-      groupList.map((group) => [
-        group.id,
-        previous?.[group.id] ?? !group.defaultCollapsed,
-      ]),
-    );
-  }
-
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
     () =>
       createInitialExpandedState(
+        accordion,
         groups,
         undefined,
         isControlled ? openGroupId : initialOpenGroupId,
@@ -316,8 +311,10 @@ export function TokenDataGrid<Row extends TokenGridRowBase>({
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExpandedGroups((state) =>
       createInitialExpandedState(
+        accordion,
         groups,
         state,
         isControlled ? openGroupId : initialOpenGroupId,

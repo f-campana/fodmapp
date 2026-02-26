@@ -102,3 +102,24 @@ Deliver:
 - page shell prototypes
 - story coverage and responsive behavior notes
 ```
+
+## Prompt 6: LLM-First Quality Gate
+
+```text
+Implement this frontend task with lint-aware output.
+
+Constraints:
+- Use the shared ESLint policy (base + next + optional llm layer).
+- Do not use vague identifiers that violate `id-denylist` (for example: `tmp`, `data`, `obj`, `item`) when avoidable.
+- Match React and async safety conventions:
+  - `react/jsx-key`
+  - `react/self-closing-comp`
+  - `react-hooks/exhaustive-deps`
+  - `@typescript-eslint/no-explicit-any`
+  - `@typescript-eslint/no-floating-promises`
+  - `@typescript-eslint/no-misused-promises`
+- Keep naming explicit and deterministic (`@typescript-eslint/naming-convention`):
+  - component names, interfaces, and types in `PascalCase`
+  - variables/functions in `camelCase`
+- Run `pnpm lint:llm` and fix all findings before returning code.
+```

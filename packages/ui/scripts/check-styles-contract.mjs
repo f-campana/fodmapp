@@ -2,8 +2,10 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __filename = fileURLToPath(import.meta.url);
-const packageRoot = path.resolve(path.dirname(__filename), "..");
+import { logError, logInfo } from "./logger.mjs";
+
+const filename = fileURLToPath(import.meta.url);
+const packageRoot = path.resolve(path.dirname(filename), "..");
 const stylesheetPath = path.join(packageRoot, "dist", "styles.css");
 
 const css = readFileSync(stylesheetPath, "utf8");
@@ -47,11 +49,11 @@ for (const selector of requiredSelectors) {
 }
 
 if (failures.length > 0) {
-  console.error("UI stylesheet contract check failed:\n");
+  logError("UI stylesheet contract check failed:\n");
   for (const failure of failures) {
-    console.error(`- ${failure}`);
+    logError(`- ${failure}`);
   }
   process.exit(1);
 }
 
-console.log("UI stylesheet contract check passed.");
+logInfo("UI stylesheet contract check passed.");

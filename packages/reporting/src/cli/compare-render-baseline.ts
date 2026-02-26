@@ -1,11 +1,12 @@
-import { existsSync, writeFileSync, readFileSync } from "node:fs";
-import { resolve, isAbsolute, dirname, join } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 import {
   parseRenderBaselineManifest,
-  SCIENTIFIC_FIGURE_ORDER,
   type RenderBaselineManifest,
+  SCIENTIFIC_FIGURE_ORDER,
 } from "../index";
+import { logError, logInfo } from "./logger";
 
 interface Args {
   currentManifest: string;
@@ -286,15 +287,15 @@ function main(): number {
     writeFileSync(outPath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
 
     if (!result.ok) {
-      console.error(`render baseline drift found: ${result.mismatch_count}`);
+      logError(`render baseline drift found: ${result.mismatch_count}`);
       return 1;
     }
 
-    console.log("render baseline compare passed");
+    logInfo("render baseline compare passed");
     return 0;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[FAIL] ${message}`);
+    logError(`[FAIL] ${message}`);
     return 1;
   }
 }

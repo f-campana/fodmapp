@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+
+import "./globals.css";
+
 import {
   getAnalyticsBootstrapStatus,
   getPlausibleScriptConfig,
@@ -10,7 +13,6 @@ import {
   captureArchitectureEvent,
   getMonitoringBootstrapStatus,
 } from "../lib/monitoring";
-import "./globals.css";
 
 export const metadata: Metadata = {
   title: "FODMAP App Scaffold",

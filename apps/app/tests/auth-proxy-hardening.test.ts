@@ -1,5 +1,7 @@
 import { type NextFetchEvent, NextRequest } from "next/server";
+
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { getAuthContext } from "../lib/auth";
 import { proxy } from "../proxy";
 

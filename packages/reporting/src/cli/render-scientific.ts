@@ -1,16 +1,17 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { dirname, resolve, isAbsolute, join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 import {
+  FIGURE_TITLE_BY_ID,
   parseRenderBaselineManifest,
   parseReportingRun,
-  renderScientificSvgBundle,
-  SCIENTIFIC_FIGURE_ORDER,
-  FIGURE_TITLE_BY_ID,
   type RenderBaselineManifest,
   type RenderScientificArtifact,
+  renderScientificSvgBundle,
+  SCIENTIFIC_FIGURE_ORDER,
 } from "../index";
+import { logError, logInfo } from "./logger";
 
 interface Args {
   input: string;
@@ -152,13 +153,13 @@ function main(): number {
       "utf8",
     );
 
-    console.log(
+    logInfo(
       `rendered scientific SVG bundle (${scientific.length}) to ${outDirPath}`,
     );
     return 0;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[FAIL] ${message}`);
+    logError(`[FAIL] ${message}`);
     return 1;
   }
 }

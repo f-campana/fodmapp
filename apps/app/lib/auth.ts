@@ -1,4 +1,5 @@
 import { getClerkBootstrapStatus } from "./clerk";
+import { logError } from "./logger";
 import { captureSentryEvent } from "./sentry";
 
 export type AuthBootstrapState =
@@ -50,12 +51,7 @@ function reportAuthRuntimeFailure(reason: string, error?: unknown): void {
     error_message: errorMessage,
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    console.error("[auth-runtime] context failed", {
-      reason,
-      error: errorMessage,
-    });
-  }
+  logError("[auth-runtime] context failed", { reason, error: errorMessage });
 }
 
 export async function getAuthContext(

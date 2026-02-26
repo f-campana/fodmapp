@@ -99,7 +99,7 @@ const config = configs[target];
 
 if (!config) {
   throw new Error(
-    `Unknown FD_BUILD_TARGET \"${target}\". Expected one of: ${Object.keys(configs).join(", ")}`,
+    `Unknown FD_BUILD_TARGET "${target}". Expected one of: ${Object.keys(configs).join(", ")}`,
   );
 }
 

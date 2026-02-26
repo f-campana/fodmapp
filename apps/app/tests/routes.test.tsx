@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
 import EspacePage from "../app/espace/page";
 import HomePage from "../app/page";
 

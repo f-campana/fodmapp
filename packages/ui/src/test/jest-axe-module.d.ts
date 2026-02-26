@@ -3,5 +3,5 @@ declare module "jest-axe" {
     node: Element | DocumentFragment,
     config?: unknown,
   ): Promise<unknown>;
-  export const toHaveNoViolations: any;
+  export const toHaveNoViolations: (options?: unknown) => void;
 }

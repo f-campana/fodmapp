@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
 import { getAuthMiddlewareMode, getClerkBootstrapStatus } from "../lib/clerk";
 import { canTrackWithConsent, getConsentBootstrapStatus } from "../lib/consent";

@@ -1,5 +1,7 @@
-import { useState, type CSSProperties } from "react";
+import { type CSSProperties, useState } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
+
 import { expect, userEvent, within } from "storybook/test";
 
 import tokens from "@fodmap/design-tokens";
@@ -106,6 +108,112 @@ const meta = {
     controls: { disable: true },
   },
 } satisfies Meta;
+
+function SpacingLayoutReferenceStory() {
+  useTokenDocsResetScrollOnMount();
+
+  const [activeGroup, setActiveGroup] = useState<{
+    gridId: "spacing-grid" | "layout-grid";
+    groupId: string;
+  }>(() => ({
+    gridId: "spacing-grid",
+    groupId: spacingReferenceGroups[0]?.id ?? "spacing",
+  }));
+
+  function setPageActiveGroup(
+    gridId: "spacing-grid" | "layout-grid",
+    groupId: string | null,
+  ) {
+    if (!groupId) {
+      return;
+    }
+
+    setActiveGroup({ gridId, groupId });
+  }
+
+  return (
+    <TokenDocsPage
+      title="Spacing & Layout Token Reference"
+      subtitle="Deterministic grouped tables for spacing and structural scales with copy actions."
+    >
+      <TokenSection
+        title="Spacing References"
+        description="Complete base spacing path/value references."
+      >
+        <TokenDataGrid
+          gridLabel="spacing-grid"
+          groups={spacingReferenceGroups}
+          accordion
+          allowCollapseAll
+          openGroupId={
+            activeGroup.gridId === "spacing-grid" ? activeGroup.groupId : null
+          }
+          onOpenGroupChange={(groupId) =>
+            setPageActiveGroup("spacing-grid", groupId)
+          }
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(360px, 1.6fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "value",
+              label: "Value",
+              width: "minmax(300px, 1fr)",
+              align: "right",
+              getValue: (row) => row.value,
+              valueMode: "plain",
+              copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+
+      <TokenSection
+        title="Layout & Structural References"
+        description="Radius, border width, opacity, breakpoint, and z-index path/value references."
+      >
+        <TokenDataGrid
+          gridLabel="layout-grid"
+          groups={layoutReferenceGroups}
+          accordion
+          allowCollapseAll
+          openGroupId={
+            activeGroup.gridId === "layout-grid" ? activeGroup.groupId : null
+          }
+          onOpenGroupChange={(groupId) =>
+            setPageActiveGroup("layout-grid", groupId)
+          }
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(360px, 1.8fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "value",
+              label: "Value",
+              width: "minmax(300px, 1fr)",
+              align: "right",
+              getValue: (row) => row.value,
+              valueMode: "plain",
+              copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+    </TokenDocsPage>
+  );
+}
 
 export default meta;
 
@@ -348,111 +456,7 @@ export const Showcase: Story = {
 };
 
 export const Reference: Story = {
-  render: () => {
-    useTokenDocsResetScrollOnMount();
-
-    const [activeGroup, setActiveGroup] = useState<{
-      gridId: "spacing-grid" | "layout-grid";
-      groupId: string;
-    }>(() => ({
-      gridId: "spacing-grid",
-      groupId: spacingReferenceGroups[0]?.id ?? "spacing",
-    }));
-
-    function setPageActiveGroup(
-      gridId: "spacing-grid" | "layout-grid",
-      groupId: string | null,
-    ) {
-      if (!groupId) {
-        return;
-      }
-
-      setActiveGroup({ gridId, groupId });
-    }
-
-    return (
-      <TokenDocsPage
-        title="Spacing & Layout Token Reference"
-        subtitle="Deterministic grouped tables for spacing and structural scales with copy actions."
-      >
-        <TokenSection
-          title="Spacing References"
-          description="Complete base spacing path/value references."
-        >
-          <TokenDataGrid
-            gridLabel="spacing-grid"
-            groups={spacingReferenceGroups}
-            accordion
-            allowCollapseAll
-            openGroupId={
-              activeGroup.gridId === "spacing-grid" ? activeGroup.groupId : null
-            }
-            onOpenGroupChange={(groupId) =>
-              setPageActiveGroup("spacing-grid", groupId)
-            }
-            columns={[
-              {
-                key: "path",
-                label: "Token Path",
-                width: "minmax(360px, 1.6fr)",
-                getValue: (row) => row.path,
-                render: (row) => <TokenPathText value={row.path} />,
-                valueMode: "plain",
-                copyValue: (row) => row.path,
-              },
-              {
-                key: "value",
-                label: "Value",
-                width: "minmax(300px, 1fr)",
-                align: "right",
-                getValue: (row) => row.value,
-                valueMode: "plain",
-                copyValue: (row) => row.value,
-              },
-            ]}
-          />
-        </TokenSection>
-
-        <TokenSection
-          title="Layout & Structural References"
-          description="Radius, border width, opacity, breakpoint, and z-index path/value references."
-        >
-          <TokenDataGrid
-            gridLabel="layout-grid"
-            groups={layoutReferenceGroups}
-            accordion
-            allowCollapseAll
-            openGroupId={
-              activeGroup.gridId === "layout-grid" ? activeGroup.groupId : null
-            }
-            onOpenGroupChange={(groupId) =>
-              setPageActiveGroup("layout-grid", groupId)
-            }
-            columns={[
-              {
-                key: "path",
-                label: "Token Path",
-                width: "minmax(360px, 1.8fr)",
-                getValue: (row) => row.path,
-                render: (row) => <TokenPathText value={row.path} />,
-                valueMode: "plain",
-                copyValue: (row) => row.path,
-              },
-              {
-                key: "value",
-                label: "Value",
-                width: "minmax(300px, 1fr)",
-                align: "right",
-                getValue: (row) => row.value,
-                valueMode: "plain",
-                copyValue: (row) => row.value,
-              },
-            ]}
-          />
-        </TokenSection>
-      </TokenDocsPage>
-    );
-  },
+  render: () => <SpacingLayoutReferenceStory />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(
