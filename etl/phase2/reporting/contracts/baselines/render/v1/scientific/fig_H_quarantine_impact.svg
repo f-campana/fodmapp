@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="Figure H Quarantine Impact">
+<title>Figure H Quarantine Impact</title>
+<defs>
+<style><![CDATA[
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
+.grid{stroke:#d7e0eb;stroke-width:1;}
+.axis{stroke:#64748b;stroke-width:1.2;}
+]]></style>
+</defs>
+<rect x="0" y="0" width="1200" height="420" fill="#f8fafc"/>
+<text class="title" x="24" y="36">H - Frozen Quarantine Case Study</text>
+<text class="subtitle" x="24" y="58">Source: E-04_rank2_quarantine_case_study</text>
+<rect x="36" y="96" width="540" height="260" fill="#ffffff" stroke="#cbd5e1"/>
+<text class="subtitle" x="56" y="130">mode</text>
+<text class="value" x="56" y="154">frozen_case_study</text>
+<text class="subtitle" x="56" y="190">source_stage</text>
+<text class="value" x="56" y="214">post_batch10</text>
+<text class="subtitle" x="56" y="250">rank2_current_target_measurements_expected</text>
+<text class="value" x="56" y="274">0</text>
+<text class="subtitle" x="56" y="310">post_batch10_readiness_rows=9</text>
+<rect x="620" y="96" width="540" height="260" fill="#ffffff" stroke="#cbd5e1"/>
+<text class="subtitle" x="640" y="130">cohort_note_count</text>
+<text class="value" x="640" y="156">1</text>
+<text class="mono" x="640" y="194">This figure is intentionally frozen for auditability.</text>
+<text class="mono" x="640" y="214">No dynamic recompute against final DB state.</text>
+</svg>

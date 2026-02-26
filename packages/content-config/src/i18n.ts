@@ -12,6 +12,15 @@ export interface SectionCopy {
 
 export type ContentSection = "marketing" | "research";
 
+export interface ReportingCopy {
+  pageTitle: string;
+  pageDescription: string;
+  heading: string;
+  subheading: string;
+  baselineLabel: string;
+  runLabel: string;
+}
+
 const COPY: Record<ContentSection, Record<Locale, SectionCopy>> = {
   marketing: {
     fr: {
@@ -63,9 +72,38 @@ const COPY: Record<ContentSection, Record<Locale, SectionCopy>> = {
   },
 };
 
+const REPORTING_COPY: Record<Locale, ReportingCopy> = {
+  fr: {
+    pageTitle: "Reporting Phase 2",
+    pageDescription:
+      "Tableau SSR statique derive du contrat reporting Phase 2, sans recalcul client.",
+    heading: "Reporting contractuel Phase 2",
+    subheading:
+      "Vue statique audit-ready basee sur le baseline metrics committe.",
+    baselineLabel: "Baseline",
+    runLabel: "Run",
+  },
+  en: {
+    pageTitle: "Phase 2 Reporting",
+    pageDescription:
+      "Static SSR dashboard derived from the Phase 2 reporting contract with no client recompute.",
+    heading: "Phase 2 Contract Reporting",
+    subheading:
+      "Audit-ready static view backed by the committed metrics baseline.",
+    baselineLabel: "Baseline",
+    runLabel: "Run",
+  },
+};
+
 export function getLocalizedCopy(
   section: ContentSection,
   locale: Locale = DEFAULT_LOCALE,
 ): SectionCopy {
   return COPY[section][locale];
+}
+
+export function getReportingCopy(
+  locale: Locale = DEFAULT_LOCALE,
+): ReportingCopy {
+  return REPORTING_COPY[locale];
 }

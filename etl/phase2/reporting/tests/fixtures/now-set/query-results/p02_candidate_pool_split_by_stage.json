@@ -1,0 +1,70 @@
+{
+  "contract_refs": [
+    "etl/phase2/sql/phase2_fructan_wave01_checks.sql",
+    "etl/phase2/sql/phase2_fructan_wave02_checks.sql",
+    "etl/phase2/sql/phase2_gos_wave01_checks.sql",
+    "etl/phase2/sql/phase2_gos_wave02_checks.sql",
+    "etl/phase2/sql/phase2_polyol_wave01_checks.sql",
+    "etl/phase2/sql/phase2_polyol_wave02_checks.sql"
+  ],
+  "figure_id": "P-02_candidate_pool_split_by_stage",
+  "fixture_id": "P-02",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:TODO",
+    "etl/phase2/sql/phase2_fructan_wave01_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_fructan_wave02_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_gos_wave01_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_gos_wave02_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_polyol_wave01_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_polyol_wave02_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "stages": [
+      {
+        "pool_closure_rate": 0.6154,
+        "stage_id": "fructan_wave01",
+        "unresolved_rows": 26,
+        "with_candidates_rows": 16,
+        "without_candidates_rows": 10
+      },
+      {
+        "pool_closure_rate": 0.7143,
+        "stage_id": "fructan_wave02",
+        "unresolved_rows": 21,
+        "with_candidates_rows": 15,
+        "without_candidates_rows": 6
+      },
+      {
+        "pool_closure_rate": 0.6,
+        "stage_id": "gos_wave01",
+        "unresolved_rows": 15,
+        "with_candidates_rows": 9,
+        "without_candidates_rows": 6
+      },
+      {
+        "pool_closure_rate": 0.6667,
+        "stage_id": "gos_wave02",
+        "unresolved_rows": 9,
+        "with_candidates_rows": 6,
+        "without_candidates_rows": 3
+      },
+      {
+        "pool_closure_rate": 0.3333,
+        "stage_id": "polyol_wave01",
+        "unresolved_rows": 3,
+        "with_candidates_rows": 1,
+        "without_candidates_rows": 2
+      },
+      {
+        "pool_closure_rate": 1.0,
+        "stage_id": "polyol_wave02",
+        "unresolved_rows": 0,
+        "with_candidates_rows": 0,
+        "without_candidates_rows": 0
+      }
+    ],
+    "total_with_candidates": 47,
+    "total_without_candidates": 27
+  }
+}

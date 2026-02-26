@@ -1,0 +1,18 @@
+version: "1.0.0"
+default:
+  include:
+    - "status"
+    - "hard_gate"
+    - "contract_refs"
+    - "metrics"
+  ignore:
+    - "artifact.path"
+    - "artifact.sha256"
+    - "artifact.row_count"
+    - "validation"
+    - "schema_version"
+    - "payload_version"
+    - "run_id"
+    - "generated_at_utc"
+    - "git_sha"
+figures: {}

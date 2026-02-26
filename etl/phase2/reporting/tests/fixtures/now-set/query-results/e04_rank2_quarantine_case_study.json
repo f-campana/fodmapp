@@ -1,0 +1,20 @@
+{
+  "contract_refs": [
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql",
+    "etl/phase2/sql/phase2_post_batch10_checks.sql"
+  ],
+  "figure_id": "E-04_rank2_quarantine_case_study",
+  "fixture_id": "E-04",
+  "mode": "fixture_smoke",
+  "source_file_hashes": {
+    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:TODO",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:TODO"
+  },
+  "source_rows": {
+    "cohort_note_count": 1,
+    "mode": "frozen_case_study",
+    "post_batch10_readiness_rows": 9,
+    "rank2_current_target_measurements_expected": 0,
+    "source_stage": "post_batch10"
+  }
+}

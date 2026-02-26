@@ -1,0 +1,122 @@
+policy_version: "1.0.0"
+reporting_root: "etl/phase2/reporting"
+created_from: "phase2-reporting-plan-v4"
+
+contract_refs:
+  source_schema_version: "v1"
+  stage_contract_source_version: "v1"
+
+allowed_inputs:
+  files:
+    - "etl/phase2/POD_WAVES_RUNBOOK.md"
+    - "etl/phase2/decisions/phase2_wave_manifest.csv"
+    - "etl/phase2/sql/phase2_scaffold_views.sql"
+    - "etl/phase2/sql/phase2_replay_final_checks.sql"
+    - "etl/phase2/sql/phase2_post_batch10_checks.sql"
+    - "etl/phase2/sql/phase2_post_quarantine_checks.sql"
+    - "etl/phase2/sql/phase2_fructan_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_fructan_wave02_checks.sql"
+    - "etl/phase2/sql/phase2_gos_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_gos_wave02_checks.sql"
+    - "etl/phase2/sql/phase2_polyol_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_polyol_wave02_checks.sql"
+    - "etl/phase3/PRODUCT_LAYER_RUNBOOK.md"
+    - "etl/phase3/sql/phase3_swap_activation_apply.sql"
+    - "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
+    - "api/app/sql.py"
+    - "api/tests/test_swaps.py"
+    - "api/openapi/v0.yaml"
+
+artifact_lifecycle:
+  commit:
+    - "etl/phase2/reporting/contracts/generated/*.generated.yaml"
+    - "etl/phase2/reporting/contracts/baselines/**/*.json"
+    - "etl/phase2/reporting/contracts/baselines/render/**/*.svg"
+    - "etl/phase2/reporting/contracts/baselines/render/**/*.html"
+    - "etl/phase2/reporting/contracts/schema/*"
+    - "etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml"
+    - ".github/workflows/phase2-reporting.yml"
+  run_only:
+    - "etl/phase2/reporting/out/**"
+
+baseline:
+  now_bundle_path: "etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json"
+  pattern: "etl/phase2/reporting/contracts/baselines/**/*.json"
+  exact_baseline_files:
+    - "etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json"
+    - "etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json"
+  drift_tolerance:
+    int: "exact"
+    float_epsilon: 0.000001
+    missing_required: "fail"
+    status_flip: "fail"
+
+render_baseline:
+  version: "v1"
+  scientific_dir: "etl/phase2/reporting/contracts/baselines/render/v1/scientific"
+  public_file: "etl/phase2/reporting/contracts/baselines/render/v1/public/phase2_dashboard.html"
+  manifest_file: "etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json"
+  scientific_files:
+    - "fig_A_pipeline_progression.svg"
+    - "fig_B_candidate_pool_evolution.svg"
+    - "fig_C_gap_completion_heatmap.svg"
+    - "fig_D_status_distribution.svg"
+    - "fig_E_evidence_quality.svg"
+    - "fig_F_serving_load_vs_thresholds.svg"
+    - "fig_G_source_provenance.svg"
+    - "fig_H_quarantine_impact.svg"
+
+q03_scope_rule:
+  reviewed_snapshot_rows_min: 1
+
+baseline_update:
+  input_name: "baseline_update"
+  approval_input_name: "baseline_update_approved_by"
+  approval_confirm_input_name: "baseline_update_confirmed"
+  clean_tree_required: true
+  requires_workflow_dispatch: true
+  log_entry_fields:
+    - "schema_version"
+    - "source_file_hashes"
+    - "run_id"
+  writable_scope:
+    allow:
+      - "etl/phase2/reporting/contracts/generated/*.generated.yaml"
+      - "etl/phase2/reporting/contracts/baselines/**/*.json"
+      - "etl/phase2/reporting/contracts/baselines/render/**/*.svg"
+      - "etl/phase2/reporting/contracts/baselines/render/**/*.html"
+    deny:
+      - "etl/phase2/reporting/contracts/schema/*"
+      - "etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml"
+      - "etl/phase2/reporting/docs/**"
+      - "etl/phase2/reporting/tests/**"
+      - ".github/workflows/phase2-reporting.yml"
+
+parser:
+  fail_loud:
+    on_unknown_file: true
+    on_unknown_metric: true
+    on_missing_scalar: true
+    on_null_or_empty_scalar: true
+    on_duplicate_scalar: true
+    on_unexpected_column: true
+    on_unexpected_figure_contract: true
+  allowed_patterns:
+    - "etl/phase2/POD_WAVES_RUNBOOK.md"
+    - "etl/phase2/decisions/phase2_wave_manifest.csv"
+    - "etl/phase2/sql/phase2_scaffold_views.sql"
+    - "etl/phase2/sql/phase2_replay_final_checks.sql"
+    - "etl/phase2/sql/phase2_post_batch10_checks.sql"
+    - "etl/phase2/sql/phase2_post_quarantine_checks.sql"
+    - "etl/phase2/sql/phase2_fructan_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_fructan_wave02_checks.sql"
+    - "etl/phase2/sql/phase2_gos_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_gos_wave02_checks.sql"
+    - "etl/phase2/sql/phase2_polyol_wave01_checks.sql"
+    - "etl/phase2/sql/phase2_polyol_wave02_checks.sql"
+    - "etl/phase3/PRODUCT_LAYER_RUNBOOK.md"
+    - "etl/phase3/sql/phase3_swap_activation_apply.sql"
+    - "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
+    - "api/app/sql.py"
+    - "api/tests/test_swaps.py"
+    - "api/openapi/v0.yaml"

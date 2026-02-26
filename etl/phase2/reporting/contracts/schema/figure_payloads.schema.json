@@ -1,0 +1,672 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "phase2_reporting_figure_payload",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/$defs/base_figure"
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "P-01_stage_progression_contract_curve"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/P01_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "P-02_candidate_pool_split_by_stage"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/P02_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "P-03_gap_completion_matrix"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/P03_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "Q-02_critical_contract_scorecard"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/Q02_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "Q-03_snapshot_lock_drift_panel"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/Q03_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "Q-04_rank2_exclusion_audit"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/Q04_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "E-03_threshold_provenance_completeness"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/E03_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "figure_id": {
+            "const": "E-04_rank2_quarantine_case_study"
+          }
+        },
+        "required": ["figure_id"]
+      },
+      "then": {
+        "properties": {
+          "metrics": {
+            "$ref": "#/$defs/E04_metrics"
+          }
+        },
+        "required": ["metrics"]
+      }
+    }
+  ],
+  "$defs": {
+    "base_figure": {
+      "type": "object",
+      "required": [
+        "figure_id",
+        "schema_version",
+        "payload_version",
+        "status",
+        "hard_gate",
+        "contract_refs",
+        "metrics",
+        "validation",
+        "artifact"
+      ],
+      "properties": {
+        "figure_id": {
+          "type": "string",
+          "enum": [
+            "P-01_stage_progression_contract_curve",
+            "P-02_candidate_pool_split_by_stage",
+            "P-03_gap_completion_matrix",
+            "Q-02_critical_contract_scorecard",
+            "Q-03_snapshot_lock_drift_panel",
+            "Q-04_rank2_exclusion_audit",
+            "E-03_threshold_provenance_completeness",
+            "E-04_rank2_quarantine_case_study"
+          ]
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "payload_version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "warn",
+            "fail"
+          ]
+        },
+        "hard_gate": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        },
+        "contract_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation": {
+          "type": "object",
+          "required": [
+            "ok"
+          ],
+          "properties": {
+            "ok": {
+              "type": "boolean"
+            },
+            "error_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "artifact": {
+          "type": "object",
+          "required": [
+            "path",
+            "sha256",
+            "row_count"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string"
+            },
+            "row_count": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "metrics": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "int_tuple": {
+      "type": "object",
+      "required": ["total", "resolved", "unresolved"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "stage_record": {
+      "type": "object",
+      "required": [
+        "stage_id",
+        "executed",
+        "resolved_rows",
+        "unresolved_rows",
+        "expected_resolved_rows",
+        "expected_unresolved_rows"
+      ],
+      "properties": {
+        "stage_id": {
+          "type": "string"
+        },
+        "executed": {
+          "type": "boolean"
+        },
+        "resolved_rows": {
+          "type": "integer"
+        },
+        "unresolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_resolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_unresolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "delta_resolved_rows": {
+          "type": "integer"
+        },
+        "delta_unresolved_rows": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "candidate_stage_record": {
+      "type": "object",
+      "required": [
+        "stage_id",
+        "with_candidates_rows",
+        "without_candidates_rows",
+        "pool_closure_rate"
+      ],
+      "properties": {
+        "stage_id": {
+          "type": "string"
+        },
+        "with_candidates_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "without_candidates_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pool_closure_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "unresolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "gap_bucket_record": {
+      "type": "object",
+      "required": [
+        "bucket",
+        "priority_rows",
+        "resolved_rows",
+        "completed_rows",
+        "unresolved_rows",
+        "pending_measurement_rows"
+      ],
+      "properties": {
+        "bucket": {
+          "type": "string"
+        },
+        "priority_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completed_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unresolved_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pending_measurement_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "completion_ratio": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "readiness_gap": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "P01_metrics": {
+      "type": "object",
+      "required": [
+        "baseline_resolved",
+        "baseline_unresolved",
+        "stages",
+        "contract_ref"
+      ],
+      "properties": {
+        "baseline_resolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseline_unresolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/stage_record"
+          }
+        },
+        "contract_ref": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "P02_metrics": {
+      "type": "object",
+      "required": [
+        "stages",
+        "total_with_candidates",
+        "total_without_candidates"
+      ],
+      "properties": {
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/candidate_stage_record"
+          }
+        },
+        "total_with_candidates": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_without_candidates": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "P03_metrics": {
+      "type": "object",
+      "required": [
+        "bucket_rows",
+        "completion_ratio",
+        "readiness_gap"
+      ],
+      "properties": {
+        "bucket_rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/gap_bucket_record"
+          }
+        },
+        "completion_ratio": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "readiness_gap": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Q02_metrics": {
+      "type": "object",
+      "required": [
+        "phase2_priority_tuple",
+        "phase2_gap_tuples",
+        "phase3_rollup_row_count",
+        "swap_status_tuple",
+        "contract_checks"
+      ],
+      "properties": {
+        "phase2_priority_tuple": {
+          "$ref": "#/$defs/int_tuple"
+        },
+        "phase2_gap_tuples": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["bucket", "tuple", "ok"],
+            "properties": {
+              "bucket": {
+                "type": "string"
+              },
+              "tuple": {
+                "$ref": "#/$defs/int_tuple"
+              },
+              "ok": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "phase3_rollup_row_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "swap_status_tuple": {
+          "type": "object",
+          "required": ["active", "draft"],
+          "properties": {
+            "active": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "draft": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "contract_checks": {
+          "type": "object",
+          "required": ["phase2_ok", "phase3_ok", "rank2_api_ok"],
+          "properties": {
+            "phase2_ok": {
+              "type": "boolean"
+            },
+            "phase3_ok": {
+              "type": "boolean"
+            },
+            "rank2_api_ok": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Q03_metrics": {
+      "type": "object",
+      "required": [
+        "reviewed_snapshot_rows",
+        "snapshot_mismatch_rows",
+        "auto_eligible_mismatch_rows",
+        "approve_for_ineligible_rows"
+      ],
+      "properties": {
+        "reviewed_snapshot_rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "snapshot_mismatch_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "auto_eligible_mismatch_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "approve_for_ineligible_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scoring_version_snapshot_actual": {
+          "type": "string"
+        },
+        "fodmap_safety_score_snapshot_actual": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Q04_metrics": {
+      "type": "object",
+      "required": [
+        "phase2_rank2_current_target_measurements",
+        "phase3_rules_touching_rank2",
+        "api_rank2_leak_rows",
+        "overall_pass"
+      ],
+      "properties": {
+        "phase2_rank2_current_target_measurements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "phase3_rules_touching_rank2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "api_rank2_leak_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overall_pass": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "E03_metrics": {
+      "type": "object",
+      "required": [
+        "invalid_threshold_source_rows",
+        "missing_default_threshold_citation_rows",
+        "default_threshold_share"
+      ],
+      "properties": {
+        "invalid_threshold_source_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing_default_threshold_citation_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "default_threshold_share": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0
+        },
+        "invalid_rows_total": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "E04_metrics": {
+      "type": "object",
+      "required": [
+        "mode",
+        "source_stage",
+        "rank2_current_target_measurements_expected",
+        "cohort_note_count",
+        "post_batch10_readiness_rows"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "frozen_case_study"
+        },
+        "source_stage": {
+          "type": "string",
+          "const": "post_batch10"
+        },
+        "rank2_current_target_measurements_expected": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 0
+        },
+        "cohort_note_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "post_batch10_readiness_rows": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
