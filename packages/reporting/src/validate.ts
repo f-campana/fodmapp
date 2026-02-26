@@ -1,9 +1,9 @@
 import {
+  NOW_FIGURE_IDS,
   type FigureId,
   type FigurePayload,
-  NOW_FIGURE_IDS,
-  type RenderBaselineManifest,
   type ReportingRun,
+  type RenderBaselineManifest,
 } from "./contracts";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
