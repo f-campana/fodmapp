@@ -38,12 +38,8 @@
     --color-secondary-hover: var(--fd-semantic-color-action-secondary-bg-hover);
     --color-secondary-foreground: var(--fd-semantic-color-action-secondary-fg);
     --color-destructive: var(--fd-semantic-color-action-destructive-bg);
-    --color-destructive-hover: var(
-      --fd-semantic-color-action-destructive-bg-hover
-    );
-    --color-destructive-foreground: var(
-      --fd-semantic-color-action-destructive-fg
-    );
+    --color-destructive-hover: var(--fd-semantic-color-action-destructive-bg-hover);
+    --color-destructive-foreground: var(--fd-semantic-color-action-destructive-fg);
 
     --color-info: var(--fd-semantic-color-status-info-bg);
     --color-info-foreground: var(--fd-semantic-color-status-info-fg);
@@ -96,12 +92,8 @@
   --color-secondary-hover: var(--fd-semantic-color-action-secondary-bg-hover);
   --color-secondary-foreground: var(--fd-semantic-color-action-secondary-fg);
   --color-destructive: var(--fd-semantic-color-action-destructive-bg);
-  --color-destructive-hover: var(
-    --fd-semantic-color-action-destructive-bg-hover
-  );
-  --color-destructive-foreground: var(
-    --fd-semantic-color-action-destructive-fg
-  );
+  --color-destructive-hover: var(--fd-semantic-color-action-destructive-bg-hover);
+  --color-destructive-foreground: var(--fd-semantic-color-action-destructive-fg);
 
   --color-info: var(--fd-semantic-color-status-info-bg);
   --color-info-foreground: var(--fd-semantic-color-status-info-fg);
