@@ -116,7 +116,7 @@ export function renderDashboardFragment(
 
   <div class="fd-reporting-grid">
     <article class="fd-reporting-card">
-      <h3>A. Pipeline Progression</h3>
+      <h2>A. Pipeline Progression</h2>
       <table class="fd-reporting-table">
         <thead><tr><th>Stage</th><th>Resolved</th><th>Unresolved</th><th>Expected</th></tr></thead>
         <tbody>
@@ -127,7 +127,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>B. Candidate Pool Evolution</h3>
+      <h2>B. Candidate Pool Evolution</h2>
       <table class="fd-reporting-table">
         <thead><tr><th>Stage</th><th>With</th><th>Without</th><th>Closure</th></tr></thead>
         <tbody>
@@ -147,7 +147,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>C. Gap Completion Matrix</h3>
+      <h2>C. Gap Completion Matrix</h2>
       <table class="fd-reporting-table">
         <thead><tr><th>Bucket</th><th>Priority</th><th>Resolved</th><th>Completed</th><th>Unresolved</th><th>Pending</th></tr></thead>
         <tbody>${p03Rows}</tbody>
@@ -156,7 +156,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>D. Critical Contract Scorecard</h3>
+      <h2>D. Critical Contract Scorecard</h2>
       <dl class="fd-reporting-kv">
         <dt>phase3_rollup_row_count</dt><dd>${models.Q02.metrics.phase3_rollup_row_count}</dd>
         <dt>swap_status.active</dt><dd>${models.Q02.metrics.swap_status_tuple.active}</dd>
@@ -172,7 +172,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>E. Snapshot Lock Drift</h3>
+      <h2>E. Snapshot Lock Drift</h2>
       <dl class="fd-reporting-kv">
         <dt>reviewed_snapshot_rows</dt><dd>${models.Q03.metrics.reviewed_snapshot_rows}</dd>
         <dt>snapshot_mismatch_rows</dt><dd>${models.Q03.metrics.snapshot_mismatch_rows}</dd>
@@ -184,7 +184,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>F. Rank2 Exclusion Audit</h3>
+      <h2>F. Rank2 Exclusion Audit</h2>
       <dl class="fd-reporting-kv">
         <dt>phase2_rank2_current_target_measurements</dt><dd>${models.Q04.metrics.phase2_rank2_current_target_measurements}</dd>
         <dt>phase3_rules_touching_rank2</dt><dd>${models.Q04.metrics.phase3_rules_touching_rank2}</dd>
@@ -194,7 +194,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>G. Threshold Provenance</h3>
+      <h2>G. Threshold Provenance</h2>
       <dl class="fd-reporting-kv">
         <dt>invalid_threshold_source_rows</dt><dd>${models.E03.metrics.invalid_threshold_source_rows}</dd>
         <dt>missing_default_threshold_citation_rows</dt><dd>${models.E03.metrics.missing_default_threshold_citation_rows}</dd>
@@ -204,7 +204,7 @@ export function renderDashboardFragment(
     </article>
 
     <article class="fd-reporting-card">
-      <h3>H. Frozen Quarantine Case Study</h3>
+      <h2>H. Frozen Quarantine Case Study</h2>
       <dl class="fd-reporting-kv">
         <dt>mode</dt><dd>${escapeHtml(models.E04.metrics.mode)}</dd>
         <dt>source_stage</dt><dd>${escapeHtml(models.E04.metrics.source_stage)}</dd>
