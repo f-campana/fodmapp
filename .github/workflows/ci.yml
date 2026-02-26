@@ -151,7 +151,9 @@ jobs:
 
       - name: Test, build, and typecheck app scaffold
         run: |
-          pnpm turbo run test typecheck build --filter=@fodmap/app
+          pnpm turbo run test --filter=@fodmap/app
+          pnpm turbo run typecheck --filter=@fodmap/app
+          pnpm turbo run build --filter=@fodmap/app
 
   content-scaffolds:
     name: content-scaffolds
