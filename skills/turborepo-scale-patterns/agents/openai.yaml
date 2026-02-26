@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turborepo Scale Patterns"
+  short_description: "Patterns from large OSS Turborepos"
+  default_prompt: "Apply proven Turborepo patterns from large open-source monorepos."
