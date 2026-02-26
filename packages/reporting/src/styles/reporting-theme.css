@@ -92,7 +92,7 @@
   overflow-x: auto;
 }
 
-.fd-reporting-card h3 {
+.fd-reporting-card h2 {
   margin: 0 0 var(--fd-base-space-2, 0.5rem);
   color: var(--fd-reporting-color-text);
   font: var(--fd-base-typography-font-weight-bold, 700)
