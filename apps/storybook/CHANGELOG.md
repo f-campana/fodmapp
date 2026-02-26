@@ -1,5 +1,11 @@
 # @fodmap/storybook
 
+## 0.1.2
+
+### Patch Changes
+
+- [#78](https://github.com/f-campana/Fodmap/pull/78) [`fb83339`](https://github.com/f-campana/Fodmap/commit/fb83339941df16335dcd8d38e3d141c40f78e284) Thanks [@f-campana](https://github.com/f-campana)! - chore: harden changeset governance gate and use GitHub changelog plugin for Changesets
+
 ## 0.1.1
 
 ### Patch Changes
