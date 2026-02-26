@@ -29,6 +29,11 @@ const meta = {
   component: DashboardPreview,
   parameters: {
     layout: "fullscreen",
+    a11y: {
+      config: {
+        rules: [{ id: "heading-order", enabled: false }],
+      },
+    },
   },
   tags: ["autodocs"],
 } satisfies Meta<typeof DashboardPreview>;

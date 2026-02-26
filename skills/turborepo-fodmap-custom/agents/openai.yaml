@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turborepo Fodmap Custom"
+  short_description: "Turborepo workflow tuned for Fodmap conventions"
+  default_prompt: "Use Turborepo best practices plus Fodmap collaboration and safety conventions."
