@@ -13,3 +13,8 @@
 
 - Any breaking changes?
 - Any migration needed?
+
+## Changesets
+
+- If this PR changes `apps/*` or `packages/*`, include a corresponding `.changeset/*.md` file.
+- Reference: `.changeset` governance is required for package/app surface changes.
