@@ -55,10 +55,10 @@
     "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
   },
   "devDependencies": {
-    "@fodmap/eslint-config": "workspace:*",
-    "@changesets/cli": "2.29.8",
     "@changesets/changelog-github": "0.5.2",
+    "@changesets/cli": "2.29.8",
     "@eslint/js": "9.39.3",
+    "@fodmap/eslint-config": "workspace:*",
     "@next/eslint-plugin-next": "16.1.6",
     "eslint": "9.39.3",
     "eslint-config-next": "16.1.6",
@@ -70,10 +70,11 @@
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-simple-import-sort": "12.1.1",
     "globals": "17.3.0",
-    "typescript-eslint": "8.56.1",
+    "metro-runtime": "0.83.3",
     "prettier": "3.8.1",
     "prettier-plugin-tailwindcss": "0.7.2",
     "tailwindcss": "4.2.0",
-    "turbo": "2.8.10"
+    "turbo": "2.8.10",
+    "typescript-eslint": "8.56.1"
   }
 }
