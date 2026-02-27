@@ -31,6 +31,7 @@ yarn-error.log*
 # python environments and caches
 api/.venv/
 api/.pytest_cache/
+api/*.egg-info/
 api/**/__pycache__/
 etl/ciqual/__pycache__/
 
