@@ -3,6 +3,39 @@ set -euo pipefail
 
 mode="${1:-standard}"
 
+print_usage() {
+  cat <<'EOF'
+Usage: ./.github/scripts/quality-gate.sh [--full|--strict|--all]
+  (no args)     Run governance checks only.
+  --full|--strict|--all
+                Run full local CI parity checks.
+EOF
+}
+
+if [[ "$#" -gt 1 ]]; then
+  echo "[FAIL] too many arguments: $*" >&2
+  print_usage >&2
+  exit 2
+fi
+
+run_full="false"
+case "$mode" in
+  standard)
+    ;;
+  --full|--strict|--all)
+    run_full="true"
+    ;;
+  -h|--help)
+    print_usage
+    exit 0
+    ;;
+  *)
+    echo "[FAIL] unsupported mode: $mode" >&2
+    print_usage >&2
+    exit 2
+    ;;
+esac
+
 required_files=(
   ".editorconfig"
   ".gitattributes"
@@ -38,10 +71,13 @@ bash -n .githooks/commit-msg
 
 echo "[OK] governance quality gate passed"
 
-if [[ "$mode" == "--full" || "$mode" == "--strict" || "$mode" == "--all" ]]; then
+if [[ "$run_full" == "true" ]]; then
   run_cmd "format check" pnpm format:check
+  run_cmd "UI package build for lint imports" pnpm --filter @fodmap/ui build
   run_cmd "lint (CI)" pnpm lint:ci
-  run_cmd "openapi check" pnpm openapi:check
+  run_cmd "python lint (CI)" pnpm python:ci
+  run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
+  run_cmd "openapi check" pnpm --filter @fodmap/types openapi:check
   run_cmd "design token check" pnpm tokens:check
   run_cmd "tailwind style check" pnpm tailwind:styles:check
   run_cmd "UI package build" pnpm ui:build
