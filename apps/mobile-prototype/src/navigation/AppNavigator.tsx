@@ -1,22 +1,23 @@
-import type { ReactNode } from 'react';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { FoodDetailScreen } from '../screens/FoodDetailScreen';
-import { FoodsScreen } from '../screens/FoodsScreen';
-import { HomeScreen } from '../screens/HomeScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
-import { theme } from '../theme/tokens';
+import type { ReactNode } from "react";
+import { StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { FoodDetailScreen } from "../screens/FoodDetailScreen";
+import { FoodsScreen } from "../screens/FoodsScreen";
+import { HomeScreen } from "../screens/HomeScreen";
+import { SettingsScreen } from "../screens/SettingsScreen";
+import { theme } from "../theme/tokens";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
 
 export type RootStackParamList = {
   MainTabs: undefined;
-  FoodDetail: { foodId: string };
+  FoodDetail: { foodId: string; foodName?: string };
 };
 
 export type TabParamList = {
@@ -25,8 +26,8 @@ export type TabParamList = {
   SettingsTab: undefined;
 };
 
-function TabIcon({ icon, active }: { icon: string; active: boolean }) {
-  return <Text style={[styles.tabIcon, active ? styles.tabIconActive : null]}>{icon}</Text>;
+function TabIcon({ icon, color }: { icon: string; color: string }) {
+  return <Text style={[styles.tabIcon, { color }]}>{icon}</Text>;
 }
 
 function TabNavigator() {
@@ -35,39 +36,46 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: theme.color.accent,
-        tabBarInactiveTintColor: '#818a97',
+        tabBarInactiveTintColor: theme.color.textMuted,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarStyle: styles.tabBar
-      }}>
+        tabBarStyle: [styles.tabBar, { backgroundColor: theme.color.surface }],
+      }}
+    >
       <Tabs.Screen
         name="HomeTab"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ focused }) => <TabIcon icon="🏠" active={focused} />
+          title: "Home",
+          tabBarIcon: ({ color }) => <TabIcon icon="🏠" color={color} />,
         }}
         children={({ navigation }) => (
           <ScreenPad>
-            <HomeScreen onBrowse={() => navigation.navigate('FoodsTab')} />
+            <HomeScreen onBrowse={() => navigation.navigate("FoodsTab")} />
           </ScreenPad>
         )}
       />
       <Tabs.Screen
         name="FoodsTab"
         options={{
-          title: 'Foods',
-          tabBarIcon: ({ focused }) => <TabIcon icon="🥝" active={focused} />
+          title: "Foods",
+          tabBarIcon: ({ color }) => <TabIcon icon="🥝" color={color} />,
         }}
         children={({ navigation }) => (
           <ScreenPad>
-            <FoodsScreen onSelectFood={(foodId) => navigation.getParent()?.navigate('FoodDetail', { foodId })} />
+            <FoodsScreen
+              onSelectFood={(foodId, foodName) =>
+                navigation
+                  .getParent()
+                  ?.navigate("FoodDetail", { foodId, foodName })
+              }
+            />
           </ScreenPad>
         )}
       />
       <Tabs.Screen
         name="SettingsTab"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ focused }) => <TabIcon icon="⚙️" active={focused} />
+          title: "Settings",
+          tabBarIcon: ({ color }) => <TabIcon icon="⚙️" color={color} />,
         }}
         children={() => (
           <ScreenPad>
@@ -90,19 +98,25 @@ export function AppNavigator() {
           text: theme.color.text,
           card: theme.color.surface,
           border: theme.color.border,
-          primary: theme.color.accent
-        }
-      }}>
+          primary: theme.color.accent,
+        },
+      }}
+    >
       <Stack.Navigator>
-        <Stack.Screen name="MainTabs" component={TabNavigator} options={{ title: 'FODMAP Prototype', headerShown: false }} />
+        <Stack.Screen
+          name="MainTabs"
+          component={TabNavigator}
+          options={{ title: "FODMAP Prototype", headerShown: false }}
+        />
         <Stack.Screen
           name="FoodDetail"
-          options={{
-            title: 'Food detail',
-            headerBackButtonDisplayMode: 'minimal',
+          options={({ route }) => ({
+            title: route.params.foodName ?? "Food",
+            headerBackButtonDisplayMode: "minimal",
             headerShadowVisible: false,
-            headerStyle: { backgroundColor: theme.color.canvas }
-          }}>
+            headerStyle: { backgroundColor: theme.color.canvas },
+          })}
+        >
           {({ route }) => (
             <ScreenPad>
               <FoodDetailScreen foodId={route.params.foodId} />
@@ -116,7 +130,7 @@ export function AppNavigator() {
 
 function ScreenPad({ children }: { children: ReactNode }) {
   return (
-    <SafeAreaView edges={['top']} style={styles.screen}>
+    <SafeAreaView edges={["top"]} style={styles.screen}>
       {children}
     </SafeAreaView>
   );
@@ -126,24 +140,20 @@ const styles = StyleSheet.create({
   screen: {
     backgroundColor: theme.color.canvas,
     flex: 1,
-    paddingHorizontal: theme.spacing.md
+    paddingHorizontal: theme.spacing.md,
   },
   tabBar: {
     borderTopColor: theme.color.border,
     height: 78,
     paddingBottom: 10,
-    paddingTop: 8
+    paddingTop: 8,
   },
   tabIcon: {
     fontSize: 18,
-    opacity: 0.5
-  },
-  tabIconActive: {
-    opacity: 1
   },
   tabLabel: {
     fontSize: 12,
-    fontWeight: '600',
-    marginBottom: 2
-  }
+    fontWeight: "600",
+    marginBottom: 2,
+  },
 });

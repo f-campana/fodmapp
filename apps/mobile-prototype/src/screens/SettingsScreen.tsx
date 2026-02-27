@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from "react";
 
-import { Badge, Card, PrimaryButton, Screen, StateView } from '../components/ui';
-import { type Preferences } from '../data/repository';
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+
+import { Badge, Card, Screen, StateView } from "../components/ui";
+import { type Preferences } from "../data/repository";
 import {
   loadPreferences,
   saveOnboardingCompleted,
-  savePreferences
-} from '../storage/preferencesStore';
-import { theme } from '../theme/tokens';
+  savePreferences,
+} from "../storage/preferencesStore";
+import { rnTheme } from "../theme/rn-adapter";
+import { theme } from "../theme/tokens";
 
 export function SettingsScreen() {
   const [prefs, setPrefs] = useState<Preferences | null>(null);
@@ -29,7 +31,7 @@ export function SettingsScreen() {
   }, []);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
   const persist = async (next: Preferences) => {
@@ -39,11 +41,26 @@ export function SettingsScreen() {
     setSaving(false);
   };
 
-  if (loading) return <StateView loading message="Loading preferences..." />;
-  if (error || !prefs) return <StateView message="Could not load settings." action={load} />;
+  if (loading) {
+    return <StateView loading message="Loading preferences..." />;
+  }
+  if (error || !prefs) {
+    return (
+      <StateView
+        message="Could not load settings."
+        action={() => {
+          void load();
+        }}
+      />
+    );
+  }
 
   return (
-    <Screen title="Settings" subtitle="Personalize your prototype experience" scroll>
+    <Screen
+      title="Settings"
+      subtitle="Personalize your prototype experience"
+      scroll
+    >
       <Card>
         <Text style={styles.label}>Household</Text>
         <Text style={styles.value}>{prefs.householdName}</Text>
@@ -53,12 +70,16 @@ export function SettingsScreen() {
         <SettingRow
           label="Strict low-FODMAP mode"
           value={prefs.strictMode}
-          onChange={(value) => persist({ ...prefs, strictMode: value })}
+          onChange={(value) => {
+            void persist({ ...prefs, strictMode: value });
+          }}
         />
         <SettingRow
           label="Only safe swaps"
           value={prefs.showOnlySafeSwaps}
-          onChange={(value) => persist({ ...prefs, showOnlySafeSwaps: value })}
+          onChange={(value) => {
+            void persist({ ...prefs, showOnlySafeSwaps: value });
+          }}
         />
       </Card>
 
@@ -71,46 +92,85 @@ export function SettingsScreen() {
         </View>
       </Card>
 
-      <PrimaryButton label={saving ? 'Saving…' : 'Auto-save enabled'} />
+      <View style={styles.autosaveIndicator}>
+        <Text style={styles.autosaveText}>
+          {saving ? "Saving…" : "✓ Auto-save enabled"}
+        </Text>
+      </View>
 
       <Pressable
         onPress={() => {
           void saveOnboardingCompleted(false);
         }}
-        style={styles.secondaryAction}>
-        <Text style={styles.secondaryActionText}>Show onboarding on next launch</Text>
+        style={styles.secondaryAction}
+      >
+        <Text style={styles.secondaryActionText}>
+          Show onboarding on next launch
+        </Text>
       </Pressable>
     </Screen>
   );
 }
 
-function SettingRow({ label, value, onChange }: { label: string; value: boolean; onChange: (next: boolean) => void }) {
+function SettingRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (next: boolean) => void;
+}) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowText}>{label}</Text>
-      <Switch value={value} onValueChange={onChange} trackColor={{ true: theme.color.accent }} />
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: theme.color.accent }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  label: { color: theme.color.text, fontSize: 28, fontWeight: '800', marginBottom: 4 },
-  row: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  autosaveIndicator: {
+    alignItems: "center",
+    paddingVertical: rnTheme.spacing[3],
+  },
+  autosaveText: {
+    color: rnTheme.color.accent,
+    fontSize: 16,
+    textAlign: "center",
+  },
+  label: {
+    color: theme.color.text,
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+    paddingVertical: 12,
+  },
   rowText: { color: theme.color.text, flex: 1, fontSize: 20, marginRight: 8 },
   secondaryAction: {
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: theme.color.surface,
     borderColor: theme.color.border,
     borderRadius: theme.radius.sm,
     borderWidth: 1,
     minHeight: 52,
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   secondaryActionText: {
     color: theme.color.text,
     fontSize: 18,
-    fontWeight: '600'
+    fontWeight: "600",
   },
-  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
-  value: { color: theme.color.textMuted, fontSize: 20, marginTop: 2 }
+  tags: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
+  value: { color: theme.color.textMuted, fontSize: 20, marginTop: 2 },
 });

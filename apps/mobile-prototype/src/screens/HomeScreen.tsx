@@ -1,14 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState } from "react";
 
-import { Card, PrimaryButton, Screen, StateView } from '../components/ui';
-import { getDashboardSnapshot } from '../data/repository';
-import { theme } from '../theme/tokens';
+import { StyleSheet, Text, View } from "react-native";
+
+import { Card, PrimaryButton, Screen, StateView } from "../components/ui";
+import { getDashboardSnapshot } from "../data/repository";
+import { rnTheme } from "../theme/rn-adapter";
+import { theme } from "../theme/tokens";
 
 export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [data, setData] = useState<{ trackedFoods: number; highRiskFoods: number; availableSwaps: number } | null>(null);
+  const [data, setData] = useState<{
+    trackedFoods: number;
+    highRiskFoods: number;
+    availableSwaps: number;
+  } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -23,18 +29,38 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
   }, []);
 
   useEffect(() => {
-    load();
+    void load();
   }, [load]);
 
-  if (loading) return <StateView loading message="Building your dashboard..." />;
-  if (error || !data) return <StateView message="Unable to load dashboard." action={load} />;
+  if (loading) {
+    return <StateView loading message="Building your dashboard..." />;
+  }
+  if (error || !data) {
+    return (
+      <StateView
+        message="Unable to load dashboard."
+        action={() => {
+          void load();
+        }}
+      />
+    );
+  }
 
   return (
-    <Screen title="Today" subtitle="Your personalized low-FODMAP dashboard" scroll>
+    <Screen
+      title="Today"
+      subtitle="Your personalized low-FODMAP dashboard"
+      scroll
+    >
       <Card style={styles.heroCard}>
         <Text style={styles.kicker}>Today&apos;s focus</Text>
-        <Text style={styles.metric}>{data.highRiskFoods} high-risk foods to replace</Text>
-        <Text style={styles.muted}>Tap below to explore swaps with the strongest symptom-relief potential.</Text>
+        <Text style={styles.metric}>
+          {data.highRiskFoods} high-risk foods to replace
+        </Text>
+        <Text style={styles.muted}>
+          Tap below to explore swaps with the strongest symptom-relief
+          potential.
+        </Text>
         <PrimaryButton label="Browse foods" onPress={onBrowse} />
       </Card>
 
@@ -51,7 +77,10 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
 
       <Card style={styles.tipCard}>
         <Text style={styles.tipTitle}>Quick tip</Text>
-        <Text style={styles.muted}>Start by replacing one high-risk staple this week and track how you feel.</Text>
+        <Text style={styles.muted}>
+          Start by replacing one high-risk staple this week and track how you
+          feel.
+        </Text>
       </Card>
     </Screen>
   );
@@ -59,13 +88,38 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  heroCard: { backgroundColor: theme.color.surface },
-  kicker: { color: theme.color.accentStrong, fontSize: 14, fontWeight: '700', textTransform: 'uppercase' },
-  metric: { color: theme.color.text, fontSize: 28, fontWeight: '800', marginBottom: 8, marginTop: 8 },
-  muted: { color: theme.color.textMuted, fontSize: 16, lineHeight: 22, marginBottom: theme.spacing.sm },
-  row: { flexDirection: 'row', gap: theme.spacing.sm },
-  stat: { color: theme.color.text, fontSize: 34, fontWeight: '800' },
-  statCard: { minHeight: 130 },
-  tipCard: { backgroundColor: theme.color.infoSoft },
-  tipTitle: { color: theme.color.text, fontSize: 18, fontWeight: '700', marginBottom: 6 }
+  heroCard: {
+    backgroundColor: rnTheme.color.surfaceRaised,
+    borderLeftWidth: 3,
+    borderLeftColor: rnTheme.color.accent,
+  },
+  kicker: {
+    color: theme.color.accentStrong,
+    fontSize: 14,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  metric: {
+    color: theme.color.text,
+    fontSize: 28,
+    fontWeight: "800",
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  muted: {
+    color: theme.color.textMuted,
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: theme.spacing.sm,
+  },
+  row: { flexDirection: "row", gap: theme.spacing.sm },
+  stat: { color: theme.color.text, fontSize: 34, fontWeight: "800" },
+  statCard: { justifyContent: "flex-end", minHeight: 130 },
+  tipCard: { backgroundColor: rnTheme.color.surfaceMuted },
+  tipTitle: {
+    color: theme.color.text,
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
 });

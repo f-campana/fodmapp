@@ -1,12 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useState } from "react";
 
-import { Badge, Card, Screen, StateView } from '../components/ui';
-import { listFoods, type Food } from '../data/repository';
-import { theme } from '../theme/tokens';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-export function FoodsScreen({ onSelectFood }: { onSelectFood: (foodId: string) => void }) {
-  const [query, setQuery] = useState('');
+import { Badge, Card, Screen, StateView } from "../components/ui";
+import { type Food, listFoods } from "../data/repository";
+import { rnTheme } from "../theme/rn-adapter";
+import { theme } from "../theme/tokens";
+
+export function FoodsScreen({
+  onSelectFood,
+}: {
+  onSelectFood: (foodId: string, foodName?: string) => void;
+}) {
+  const [query, setQuery] = useState("");
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -24,7 +37,7 @@ export function FoodsScreen({ onSelectFood }: { onSelectFood: (foodId: string) =
   }, []);
 
   useEffect(() => {
-    load(query);
+    void load(query);
   }, [load, query]);
 
   return (
@@ -38,19 +51,34 @@ export function FoodsScreen({ onSelectFood }: { onSelectFood: (foodId: string) =
       />
 
       {loading ? <StateView loading message="Loading foods..." /> : null}
-      {error ? <StateView message="Could not load foods." action={() => load(query)} /> : null}
+      {error ? (
+        <StateView
+          message="Could not load foods."
+          action={() => {
+            void load(query);
+          }}
+        />
+      ) : null}
       {!loading && !error && foods.length === 0 ? (
-        <StateView message="No foods found for this search." action={() => setQuery('')} actionLabel="Clear search" />
+        <StateView
+          message="No foods found for this search."
+          action={() => setQuery("")}
+          actionLabel="Clear search"
+        />
       ) : null}
 
       {!loading && !error && foods.length > 0 ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           {foods.map((food) => (
-            <Pressable key={food.id} onPress={() => onSelectFood(food.id)}>
+            <Pressable
+              key={food.id}
+              onPress={() => onSelectFood(food.id, food.name)}
+              style={({ pressed }) => (pressed ? { opacity: 0.72 } : undefined)}
+            >
               <Card>
                 <View style={styles.headerRow}>
                   <Text style={styles.name}>{food.name}</Text>
-                  <Badge label={food.severity} />
+                  <Badge label={food.severity} variant={food.severity} />
                 </View>
                 <Text style={styles.meta}>{food.category}</Text>
                 <Text style={styles.meta}>{food.serving}</Text>
@@ -65,12 +93,18 @@ export function FoodsScreen({ onSelectFood }: { onSelectFood: (foodId: string) =
 
 const styles = StyleSheet.create({
   headerRow: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+    alignItems: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   meta: { color: theme.color.textMuted, fontSize: 16, marginTop: 2 },
-  name: { color: theme.color.text, fontSize: 30, fontWeight: '800', letterSpacing: -0.3, maxWidth: '72%' },
+  name: {
+    color: theme.color.text,
+    fontSize: rnTheme.typography.fontSize["2xl"],
+    fontWeight: "800",
+    letterSpacing: -0.3,
+    maxWidth: "72%",
+  },
   search: {
     backgroundColor: theme.color.surface,
     borderColor: theme.color.border,
@@ -81,6 +115,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
     minHeight: 54,
     paddingHorizontal: 14,
-    paddingVertical: 12
-  }
+    paddingVertical: 12,
+  },
 });

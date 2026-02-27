@@ -1,36 +1,37 @@
+import { type RNTheme, rnTheme } from "./rn-adapter";
+
 export const theme = {
   color: {
-    canvas: '#f4f7f5',
-    surface: '#ffffff',
-    surfaceMuted: '#eef3ef',
-    text: '#172033',
-    textMuted: '#52607a',
-    border: '#d8e0e8',
-    accent: '#2f8f60',
-    accentStrong: '#26724d',
-    accentSoft: '#dbf2e6',
-    infoSoft: '#e8f0fe',
-    danger: '#c53030'
+    canvas: rnTheme.color.canvas,
+    surface: rnTheme.color.surface,
+    surfaceMuted: rnTheme.color.surfaceMuted,
+    text: rnTheme.color.text,
+    textMuted: rnTheme.color.textMuted,
+    border: rnTheme.color.border,
+    accent: rnTheme.color.accent,
+    accentStrong: rnTheme.color.accentStrong,
+    accentSoft: rnTheme.color.surfaceMuted,
+    infoSoft: rnTheme.color.surfaceRaised,
+    danger: rnTheme.color.danger,
   },
+  // Numeric keys + backward-compat named aliases
   radius: {
-    sm: 12,
-    md: 18,
-    lg: 24
+    ...rnTheme.radius,
+    sm: rnTheme.radius.control, // 12 — buttons, controls
+    md: rnTheme.radius.container, // 16 — cards, containers
+    lg: rnTheme.radius["2xl"], // 24 — large radius
   },
+  // Numeric keys + backward-compat named aliases
   spacing: {
-    xs: 8,
-    sm: 12,
-    md: 16,
-    lg: 20,
-    xl: 28
+    ...rnTheme.spacing,
+    xs: rnTheme.spacing[2], // 8
+    sm: rnTheme.spacing[3], // 12
+    md: rnTheme.spacing[4], // 16
+    lg: rnTheme.spacing[5], // 20
+    xl: rnTheme.spacing[8], // 32
   },
-  shadow: {
-    card: {
-      elevation: 2,
-      shadowColor: '#0b172a',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.06,
-      shadowRadius: 10
-    }
-  }
+  shadow: { card: rnTheme.shadow.card },
 } as const;
+
+export type { RNTheme };
+export { rnTheme };

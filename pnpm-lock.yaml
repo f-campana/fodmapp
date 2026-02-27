@@ -130,6 +130,9 @@ importers:
 
   apps/mobile-prototype:
     dependencies:
+      '@fodmap/design-tokens':
+        specifier: workspace:*
+        version: link:../../packages/design-tokens
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.81.5(@babel/core@7.29.0)(@types/react@19.1.17)(react@19.1.0))
@@ -16108,7 +16111,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 25.3.0
+      '@types/node': 22.19.13
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

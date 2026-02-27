@@ -1,22 +1,24 @@
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
   ScrollView,
+  type StyleProp,
   StyleSheet,
   Text,
   View,
-  type StyleProp,
-  type ViewStyle
-} from 'react-native';
+  type ViewStyle,
+} from "react-native";
 
-import { theme } from '../theme/tokens';
+import type { Severity } from "../data/mockData";
+import { rnTheme, severityColors } from "../theme/rn-adapter";
+import { theme } from "../theme/tokens";
 
 export function Screen({
   title,
   subtitle,
   children,
-  scroll = false
+  scroll = false,
 }: {
   title: string;
   subtitle?: string;
@@ -27,33 +29,78 @@ export function Screen({
     <View style={styles.screenContent}>
       <View style={styles.screenHeader}>
         <Text style={styles.screenTitle}>{title}</Text>
-        {subtitle ? <Text style={styles.screenSubtitle}>{subtitle}</Text> : null}
+        {subtitle ? (
+          <Text style={styles.screenSubtitle}>{subtitle}</Text>
+        ) : null}
       </View>
       {children}
     </View>
   );
 
   if (scroll) {
-    return <ScrollView contentContainerStyle={styles.scrollContent}>{content}</ScrollView>;
+    return (
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {content}
+      </ScrollView>
+    );
   }
 
   return content;
 }
 
-export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+export function Card({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-export function PrimaryButton({ label, onPress }: { label: string; onPress?: () => void }) {
+export function Divider() {
+  return <View style={styles.divider} />;
+}
+
+export function PrimaryButton({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress?: () => void;
+}) {
   return (
-    <Pressable onPress={onPress} style={styles.primaryButton}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.primaryButton,
+        pressed && styles.primaryButtonPressed,
+      ]}
+    >
       <Text style={styles.primaryLabel}>{label}</Text>
     </Pressable>
   );
 }
 
-export function Badge({ label }: { label: string }) {
-  return <Text style={styles.badge}>{label}</Text>;
+export function Badge({
+  label,
+  variant,
+}: {
+  label: string;
+  variant?: Severity | "default";
+}) {
+  const colors =
+    variant && variant !== "default"
+      ? { bg: severityColors[variant].bg, fg: severityColors[variant].fg }
+      : { bg: theme.color.accentSoft, fg: theme.color.accentStrong };
+
+  return (
+    <Text
+      style={[styles.badge, { backgroundColor: colors.bg, color: colors.fg }]}
+    >
+      {label}
+    </Text>
+  );
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
@@ -64,7 +111,7 @@ export function StateView({
   loading,
   message,
   action,
-  actionLabel
+  actionLabel,
 }: {
   loading?: boolean;
   message: string;
@@ -75,25 +122,25 @@ export function StateView({
     <View style={styles.centered}>
       {loading ? <ActivityIndicator color={theme.color.accent} /> : null}
       <Text style={styles.muted}>{message}</Text>
-      {action ? <PrimaryButton label={actionLabel ?? 'Retry'} onPress={action} /> : null}
+      {action ? (
+        <PrimaryButton label={actionLabel ?? "Retry"} onPress={action} />
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: theme.color.accentSoft,
+    alignSelf: "flex-start",
     borderRadius: 999,
-    color: theme.color.accentStrong,
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: "800",
     letterSpacing: 0.4,
     marginTop: theme.spacing.sm,
-    overflow: 'hidden',
+    overflow: "hidden",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    textTransform: 'uppercase'
+    textTransform: "uppercase",
   },
   card: {
     backgroundColor: theme.color.surface,
@@ -102,50 +149,70 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: theme.spacing.sm,
     padding: theme.spacing.md,
-    ...theme.shadow.card
+    ...theme.shadow.card,
   },
-  centered: { alignItems: 'center', justifyContent: 'center', minHeight: 240, paddingHorizontal: theme.spacing.lg },
-  muted: { color: theme.color.textMuted, marginBottom: theme.spacing.sm, marginTop: theme.spacing.xs, textAlign: 'center' },
+  centered: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 200,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  divider: {
+    backgroundColor: theme.color.border,
+    height: 1,
+    marginVertical: rnTheme.spacing[2],
+  },
+  muted: {
+    color: theme.color.textMuted,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.xs,
+    textAlign: "center",
+  },
   primaryButton: {
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: theme.color.accent,
     borderRadius: theme.radius.sm,
     minHeight: 52,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm
+    paddingVertical: theme.spacing.sm,
+  },
+  primaryButtonPressed: {
+    opacity: 0.82,
+    backgroundColor: rnTheme.color.accentStrong,
   },
   primaryLabel: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: '700'
+    fontWeight: "700",
   },
   screenContent: {
     flex: 1,
-    gap: theme.spacing.sm
+    gap: theme.spacing.sm,
   },
   screenHeader: {
-    marginBottom: theme.spacing.xs,
-    marginTop: theme.spacing.xs
+    marginBottom: rnTheme.spacing[4],
+    marginTop: theme.spacing.xs,
   },
   screenSubtitle: {
     color: theme.color.textMuted,
     fontSize: 16,
-    marginTop: 2
+    marginTop: 2,
   },
   screenTitle: {
     color: theme.color.text,
-    fontSize: 30,
-    fontWeight: '800',
-    letterSpacing: -0.4
+    fontSize: rnTheme.typography.fontSize["3xl"],
+    fontWeight: "700",
+    letterSpacing: -0.4,
   },
   scrollContent: {
-    paddingBottom: theme.spacing.xl
+    paddingBottom: theme.spacing.xl,
   },
   sectionTitle: {
     color: theme.color.text,
-    fontSize: 32,
-    fontWeight: '800',
-    marginBottom: theme.spacing.xs
-  }
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: theme.spacing.xs,
+  },
 });
