@@ -42,6 +42,11 @@ feat(schema): add source confidence index
    - `pnpm lint:ci` for warning-fail-fast PR validation (already included in `--full`)
    - `pnpm lint:llm` for LLM-authored code (warnings as hard failures in CI for `lint:llm:ci`)
    - `./.github/scripts/ci-api-pr.sh` for API changes needing seeded integration parity with CI
+5. Changesets policy:
+   - Default: if `apps/*` or `packages/*` changed, include a `.changeset/*.md` entry.
+   - Exemption: allowlisted prototype packages may skip `.changeset` only with PR label `changeset-exempt`.
+   - Current allowlist (`CHANGESET_EXEMPT_PACKAGES`): `@fodmap/mobile-prototype`.
+   - Local parity note: for exemption-path pushes before PR labeling, run `PR_LABELS=changeset-exempt git push`.
 
 Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are now blocked until `./.github/scripts/quality-gate.sh --full` passes.
 
