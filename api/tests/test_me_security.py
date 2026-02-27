@@ -13,7 +13,7 @@ from psycopg.rows import dict_row
 from app.consent_chain import proof_secret
 from app.crypto_utils import canonical_json, hmac_signature, sha256_hex
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema")]
 
 
 def _secret_b64(seed: str) -> str:

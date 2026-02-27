@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterator
+from pathlib import Path
 
 import psycopg
 import pytest
@@ -9,6 +10,10 @@ from fastapi.testclient import TestClient
 from psycopg.rows import dict_row
 
 from app.main import create_app
+
+SECURITY_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-02-25_security_consent_export_delete.sql"
+)
 
 
 def _default_db_url() -> str:
@@ -47,6 +52,24 @@ def integration_db_ready(db_url: str) -> bool:
 def integration_guard(integration_db_ready: bool) -> None:
     if not integration_db_ready:
         pytest.skip("integration DB is not ready or schema is missing")
+
+
+def _ensure_me_security_schema(db_url: str) -> None:
+    with psycopg.connect(db_url, row_factory=dict_row) as conn:
+        table_state = conn.execute("SELECT to_regclass('public.me_mutation_queue') AS queue_table").fetchone()
+        if table_state and table_state["queue_table"]:
+            return
+
+    migration_sql = SECURITY_MIGRATION_PATH.read_text(encoding="utf-8")
+    with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+        conn.execute(migration_sql)
+
+
+@pytest.fixture(scope="session")
+def me_security_schema(db_url: str, integration_db_ready: bool) -> None:
+    if not integration_db_ready:
+        pytest.skip("integration DB is not ready or schema is missing")
+    _ensure_me_security_schema(db_url)
 
 
 @pytest.fixture()

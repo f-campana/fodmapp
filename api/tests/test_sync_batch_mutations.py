@@ -11,7 +11,7 @@ from psycopg.rows import dict_row
 
 from app.crypto_utils import canonical_json, hmac_signature, sha256_hex
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema")]
 
 
 def _seed_secret(seed: str) -> str:
