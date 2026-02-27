@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Header, Request, Response
+from psycopg.types.json import Jsonb
 
 from app import sql
 from app.consent_chain import (
@@ -86,6 +87,10 @@ def _compute_mutation_chain_hash(payload_hash: str, chain_prev_hash: str | None)
             }
         )
     )
+
+
+def _jsonb(value: Any) -> Any:
+    return Jsonb(value) if value is not None else None
 
 
 def _verify_consent_chain(conn, user_id: UUID) -> None:
@@ -231,21 +236,37 @@ def _validate_signature(secret_b64: str, env: MutationEnvelope) -> str:
     if env.signature_algorithm != "hmac-sha256":
         raise bad_request("Unsupported signature algorithm")
 
-    payload_for_sig = env.model_dump(exclude={"signature"}, by_alias=True)
+    payload_for_sig = env.model_dump(exclude={"signature"}, by_alias=True, mode="json")
     payload_for_sig = {key: value for key, value in payload_for_sig.items() if value is not None}
-    if isinstance(payload_for_sig.get("created_at_utc"), datetime):
-        payload_for_sig["created_at_utc"] = payload_for_sig["created_at_utc"].isoformat()
     signed_payload = canonical_json(payload_for_sig)
-    if not hmac_verify(secret_b64, signed_payload, env.signature):
-        raise unauthorized("Invalid mutation signature")
-    return sha256_hex(signed_payload)
+    if hmac_verify(secret_b64, signed_payload, env.signature):
+        return sha256_hex(signed_payload)
+
+    # Compatibility for clients that still sign UTC timestamps with "+00:00".
+    legacy_payload = dict(payload_for_sig)
+    created_at = legacy_payload.get("created_at_utc")
+    if isinstance(created_at, str) and created_at.endswith("Z"):
+        legacy_payload["created_at_utc"] = f"{created_at[:-1]}+00:00"
+        legacy_signed_payload = canonical_json(legacy_payload)
+        if hmac_verify(secret_b64, legacy_signed_payload, env.signature):
+            return sha256_hex(legacy_signed_payload)
+
+    raise unauthorized("Invalid mutation signature")
+
+
+def _parse_iso_datetime(value: str | datetime) -> datetime:
+    if isinstance(value, datetime):
+        return value
+    if value.endswith("Z"):
+        return datetime.fromisoformat(f"{value[:-1]}+00:00")
+    return datetime.fromisoformat(value)
 
 
 def _build_export_receipt(export_id: UUID, user_id: UUID, manifest: Dict[str, Any]) -> Dict[str, Any]:
-    now = _now()
+    issued_at_utc = _now().isoformat().replace("+00:00", "Z")
     receipt = {
         "receipt_id": str(uuid4()),
-        "issued_at_utc": now.isoformat(),
+        "issued_at_utc": issued_at_utc,
         "actor": "api",
         "policy_version": get_settings().api_version,
         "manifest_hash": sha256_hex(canonical_json(manifest)),
@@ -263,7 +284,7 @@ def _build_export_receipt(export_id: UUID, user_id: UUID, manifest: Dict[str, An
 
 
 def _build_delete_receipt(delete_request_id: UUID, user_id: UUID, summary: DeleteSummary) -> Dict[str, Any]:
-    now = _now()
+    issued_at_utc = _now().isoformat().replace("+00:00", "Z")
     payload = {
         "scope": "delete",
         "delete_request_id": str(delete_request_id),
@@ -274,12 +295,12 @@ def _build_delete_receipt(delete_request_id: UUID, user_id: UUID, summary: Delet
         "diet_logs_deleted": summary.diet_logs_deleted,
         "swap_history_deleted": summary.swap_history_deleted,
         "exports_invalidated": summary.exports_invalidated,
-        "issued_at_utc": now.isoformat(),
+        "issued_at_utc": issued_at_utc,
         "actor": "api",
     }
     receipt = {
         "receipt_id": str(uuid4()),
-        "issued_at_utc": now.isoformat(),
+        "issued_at_utc": issued_at_utc,
         "actor": "api",
         "policy_version": get_settings().api_version,
         "manifest_hash": sha256_hex(canonical_json(payload)),
@@ -466,7 +487,7 @@ def post_me_consent(
                 "tenant_scope": "fodmap_app",
                 "policy_version": payload.policy_version,
                 "legal_basis": payload.legal_basis,
-                "consent_scope": payload.scope,
+                "consent_scope": _jsonb(payload.scope),
                 "consent_method": payload.method,
                 "source": payload.source,
                 "source_ref": payload.source_ref,
@@ -600,12 +621,12 @@ def request_export(
                 "idempotency_key": idempotency_key,
                 "requested_by_actor_id": user_id,
                 "status": "accepted",
-                "requested_scope": requested_scope,
+                "requested_scope": _jsonb(requested_scope),
                 "include_domain": include,
-                "rows_by_domain": rows_by_domain,
+                "rows_by_domain": _jsonb(rows_by_domain),
                 "redactions": ["email_last_4"] if payload.anonymize else [],
-                "manifest": manifest,
-                "proof": None,
+                "manifest": _jsonb(manifest),
+                "proof": _jsonb(None),
                 "download_url": None,
             },
         ).fetchone()
@@ -621,9 +642,9 @@ def request_export(
             {
                 "export_id": export_id,
                 "status": target_status,
-                "rows_by_domain": rows_by_domain,
-                "manifest": manifest,
-                "proof": proof,
+                "rows_by_domain": _jsonb(rows_by_domain),
+                "manifest": _jsonb(manifest),
+                "proof": _jsonb(proof),
                 "download_url": None,
                 "error_code": None,
                 "error_detail": None,
@@ -668,7 +689,7 @@ def get_export_status(
         proof = row["proof"]
         proof_model = Receipt(
             receipt_id=UUID(str(proof["receipt_id"])) if isinstance(proof["receipt_id"], str) else proof["receipt_id"],
-            issued_at_utc=datetime.fromisoformat(proof["issued_at_utc"]),
+            issued_at_utc=_parse_iso_datetime(proof["issued_at_utc"]),
             actor=proof["actor"],
             policy_version=proof.get("policy_version"),
             manifest_hash=proof["manifest_hash"],
@@ -749,14 +770,14 @@ def request_delete(
                 "status": "processing",
                 "soft_delete_window_days": payload.soft_delete_window_days,
                 "hard_delete": payload.hard_delete,
-                "summary": {
+                "summary": _jsonb({
                     "consent_records_touched": 0,
                     "symptom_logs_deleted": 0,
                     "diet_logs_deleted": 0,
                     "swap_history_deleted": 0,
                     "queue_items_dropped": 0,
                     "exports_invalidated": 0,
-                },
+                }),
             },
         ).fetchone()
         if insert_row is None:
@@ -788,8 +809,8 @@ def request_delete(
                     {
                         "delete_request_id": delete_request_id,
                         "status": status,
-                        "summary": summary_dict,
-                        "proof": _build_delete_receipt(delete_request_id, user_id, summary),
+                        "summary": _jsonb(summary_dict),
+                        "proof": _jsonb(_build_delete_receipt(delete_request_id, user_id, summary)),
                         "error_code": None,
                         "error_detail": None,
                     },
@@ -809,8 +830,8 @@ def request_delete(
                     {
                         "delete_request_id": delete_request_id,
                         "status": status,
-                        "summary": summary,
-                        "proof": None,
+                        "summary": _jsonb(summary),
+                        "proof": _jsonb(None),
                         "error_code": "delete_processing_failed",
                         "error_detail": str(exc)[:4000],
                     },
@@ -823,8 +844,8 @@ def request_delete(
                 {
                     "delete_request_id": delete_request_id,
                     "status": status,
-                    "summary": summary,
-                    "proof": _build_delete_receipt(delete_request_id, user_id, DeleteSummary(**summary)),
+                    "summary": _jsonb(summary),
+                    "proof": _jsonb(_build_delete_receipt(delete_request_id, user_id, DeleteSummary(**summary))),
                     "error_code": None,
                     "error_detail": None,
                 },
@@ -865,7 +886,7 @@ def get_delete_status(
         raw = row["proof"]
         proof = Receipt(
             receipt_id=UUID(str(raw["receipt_id"])),
-            issued_at_utc=datetime.fromisoformat(raw["issued_at_utc"]),
+            issued_at_utc=_parse_iso_datetime(raw["issued_at_utc"]),
             actor=raw["actor"],
             policy_version=raw.get("policy_version"),
             manifest_hash=raw["manifest_hash"],
@@ -1074,20 +1095,20 @@ def sync_mutations(
                     "entity_id": entity_id,
                     "client_seq": env.client_seq,
                     "base_version": env.base_version,
-                "payload_hash": payload_hash,
-                "aad": env.aad,
-                "envelope_json": env.model_dump(mode="json"),
-                "signature_algorithm": env.signature_algorithm,
-                "signature_kid": env.signature_kid,
-                "signature": env.signature,
-                "chain_prev_hash": chain_prev_hash,
-                "chain_item_hash": chain_item_hash,
-                "status": "accepted",
-                "error_code": None,
-                "error_detail": None,
-                "ttl_seconds": env.ttl_seconds,
-            },
-        )
+                    "payload_hash": payload_hash,
+                    "aad": _jsonb(env.aad),
+                    "envelope_json": _jsonb(env.model_dump(mode="json")),
+                    "signature_algorithm": env.signature_algorithm,
+                    "signature_kid": env.signature_kid,
+                    "signature": env.signature,
+                    "chain_prev_hash": chain_prev_hash,
+                    "chain_item_hash": chain_item_hash,
+                    "status": "accepted",
+                    "error_code": None,
+                    "error_detail": None,
+                    "ttl_seconds": env.ttl_seconds,
+                },
+            )
 
             next_version = current_version + 1
             if env.base_version is None:

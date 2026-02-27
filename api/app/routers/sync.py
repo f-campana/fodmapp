@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional, Tuple
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Header, Request, Response
+from psycopg.types.json import Jsonb
 
 from app import sql
 from app.config import get_settings
@@ -44,6 +45,10 @@ def _now_utc() -> datetime:
 
 def _now_ms() -> int:
     return int(_now_utc().timestamp() * 1000)
+
+
+def _jsonb(value: Any) -> Any:
+    return Jsonb(value) if value is not None else None
 
 
 def _decorate_legacy_sync_headers(response: Response) -> None:
@@ -117,7 +122,7 @@ def _last_queue_chain_hash(conn, user_id: UUID, device_id: str) -> Optional[str]
 
 
 def _build_delete_receipt(delete_request_id: UUID, user_id: UUID, summary: DeleteSummary) -> Dict[str, Any]:
-    now = _now_utc()
+    issued_at_utc = _now_utc().isoformat().replace("+00:00", "Z")
     payload = {
         "scope": "delete",
         "delete_request_id": str(delete_request_id),
@@ -128,12 +133,12 @@ def _build_delete_receipt(delete_request_id: UUID, user_id: UUID, summary: Delet
         "diet_logs_deleted": summary.diet_logs_deleted,
         "swap_history_deleted": summary.swap_history_deleted,
         "exports_invalidated": summary.exports_invalidated,
-        "issued_at_utc": now.isoformat(),
+        "issued_at_utc": issued_at_utc,
         "actor": "api",
     }
     receipt = {
         "receipt_id": str(uuid4()),
-        "issued_at_utc": now.isoformat(),
+        "issued_at_utc": issued_at_utc,
         "actor": "api",
         "policy_version": get_settings().api_version,
         "manifest_hash": sha256_hex(canonical_json(payload)),
@@ -209,13 +214,13 @@ def _normalize_conflict_code(raw_code: Optional[str]) -> Optional[SyncV1Conflict
         "CONSENT_REVOKED",
         "ACCOUNT_DELETED",
     }:
-        return SyncV1ConflictCode(code)
+        return code
 
     legacy_map = {
         "BASE_VERSION_MISMATCH": "VERSION_CONFLICT",
         "VERSION": "VERSION_CONFLICT",
     }
-    return SyncV1ConflictCode(legacy_map[code]) if code in legacy_map else None
+    return legacy_map[code] if code in legacy_map else None
 
 
 def _build_result(
@@ -240,9 +245,9 @@ def _build_result(
         retry_after_ms=retry_after_ms,
         attempted=state
         in {
-            SyncV1MutationResultState("APPLIED"),
-            SyncV1MutationResultState("CONFLICT"),
-            SyncV1MutationResultState("RETRY_WAIT"),
+            "APPLIED",
+            "CONFLICT",
+            "RETRY_WAIT",
         },
         applied_version=applied_version,
         conflict=conflict,
@@ -274,7 +279,7 @@ def _build_replay_result(
         return _build_result(
             payload,
             mutation,
-            SyncV1MutationResultState("DUPLICATE"),
+            "DUPLICATE",
             "DUPLICATE",
             received_at,
             0,
@@ -316,7 +321,7 @@ def _build_replay_result(
     return _build_result(
         payload,
         mutation=mutation,
-        state=SyncV1MutationResultState("FAILED_PERMANENT"),
+        state="FAILED_PERMANENT",
         result_code="INVALID_PAYLOAD",
         received_at=received_at,
         processing_ms=0,
@@ -457,7 +462,7 @@ def _conflict_for_code(
 ) -> tuple[SyncV1MutationResultState, int, SyncV1MutationConflict]:
     if code == "RULE_INACTIVE":
         return (
-            SyncV1MutationResultState("CONFLICT"),
+            "CONFLICT",
             0,
             SyncV1MutationConflict(
                 code="RULE_INACTIVE",
@@ -472,7 +477,7 @@ def _conflict_for_code(
 
     if code == "RULE_SCORE_BELOW_THRESHOLD":
         return (
-            SyncV1MutationResultState("CONFLICT"),
+            "CONFLICT",
             0,
             SyncV1MutationConflict(
                 code="RULE_SCORE_BELOW_THRESHOLD",
@@ -491,7 +496,7 @@ def _conflict_for_code(
 
     if code == "RANK2_BLOCKED":
         return (
-            SyncV1MutationResultState("CONFLICT"),
+            "CONFLICT",
             0,
             SyncV1MutationConflict(
                 code="RANK2_BLOCKED",
@@ -506,7 +511,7 @@ def _conflict_for_code(
 
     if code == "VERSION_CONFLICT":
         return (
-            SyncV1MutationResultState("RETRY_WAIT"),
+            "RETRY_WAIT",
             RETRY_DELAY_MS_VERSION_CONFLICT,
             SyncV1MutationConflict(
                 code="VERSION_CONFLICT",
@@ -519,7 +524,7 @@ def _conflict_for_code(
 
     if code == "ENDPOINT_UNKNOWN":
         return (
-            SyncV1MutationResultState("RETRY_WAIT"),
+            "RETRY_WAIT",
             RETRY_DELAY_MS_ENDPOINT_UNKNOWN,
             SyncV1MutationConflict(
                 code="ENDPOINT_UNKNOWN",
@@ -532,7 +537,7 @@ def _conflict_for_code(
 
     if code == "CONSENT_REVOKED":
         return (
-            SyncV1MutationResultState("CANCELLED_BY_CONSENT"),
+            "CANCELLED_BY_CONSENT",
             0,
             SyncV1MutationConflict(
                 code="CONSENT_REVOKED",
@@ -545,7 +550,7 @@ def _conflict_for_code(
 
     if code == "ACCOUNT_DELETED":
         return (
-            SyncV1MutationResultState("CANCELLED_BY_DELETE"),
+            "CANCELLED_BY_DELETE",
             0,
             SyncV1MutationConflict(
                 code="ACCOUNT_DELETED",
@@ -557,7 +562,7 @@ def _conflict_for_code(
         )
 
     return (
-        SyncV1MutationResultState("CONFLICT"),
+        "CONFLICT",
         0,
         SyncV1MutationConflict(
             code=code,
@@ -576,11 +581,11 @@ def _conflict_for_code(
 
 
 def _queue_status(state: SyncV1MutationResultState) -> str:
-    if state == SyncV1MutationResultState("APPLIED"):
+    if state == "APPLIED":
         return "accepted"
-    if state == SyncV1MutationResultState("DUPLICATE"):
+    if state == "DUPLICATE":
         return "duplicate"
-    if state in {SyncV1MutationResultState("CONFLICT"), SyncV1MutationResultState("RETRY_WAIT")}:
+    if state in {"CONFLICT", "RETRY_WAIT"}:
         return "conflict"
     return "rejected"
 
@@ -601,7 +606,7 @@ def _insert_queue(
     chain_prev_hash: Optional[str],
     chain_item_hash: Optional[str],
 ) -> None:
-    if state == SyncV1MutationResultState("DUPLICATE"):
+    if state == "DUPLICATE":
         return
 
     aad = {
@@ -630,8 +635,8 @@ def _insert_queue(
             "client_seq": mutation.client_seq,
             "base_version": mutation.base_version,
             "payload_hash": signature_hash,
-            "aad": aad,
-            "envelope_json": mutation.model_dump(),
+            "aad": _jsonb(aad),
+            "envelope_json": _jsonb(mutation.model_dump(mode="json")),
             "signature_algorithm": mutation.integrity.signature_algo if mutation.integrity else "hmac-sha256",
             "signature_kid": signature_key_id or "legacy",
             "signature": mutation.integrity.signature if mutation.integrity else "",
@@ -711,14 +716,14 @@ def _mark_account_deleted(conn, user_id: UUID) -> None:
             "status": "processing",
             "soft_delete_window_days": 0,
             "hard_delete": True,
-            "summary": {
+            "summary": _jsonb({
                 "symptom_logs_deleted": 0,
                 "diet_logs_deleted": 0,
                 "swap_history_deleted": 0,
                 "queue_items_dropped": 0,
                 "consent_records_touched": 0,
                 "exports_invalidated": 0,
-            },
+            }),
         },
     ).fetchone()
     if insert_row is None:
@@ -731,8 +736,8 @@ def _mark_account_deleted(conn, user_id: UUID) -> None:
         {
             "delete_request_id": delete_request_id,
             "status": "completed",
-            "summary": summary.model_dump(),
-            "proof": _build_delete_receipt(delete_request_id, user_id, summary),
+            "summary": _jsonb(summary.model_dump()),
+            "proof": _jsonb(_build_delete_receipt(delete_request_id, user_id, summary)),
             "error_code": None,
             "error_detail": None,
         },
@@ -766,9 +771,9 @@ def _set_entity_version(conn, user_id: UUID, entity_type: str, entity_id: str, n
 
 
 def _normalize_mutation(item: SyncV1MutationItem, migration_mode: bool) -> SyncV1MutationItem:
-    if migration_mode and item.operation_legacy is None:
+    if migration_mode and item.operation_legacy is None and item.operation_type is None:
         raise ValueError("operation_legacy required in migration mode")
-    if migration_mode and item.mutation_id_legacy is None:
+    if migration_mode and item.mutation_id_legacy is None and item.mutation_id is None:
         raise ValueError("mutation_id_legacy required in migration mode")
 
     op = item.operation_type or item.operation_legacy
@@ -854,7 +859,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         fallback_mutation,
-                        SyncV1MutationResultState("FAILED_PERMANENT"),
+                        "FAILED_PERMANENT",
                         "INVALID_PAYLOAD",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -873,6 +878,48 @@ def sync_mutations_batch(
 
             entity_type, entity_id = _infer_entity(user_id, normalized)
             base_hash = sha256_hex(canonical_json(_signature_payload(normalized)))
+
+            if account_deleted:
+                chain_prev_hash = _last_queue_chain_hash(
+                    conn,
+                    user_id=user_id,
+                    device_id=payload.client_device_id,
+                )
+                chain_item_hash = _compute_chain_hash(base_hash, chain_prev_hash)
+                state, retry_after_ms, conflict = _conflict_for_code("ACCOUNT_DELETED")
+                _insert_queue(
+                    conn,
+                    payload,
+                    normalized,
+                    user_id,
+                    entity_type,
+                    entity_id,
+                    base_hash,
+                    None,
+                    state,
+                    False,
+                    "ACCOUNT_DELETED",
+                    "delete_in_progress",
+                    chain_prev_hash,
+                    chain_item_hash,
+                )
+                results.append(
+                    _build_result(
+                        payload,
+                        normalized,
+                        state,
+                        "ACCOUNT_DELETED",
+                        received_at,
+                        max(0, _now_ms() - start_ms),
+                        base_hash,
+                        False,
+                        None,
+                        conflict,
+                        retry_after_ms,
+                        False,
+                    )
+                )
+                continue
 
             try:
                 signature_valid, signature_hash, signature_key_id = _verify_signature(
@@ -902,7 +949,7 @@ def sync_mutations_batch(
                     entity_id,
                     signature_hash,
                     signature_key_id,
-                    SyncV1MutationResultState("FAILED_PERMANENT"),
+                    "FAILED_PERMANENT",
                     False,
                     "INVALID_PAYLOAD",
                     str(exc),
@@ -913,7 +960,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         normalized,
-                        SyncV1MutationResultState("FAILED_PERMANENT"),
+                        "FAILED_PERMANENT",
                         "INVALID_PAYLOAD",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -932,10 +979,9 @@ def sync_mutations_batch(
                 user_id=user_id,
                 device_id=payload.client_device_id,
             )
-            if normalized.integrity is not None:
+            if normalized.integrity is not None and normalized.integrity.chain_prev_hash is not None:
                 provided_prev = normalized.integrity.chain_prev_hash
                 expected_prev = chain_prev_hash or ""
-                provided_prev = provided_prev or ""
                 if provided_prev != expected_prev:
                     chain_item_hash = _compute_chain_hash(signature_hash, chain_prev_hash)
                     _insert_queue(
@@ -947,7 +993,7 @@ def sync_mutations_batch(
                         entity_id,
                         signature_hash,
                         signature_key_id,
-                        SyncV1MutationResultState("FAILED_PERMANENT"),
+                        "FAILED_PERMANENT",
                         signature_valid,
                         "INVALID_PAYLOAD",
                         "chain_prev_hash_mismatch",
@@ -958,7 +1004,7 @@ def sync_mutations_batch(
                         _build_result(
                             payload=payload,
                             mutation=normalized,
-                            state=SyncV1MutationResultState("FAILED_PERMANENT"),
+                            state="FAILED_PERMANENT",
                             result_code="INVALID_PAYLOAD",
                             received_at=received_at,
                             processing_ms=max(0, _now_ms() - start_ms),
@@ -1014,7 +1060,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         normalized,
-                        SyncV1MutationResultState("FAILED_PERMANENT"),
+                        "FAILED_PERMANENT",
                         "INVALID_PAYLOAD",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -1024,43 +1070,6 @@ def sync_mutations_batch(
                         None,
                         0,
                         True,
-                    )
-                )
-                continue
-
-            # In-batch and persisted-state gating.
-            if account_deleted:
-                state, retry_after_ms, conflict = _conflict_for_code("ACCOUNT_DELETED")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "ACCOUNT_DELETED",
-                    "delete_in_progress",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
-                results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "ACCOUNT_DELETED",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        conflict,
-                        retry_after_ms,
-                        False,
                     )
                 )
                 continue
@@ -1115,7 +1124,7 @@ def sync_mutations_batch(
                     entity_id,
                     signature_hash,
                     signature_key_id,
-                    SyncV1MutationResultState("APPLIED"),
+                    "APPLIED",
                     signature_valid,
                     "OK",
                     None,
@@ -1126,7 +1135,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         normalized,
-                        SyncV1MutationResultState("APPLIED"),
+                        "APPLIED",
                         "OK",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -1189,7 +1198,7 @@ def sync_mutations_batch(
                     entity_id,
                     signature_hash,
                     signature_key_id,
-                    SyncV1MutationResultState("APPLIED"),
+                    "APPLIED",
                     signature_valid,
                     "OK",
                     None,
@@ -1200,7 +1209,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         normalized,
-                        SyncV1MutationResultState("APPLIED"),
+                        "APPLIED",
                         "OK",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -1261,7 +1270,7 @@ def sync_mutations_batch(
                     entity_id,
                     base_hash,
                     signature_key_id,
-                    SyncV1MutationResultState("FAILED_PERMANENT"),
+                    "FAILED_PERMANENT",
                     signature_valid,
                     "INVALID_PAYLOAD",
                     "depends_on_mutation_not_applied",
@@ -1272,7 +1281,7 @@ def sync_mutations_batch(
                     _build_result(
                         payload,
                         normalized,
-                        SyncV1MutationResultState("FAILED_PERMANENT"),
+                        "FAILED_PERMANENT",
                         "INVALID_PAYLOAD",
                         received_at,
                         max(0, _now_ms() - start_ms),
@@ -1376,7 +1385,7 @@ def sync_mutations_batch(
                 entity_id,
                 signature_hash,
                 signature_key_id,
-                SyncV1MutationResultState("APPLIED"),
+                "APPLIED",
                 signature_valid,
                 "OK",
                 None,
@@ -1387,7 +1396,7 @@ def sync_mutations_batch(
                 _build_result(
                     payload,
                     normalized,
-                    SyncV1MutationResultState("APPLIED"),
+                    "APPLIED",
                     "OK",
                     received_at,
                     max(0, _now_ms() - start_ms),

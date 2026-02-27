@@ -4,6 +4,8 @@ import os
 from typing import Any, Dict, Optional
 from uuid import UUID
 
+from psycopg.types.json import Jsonb
+
 from app import sql
 from app.crypto_utils import canonical_json, hmac_signature
 
@@ -79,7 +81,7 @@ def insert_event(
             "actor_type": actor_type,
             "actor_id": actor_id,
             "reason": reason,
-            "metadata_json": metadata,
+            "metadata_json": Jsonb(metadata),
             "event_hash": event_hash,
             "prev_hash": prev_hash,
         },

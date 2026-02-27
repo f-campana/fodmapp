@@ -443,7 +443,7 @@ class SyncV1MutationConflict(BaseModel):
 
 class SyncV1MutationItem(BaseModel):
     mutation_id: Optional[str] = Field(default=None, min_length=1)
-    idempotency_key: Optional[str] = Field(default=None, min_length=1)
+    idempotency_key: Optional[str] = None
     operation_type: Optional[SyncV1MutationType] = None
     entity_type: Optional[str] = None
     entity_id: Optional[str] = None

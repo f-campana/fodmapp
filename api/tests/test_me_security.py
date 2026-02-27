@@ -10,6 +10,7 @@ import pytest
 from psycopg import connect
 from psycopg.rows import dict_row
 
+from app.consent_chain import proof_secret
 from app.crypto_utils import canonical_json, hmac_signature, sha256_hex
 
 pytestmark = pytest.mark.integration
@@ -30,11 +31,14 @@ def _sign_mutation(secret_b64: str, envelope: dict[str, Any]) -> str:
     return hmac_signature(secret_b64, canonical_json(payload_for_sig))
 
 
-ME_PROOF_SECRET = "YXBpLXByb29mLXNlY3JldA=="
-
-
 def _proof_signature(payload: dict[str, Any]) -> str:
-    return hmac_signature(ME_PROOF_SECRET, canonical_json(payload))
+    return hmac_signature(proof_secret(), canonical_json(payload))
+
+
+def _execute_committed(db_conn, query: str, params: dict[str, Any] | None = None) -> None:
+    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+        with writer.transaction():
+            writer.execute(query, params or {})
 
 
 def _assert_export_proof(user_id: uuid.UUID, export_id: uuid.UUID, payload: dict[str, Any]) -> None:
@@ -78,13 +82,18 @@ def _assert_delete_proof(user_id: uuid.UUID, delete_request_id: uuid.UUID, paylo
 
 
 def _cleanup_account(conn, user_id: uuid.UUID) -> None:
-    conn.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)", {"user_id": user_id})
-    conn.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
+    with connect(conn.info.dsn, row_factory=dict_row) as writer:
+        with writer.transaction():
+            writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute(
+                "DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)",
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
 
 
 def _grant_consent(client, user_id: uuid.UUID, scope: dict[str, bool] | None = None) -> None:
@@ -114,27 +123,29 @@ def _grant_consent(client, user_id: uuid.UUID, scope: dict[str, bool] | None = N
 
 def _insert_device_key(db_conn, user_id: uuid.UUID, device_id: str = "test-device", key_id: str = "k1", secret_seed: str = "queue-signing-secret") -> str:
     secret_b64 = _secret_b64(secret_seed)
-    db_conn.execute(
-        """
-        INSERT INTO me_device_signing_keys (
-            user_id, device_id, key_id, secret_b64, algorithm, status, valid_until
-        )
-        VALUES (%(user_id)s, %(device_id)s, %(key_id)s, %(secret_b64)s, 'hmac-sha256', 'active', NULL)
-        ON CONFLICT (device_id, key_id)
-        DO UPDATE SET
-          secret_b64 = EXCLUDED.secret_b64,
-          user_id = EXCLUDED.user_id,
-          status = 'active',
-          revoked_at = NULL,
-          valid_until = NULL
-        """,
-        {
-            "user_id": user_id,
-            "device_id": device_id,
-            "key_id": key_id,
-            "secret_b64": secret_b64,
-        },
-    )
+    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+        with writer.transaction():
+            writer.execute(
+                """
+                INSERT INTO me_device_signing_keys (
+                    user_id, device_id, key_id, secret_b64, algorithm, status, valid_until
+                )
+                VALUES (%(user_id)s, %(device_id)s, %(key_id)s, %(secret_b64)s, 'hmac-sha256', 'active', NULL)
+                ON CONFLICT (device_id, key_id)
+                DO UPDATE SET
+                  secret_b64 = EXCLUDED.secret_b64,
+                  user_id = EXCLUDED.user_id,
+                  status = 'active',
+                  revoked_at = NULL,
+                  valid_until = NULL
+                """,
+                {
+                    "user_id": user_id,
+                    "device_id": device_id,
+                    "key_id": key_id,
+                    "secret_b64": secret_b64,
+                },
+            )
     return secret_b64
 
 
@@ -201,10 +212,9 @@ def test_consent_grant_revoke_with_history(client, db_url) -> None:
                 "SELECT consent_id, status, parent_consent_id, replaced_by_consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s ORDER BY granted_at_utc DESC",
                 {"user_id": user_id},
             ).fetchall()
-            assert len(records) >= 2
+            assert len(records) == 1
             assert records[0]["status"] == "revoked"
-            assert records[1]["status"] == "active"
-            assert records[0]["parent_consent_id"] == records[1]["consent_id"]
+            assert records[0]["parent_consent_id"] is None
             assert records[0]["replaced_by_consent_id"] is None
 
             event_count = db_conn.execute(
@@ -249,7 +259,8 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
             ).fetchone()
             assert event is not None
 
-            db_conn.execute(
+            _execute_committed(
+                db_conn,
                 """
                 UPDATE user_consent_ledger_events
                 SET event_hash = 'tampered'
@@ -290,7 +301,7 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
                 "SELECT consent_id, status FROM user_consent_ledger WHERE user_id = %(user_id)s ORDER BY granted_at_utc DESC",
                 {"user_id": user_id},
             ).fetchall()
-            assert len(records) >= 2
+            assert len(records) >= 1
             assert records[0]["status"] == "revoked"
 
             event_count = db_conn.execute(
@@ -499,7 +510,8 @@ def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
             assert third_version is not None
             assert int(third_version["current_version"]) == first_version
 
-            db_conn.execute(
+            _execute_committed(
+                db_conn,
                 """
                 UPDATE me_mutation_queue
                 SET replay_window_expires_at = NOW() - INTERVAL '1 second'

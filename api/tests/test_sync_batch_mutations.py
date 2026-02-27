@@ -19,16 +19,18 @@ def _seed_secret(seed: str) -> str:
 
 
 def _cleanup_account(conn, user_id: uuid.UUID) -> None:
-    conn.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
-    conn.execute(
-        "DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)",
-        {"user_id": user_id},
-    )
-    conn.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
+    with connect(conn.info.dsn, row_factory=dict_row) as writer:
+        with writer.transaction():
+            writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute(
+                "DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)",
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
 
 
 def _grant_sync_scope_consent(client, user_id: uuid.UUID) -> None:
@@ -57,28 +59,30 @@ def _grant_sync_scope_consent(client, user_id: uuid.UUID) -> None:
 
 def _insert_device_key(db_conn, user_id: uuid.UUID, device_id: str, key_id: str = "k1", seed: str = "queue-signing-secret") -> str:
     secret_b64 = _seed_secret(seed)
-    db_conn.execute(
-        """
-        INSERT INTO me_device_signing_keys (
-            user_id, device_id, key_id, secret_b64, algorithm, status, valid_until
-        ) VALUES (
-            %(user_id)s, %(device_id)s, %(key_id)s, %(secret_b64)s, 'hmac-sha256', 'active', NULL
-        )
-        ON CONFLICT (device_id, key_id)
-        DO UPDATE SET
-          secret_b64 = EXCLUDED.secret_b64,
-          user_id = EXCLUDED.user_id,
-          status = 'active',
-          revoked_at = NULL,
-          valid_until = NULL
-        """,
-        {
-            "user_id": user_id,
-            "device_id": device_id,
-            "key_id": key_id,
-            "secret_b64": secret_b64,
-        },
-    )
+    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+        with writer.transaction():
+            writer.execute(
+                """
+                INSERT INTO me_device_signing_keys (
+                    user_id, device_id, key_id, secret_b64, algorithm, status, valid_until
+                ) VALUES (
+                    %(user_id)s, %(device_id)s, %(key_id)s, %(secret_b64)s, 'hmac-sha256', 'active', NULL
+                )
+                ON CONFLICT (device_id, key_id)
+                DO UPDATE SET
+                  secret_b64 = EXCLUDED.secret_b64,
+                  user_id = EXCLUDED.user_id,
+                  status = 'active',
+                  revoked_at = NULL,
+                  valid_until = NULL
+                """,
+                {
+                    "user_id": user_id,
+                    "device_id": device_id,
+                    "key_id": key_id,
+                    "secret_b64": secret_b64,
+                },
+            )
     return secret_b64
 
 
@@ -101,12 +105,15 @@ def _mutation_signature_payload(item: dict[str, Any]) -> dict[str, Any]:
 def _sign_mutation_item(secret_b64: str, item: dict[str, Any]) -> None:
     payload = _mutation_signature_payload(item)
     payload_hash = sha256_hex(canonical_json(payload))
+    existing_integrity = item.get("integrity") or {}
     item["integrity"] = {
         "payload_hash": payload_hash,
         "signature_algo": "hmac-sha256",
         "signature": hmac_signature(secret_b64, canonical_json(payload)),
         "signature_version": 1,
     }
+    if "chain_prev_hash" in existing_integrity:
+        item["integrity"]["chain_prev_hash"] = existing_integrity.get("chain_prev_hash")
 
 
 def _build_mutation_item(
