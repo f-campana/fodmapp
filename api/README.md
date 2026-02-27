@@ -51,6 +51,15 @@ CIQUAL inputs are downloaded from official public endpoints and validated by SHA
 
 If checksums drift, CI fails fast before seeding.
 
+Local CI parity command from repository root:
+
+```bash
+./.github/scripts/ci-api-pr.sh
+```
+
+Defaults assume local Postgres is available at
+`postgresql://postgres:postgres@localhost:5432/fodmap_api_ci`.
+
 ## OpenAPI
 
 Canonical v0 review contract is committed at:

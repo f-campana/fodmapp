@@ -4,9 +4,12 @@
 
 ## Validation
 
-- [ ] Quality gate executed locally
+- [ ] `./.github/scripts/quality-gate.sh --full` executed locally
 - [ ] `pnpm lint:ci` (including warnings as failures)
 - [ ] `pnpm lint:llm` for agent-generated code paths (if applicable), with findings fixed before merge
+- [ ] `pnpm python:ci` for Python path changes
+- [ ] `pnpm --filter @fodmap/types openapi:check` for OpenAPI contract changes
+- [ ] `./.github/scripts/ci-api-pr.sh` for DB-auth-sensitive API test/helper changes
 - [ ] No secrets introduced
 
 ## Contract Impact
