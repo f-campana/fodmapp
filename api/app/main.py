@@ -10,6 +10,8 @@ from app.errors import register_error_handlers
 from app.routers.foods import router as foods_router
 from app.routers.health import router as health_router
 from app.routers.swaps import router as swaps_router
+from app.routers.me import router as me_router
+from app.routers.sync import router as sync_router
 
 
 def create_app() -> FastAPI:
@@ -41,6 +43,8 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(foods_router)
     app.include_router(swaps_router)
+    app.include_router(me_router)
+    app.include_router(sync_router)
 
     return app
 

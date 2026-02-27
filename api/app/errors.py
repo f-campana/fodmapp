@@ -26,6 +26,34 @@ def service_unavailable(message: str = "Database unavailable") -> ApiError:
     return ApiError(code="service_unavailable", message=message, status_code=503)
 
 
+def unauthorized(message: str = "Unauthorized") -> ApiError:
+    return ApiError(code="unauthorized", message=message, status_code=401)
+
+
+def conflict(message: str = "Conflict") -> ApiError:
+    return ApiError(code="conflict", message=message, status_code=409)
+
+
+def precondition_failed(message: str = "Precondition failed") -> ApiError:
+    return ApiError(code="precondition_failed", message=message, status_code=412)
+
+
+def locked(message: str = "Locked") -> ApiError:
+    return ApiError(code="locked", message=message, status_code=423)
+
+
+def too_many_requests(message: str = "Too many requests") -> ApiError:
+    return ApiError(code="too_many_requests", message=message, status_code=429)
+
+
+def bad_request(message: str = "Bad request") -> ApiError:
+    return ApiError(code="bad_request", message=message, status_code=400)
+
+
+def request_not_readable(message: str = "Request could not be read") -> ApiError:
+    return ApiError(code="request_unreadable", message=message, status_code=422)
+
+
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def handle_api_error(_request: Request, exc: ApiError) -> JSONResponse:
