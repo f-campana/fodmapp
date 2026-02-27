@@ -11,7 +11,8 @@ from psycopg.types.json import Jsonb
 
 from app import sql
 from app.config import get_settings
-from app.consent_chain import insert_event as insert_consent_event, proof_payload_signature
+from app.consent_chain import insert_event as insert_consent_event
+from app.consent_chain import proof_payload_signature
 from app.crypto_utils import canonical_json, hmac_verify, sha256_hex
 from app.db import Database
 from app.errors import bad_request
@@ -56,8 +57,7 @@ def _decorate_legacy_sync_headers(response: Response) -> None:
         {
             "Deprecation": "true",
             "Warning": (
-                '299 - "Compatibility-only endpoint: '
-                "/v0/sync/mutations is deprecated; use /v0/sync/mutations:batch"
+                '299 - "Compatibility-only endpoint: /v0/sync/mutations is deprecated; use /v0/sync/mutations:batch'
             ),
             "Link": '</v0/sync/mutations:batch>; rel="successor-version"; '
             'title="Batch mutations endpoint required for new clients"',
@@ -416,7 +416,10 @@ def _is_account_deleted(conn, user_id: UUID) -> bool:
     return row is not None
 
 
-def _evaluate_swap_rule(conn, mutation: SyncV1MutationItem) -> tuple[Optional[dict[str, Any]], Optional[SyncV1ConflictCode]]:
+def _evaluate_swap_rule(
+    conn,
+    mutation: SyncV1MutationItem,
+) -> tuple[Optional[dict[str, Any]], Optional[SyncV1ConflictCode]]:
     payload = mutation.payload
     from_slug = payload.get("from_food_slug") or payload.get("from")
     to_slug = payload.get("to_food_slug") or payload.get("to")
@@ -456,6 +459,18 @@ def _evaluate_swap_rule(conn, mutation: SyncV1MutationItem) -> tuple[Optional[di
     return rule, None
 
 
+def _rule_float(rule: Optional[dict[str, Any]], key: str) -> Optional[float]:
+    if rule is None or rule.get(key) is None:
+        return None
+    return float(rule[key])
+
+
+def _rule_str(rule: Optional[dict[str, Any]], key: str) -> Optional[str]:
+    if rule is None or rule.get(key) is None:
+        return None
+    return str(rule[key])
+
+
 def _conflict_for_code(
     code: SyncV1ConflictCode,
     rule: Optional[dict[str, Any]] = None,
@@ -485,12 +500,12 @@ def _conflict_for_code(
                 retryable=False,
                 is_resolvable_client_side=False,
                 recovery=SyncV1MutationRecovery(action="SHOW_REPLACEMENT"),
-                fodmap_safety_score_snapshot=float(rule["fodmap_safety_score"]) if rule and rule.get("fodmap_safety_score") is not None else None,
-                scoring_version_snapshot=str(rule["scoring_version"]) if rule and rule.get("scoring_version") is not None else None,
+                fodmap_safety_score_snapshot=_rule_float(rule, "fodmap_safety_score"),
+                scoring_version_snapshot=_rule_str(rule, "scoring_version"),
                 from_food_slug=rule.get("from_food_slug") if rule else None,
                 to_food_slug=rule.get("to_food_slug") if rule else None,
                 to_overall_level=rule.get("to_overall_level") if rule else None,
-                coverage_ratio=float(rule["coverage_ratio"]) if rule and rule.get("coverage_ratio") is not None else None,
+                coverage_ratio=_rule_float(rule, "coverage_ratio"),
             ),
         )
 
@@ -570,12 +585,12 @@ def _conflict_for_code(
             retryable=False,
             is_resolvable_client_side=True,
             recovery=SyncV1MutationRecovery(action="SHOW_REPLACEMENT"),
-            fodmap_safety_score_snapshot=float(rule["fodmap_safety_score"]) if rule and rule.get("fodmap_safety_score") is not None else None,
-            scoring_version_snapshot=str(rule["scoring_version"]) if rule and rule.get("scoring_version") is not None else None,
+            fodmap_safety_score_snapshot=_rule_float(rule, "fodmap_safety_score"),
+            scoring_version_snapshot=_rule_str(rule, "scoring_version"),
             from_food_slug=rule.get("from_food_slug") if rule else None,
             to_food_slug=rule.get("to_food_slug") if rule else None,
             to_overall_level=rule.get("to_overall_level") if rule else None,
-            coverage_ratio=float(rule["coverage_ratio"]) if rule and rule.get("coverage_ratio") is not None else None,
+            coverage_ratio=_rule_float(rule, "coverage_ratio"),
         ),
     )
 
@@ -716,14 +731,16 @@ def _mark_account_deleted(conn, user_id: UUID) -> None:
             "status": "processing",
             "soft_delete_window_days": 0,
             "hard_delete": True,
-            "summary": _jsonb({
-                "symptom_logs_deleted": 0,
-                "diet_logs_deleted": 0,
-                "swap_history_deleted": 0,
-                "queue_items_dropped": 0,
-                "consent_records_touched": 0,
-                "exports_invalidated": 0,
-            }),
+            "summary": _jsonb(
+                {
+                    "symptom_logs_deleted": 0,
+                    "diet_logs_deleted": 0,
+                    "swap_history_deleted": 0,
+                    "queue_items_dropped": 0,
+                    "consent_records_touched": 0,
+                    "exports_invalidated": 0,
+                }
+            ),
         },
     ).fetchone()
     if insert_row is None:
@@ -848,7 +865,7 @@ def sync_mutations_batch(
 
             try:
                 normalized = _normalize_mutation(mutation, payload.migration_mode)
-            except Exception as exc:
+            except Exception:
                 fallback_mutation = mutation.model_copy(
                     update={
                         "mutation_id": mutation.mutation_id or str(uuid4()),
@@ -1412,11 +1429,7 @@ def sync_mutations_batch(
 
         failed_payload_count = len([item for item in results if item.result_code == "INVALID_PAYLOAD"])
         failed_permanent_count = len(
-            [
-                item
-                for item in results
-                if item.result_code == "INVALID_PAYLOAD" and item.status == "FAILED_PERMANENT"
-            ]
+            [item for item in results if item.result_code == "INVALID_PAYLOAD" and item.status == "FAILED_PERMANENT"]
         )
 
         if legacy_mutation_count > 0:

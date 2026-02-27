@@ -18,8 +18,8 @@ def _seed_secret(seed: str) -> str:
     return base64.urlsafe_b64encode(seed.encode("utf-8")).decode("ascii")
 
 
-def _cleanup_account(conn, user_id: uuid.UUID) -> None:
-    with connect(conn.info.dsn, row_factory=dict_row) as writer:
+def _cleanup_account(db_url: str, user_id: uuid.UUID) -> None:
+    with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
             writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -27,7 +27,14 @@ def _cleanup_account(conn, user_id: uuid.UUID) -> None:
             writer.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute(
-                "DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)",
+                """
+                DELETE FROM user_consent_ledger_events
+                WHERE consent_id IN (
+                    SELECT consent_id
+                    FROM user_consent_ledger
+                    WHERE user_id = %(user_id)s
+                )
+                """,
                 {"user_id": user_id},
             )
             writer.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -57,9 +64,15 @@ def _grant_sync_scope_consent(client, user_id: uuid.UUID) -> None:
     assert response.status_code == 200
 
 
-def _insert_device_key(db_conn, user_id: uuid.UUID, device_id: str, key_id: str = "k1", seed: str = "queue-signing-secret") -> str:
+def _insert_device_key(
+    db_url: str,
+    user_id: uuid.UUID,
+    device_id: str,
+    key_id: str = "k1",
+    seed: str = "queue-signing-secret",
+) -> str:
     secret_b64 = _seed_secret(seed)
-    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+    with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
             writer.execute(
                 """
@@ -175,9 +188,9 @@ def test_sync_batch_withdraw_consent_cancels_following_mutations(client, db_url)
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_sync_scope_consent(client, user_id)
-            secret = _insert_device_key(db_conn, user_id, device_id=device_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id)
 
             symptom_id = str(uuid.uuid4())
             item_withdraw_after = _build_mutation_item(
@@ -241,7 +254,7 @@ def test_sync_batch_withdraw_consent_cancels_following_mutations(client, db_url)
             assert row["status"] == "rejected"
             assert row["error_code"] == "CONSENT_REVOKED"
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_sync_batch_delete_account_cancels_following_and_future_mutations(client, db_url) -> None:
@@ -250,9 +263,9 @@ def test_sync_batch_delete_account_cancels_following_and_future_mutations(client
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_sync_scope_consent(client, user_id)
-            secret = _insert_device_key(db_conn, user_id, device_id=device_id, key_id="k2", seed="queue-delete")
+            secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id="k2", seed="queue-delete")
 
             symptom_id = str(uuid.uuid4())
             item_apply = _build_mutation_item(
@@ -318,7 +331,7 @@ def test_sync_batch_delete_account_cancels_following_and_future_mutations(client
             assert [item["status"] for item in second_payload["items"]] == ["CANCELLED_BY_DELETE"]
             assert second_payload["items"][0]["result_code"] == "ACCOUNT_DELETED"
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_sync_batch_legacy_migration_accepts_unsigned_without_idempotency(client, db_url) -> None:
@@ -327,9 +340,9 @@ def test_sync_batch_legacy_migration_accepts_unsigned_without_idempotency(client
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_sync_scope_consent(client, user_id)
-            _insert_device_key(db_conn, user_id, device_id=device_id, key_id="k3", seed="legacy-migration")
+            _insert_device_key(db_url, user_id, device_id=device_id, key_id="k3", seed="legacy-migration")
 
             mutation_id = str(uuid.uuid4())
             legacy_item = _build_mutation_item(
@@ -393,7 +406,7 @@ def test_sync_batch_legacy_migration_accepts_unsigned_without_idempotency(client
             assert conflict_payload["items"][0]["status"] == "FAILED_PERMANENT"
             assert conflict_payload["items"][0]["result_code"] == "INVALID_PAYLOAD"
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_sync_batch_chain_prev_hash_required_and_tamper_detected(client, db_url) -> None:
@@ -402,9 +415,9 @@ def test_sync_batch_chain_prev_hash_required_and_tamper_detected(client, db_url)
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_sync_scope_consent(client, user_id)
-            secret = _insert_device_key(db_conn, user_id, device_id=device_id, key_id="k4", seed="chain-integrity")
+            secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id="k4", seed="chain-integrity")
 
             first_entity_id = str(uuid.uuid4())
             first_item = _build_mutation_item(
@@ -490,4 +503,4 @@ def test_sync_batch_chain_prev_hash_required_and_tamper_detected(client, db_url)
             assert tamper_payload["items"][0]["status"] == "FAILED_PERMANENT"
             assert tamper_payload["items"][0]["result_code"] == "INVALID_PAYLOAD"
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)

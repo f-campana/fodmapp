@@ -140,6 +140,130 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/me/consent": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get latest consent record with history */
+    get: operations["getMeConsent"];
+    put?: never;
+    /** Grant, update, or revoke consent */
+    post: operations["postMeConsent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/export": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Request data export package */
+    post: operations["requestMeExport"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/export/{export_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Poll export status */
+    get: operations["getMeExport"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/delete": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Request data delete/purge */
+    post: operations["requestMeDelete"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/delete/{delete_request_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Poll delete status */
+    get: operations["getMeDelete"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/sync/mutations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Push offline mutation envelope(s) (compatibility-only legacy API)
+     * @deprecated
+     * @description Compatibility-only endpoint retained for legacy clients. New implementations must call `/v0/sync/mutations:batch` with signed envelopes and replay-window enforcement.
+     */
+    post: operations["postSyncMutations"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/sync/mutations:batch": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Push signed mutation batch with deterministic conflict codes */
+    post: operations["postSyncMutationsBatch"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -277,6 +401,477 @@ export interface components {
       items: components["schemas"]["SwapItem"][];
       total: number;
     };
+    /** @enum {string} */
+    ConsentStatus:
+      | "active"
+      | "revoked"
+      | "expired"
+      | "superseded"
+      | "invalidated";
+    ConsentState: {
+      active: boolean;
+      /** Format: uuid */
+      consent_id: string;
+      policy_version: string;
+      /** @enum {string} */
+      legal_basis:
+        | "consent"
+        | "contract"
+        | "legal_obligation"
+        | "vital_interests"
+        | "public_interest"
+        | "legitimate_interests";
+      scope: {
+        [key: string]: boolean;
+      };
+      /** @enum {string} */
+      method:
+        | "explicit_checkbox"
+        | "oauth_consent"
+        | "in_app_sheet"
+        | "api_admin"
+        | "offline_cache_reconsent";
+      /** @enum {string} */
+      source: "mobile_app" | "web_fallback" | "support" | "api_internal";
+      /** Format: date-time */
+      revoked_at_utc?: string | null;
+      revocation_reason?: string | null;
+      /** Format: date-time */
+      granted_at_utc: string;
+      status: components["schemas"]["ConsentStatus"];
+    };
+    ConsentHistoryEntry: {
+      event: string;
+      /** Format: date-time */
+      at_utc: string;
+      policy_version?: string | null;
+      source?: string | null;
+      reason?: string | null;
+    };
+    ConsentGetResponse: {
+      /** Format: uuid */
+      user_id: string;
+      consent_state: components["schemas"]["ConsentState"];
+      history: components["schemas"]["ConsentHistoryEntry"][];
+    };
+    ConsentPostRequest: {
+      policy_version: string;
+      /** @enum {string} */
+      action: "grant" | "revoke" | "update";
+      scope: {
+        [key: string]: boolean;
+      };
+      /**
+       * @default consent
+       * @enum {string}
+       */
+      legal_basis:
+        | "consent"
+        | "contract"
+        | "legal_obligation"
+        | "vital_interests"
+        | "public_interest"
+        | "legitimate_interests";
+      /**
+       * @default in_app_sheet
+       * @enum {string}
+       */
+      method:
+        | "explicit_checkbox"
+        | "oauth_consent"
+        | "in_app_sheet"
+        | "api_admin"
+        | "offline_cache_reconsent";
+      /**
+       * @default mobile_app
+       * @enum {string}
+       */
+      source: "mobile_app" | "web_fallback" | "support" | "api_internal";
+      source_ref?: string | null;
+      /** @default fr-FR */
+      language: string;
+      reason?: string | null;
+      signature?: string | null;
+      signature_payload?: string | null;
+      public_key_id?: string | null;
+    };
+    ConsentPostResponse: {
+      /** Format: uuid */
+      consent_id: string;
+      status: components["schemas"]["ConsentStatus"];
+      policy_version: string;
+      /** @enum {string} */
+      legal_basis:
+        | "consent"
+        | "contract"
+        | "legal_obligation"
+        | "vital_interests"
+        | "public_interest"
+        | "legitimate_interests";
+      /** Format: date-time */
+      effective_at_utc: string;
+      /** Format: uuid */
+      previous_consent_id?: string | null;
+      evidence_uri?: string | null;
+      evidence_hash: string;
+      history: components["schemas"]["ConsentHistoryEntry"][];
+    };
+    Receipt: {
+      /** Format: uuid */
+      receipt_id: string;
+      /** Format: date-time */
+      issued_at_utc: string;
+      actor: string;
+      policy_version?: string | null;
+      manifest_hash: string;
+      proof_signature?: string | null;
+    };
+    ExportRequest: {
+      /** @enum {string} */
+      format: "json" | "ndjson";
+      /** Format: date-time */
+      from_ts_utc?: string | null;
+      /** Format: date-time */
+      to_ts_utc?: string | null;
+      include?: string[];
+      /** @default true */
+      anonymize: boolean;
+      idempotency_key?: string | null;
+    };
+    ExportAcceptedResponse: {
+      /** Format: uuid */
+      export_id: string;
+      /** @enum {string} */
+      status:
+        | "accepted"
+        | "queued"
+        | "processing"
+        | "ready"
+        | "ready_with_redactions"
+        | "failed";
+      /** Format: date-time */
+      requested_at_utc: string;
+      /** Format: date-time */
+      expiry_at_utc: string;
+      idempotency_key?: string | null;
+      status_uri: string;
+    };
+    ExportPollResponse: {
+      /** Format: uuid */
+      export_id: string;
+      idempotency_key?: string | null;
+      status: string;
+      /** Format: date-time */
+      completed_at_utc?: string | null;
+      scope: {
+        [key: string]: unknown;
+      };
+      rows_by_domain: {
+        [key: string]: number;
+      };
+      redactions: string[];
+      download_url?: string | null;
+      manifest: {
+        [key: string]: unknown;
+      };
+      proof?: components["schemas"]["Receipt"];
+      failure?: {
+        [key: string]: string;
+      } | null;
+    };
+    DeleteRequest: {
+      /** @enum {string} */
+      scope: "all" | "symptoms_only" | "diet_only" | "analytics_only";
+      soft_delete_window_days?: number;
+      /** @default true */
+      hard_delete: boolean;
+      confirm_text: string;
+      reason?: string | null;
+      client_nonce?: string | null;
+      idempotency_key?: string | null;
+    };
+    DeleteSummary: {
+      consent_records_touched?: number;
+      symptom_logs_deleted?: number;
+      diet_logs_deleted?: number;
+      swap_history_deleted?: number;
+      queue_items_dropped?: number;
+      exports_invalidated?: number;
+    };
+    DeleteAcceptedResponse: {
+      /** Format: uuid */
+      delete_request_id: string;
+      /** @enum {string} */
+      status:
+        | "accepted"
+        | "queued"
+        | "processing"
+        | "completed"
+        | "partial"
+        | "failed";
+      /** Format: date-time */
+      requested_at_utc: string;
+      /** @enum {string} */
+      scope: "all" | "symptoms_only" | "diet_only" | "analytics_only";
+      idempotency_key?: string | null;
+      local_effective_ttl_seconds: number;
+      /** Format: date-time */
+      server_effective_at_utc: string;
+      proof_uri?: string | null;
+      status_uri: string;
+    };
+    RetainedArtifact: {
+      type: string;
+      reason: string;
+      /** Format: date-time */
+      retention_until_utc: string;
+    };
+    DeletePollResponse: {
+      /** Format: uuid */
+      delete_request_id: string;
+      /** @enum {string} */
+      status:
+        | "accepted"
+        | "queued"
+        | "processing"
+        | "completed"
+        | "partial"
+        | "failed";
+      idempotency_key?: string | null;
+      /** Format: date-time */
+      completed_at_utc?: string | null;
+      summary: components["schemas"]["DeleteSummary"];
+      proof?: components["schemas"]["Receipt"];
+      failure?: {
+        [key: string]: string;
+      } | null;
+      retained_artifacts?: components["schemas"]["RetainedArtifact"][];
+    };
+    MutationEnvelope: {
+      /** Format: uuid */
+      queue_item_id: string;
+      idempotency_key: string;
+      device_id: string;
+      app_install_id: string;
+      op: string;
+      entity_type: string;
+      entity_id?: string | null;
+      client_seq: number;
+      base_version?: number | null;
+      attempt?: number;
+      ttl_seconds: number;
+      /** Format: date-time */
+      created_at_utc: string;
+      payload: {
+        [key: string]: unknown;
+      };
+      aad?: {
+        [key: string]: unknown;
+      };
+      signature: string;
+      signature_kid: string;
+      /** @default hmac-sha256 */
+      signature_algorithm: string;
+      ciphertext?: string | null;
+      nonce?: string | null;
+      tag?: string | null;
+    };
+    MutationResult: {
+      /** Format: uuid */
+      queue_item_id: string;
+      idempotency_key: string;
+      /** @enum {string} */
+      status:
+        | "accepted"
+        | "duplicate"
+        | "conflict"
+        | "replayed"
+        | "rejected"
+        | "error";
+      mutation_status: string;
+      entity_version?: number | null;
+      error_code?: string | null;
+    };
+    SyncMutationRequest: {
+      items: components["schemas"]["MutationEnvelope"][];
+    };
+    SyncMutationResponse: {
+      processed: number;
+      accepted: number;
+      duplicates: number;
+      results: components["schemas"]["MutationResult"][];
+    };
+    SyncV1MutationSource: {
+      /** @enum {string} */
+      platform: "ios" | "android" | "web";
+      screen: string;
+      /** @enum {string} */
+      actor: "user" | "background_replay" | "system";
+      app_build?: string | null;
+    };
+    SyncV1MutationIntegrity: {
+      payload_hash: string;
+      chain_prev_hash?: string | null;
+      /**
+       * @default hmac-sha256
+       * @enum {string}
+       */
+      signature_algo: "hmac-sha256";
+      signature: string;
+      signature_version: number;
+    };
+    SyncV1MutationRecovery: {
+      /** @enum {string} */
+      action:
+        | "SHOW_REPLACEMENT"
+        | "KEEP_REMOTE"
+        | "MANUAL_RETRY"
+        | "OPEN_SETTINGS"
+        | "NONE";
+      replacement_rule_id?: string | null;
+      note?: string | null;
+    };
+    SyncV1MutationConflict: {
+      /** @enum {string} */
+      code:
+        | "RULE_INACTIVE"
+        | "RULE_SCORE_BELOW_THRESHOLD"
+        | "ENDPOINT_UNKNOWN"
+        | "RANK2_BLOCKED"
+        | "VERSION_CONFLICT"
+        | "CONSENT_REVOKED"
+        | "ACCOUNT_DELETED";
+      message_key: string;
+      /** @default false */
+      retryable: boolean;
+      /** @default false */
+      is_resolvable_client_side: boolean;
+      recovery: components["schemas"]["SyncV1MutationRecovery"];
+      fodmap_safety_score_snapshot?: number | null;
+      scoring_version_snapshot?: string | null;
+      from_food_slug?: string | null;
+      to_food_slug?: string | null;
+      to_overall_level?: components["schemas"]["FoodLevel"];
+      coverage_ratio?: number | null;
+    };
+    SyncV1MutationObservability: {
+      event_id: string;
+      request_id: string;
+      payload_hash: string;
+      processing_ms: number;
+      /** @default false */
+      signature_valid: boolean;
+      /** Format: date-time */
+      server_received_at_utc: string;
+      /** @default false */
+      dedupe_hit: boolean;
+      /** @default 0 */
+      retry_attempt: number;
+    };
+    SyncV1MutationItem: {
+      /** Format: uuid */
+      mutation_id: string;
+      idempotency_key: string;
+      /** @enum {string} */
+      operation_type:
+        | "SYMPTOM_CREATE"
+        | "SYMPTOM_UPDATE"
+        | "SYMPTOM_DELETE"
+        | "PREF_SET"
+        | "PREF_DELETE"
+        | "SWAP_APPLY"
+        | "SWAP_REVERT"
+        | "WITHDRAW_CONSENT"
+        | "DELETE_ACCOUNT";
+      entity_type?: string | null;
+      entity_id?: string | null;
+      base_version?: number | null;
+      client_seq: number;
+      /** Format: date-time */
+      client_created_at: string;
+      payload: {
+        [key: string]: unknown;
+      };
+      /** Format: uuid */
+      depends_on_mutation_id?: string | null;
+      source?: components["schemas"]["SyncV1MutationSource"];
+      conflict_marker?: {
+        [key: string]: unknown;
+      } | null;
+      integrity: components["schemas"]["SyncV1MutationIntegrity"];
+      mutation_id_legacy?: string;
+      /** @enum {string} */
+      operation_legacy?:
+        | "SYMPTOM_CREATE"
+        | "SYMPTOM_UPDATE"
+        | "SYMPTOM_DELETE"
+        | "PREF_SET"
+        | "PREF_DELETE"
+        | "SWAP_APPLY"
+        | "SWAP_REVERT"
+        | "WITHDRAW_CONSENT"
+        | "DELETE_ACCOUNT";
+      legacy_source?: {
+        [key: string]: unknown;
+      };
+    };
+    SyncV1MutationResult: {
+      /** Format: uuid */
+      mutation_id: string;
+      idempotency_key: string;
+      /** @enum {string} */
+      status:
+        | "APPLIED"
+        | "DUPLICATE"
+        | "CONFLICT"
+        | "RETRY_WAIT"
+        | "FAILED_PERMANENT"
+        | "CANCELLED_BY_CONSENT"
+        | "CANCELLED_BY_DELETE";
+      /** @enum {string} */
+      result_code:
+        | "OK"
+        | "DUPLICATE"
+        | "RULE_INACTIVE"
+        | "RULE_SCORE_BELOW_THRESHOLD"
+        | "ENDPOINT_UNKNOWN"
+        | "RANK2_BLOCKED"
+        | "VERSION_CONFLICT"
+        | "CONSENT_REVOKED"
+        | "ACCOUNT_DELETED"
+        | "INVALID_PAYLOAD"
+        | "INTERNAL_ERROR";
+      retry_after_ms?: number;
+      /** @default true */
+      attempted: boolean;
+      applied_version?: number | null;
+      conflict?: components["schemas"]["SyncV1MutationConflict"];
+      observability: components["schemas"]["SyncV1MutationObservability"];
+      /** Format: date-time */
+      server_received_at_utc: string;
+    };
+    SyncV1MutationBatchRequest: {
+      /** @default 1 */
+      schema_version: number;
+      batch_id: string;
+      client_device_id: string;
+      sync_session_id: string;
+      /** Format: date-time */
+      client_time_utc: string;
+      /** Format: uuid */
+      user_id: string;
+      items: components["schemas"]["SyncV1MutationItem"][];
+      /** @default false */
+      migration_mode: boolean;
+    };
+    SyncV1MutationBatchResponse: {
+      batch_id: string;
+      schema_version: number;
+      /** Format: date-time */
+      received_at_utc: string;
+      server_batch_seq: number;
+      items: components["schemas"]["SyncV1MutationResult"][];
+    };
   };
   responses: {
     /** @description Resource not found */
@@ -290,6 +885,13 @@ export interface components {
     };
   };
   parameters: {
+    /** @description Account or user identifier. */
+    MeUserIdHeader: string;
+    /** @description Opaque device identifier required for signing lookup. */
+    MeDeviceIdHeader: string;
+    /** @description Actor UUID when changes are performed by support automation. */
+    MeActorIdHeader: string;
+    SyncDeviceIdHeader: string;
     /** @description Stable unique food slug (`foods.food_slug`). */
     FoodSlugPath: string;
     /** @description Case-insensitive food search string. */
@@ -483,6 +1085,345 @@ export interface operations {
         };
       };
       404: components["responses"]["NotFound"];
+    };
+  };
+  getMeConsent: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Consent state */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ConsentGetResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  postMeConsent: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+        /** @description Opaque device identifier required for signing lookup. */
+        "X-Device-Id"?: components["parameters"]["MeDeviceIdHeader"];
+        /** @description Actor UUID when changes are performed by support automation. */
+        "X-Actor-Id"?: components["parameters"]["MeActorIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConsentPostRequest"];
+      };
+    };
+    responses: {
+      /** @description Consent updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ConsentPostResponse"];
+        };
+      };
+      /** @description Invalid payload or missing required request field */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Consent update conflicts with delete hold or signature mismatch */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  requestMeExport: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExportRequest"];
+      };
+    };
+    responses: {
+      /** @description Accepted for async export processing */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExportAcceptedResponse"];
+        };
+      };
+      /** @description Invalid request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+      /** @description Request is rejected due consent or legal restriction */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  getMeExport: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        export_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Export status */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ExportPollResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Export no longer available */
+      410: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  requestMeDelete: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeleteRequest"];
+      };
+    };
+    responses: {
+      /** @description Accepted for async purge */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteAcceptedResponse"];
+        };
+      };
+      /** @description Invalid request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+      /** @description Delete request conflicts with active deletion or invalid confirmation */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  getMeDelete: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        delete_request_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Delete status */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeletePollResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Delete request expired */
+      410: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  postSyncMutations: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+        "X-Device-Id": components["parameters"]["SyncDeviceIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SyncMutationRequest"];
+      };
+    };
+    responses: {
+      /** @description Mutation ingest result */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SyncMutationResponse"];
+        };
+      };
+      /** @description Signature verification or key missing */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+      /** @description Version conflict detected */
+      412: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+      /** @description Sync disabled due consent/revocation state */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  postSyncMutationsBatch: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SyncV1MutationBatchRequest"];
+      };
+    };
+    responses: {
+      /** @description Mutation batch ingest result */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SyncV1MutationBatchResponse"];
+        };
+      };
+      /** @description Invalid request payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
     };
   };
 }

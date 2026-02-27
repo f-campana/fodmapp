@@ -9,8 +9,8 @@ from app.db import Database
 from app.errors import register_error_handlers
 from app.routers.foods import router as foods_router
 from app.routers.health import router as health_router
-from app.routers.swaps import router as swaps_router
 from app.routers.me import router as me_router
+from app.routers.swaps import router as swaps_router
 from app.routers.sync import router as sync_router
 
 

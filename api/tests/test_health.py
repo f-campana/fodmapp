@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 from contextlib import contextmanager
+from pathlib import Path
 
 import yaml
 
@@ -55,9 +55,7 @@ def test_openapi_contract_parity(app_instance) -> None:
 
     assert set(spec["paths"].keys()) == expected_paths
 
-    swap_required = set(
-        spec["components"]["schemas"]["SwapItem"]["required"]
-    )
+    swap_required = set(spec["components"]["schemas"]["SwapItem"]["required"])
     assert {
         "from_food_slug",
         "to_food_slug",

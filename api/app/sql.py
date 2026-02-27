@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 
 from psycopg import Connection
 
-
 SQL_GET_FOOD = """
 SELECT
   f.food_id,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 import json
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
@@ -10,13 +10,15 @@ from fastapi import APIRouter, Header, Request, Response
 from psycopg.types.json import Jsonb
 
 from app import sql
+from app.config import get_settings
 from app.consent_chain import (
     ConsentChainInvalidError,
-    insert_event as insert_consent_event,
     proof_payload_signature,
     verify_user_consent_chain,
 )
-from app.config import get_settings
+from app.consent_chain import (
+    insert_event as insert_consent_event,
+)
 from app.crypto_utils import canonical_json, hmac_verify, sha256_hex
 from app.db import Database
 from app.errors import bad_request, conflict, locked, not_found, unauthorized
@@ -51,8 +53,7 @@ def _decorate_legacy_sync_headers(response: Response) -> None:
         {
             "Deprecation": "true",
             "Warning": (
-                '299 - "Compatibility-only endpoint: '
-                "/v0/sync/mutations is deprecated; use /v0/sync/mutations:batch"
+                '299 - "Compatibility-only endpoint: /v0/sync/mutations is deprecated; use /v0/sync/mutations:batch'
             ),
             "Link": '</v0/sync/mutations:batch>; rel="successor-version"; '
             'title="Batch mutations endpoint required for new clients"',
@@ -271,15 +272,17 @@ def _build_export_receipt(export_id: UUID, user_id: UUID, manifest: Dict[str, An
         "policy_version": get_settings().api_version,
         "manifest_hash": sha256_hex(canonical_json(manifest)),
     }
-    receipt["proof_signature"] = proof_payload_signature({
-        "scope": "export",
-        "export_id": str(export_id),
-        "user_id": str(user_id),
-        "receipt_id": receipt["receipt_id"],
-        "manifest_hash": receipt["manifest_hash"],
-        "issued_at_utc": receipt["issued_at_utc"],
-        "actor": receipt["actor"],
-    })
+    receipt["proof_signature"] = proof_payload_signature(
+        {
+            "scope": "export",
+            "export_id": str(export_id),
+            "user_id": str(user_id),
+            "receipt_id": receipt["receipt_id"],
+            "manifest_hash": receipt["manifest_hash"],
+            "issued_at_utc": receipt["issued_at_utc"],
+            "actor": receipt["actor"],
+        }
+    )
     return receipt
 
 
@@ -349,7 +352,10 @@ def _verify_delete_receipt(delete_request_id: UUID, user_id: UUID, row: Dict[str
         "actor": proof.get("actor"),
     }
     expected_signature = proof_payload_signature(payload)
-    if proof.get("manifest_hash") != sha256_hex(canonical_json(payload)) or proof.get("proof_signature") != expected_signature:
+    if (
+        proof.get("manifest_hash") != sha256_hex(canonical_json(payload))
+        or proof.get("proof_signature") != expected_signature
+    ):
         raise conflict("Invalid delete proof")
 
 
@@ -421,7 +427,11 @@ def post_me_consent(
                 },
             )
             conn.execute(
-                "UPDATE user_consent_ledger SET revocation_reason = %(revocation_reason)s WHERE consent_id = %(consent_id)s",
+                """
+                UPDATE user_consent_ledger
+                SET revocation_reason = %(revocation_reason)s
+                WHERE consent_id = %(consent_id)s
+                """,
                 {
                     "revocation_reason": payload.reason,
                     "consent_id": existing["consent_id"],
@@ -700,7 +710,9 @@ def get_export_status(
         export_id=export_id,
         idempotency_key=row["idempotency_key"],
         status=row["status"],
-        completed_at_utc=row["requested_at"] if row["status"] in {"ready", "ready_with_redactions", "failed", "completed"} else None,
+        completed_at_utc=(
+            row["requested_at"] if row["status"] in {"ready", "ready_with_redactions", "failed", "completed"} else None
+        ),
         scope={
             "included_tables": row["include_domain"],
             "requested_scope": row["requested_scope"],
@@ -770,14 +782,16 @@ def request_delete(
                 "status": "processing",
                 "soft_delete_window_days": payload.soft_delete_window_days,
                 "hard_delete": payload.hard_delete,
-                "summary": _jsonb({
-                    "consent_records_touched": 0,
-                    "symptom_logs_deleted": 0,
-                    "diet_logs_deleted": 0,
-                    "swap_history_deleted": 0,
-                    "queue_items_dropped": 0,
-                    "exports_invalidated": 0,
-                }),
+                "summary": _jsonb(
+                    {
+                        "consent_records_touched": 0,
+                        "symptom_logs_deleted": 0,
+                        "diet_logs_deleted": 0,
+                        "swap_history_deleted": 0,
+                        "queue_items_dropped": 0,
+                        "exports_invalidated": 0,
+                    }
+                ),
             },
         ).fetchone()
         if insert_row is None:
@@ -900,11 +914,7 @@ def get_delete_status(
         completed_at_utc=row["requested_at"] if row["status"] in {"completed", "partial", "failed"} else None,
         summary=summary,
         proof=proof,
-        failure=(
-            {"code": row["error_code"], "message": row["error_detail"]}
-            if row["error_code"]
-            else None
-        ),
+        failure=({"code": row["error_code"], "message": row["error_detail"]} if row["error_code"] else None),
         retained_artifacts=[],
     )
 
@@ -1068,7 +1078,9 @@ def sync_mutations(
                     "entity_id": entity_id,
                 },
             )
-            current_version = int(version_row["current_version"]) if version_row and version_row["current_version"] is not None else 0
+            current_version = (
+                int(version_row["current_version"]) if version_row and version_row["current_version"] is not None else 0
+            )
 
             if env.base_version is not None and env.base_version != current_version:
                 results.append(

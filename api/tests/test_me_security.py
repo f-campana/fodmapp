@@ -35,8 +35,8 @@ def _proof_signature(payload: dict[str, Any]) -> str:
     return hmac_signature(proof_secret(), canonical_json(payload))
 
 
-def _execute_committed(db_conn, query: str, params: dict[str, Any] | None = None) -> None:
-    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+def _execute_committed(db_url: str, query: str, params: dict[str, Any] | None = None) -> None:
+    with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
             writer.execute(query, params or {})
 
@@ -81,8 +81,8 @@ def _assert_delete_proof(user_id: uuid.UUID, delete_request_id: uuid.UUID, paylo
     assert proof["proof_signature"] == _proof_signature(manifest_payload)
 
 
-def _cleanup_account(conn, user_id: uuid.UUID) -> None:
-    with connect(conn.info.dsn, row_factory=dict_row) as writer:
+def _cleanup_account(db_url: str, user_id: uuid.UUID) -> None:
+    with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
             writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -90,7 +90,14 @@ def _cleanup_account(conn, user_id: uuid.UUID) -> None:
             writer.execute("DELETE FROM me_export_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_delete_jobs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute(
-                "DELETE FROM user_consent_ledger_events WHERE consent_id IN (SELECT consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s)",
+                """
+                DELETE FROM user_consent_ledger_events
+                WHERE consent_id IN (
+                    SELECT consent_id
+                    FROM user_consent_ledger
+                    WHERE user_id = %(user_id)s
+                )
+                """,
                 {"user_id": user_id},
             )
             writer.execute("DELETE FROM user_consent_ledger WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -121,9 +128,15 @@ def _grant_consent(client, user_id: uuid.UUID, scope: dict[str, bool] | None = N
     assert response.status_code == 200
 
 
-def _insert_device_key(db_conn, user_id: uuid.UUID, device_id: str = "test-device", key_id: str = "k1", secret_seed: str = "queue-signing-secret") -> str:
+def _insert_device_key(
+    db_url: str,
+    user_id: uuid.UUID,
+    device_id: str = "test-device",
+    key_id: str = "k1",
+    secret_seed: str = "queue-signing-secret",
+) -> str:
     secret_b64 = _secret_b64(secret_seed)
-    with connect(db_conn.info.dsn, row_factory=dict_row) as writer:
+    with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
             writer.execute(
                 """
@@ -153,7 +166,7 @@ def test_consent_grant_revoke_with_history(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             response = client.post(
                 "/v0/me/consent",
                 headers={"X-User-Id": str(user_id)},
@@ -209,7 +222,12 @@ def test_consent_grant_revoke_with_history(client, db_url) -> None:
             assert payload["history"][0]["event"] == "consent_revoke"
 
             records = db_conn.execute(
-                "SELECT consent_id, status, parent_consent_id, replaced_by_consent_id FROM user_consent_ledger WHERE user_id = %(user_id)s ORDER BY granted_at_utc DESC",
+                """
+                SELECT consent_id, status, parent_consent_id, replaced_by_consent_id
+                FROM user_consent_ledger
+                WHERE user_id = %(user_id)s
+                ORDER BY granted_at_utc DESC
+                """,
                 {"user_id": user_id},
             ).fetchall()
             assert len(records) == 1
@@ -223,14 +241,14 @@ def test_consent_grant_revoke_with_history(client, db_url) -> None:
             ).fetchone()["n"]
             assert event_count >= 1
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id)
 
             revoke_resp = client.post(
@@ -260,7 +278,7 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
             assert event is not None
 
             _execute_committed(
-                db_conn,
+                db_url,
                 """
                 UPDATE user_consent_ledger_events
                 SET event_hash = 'tampered'
@@ -272,7 +290,7 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
             check = client.get("/v0/me/consent", headers={"X-User-Id": str(user_id)})
             assert check.status_code == 409
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id)
 
             response = client.post(
@@ -298,7 +316,12 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
             assert payload["consent_state"]["revocation_reason"] == "user_request"
 
             records = db_conn.execute(
-                "SELECT consent_id, status FROM user_consent_ledger WHERE user_id = %(user_id)s ORDER BY granted_at_utc DESC",
+                """
+                SELECT consent_id, status
+                FROM user_consent_ledger
+                WHERE user_id = %(user_id)s
+                ORDER BY granted_at_utc DESC
+                """,
                 {"user_id": user_id},
             ).fetchall()
             assert len(records) >= 1
@@ -310,20 +333,25 @@ def test_consent_chain_integrity_is_enforced(client, db_url) -> None:
             ).fetchone()["n"]
             assert event_count >= 1
             events = db_conn.execute(
-                "SELECT event_type, reason FROM user_consent_ledger_events WHERE consent_id = %(consent_id)s ORDER BY at_utc DESC",
+                """
+                SELECT event_type, reason
+                FROM user_consent_ledger_events
+                WHERE consent_id = %(consent_id)s
+                ORDER BY at_utc DESC
+                """,
                 {"consent_id": records[0]["consent_id"]},
             ).fetchall()
             assert events[0]["event_type"] == "consent_revoke"
             assert events[0]["reason"] == "user_request"
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_consent_request_strict_validation(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
             base_payload = {
                 "policy_version": "gdpr-v2.1.0",
@@ -353,7 +381,7 @@ def test_consent_request_strict_validation(client, db_url) -> None:
             )
             assert invalid_legal_basis.status_code == 422
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def _build_mutation_payload(
@@ -396,9 +424,9 @@ def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id)
-            secret = _insert_device_key(db_conn, user_id, device_id=device_id, key_id=key_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id=key_id)
 
             payload = _build_mutation_payload(
                 user_id=user_id,
@@ -487,7 +515,12 @@ def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
             ).fetchone()["count"]
             assert queued_rows == 1
             queue_row = db_conn.execute(
-                "SELECT chain_prev_hash, chain_item_hash FROM me_mutation_queue WHERE user_id = %(user_id)s AND idempotency_key = %(idempotency_key)s",
+                """
+                SELECT chain_prev_hash, chain_item_hash
+                FROM me_mutation_queue
+                WHERE user_id = %(user_id)s
+                  AND idempotency_key = %(idempotency_key)s
+                """,
                 {"user_id": user_id, "idempotency_key": payload["idempotency_key"]},
             ).fetchone()
             assert queue_row is not None
@@ -511,7 +544,7 @@ def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
             assert int(third_version["current_version"]) == first_version
 
             _execute_committed(
-                db_conn,
+                db_url,
                 """
                 UPDATE me_mutation_queue
                 SET replay_window_expires_at = NOW() - INTERVAL '1 second'
@@ -550,7 +583,7 @@ def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
             assert stale_version is not None
             assert int(stale_version["current_version"]) == first_version
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def _wait_for_export_completed(client, user_id: uuid.UUID, export_id: str) -> dict[str, Any]:
@@ -568,7 +601,7 @@ def test_export_delete_async_lifecycle_and_sync_reject(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id, scope={"sync_mutations": True, "analytics": True})
 
             export_resp = client.post(
@@ -633,16 +666,16 @@ def test_export_delete_async_lifecycle_and_sync_reject(client, db_url) -> None:
             )
             assert sync_response.status_code == 423
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_purge_proof_and_negative_queries_after_delete(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id)
-            secret = _insert_device_key(db_conn, user_id, device_id="proof-device", key_id="k1")
+            secret = _insert_device_key(db_url, user_id, device_id="proof-device", key_id="k1")
 
             export_resp = client.post(
                 "/v0/me/export",
@@ -753,14 +786,14 @@ def test_purge_proof_and_negative_queries_after_delete(client, db_url) -> None:
             )
             assert sync_check.status_code == 423
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
 
 
 def test_delete_all_requires_confirmation_text(client, db_url) -> None:
     user_id = uuid.uuid4()
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
             _grant_consent(client, user_id)
             bad = client.post(
                 "/v0/me/delete",
@@ -780,4 +813,4 @@ def test_delete_all_requires_confirmation_text(client, db_url) -> None:
             ).fetchone()
             assert row["count"] == 0
 
-            _cleanup_account(db_conn, user_id)
+            _cleanup_account(db_url, user_id)
