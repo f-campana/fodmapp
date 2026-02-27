@@ -31,3 +31,9 @@ class Database:
             with conn.transaction():
                 conn.execute("SET TRANSACTION READ ONLY")
                 yield conn
+
+    @contextmanager
+    def connection(self) -> Iterator[Connection]:
+        with self._pool.connection() as conn:
+            with conn.transaction():
+                yield conn

@@ -44,6 +44,13 @@ def test_openapi_contract_parity(app_instance) -> None:
         "/v0/foods/{food_slug}/subtypes",
         "/v0/foods/{food_slug}/traits",
         "/v0/swaps",
+        "/v0/me/consent",
+        "/v0/me/export",
+        "/v0/me/export/{export_id}",
+        "/v0/me/delete",
+        "/v0/me/delete/{delete_request_id}",
+        "/v0/sync/mutations",
+        "/v0/sync/mutations:batch",
     }
 
     assert set(spec["paths"].keys()) == expected_paths
