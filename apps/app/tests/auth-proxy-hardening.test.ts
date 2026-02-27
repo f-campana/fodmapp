@@ -113,4 +113,18 @@ describe("proxy runtime hardening", () => {
     expect(response.status).toBe(200);
     expect(reportFailure).not.toHaveBeenCalled();
   });
+
+  it("keeps sign-in route as pass-through", async () => {
+    configureClerkRuntimeEnv();
+    const reportFailure = vi.fn();
+    const request = new NextRequest("https://example.com/sign-in");
+
+    const response = await proxy(request, {} as NextFetchEvent, {
+      loadClerkProxyHandler: async () => null,
+      reportRuntimeFailure: reportFailure,
+    });
+
+    expect(response.status).toBe(200);
+    expect(reportFailure).not.toHaveBeenCalled();
+  });
 });

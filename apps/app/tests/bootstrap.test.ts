@@ -1,12 +1,16 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { getAnalyticsBootstrapStatus } from "../lib/analytics";
+import {
+  getAnalyticsBootstrapStatus,
+  trackAnalyticsEvent,
+} from "../lib/analytics";
 import { getAuthMiddlewareMode, getClerkBootstrapStatus } from "../lib/clerk";
 import { canTrackWithConsent, getConsentBootstrapStatus } from "../lib/consent";
 import { getMonitoringBootstrapStatus } from "../lib/monitoring";
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
 });
 
 describe("cross-cutting runtime adapters", () => {
@@ -55,40 +59,52 @@ describe("cross-cutting runtime adapters", () => {
     expect(auth.mode).toBe("runtime");
     expect(monitoring.configured).toBe(true);
     expect(monitoring.mode).toBe("runtime");
-    expect(analytics.configured).toBe(true);
-    expect(analytics.mode).toBe("runtime");
-    expect(consent.configured).toBe(true);
-    expect(consent.mode).toBe("deferred-noop");
+    expect(analytics.configured).toBe(false);
+    expect(analytics.mode).toBe("disabled");
+    expect(consent.mode).toBe("disabled");
+    expect(consent.configured).toBe(false);
     expect(canTrackWithConsent(consent)).toBe(false);
-    expect(consent.deferredReason).toContain("Deferred:");
+    expect(consent.deferredReason).toContain("not configured");
   });
 
-  it("allows analytics only when manual consent override is enabled", () => {
-    vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
-    vi.stubEnv("NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED", "true");
-
-    const analytics = getAnalyticsBootstrapStatus();
-    const consent = getConsentBootstrapStatus();
-
-    expect(analytics.configured).toBe(true);
-    expect(consent.mode).toBe("manual-opt-in");
-    expect(canTrackWithConsent(consent)).toBe(true);
-  });
-
-  it("keeps manual consent override disabled in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
+  it("switches consent bootstrap to API-backed mode when /v0 base URL is provided", () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID", "axeptio-client");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION", "v1");
     vi.stubEnv("NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED", "true");
 
+    const analytics = getAnalyticsBootstrapStatus();
     const consent = getConsentBootstrapStatus();
 
-    expect(consent.manualOptInRequested).toBe(true);
+    expect(analytics.configured).toBe(false);
+    expect(consent.mode).toBe("api-ready");
+    expect(consent.configured).toBe(true);
     expect(consent.manualOptIn).toBe(false);
-    expect(consent.mode).toBe("deferred-noop");
+    expect(consent.manualOptInRequested).toBe(false);
     expect(canTrackWithConsent(consent)).toBe(false);
-    expect(consent.deferredReason).toContain("disabled in production");
+    expect(consent.deferredReason).toContain("API-backed");
+  });
+
+  it("keeps manual consent override placeholders out of runtime bootstrap mode", () => {
+    vi.stubEnv("NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED", "true");
+
+    const consent = getConsentBootstrapStatus();
+
+    expect(consent.manualOptInRequested).toBe(false);
+    expect(consent.manualOptIn).toBe(false);
+    expect(consent.mode).toBe("disabled");
+    expect(canTrackWithConsent(consent)).toBe(false);
+  });
+
+  it("does not emit analytics events while runtime hard-off policy is active", () => {
+    vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
+    const plausible = vi.fn();
+    vi.stubGlobal("window", { plausible });
+
+    trackAnalyticsEvent("home_page_viewed", { route: "/" });
+
+    expect(plausible).not.toHaveBeenCalled();
   });
 
   it("keeps middleware route protection in placeholder mode when env is missing", () => {
