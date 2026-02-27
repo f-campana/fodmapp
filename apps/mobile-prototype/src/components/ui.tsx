@@ -1,6 +1,8 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+
 import {
   ActivityIndicator,
+  Animated,
   Pressable,
   ScrollView,
   type StyleProp,
@@ -69,15 +71,36 @@ export function PrimaryButton({
   label: string;
   onPress?: () => void;
 }) {
+  const [scaleAnim] = useState(() => new Animated.Value(1));
+
+  const handlePressIn = () =>
+    Animated.spring(scaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 60,
+      bounciness: 0,
+    }).start();
+
+  const handlePressOut = () =>
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 60,
+      bounciness: 4,
+    }).start();
+
   return (
     <Pressable
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.primaryButton,
-        pressed && styles.primaryButtonPressed,
-      ]}
+      style={({ pressed }) => pressed && styles.primaryButtonPressed}
     >
-      <Text style={styles.primaryLabel}>{label}</Text>
+      <Animated.View
+        style={[styles.primaryButton, { transform: [{ scale: scaleAnim }] }]}
+      >
+        <Text style={styles.primaryLabel}>{label}</Text>
+      </Animated.View>
     </Pressable>
   );
 }
@@ -179,7 +202,6 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   primaryButtonPressed: {
-    opacity: 0.82,
     backgroundColor: rnTheme.color.accentStrong,
   },
   primaryLabel: {

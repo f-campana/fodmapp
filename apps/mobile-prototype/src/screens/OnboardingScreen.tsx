@@ -1,9 +1,18 @@
 import { useMemo, useState } from "react";
 
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Easing,
+  LayoutAnimation,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Card } from "../components/ui";
+import { rnTheme } from "../theme/rn-adapter";
 import { theme } from "../theme/tokens";
 
 const STEPS = [
@@ -28,15 +37,43 @@ export function OnboardingScreen({ onComplete }: { onComplete: () => void }) {
   const [stepIndex, setStepIndex] = useState(0);
   const step = STEPS[stepIndex];
   const isLast = useMemo(() => stepIndex === STEPS.length - 1, [stepIndex]);
+  const [contentOpacity] = useState(() => new Animated.Value(1));
+
+  const advanceStep = () => {
+    if (isLast) {
+      onComplete();
+      return;
+    }
+    Animated.timing(contentOpacity, {
+      toValue: 0,
+      duration: rnTheme.motion.duration.fast,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      LayoutAnimation.configureNext({
+        duration: rnTheme.motion.duration.normal,
+        update: { type: LayoutAnimation.Types.easeInEaseOut },
+      });
+      setStepIndex((i) => i + 1);
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: rnTheme.motion.duration.slow,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    });
+  };
 
   return (
     <SafeAreaView edges={["top", "bottom"]} style={styles.container}>
       <Text style={styles.brand}>FODMAP Prototype</Text>
-      <Card style={styles.heroCard}>
-        <Text style={styles.heroIcon}>{step.icon}</Text>
-        <Text style={styles.title}>{step.title}</Text>
-        <Text style={styles.body}>{step.body}</Text>
-      </Card>
+      <Animated.View style={{ opacity: contentOpacity }}>
+        <Card style={styles.heroCard}>
+          <Text style={styles.heroIcon}>{step.icon}</Text>
+          <Text style={styles.title}>{step.title}</Text>
+          <Text style={styles.body}>{step.body}</Text>
+        </Card>
+      </Animated.View>
 
       <View style={styles.dots}>
         {STEPS.map((_, index) => (
@@ -54,13 +91,7 @@ export function OnboardingScreen({ onComplete }: { onComplete: () => void }) {
           </Pressable>
         ) : null}
         <Pressable
-          onPress={() => {
-            if (isLast) {
-              onComplete();
-              return;
-            }
-            setStepIndex((current) => current + 1);
-          }}
+          onPress={advanceStep}
           style={[styles.primaryButton, isLast ? styles.fullWidth : null]}
         >
           <Text style={styles.primaryLabel}>

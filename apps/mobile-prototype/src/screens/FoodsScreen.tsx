@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  Animated,
+  Easing,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,10 +21,17 @@ export function FoodsScreen({
 }: {
   onSelectFood: (foodId: string, foodName?: string) => void;
 }) {
+  const [rawQuery, setRawQuery] = useState("");
   const [query, setQuery] = useState("");
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [itemAnims] = useState<Animated.Value[]>(() => []);
+
+  useEffect(() => {
+    const id = setTimeout(() => setQuery(rawQuery), 300);
+    return () => clearTimeout(id);
+  }, [rawQuery]);
 
   const load = useCallback(async (input: string) => {
     setLoading(true);
@@ -40,13 +49,34 @@ export function FoodsScreen({
     void load(query);
   }, [load, query]);
 
+  useEffect(() => {
+    if (foods.length === 0) {
+      return;
+    }
+    while (itemAnims.length < foods.length) {
+      itemAnims.push(new Animated.Value(0));
+    }
+    itemAnims.slice(0, foods.length).forEach((a) => a.setValue(0));
+    Animated.stagger(
+      40,
+      itemAnims.slice(0, foods.length).map((anim) =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: rnTheme.motion.duration.normal,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ),
+    ).start();
+  }, [foods, itemAnims]);
+
   return (
     <Screen title="Foods" subtitle="Search by name, category, or trigger tag">
       <TextInput
         style={styles.search}
         placeholder="Search foods or trigger tags"
-        value={query}
-        onChangeText={setQuery}
+        value={rawQuery}
+        onChangeText={setRawQuery}
         placeholderTextColor={theme.color.textMuted}
       />
 
@@ -62,28 +92,46 @@ export function FoodsScreen({
       {!loading && !error && foods.length === 0 ? (
         <StateView
           message="No foods found for this search."
-          action={() => setQuery("")}
+          action={() => setRawQuery("")}
           actionLabel="Clear search"
         />
       ) : null}
 
       {!loading && !error && foods.length > 0 ? (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {foods.map((food) => (
-            <Pressable
+          {foods.map((food, index) => (
+            <Animated.View
               key={food.id}
-              onPress={() => onSelectFood(food.id, food.name)}
-              style={({ pressed }) => (pressed ? { opacity: 0.72 } : undefined)}
+              style={{
+                opacity: itemAnims[index] ?? 1,
+                transform: [
+                  {
+                    translateY: (
+                      itemAnims[index] ?? new Animated.Value(1)
+                    ).interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [8, 0],
+                    }),
+                  },
+                ],
+              }}
             >
-              <Card>
-                <View style={styles.headerRow}>
-                  <Text style={styles.name}>{food.name}</Text>
-                  <Badge label={food.severity} variant={food.severity} />
-                </View>
-                <Text style={styles.meta}>{food.category}</Text>
-                <Text style={styles.meta}>{food.serving}</Text>
-              </Card>
-            </Pressable>
+              <Pressable
+                onPress={() => onSelectFood(food.id, food.name)}
+                style={({ pressed }) =>
+                  pressed ? { opacity: 0.72 } : undefined
+                }
+              >
+                <Card>
+                  <View style={styles.headerRow}>
+                    <Text style={styles.name}>{food.name}</Text>
+                    <Badge label={food.severity} variant={food.severity} />
+                  </View>
+                  <Text style={styles.meta}>{food.category}</Text>
+                  <Text style={styles.meta}>{food.serving}</Text>
+                </Card>
+              </Pressable>
+            </Animated.View>
           ))}
         </ScrollView>
       ) : null}

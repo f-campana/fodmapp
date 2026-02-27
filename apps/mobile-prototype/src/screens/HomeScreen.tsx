@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { StyleSheet, Text, View } from "react-native";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
 import { Card, PrimaryButton, Screen, StateView } from "../components/ui";
 import { getDashboardSnapshot } from "../data/repository";
@@ -15,10 +15,12 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
     highRiskFoods: number;
     availableSwaps: number;
   } | null>(null);
+  const [fadeAnim] = useState(() => new Animated.Value(0));
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(false);
+    fadeAnim.setValue(0);
     try {
       setData(await getDashboardSnapshot());
     } catch {
@@ -26,11 +28,22 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fadeAnim]);
 
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (data) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: rnTheme.motion.duration.normal,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [data, fadeAnim]);
 
   if (loading) {
     return <StateView loading message="Building your dashboard..." />;
@@ -47,42 +60,44 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
   }
 
   return (
-    <Screen
-      title="Today"
-      subtitle="Your personalized low-FODMAP dashboard"
-      scroll
-    >
-      <Card style={styles.heroCard}>
-        <Text style={styles.kicker}>Today&apos;s focus</Text>
-        <Text style={styles.metric}>
-          {data.highRiskFoods} high-risk foods to replace
-        </Text>
-        <Text style={styles.muted}>
-          Tap below to explore swaps with the strongest symptom-relief
-          potential.
-        </Text>
-        <PrimaryButton label="Browse foods" onPress={onBrowse} />
-      </Card>
-
-      <View style={styles.row}>
-        <Card style={[styles.statCard, styles.flex]}>
-          <Text style={styles.stat}>{data.trackedFoods}</Text>
-          <Text style={styles.muted}>Tracked foods</Text>
+    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+      <Screen
+        title="Today"
+        subtitle="Your personalized low-FODMAP dashboard"
+        scroll
+      >
+        <Card style={styles.heroCard}>
+          <Text style={styles.kicker}>Today&apos;s focus</Text>
+          <Text style={styles.metric}>
+            {data.highRiskFoods} high-risk foods to replace
+          </Text>
+          <Text style={styles.muted}>
+            Tap below to explore swaps with the strongest symptom-relief
+            potential.
+          </Text>
+          <PrimaryButton label="Browse foods" onPress={onBrowse} />
         </Card>
-        <Card style={[styles.statCard, styles.flex]}>
-          <Text style={styles.stat}>{data.availableSwaps}</Text>
-          <Text style={styles.muted}>Available swaps</Text>
-        </Card>
-      </View>
 
-      <Card style={styles.tipCard}>
-        <Text style={styles.tipTitle}>Quick tip</Text>
-        <Text style={styles.muted}>
-          Start by replacing one high-risk staple this week and track how you
-          feel.
-        </Text>
-      </Card>
-    </Screen>
+        <View style={styles.row}>
+          <Card style={[styles.statCard, styles.flex]}>
+            <Text style={styles.stat}>{data.trackedFoods}</Text>
+            <Text style={styles.muted}>Tracked foods</Text>
+          </Card>
+          <Card style={[styles.statCard, styles.flex]}>
+            <Text style={styles.stat}>{data.availableSwaps}</Text>
+            <Text style={styles.muted}>Available swaps</Text>
+          </Card>
+        </View>
+
+        <Card style={styles.tipCard}>
+          <Text style={styles.tipTitle}>Quick tip</Text>
+          <Text style={styles.muted}>
+            Start by replacing one high-risk staple this week and track how you
+            feel.
+          </Text>
+        </Card>
+      </Screen>
+    </Animated.View>
   );
 }
 

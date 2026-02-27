@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import {
+  Animated,
+  Easing,
+  Pressable,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 
 import { Badge, Card, Screen, StateView } from "../components/ui";
 import { type Preferences } from "../data/repository";
@@ -17,6 +25,7 @@ export function SettingsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveConfirmOpacity] = useState(() => new Animated.Value(1));
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -33,6 +42,19 @@ export function SettingsScreen() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (saving) {
+      saveConfirmOpacity.setValue(0);
+    } else {
+      Animated.timing(saveConfirmOpacity, {
+        toValue: 1,
+        duration: rnTheme.motion.duration.normal,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [saving, saveConfirmOpacity]);
 
   const persist = async (next: Preferences) => {
     setPrefs(next);
@@ -93,9 +115,11 @@ export function SettingsScreen() {
       </Card>
 
       <View style={styles.autosaveIndicator}>
-        <Text style={styles.autosaveText}>
-          {saving ? "Saving…" : "✓ Auto-save enabled"}
-        </Text>
+        <Animated.View style={{ opacity: saveConfirmOpacity }}>
+          <Text style={styles.autosaveText}>
+            {saving ? "Saving…" : "✓ Auto-save enabled"}
+          </Text>
+        </Animated.View>
       </View>
 
       <Pressable
