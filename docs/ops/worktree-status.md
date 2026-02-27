@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-02-26
+Last reviewed: 2026-02-27
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -18,6 +18,8 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-barcode-v1`                            | `codex/barcode-feature-v1`                   | on-hold            | Barcode prototype feature              | Postponed.                                       |
 | `/Users/fabiencampana/Documents/Fodmap-ci-skill-policy-gate`                  | `codex/ci-skill-policy-gate`                 | active             | CI linting policy hardening            | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-ci-workflow-hardening`                 | `codex/ci-workflow-hardening`                | active             | CI workflow hardening                  | In progress.                                     |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/ci-parity-hardening`         | `codex/ci-parity-hardening`                  | active             | CI parity hardening                    | In progress.                                     |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-exemption-policy`  | `codex/changeset-exemption-policy`           | active             | Changeset exemption policy             | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-design-system-skill-pilot`             | `codex/design-system-skill-pilot`            | active             | Design system skill pilot              | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-reporting-plan`                        | `codex/phase2-reporting-implementation-plan` | active             | Phase2 reporting implementation plan   | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-unknown-fodmap-research`               | `codex/unknown-fodmap-research`              | active             | Unknown FODMAP research                | In progress.                                     |

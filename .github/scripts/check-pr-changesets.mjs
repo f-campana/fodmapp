@@ -12,6 +12,39 @@ function failLine(message) {
   process.stderr.write(`${message}\n`);
 }
 
+function parseCsvSet(value) {
+  return new Set(
+    `${value || ""}`
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean),
+  );
+}
+
+function readPrLabels() {
+  const envLabels = parseCsvSet(process.env.PR_LABELS);
+  if (envLabels.size > 0) {
+    return envLabels;
+  }
+
+  const eventPath = (process.env.GITHUB_EVENT_PATH || "").trim();
+  if (!eventPath || !existsSync(eventPath)) {
+    return new Set();
+  }
+
+  try {
+    const payload = JSON.parse(readFileSync(eventPath, "utf8"));
+    const labels = Array.isArray(payload?.pull_request?.labels)
+      ? payload.pull_request.labels
+          .map((entry) => `${entry?.name || ""}`.trim())
+          .filter(Boolean)
+      : [];
+    return new Set(labels);
+  } catch {
+    return new Set();
+  }
+}
+
 function isValidRevision(revision) {
   if (!revision) {
     return false;
@@ -29,6 +62,15 @@ function isValidRevision(revision) {
 
 const envBaseSha = (process.env.BASE_SHA || "").trim();
 const envHeadSha = (process.env.HEAD_SHA || "").trim();
+const exemptLabel = (
+  process.env.CHANGESET_EXEMPT_LABEL || "changeset-exempt"
+).trim();
+const exemptPackages = parseCsvSet(
+  process.env.CHANGESET_EXEMPT_PACKAGES || "@fodmap/mobile-prototype",
+);
+const exemptPackageList = [...exemptPackages].sort();
+const prLabels = readPrLabels();
+const hasExemptLabel = Boolean(exemptLabel) && prLabels.has(exemptLabel);
 
 let baseSha = envBaseSha;
 let headSha = envHeadSha;
@@ -184,14 +226,6 @@ try {
 
   const status = parseStatusOutput(baseSha);
   const releases = Array.isArray(status?.releases) ? status.releases : [];
-
-  if (!releases.length) {
-    failLine(
-      "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.",
-    );
-    process.exit(1);
-  }
-
   const releasePackages = new Set(
     releases
       .flatMap((entry) => {
@@ -227,17 +261,67 @@ try {
   );
 
   const changedPackageNames = touchedWorkspacePackages(changedFiles);
+  const changedPackageList = [...changedPackageNames].sort();
+  const touchedAllowlistedPackages = changedPackageList.filter((name) =>
+    exemptPackages.has(name),
+  );
+
+  if (hasExemptLabel && touchedAllowlistedPackages.length === 0) {
+    const allowlist = exemptPackageList.length
+      ? exemptPackageList.join(", ")
+      : "(none configured)";
+    failLine(
+      `[changeset-check] "${exemptLabel}" label is only valid for allowlisted packages: ${allowlist}`,
+    );
+    process.exit(1);
+  }
 
   if (changedPackageNames.size > 0) {
-    const missing = [...changedPackageNames].filter(
+    const missing = changedPackageList.filter(
       (name) => !releasePackages.has(name),
     );
 
     if (missing.length > 0) {
-      failLine(
-        `[changeset-check] Missing changeset coverage for: ${missing.join(", ")}`,
+      const nonAllowlistedMissing = missing.filter(
+        (name) => !exemptPackages.has(name),
       );
-      failLine(`Changed files: ${changedFiles.join(", ")}`);
+      if (nonAllowlistedMissing.length > 0) {
+        failLine(
+          `[changeset-check] Missing changeset coverage for: ${nonAllowlistedMissing.join(", ")}`,
+        );
+        failLine(`Changed files: ${changedFiles.join(", ")}`);
+        process.exit(1);
+      }
+
+      if (!hasExemptLabel) {
+        failLine(
+          `[changeset-check] Missing changeset coverage for allowlisted package(s): ${missing.join(", ")}`,
+        );
+        failLine(
+          `[changeset-check] Add a .changeset file or apply the "${exemptLabel}" PR label.`,
+        );
+        process.exit(1);
+      }
+
+      logLine(
+        `[changeset-check] Exemption label "${exemptLabel}" accepted for allowlisted package(s): ${missing.join(", ")}`,
+      );
+    }
+  }
+
+  if (!releases.length) {
+    const onlyAllowlistedPackagesChanged =
+      changedPackageList.length > 0 &&
+      changedPackageList.every((name) => exemptPackages.has(name));
+    const canSkipChangeset =
+      changes.changedPackagesOrApps &&
+      onlyAllowlistedPackagesChanged &&
+      hasExemptLabel;
+
+    if (!canSkipChangeset) {
+      failLine(
+        "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.",
+      );
       process.exit(1);
     }
   }

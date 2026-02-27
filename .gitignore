@@ -31,7 +31,10 @@ yarn-error.log*
 # python environments and caches
 api/.venv/
 api/.pytest_cache/
+api/*.egg-info/
 api/**/__pycache__/
+etl/phase2/reporting/.venv/
+etl/phase2/reporting/.ruff_cache/
 etl/ciqual/__pycache__/
 
 # local data files

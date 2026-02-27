@@ -1,6 +1,9 @@
 node_modules
 .pnpm-store
 .turbo
+.venv
+.ruff_cache
+*.egg-info
 coverage
 storybook-static
 dist
