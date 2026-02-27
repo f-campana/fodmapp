@@ -24,6 +24,7 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-reporting-plan`                        | `codex/phase2-reporting-implementation-plan` | active             | Phase2 reporting implementation plan   | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-unknown-fodmap-research`               | `codex/unknown-fodmap-research`              | active             | Unknown FODMAP research                | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-implementation-track` | `codex/mobile-implementation-track`          | active             | Mobile implementation track            | In progress.                                     |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-onboarding-prd`       | `codex/mobile-onboarding-prd`                | active             | Mobile onboarding PRD (FR V1)          | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-research-realignment` | `codex/mobile-research-realignment`          | active (to split)  | Mobile research + ADR + implementation | Planned split into dedicated worktrees by scope. |
 
 ## On-Hold Remote Track
