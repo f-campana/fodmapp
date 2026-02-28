@@ -1,5 +1,11 @@
 # @fodmap/design-tokens
 
+## 0.2.1
+
+### Patch Changes
+
+- [#92](https://github.com/f-campana/Fodmap/pull/92) [`f9bcf60`](https://github.com/f-campana/Fodmap/commit/f9bcf60c668f1b27b240ccd5bc0aa8687a0eca52) Thanks [@f-campana](https://github.com/f-campana)! - Track `FD_BUILD_TARGET` and `FD_OUTPUT_PATH` in Turborepo build hashing for `@fodmap/design-tokens` to prevent stale cache replays across target/output variants.
+
 ## 0.2.0
 
 ### Minor Changes
