@@ -17,6 +17,7 @@ export default defineConfig([
     "**/playwright-report/**",
     "**/storybook-static/**",
     "packages/design-tokens/src/generated/tokens.d.ts",
+    "packages/design-tokens/src/generated/tokens.native.d.ts",
   ]),
   ...baseConfig,
   ...nextConfig,

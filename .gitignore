@@ -13,6 +13,8 @@ storybook-static/
 playwright-report/
 .next/
 .astro/
+.expo/
+apps/mobile-prototype/.expo/
 *.tsbuildinfo
 packages/design-tokens/.tmp/
 
