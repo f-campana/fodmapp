@@ -25,6 +25,7 @@ REQUIRED_POLICY_KEYS = {
     "artifact_lifecycle",
     "baseline",
     "baseline_update",
+    "render_baseline_update",
     "render_baseline",
     "parser",
     "q03_scope_rule",
@@ -43,8 +44,15 @@ REQUIRED_FAIL_LOUD_KEYS = {
 REQUIRED_WORKFLOW_INPUTS = {
     "force_full_run",
     "baseline_update",
+    "render_baseline_update",
     "baseline_update_confirmed",
     "baseline_update_approved_by",
+}
+
+REQUIRED_RENDER_ALLOW_WRITES = {
+    "etl/phase2/reporting/contracts/baselines/render/**/*.svg",
+    "etl/phase2/reporting/contracts/baselines/render/**/*.html",
+    "etl/phase2/reporting/contracts/baselines/render/**/*.json",
 }
 
 
@@ -131,6 +139,56 @@ def validate_policy(policy: Dict[str, Any]) -> None:
         fail(f"policy.render_baseline missing keys: {sorted(missing_render)}")
     if not isinstance(render_baseline.get("scientific_files"), list) or len(render_baseline.get("scientific_files", [])) != 8:
         fail("policy.render_baseline.scientific_files must contain exactly 8 filenames")
+
+    for section_name in ["baseline_update", "render_baseline_update"]:
+        section = policy.get(section_name)
+        if not isinstance(section, dict):
+            fail(f"policy.{section_name} must be a mapping")
+        required_section_keys = {
+            "input_name",
+            "approval_input_name",
+            "approval_confirm_input_name",
+            "clean_tree_required",
+            "requires_workflow_dispatch",
+            "log_entry_fields",
+            "writable_scope",
+        }
+        missing_section = required_section_keys - set(section.keys())
+        if missing_section:
+            fail(f"policy.{section_name} missing keys: {sorted(missing_section)}")
+
+        writable_scope = section.get("writable_scope")
+        if not isinstance(writable_scope, dict):
+            fail(f"policy.{section_name}.writable_scope must be a mapping")
+        allow = writable_scope.get("allow")
+        deny = writable_scope.get("deny")
+        if not isinstance(allow, list) or not allow or not all(isinstance(x, str) for x in allow):
+            fail(f"policy.{section_name}.writable_scope.allow must be a non-empty string list")
+        if not isinstance(deny, list) or not all(isinstance(x, str) for x in deny):
+            fail(f"policy.{section_name}.writable_scope.deny must be a string list")
+
+    baseline_update = policy["baseline_update"]
+    render_update = policy["render_baseline_update"]
+    if baseline_update.get("input_name") != "baseline_update":
+        fail("policy.baseline_update.input_name must be baseline_update")
+    if render_update.get("input_name") != "render_baseline_update":
+        fail("policy.render_baseline_update.input_name must be render_baseline_update")
+
+    baseline_allow = set(baseline_update["writable_scope"]["allow"])
+    baseline_deny = set(baseline_update["writable_scope"]["deny"])
+    if any("contracts/baselines/render/" in pattern for pattern in baseline_allow):
+        fail("policy.baseline_update.writable_scope.allow must exclude render baseline asset paths")
+    if "etl/phase2/reporting/contracts/baselines/render/**" not in baseline_deny:
+        fail("policy.baseline_update.writable_scope.deny must include render baseline subtree deny")
+
+    render_allow = set(render_update["writable_scope"]["allow"])
+    missing_render_allow = REQUIRED_RENDER_ALLOW_WRITES - render_allow
+    if missing_render_allow:
+        fail(f"policy.render_baseline_update missing required allow patterns: {sorted(missing_render_allow)}")
+    if any(pattern.endswith(".generated.yaml") for pattern in render_allow):
+        fail("policy.render_baseline_update.allow must not include generated contract writes")
+    if any("/baselines/now/" in pattern for pattern in render_allow):
+        fail("policy.render_baseline_update.allow must not include now baseline JSON writes")
 
 
 def _validate_schema_instance(instance: Any, schema: Dict[str, Any], schema_file: pathlib.Path) -> List[str]:
@@ -272,6 +330,10 @@ def validate_workflow(workflow: Dict[str, Any]) -> None:
     jobs = workflow.get("jobs") or {}
     if "contract-lint" not in jobs:
         fail("workflow must define contract-lint job")
+    if "baseline-update" not in jobs:
+        fail("workflow must define baseline-update job")
+    if "render-baseline-update" not in jobs:
+        fail("workflow must define render-baseline-update job")
 
     contract_steps = (jobs.get("contract-lint") or {}).get("steps") or []
     run_lines: List[str] = []
@@ -283,6 +345,20 @@ def validate_workflow(workflow: Dict[str, Any]) -> None:
         fail("workflow contract-lint job must invoke scripts/contract_lint.py")
     if "pip install pyyaml==6.0.2 jsonschema==4.23.0" not in joined:
         fail("workflow contract-lint must install pinned pyyaml/jsonschema")
+
+    baseline_steps = (jobs.get("baseline-update") or {}).get("steps") or []
+    baseline_joined = "\n".join(
+        step.get("run", "") for step in baseline_steps if isinstance(step, dict)
+    )
+    if "render_baseline_update" not in baseline_joined:
+        fail("baseline-update job must enforce mutual exclusion against render_baseline_update")
+
+    render_steps = (jobs.get("render-baseline-update") or {}).get("steps") or []
+    render_joined = "\n".join(
+        step.get("run", "") for step in render_steps if isinstance(step, dict)
+    )
+    if "baseline_update" not in render_joined:
+        fail("render-baseline-update job must enforce mutual exclusion against baseline_update")
 
 
 def validate_api_sql_rank2_contract(repo_root: pathlib.Path) -> None:

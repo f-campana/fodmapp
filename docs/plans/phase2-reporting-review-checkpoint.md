@@ -1,0 +1,79 @@
+# Phase2 Reporting Review Checkpoint
+
+## Scope
+
+- Branch: `codex/phase2-reporting-implementation-plan`
+- Worktree: `/Users/fabiencampana/Documents/Fodmap-reporting-plan`
+- Checkpoint timing: after local quality gate, before CI/manual workflow execution
+
+## Findings Reviewed and Disposition
+
+1. `P1` full lane was non-blocking (`continue-on-error`) and could mask drift.
+   - Disposition: fixed.
+   - Change: removed non-blocking behavior from full lane and compare steps in `.github/workflows/phase2-reporting.yml`.
+2. `P1` baseline update writable scope was too broad (render assets mixed with metric baseline updates).
+   - Disposition: fixed.
+   - Change: split update governance into `baseline_update` and `render_baseline_update` with separate writable scopes in policy, workflow, and script enforcement.
+3. `P2` `compare_baselines.py` did not load full-scope ignore policy in `--compare-scope full`.
+   - Disposition: fixed.
+   - Change: always loads semantic policy for semantic/full scopes and fails loudly if unreadable.
+4. `P3` `jsonschema.RefResolver` deprecation in `contract_lint.py`.
+   - Disposition: deferred (explicit backlog item).
+   - Change: tracked in `docs/plans/phase2-reporting-task-breakdown.md` backlog.
+
+## What Was Fixed Now vs Deferred
+
+- Fixed now:
+  - `render_baseline_update` workflow input and dedicated update job.
+  - explicit mutual-exclusion guard for conflicting update mode inputs.
+  - strict split writable scopes for metric vs render baseline refresh.
+  - full lane is hard-fail on metric/render drift.
+  - full-compare ignore semantics in comparator.
+  - task breakdown updated with step `2.5` review gate and deprecation backlog.
+- Deferred:
+  - migration from deprecated `RefResolver` to `referencing` APIs in `contract_lint.py`.
+
+## Residual Risks Accepted
+
+- Remote workflow execution matrix (`workflow_dispatch` combinations) has not been executed in GitHub from this local checkpoint.
+  - Local logic, route guards, and script-level checks were validated.
+  - Final remote matrix execution remains required after push.
+- RefResolver deprecation remains until backlog migration is implemented.
+
+## Why Gate Behavior Is Trustworthy Now
+
+- Manual dispatch input conflict (`baseline_update=true` and `render_baseline_update=true`) now hard-fails via dedicated guard job.
+- Full lane no longer suppresses reporting drift failures.
+- Baseline refresh script enforces mode-specific allowed and denied path patterns.
+- Contract lint now validates policy/workflow structure for split update modes and mutual-exclusion coverage.
+- Semantic and full baseline compares both pass on smoke fixtures using explicit policy loading.
+
+## Verification Commands and Outcomes
+
+1. Rebase to latest main:
+   - `git fetch origin --prune`
+   - `git checkout codex/phase2-reporting-implementation-plan`
+   - `git rebase origin/main`
+   - `git rev-list --left-right --count origin/main...HEAD`
+   - Outcome: completed after conflict resolution, final divergence `0 3` vs `origin/main`.
+2. Script syntax checks:
+   - `python3 -m py_compile etl/phase2/reporting/scripts/refresh_baselines.py etl/phase2/reporting/scripts/compare_baselines.py etl/phase2/reporting/scripts/contract_lint.py`
+   - Outcome: pass.
+3. Contract lint:
+   - `python3 etl/phase2/reporting/scripts/contract_lint.py --policy etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml --run-schema etl/phase2/reporting/contracts/schema/reporting_run.schema.json --figure-schema etl/phase2/reporting/contracts/schema/figure_payloads.schema.json --parser-scope-schema etl/phase2/reporting/contracts/schema/parser_scope.schema.json --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json --fixtures-dir etl/phase2/reporting/tests/fixtures/now-set/query-results --workflow .github/workflows/phase2-reporting.yml`
+   - Outcome: pass (with known RefResolver deprecation warning).
+4. Smoke collect from fixtures:
+   - `python3 etl/phase2/reporting/scripts/collect_reporting.py --mode smoke --figures now --source fixture --fixture-dir etl/phase2/reporting/tests/fixtures/now-set/query-results --out-dir etl/phase2/reporting/out/runs/local-remediation-a --trigger pr_smoke`
+   - Outcome: pass (`[OK] collected 8 figure payloads`).
+5. Baseline compare semantic:
+   - `python3 etl/phase2/reporting/scripts/compare_baselines.py --mode now --run-artifact etl/phase2/reporting/out/runs/local-remediation-a --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json --float-eps 1e-6 --compare-scope semantic --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml`
+   - Outcome: pass.
+6. Baseline compare full:
+   - `python3 etl/phase2/reporting/scripts/compare_baselines.py --mode now --run-artifact etl/phase2/reporting/out/runs/local-remediation-a --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json --float-eps 1e-6 --compare-scope full --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml`
+   - Outcome: pass.
+7. Governance quality gate:
+   - `./.github/scripts/quality-gate.sh`
+   - Outcome: pass (`[OK] governance quality gate passed`).
+8. Route matrix static checks:
+   - `rg` checks on workflow conditions for smoke/full/update modes and mutual exclusion guards.
+   - Outcome: expected conditions present; no `continue-on-error` entries remain.

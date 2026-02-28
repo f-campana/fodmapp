@@ -40,6 +40,13 @@
    - parser fail-loud coverage (unknown source/missing scalar/empty now row)
    - Q-03 reviewed-snapshot scope non-empty
    - E-04 frozen mode + source stage fields fixed.
+12. [now][M] Split baseline refresh governance into two controlled modes
+   - `baseline_update` for generated contracts + baseline JSON only
+   - `render_baseline_update` for render baseline assets only (`svg/html/render-manifest json`)
+   - enforce mutual exclusion at workflow level
+13. [now][S] Add review/self-reflection gate before CI/manual runs
+   - author `docs/plans/phase2-reporting-review-checkpoint.md`
+   - include findings dispositions, residual risks, and exact verification commands/outcomes
 
 ## Next set (deferred)
 
@@ -57,6 +64,7 @@
 - `Q-05_ci_contract_coverage_map` — M
 - `E-05_method_comparator_mix_monitor` — M
 - `U-04_uncertainty_disclosure_card` — S (messaging risk)
+- `contract_lint.py` migration from deprecated `jsonschema.RefResolver` to `referencing` APIs — S
 
 ## Dependencies
 

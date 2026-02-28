@@ -161,8 +161,13 @@ def main() -> int:
     baseline = _load_json(baseline_path)
 
     semantic_policy: Dict[str, Any] = {}
-    if args.compare_scope == "semantic":
-        semantic_policy = _load_yaml(pathlib.Path(args.semantic_policy))
+    if args.compare_scope in {"semantic", "full"}:
+        policy_path = pathlib.Path(args.semantic_policy)
+        try:
+            semantic_policy = _load_yaml(policy_path)
+        except (FileNotFoundError, ValueError) as exc:
+            print(f"semantic policy load failed ({policy_path}): {exc}", file=sys.stderr)
+            return 1
 
     run_figures = {f["figure_id"]: f for f in run.get("figures", [])}
     baseline_figures = {f["figure_id"]: f for f in baseline.get("figures", [])}
@@ -171,7 +176,10 @@ def main() -> int:
 
     full_ignore = []
     if args.compare_scope == "full":
-        full_ignore = (semantic_policy.get("default", {}) or {}).get("ignore", []) if semantic_policy else []
+        full_ignore = (semantic_policy.get("default", {}) or {}).get("ignore", [])
+        if not isinstance(full_ignore, list):
+            print("semantic policy default.ignore must be a list for compare-scope=full", file=sys.stderr)
+            return 1
 
     mismatches: List[Dict[str, Any]] = []
 

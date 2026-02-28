@@ -8,16 +8,31 @@ import pathlib
 import subprocess
 import sys
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 import yaml
 
 
-ALLOWED_WRITES = {
-    "etl/phase2/reporting/contracts/generated/*.generated.yaml",
-    "etl/phase2/reporting/contracts/baselines/**/*.json",
-    "etl/phase2/reporting/contracts/baselines/render/**/*.svg",
-    "etl/phase2/reporting/contracts/baselines/render/**/*.html",
+MODE_ALLOWED_WRITES: Dict[str, Set[str]] = {
+    "baseline_update": {
+        "etl/phase2/reporting/contracts/generated/*.generated.yaml",
+        "etl/phase2/reporting/contracts/baselines/**/*.json",
+    },
+    "render_baseline_update": {
+        "etl/phase2/reporting/contracts/baselines/render/**/*.svg",
+        "etl/phase2/reporting/contracts/baselines/render/**/*.html",
+        "etl/phase2/reporting/contracts/baselines/render/**/*.json",
+    },
+}
+
+MODE_DENY_WRITES: Dict[str, Set[str]] = {
+    "baseline_update": {
+        "etl/phase2/reporting/contracts/baselines/render/**",
+    },
+    "render_baseline_update": {
+        "etl/phase2/reporting/contracts/generated/*.generated.yaml",
+        "etl/phase2/reporting/contracts/baselines/now/**",
+    },
 }
 
 ROW_COUNT_KEYS = {
@@ -83,6 +98,10 @@ def _path_allowed(rel_path: str, patterns: List[str]) -> bool:
     return any(fnmatch.fnmatch(rel_path, pattern) for pattern in patterns)
 
 
+def _path_denied(rel_path: str, patterns: List[str]) -> bool:
+    return any(fnmatch.fnmatch(rel_path, pattern) for pattern in patterns)
+
+
 def _stable_row_count(figure_id: str, metrics: Dict[str, Any]) -> int:
     key = ROW_COUNT_KEYS.get(figure_id)
     if key is None:
@@ -108,7 +127,7 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
     ):
         raise ValueError(f"figure {figure_id} must include non-empty contract_refs")
 
-    normalized = {
+    return {
         "figure_id": figure_id,
         "schema_version": str(figure.get("schema_version", "1.0.0")),
         "payload_version": str(figure.get("payload_version", "v1")),
@@ -116,16 +135,19 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
         "hard_gate": str(figure.get("hard_gate", "fail")),
         "contract_refs": sorted(set(contract_refs)),
         "metrics": copy.deepcopy(metrics),
-        "validation": copy.deepcopy(figure.get("validation", {"ok": True, "error_count": 0, "errors": []})),
+        "validation": copy.deepcopy(
+            figure.get("validation", {"ok": True, "error_count": 0, "errors": []})
+        ),
         "artifact": {
             "path": f"baseline://now/{figure_id}.json",
             "sha256": _sha256_json(metrics),
             "row_count": int(
-                (figure.get("artifact") or {}).get("row_count", _stable_row_count(figure_id, metrics))
+                (figure.get("artifact") or {}).get(
+                    "row_count", _stable_row_count(figure_id, metrics)
+                )
             ),
         },
     }
-    return normalized
 
 
 def _refresh_source_hashes(
@@ -169,7 +191,7 @@ def _refresh_stage_contract_hashes(
 
 def _run_renderer(
     repo_root: pathlib.Path,
-    baseline_path: pathlib.Path,
+    input_path: pathlib.Path,
     render_scientific_dir: pathlib.Path,
     render_dashboard_file: pathlib.Path,
     render_manifest_path: pathlib.Path,
@@ -181,7 +203,7 @@ def _run_renderer(
         "render:scientific",
         "--",
         "--input",
-        str(baseline_path),
+        str(input_path),
         "--out-dir",
         str(render_scientific_dir),
         "--manifest-out",
@@ -194,7 +216,7 @@ def _run_renderer(
         "render:dashboard",
         "--",
         "--input",
-        str(baseline_path),
+        str(input_path),
         "--out-file",
         str(render_dashboard_file),
         "--manifest-out",
@@ -226,18 +248,48 @@ def _render_output_files(
     return rendered
 
 
+def _validate_required_paths(
+    mode: str,
+    required_write_paths: List[str],
+    writable_globs: List[str],
+) -> bool:
+    allow_patterns = sorted(MODE_ALLOWED_WRITES[mode])
+    deny_patterns = sorted(MODE_DENY_WRITES[mode])
+
+    for rel_path in required_write_paths:
+        if not _path_allowed(rel_path, allow_patterns):
+            print(f"write path outside policy allowlist for {mode}: {rel_path}", file=sys.stderr)
+            return False
+        if _path_denied(rel_path, deny_patterns):
+            print(f"write path denied for {mode}: {rel_path}", file=sys.stderr)
+            return False
+        if not _path_allowed(rel_path, writable_globs):
+            print(f"write path outside provided writable-glob scope: {rel_path}", file=sys.stderr)
+            return False
+    return True
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh committed reporting baselines")
-    parser.add_argument("--mode", required=True)
+    parser.add_argument(
+        "--mode",
+        required=True,
+        choices=["baseline_update", "render_baseline_update"],
+    )
     parser.add_argument("--run-artifact", required=True)
-    parser.add_argument("--baseline-path", required=True)
-    parser.add_argument("--stage-contracts-path", required=True)
+    parser.add_argument(
+        "--baseline-path",
+        default="etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json",
+    )
+    parser.add_argument(
+        "--stage-contracts-path",
+        default="etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml",
+    )
     parser.add_argument("--repo-root", required=True)
     parser.add_argument("--run-notes", required=True)
     parser.add_argument("--allow-writes", action="store_true")
     parser.add_argument("--writable-glob", action="append", default=[])
     parser.add_argument("--out-dir", required=True)
-    parser.add_argument("--refresh-render-baselines", action="store_true")
     parser.add_argument(
         "--render-scientific-dir",
         default="etl/phase2/reporting/contracts/baselines/render/v1/scientific",
@@ -252,19 +304,16 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    if args.mode != "baseline_update":
-        print(f"unsupported mode: {args.mode}", file=sys.stderr)
-        return 1
     if not args.allow_writes:
-        print("--allow-writes is required for baseline_update mode", file=sys.stderr)
+        print("--allow-writes is required for refresh mode", file=sys.stderr)
         return 1
     if not args.writable_glob:
         print("at least one --writable-glob is required", file=sys.stderr)
         return 1
 
-    invalid_globs = sorted(set(args.writable_glob) - ALLOWED_WRITES)
+    invalid_globs = sorted(set(args.writable_glob) - MODE_ALLOWED_WRITES[args.mode])
     if invalid_globs:
-        print(f"invalid writable-glob entries: {', '.join(invalid_globs)}", file=sys.stderr)
+        print(f"invalid writable-glob entries for {args.mode}: {', '.join(invalid_globs)}", file=sys.stderr)
         return 1
 
     out_dir = pathlib.Path(args.out_dir)
@@ -279,6 +328,10 @@ def main() -> int:
     render_dashboard_file = pathlib.Path(args.render_dashboard_file)
     render_manifest_path = pathlib.Path(args.render_manifest_path)
 
+    if not run_bundle_path.exists():
+        print(f"run artifact not found: {run_bundle_path}", file=sys.stderr)
+        return 1
+
     try:
         baseline_rel = _repo_rel(baseline_path, repo_root)
         stage_rel = _repo_rel(stage_contracts_path, repo_root)
@@ -289,45 +342,18 @@ def main() -> int:
         print(str(exc), file=sys.stderr)
         return 1
 
-    required_write_paths = [baseline_rel, stage_rel]
-    if args.refresh_render_baselines:
+    required_write_paths: List[str]
+    if args.mode == "baseline_update":
+        required_write_paths = [baseline_rel, stage_rel]
+    else:
         render_svg_probe = f"{render_scientific_rel.rstrip('/')}/probe.svg"
-        required_write_paths.extend(
-            [render_svg_probe, render_dashboard_rel, render_manifest_rel]
-        )
+        required_write_paths = [render_svg_probe, render_dashboard_rel, render_manifest_rel]
 
-    for rel_path in required_write_paths:
-        if not _path_allowed(rel_path, list(ALLOWED_WRITES)):
-            print(f"write path outside policy allowlist: {rel_path}", file=sys.stderr)
-            return 1
-        if not _path_allowed(rel_path, args.writable_glob):
-            print(f"write path outside provided writable-glob scope: {rel_path}", file=sys.stderr)
-            return 1
-
-    if not run_bundle_path.exists():
-        print(f"run artifact not found: {run_bundle_path}", file=sys.stderr)
-        return 1
-    if not stage_contracts_path.exists():
-        print(f"stage contracts not found: {stage_contracts_path}", file=sys.stderr)
+    if not _validate_required_paths(args.mode, required_write_paths, args.writable_glob):
         return 1
 
     try:
         run_bundle = _load_json(run_bundle_path)
-        stage_contracts = _load_yaml(stage_contracts_path)
-    except ValueError as exc:
-        print(str(exc), file=sys.stderr)
-        return 1
-
-    figures = run_bundle.get("figures")
-    if not isinstance(figures, list) or not figures:
-        print("run artifact missing figures[]", file=sys.stderr)
-        return 1
-
-    try:
-        normalized_figures = sorted(
-            [_normalize_figure(figure) for figure in figures],
-            key=lambda x: x["figure_id"],
-        )
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1
@@ -336,47 +362,77 @@ def main() -> int:
     if not isinstance(source_hashes_input, dict):
         source_hashes_input = {}
     refreshed_source_hashes = _refresh_source_hashes(source_hashes_input, repo_root)
+    run_id = str(run_bundle.get("run_id", out_dir.name or args.mode))
+    updated_files: List[str] = []
+    stage_contract_source_inputs_updated = 0
 
-    normalized_run = {
-        "schema_version": str(run_bundle.get("schema_version", "phase2-reporting-bundle-v1")),
-        "run_id": str(run_bundle.get("run_id", out_dir.name or "baseline-update")),
-        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "git_sha": str(run_bundle.get("git_sha", "unknown")),
-        "source_db_ref": str(run_bundle.get("source_db_ref", "db://unknown-host/unknown-db")),
-        "contract_version": str(run_bundle.get("contract_version", "v1")),
-        "trigger": "manual_baseline_update",
-        "source_file_hashes": refreshed_source_hashes,
-        "figures": normalized_figures,
-        "summary": copy.deepcopy(
-            run_bundle.get(
-                "summary",
-                {
-                    "now_set_ok": all(f["status"] != "fail" for f in normalized_figures),
-                    "now_set_fail_count": sum(1 for f in normalized_figures if f["status"] == "fail"),
-                    "now_set_warn_count": sum(1 for f in normalized_figures if f["status"] == "warn"),
-                    "snapshot_drift_count": 0,
-                },
+    if args.mode == "baseline_update":
+        if not stage_contracts_path.exists():
+            print(f"stage contracts not found: {stage_contracts_path}", file=sys.stderr)
+            return 1
+        try:
+            stage_contracts = _load_yaml(stage_contracts_path)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+
+        figures = run_bundle.get("figures")
+        if not isinstance(figures, list) or not figures:
+            print("run artifact missing figures[]", file=sys.stderr)
+            return 1
+        try:
+            normalized_figures = sorted(
+                [_normalize_figure(figure) for figure in figures],
+                key=lambda x: x["figure_id"],
             )
-        ),
-        "artifact": {
-            "out_path": f"baseline://{baseline_rel}",
-            "sha256": _sha256_json(normalized_figures),
-        },
-    }
-    if "source_db_meta" in run_bundle:
-        normalized_run["source_db_meta"] = copy.deepcopy(run_bundle["source_db_meta"])
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
 
-    updated_source_inputs = _refresh_stage_contract_hashes(stage_contracts, repo_root)
+        normalized_run = {
+            "schema_version": str(run_bundle.get("schema_version", "phase2-reporting-bundle-v1")),
+            "run_id": run_id,
+            "generated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "git_sha": str(run_bundle.get("git_sha", "unknown")),
+            "source_db_ref": str(run_bundle.get("source_db_ref", "db://unknown-host/unknown-db")),
+            "contract_version": str(run_bundle.get("contract_version", "v1")),
+            "trigger": "manual_baseline_update",
+            "source_file_hashes": refreshed_source_hashes,
+            "figures": normalized_figures,
+            "summary": copy.deepcopy(
+                run_bundle.get(
+                    "summary",
+                    {
+                        "now_set_ok": all(f["status"] != "fail" for f in normalized_figures),
+                        "now_set_fail_count": sum(
+                            1 for f in normalized_figures if f["status"] == "fail"
+                        ),
+                        "now_set_warn_count": sum(
+                            1 for f in normalized_figures if f["status"] == "warn"
+                        ),
+                        "snapshot_drift_count": 0,
+                    },
+                )
+            ),
+            "artifact": {
+                "out_path": f"baseline://{baseline_rel}",
+                "sha256": _sha256_json(normalized_figures),
+            },
+        }
+        if "source_db_meta" in run_bundle:
+            normalized_run["source_db_meta"] = copy.deepcopy(run_bundle["source_db_meta"])
 
-    _write_json(baseline_path, normalized_run)
-    _write_yaml(stage_contracts_path, stage_contracts)
-
-    render_outputs: List[str] = []
-    if args.refresh_render_baselines:
+        stage_contract_source_inputs_updated = _refresh_stage_contract_hashes(
+            stage_contracts, repo_root
+        )
+        _write_json(baseline_path, normalized_run)
+        _write_yaml(stage_contracts_path, stage_contracts)
+        updated_files = [baseline_rel, stage_rel]
+    else:
         try:
             _run_renderer(
                 repo_root=repo_root,
-                baseline_path=baseline_path,
+                input_path=run_bundle_path,
                 render_scientific_dir=render_scientific_dir,
                 render_dashboard_file=render_dashboard_file,
                 render_manifest_path=render_manifest_path,
@@ -384,27 +440,30 @@ def main() -> int:
         except RuntimeError as exc:
             print(str(exc), file=sys.stderr)
             return 1
-        render_outputs = _render_output_files(
+        updated_files = _render_output_files(
             repo_root=repo_root,
             render_scientific_dir=render_scientific_dir,
             render_dashboard_file=render_dashboard_file,
             render_manifest_path=render_manifest_path,
         )
+        if not updated_files:
+            print("no render baseline files were produced", file=sys.stderr)
+            return 1
 
     log = {
         "schema_version": "1.0.0",
-        "mode": "baseline_update",
-        "run_id": normalized_run["run_id"],
+        "mode": args.mode,
+        "run_id": run_id,
         "run_notes": args.run_notes,
         "updated_at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "updated_files": [baseline_rel, stage_rel, *render_outputs],
+        "updated_files": updated_files,
         "source_file_hashes": refreshed_source_hashes,
-        "stage_contract_source_inputs_updated": updated_source_inputs,
-        "render_baseline_refresh": args.refresh_render_baselines,
+        "stage_contract_source_inputs_updated": stage_contract_source_inputs_updated,
+        "render_baseline_refresh": args.mode == "render_baseline_update",
     }
 
     _write_json(out_dir / "baseline-refresh-log.json", log)
-    print("baseline refresh completed")
+    print(f"{args.mode} completed")
     return 0
 
 
