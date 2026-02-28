@@ -26,10 +26,12 @@ const aliasMap = [
   ["--color-text", "--fd-semantic-color-text-primary"],
   ["--color-text-muted", "--fd-semantic-color-text-muted"],
   ["--color-border", "--fd-semantic-color-border-default"],
+  ["--color-border-control", "--fd-semantic-color-border-control"],
   ["--color-accent", "--fd-semantic-color-action-primary-bg"],
   ["--color-accent-strong", "--fd-semantic-color-action-primary-bg-hover"],
   ["--color-accent-foreground", "--fd-semantic-color-action-primary-fg"],
   ["--color-ring", "--fd-semantic-color-focus-ring"],
+  ["--color-ring-accessible", "--fd-semantic-color-focus-ring-accessible"],
   ["--color-ring-soft", "--fd-semantic-color-focus-ring-soft"],
   ["--color-warning", "--fd-semantic-color-status-warning-bg"],
   ["--color-warning-foreground", "--fd-semantic-color-status-warning-fg"],
@@ -166,7 +168,7 @@ function validateBaseColorTokens() {
   }
 }
 
-function collectLeafTokenPaths(node, pathParts = [], paths = []) {
+function collectTokenPaths(node, pathParts = [], paths = []) {
   if (node === null || node === undefined) {
     return paths;
   }
@@ -178,8 +180,18 @@ function collectLeafTokenPaths(node, pathParts = [], paths = []) {
     return paths;
   }
 
+  if (Object.prototype.hasOwnProperty.call(node, "$value")) {
+    if (pathParts.length > 0) {
+      paths.push(pathParts.join("."));
+    }
+    return paths;
+  }
+
   for (const [key, value] of Object.entries(node)) {
-    collectLeafTokenPaths(value, [...pathParts, key], paths);
+    if (key.startsWith("$")) {
+      continue;
+    }
+    collectTokenPaths(value, [...pathParts, key], paths);
   }
 
   return paths;
@@ -188,8 +200,8 @@ function collectLeafTokenPaths(node, pathParts = [], paths = []) {
 function validateSemanticTokenParity(lightTokens, darkTokens) {
   const lightSemantic = lightTokens.semantic ?? lightTokens;
   const darkSemantic = darkTokens.semantic ?? darkTokens;
-  const lightPaths = new Set(collectLeafTokenPaths(lightSemantic));
-  const darkPaths = new Set(collectLeafTokenPaths(darkSemantic));
+  const lightPaths = new Set(collectTokenPaths(lightSemantic));
+  const darkPaths = new Set(collectTokenPaths(darkSemantic));
   const onlyLight = [...lightPaths]
     .filter((path) => !darkPaths.has(path))
     .sort();
@@ -216,6 +228,187 @@ function validateSemanticTokenParity(lightTokens, darkTokens) {
   }
 
   throw new Error(`Semantic token parity check failed:\n${details.join("\n")}`);
+}
+
+function getPathValue(node, tokenPath) {
+  return tokenPath.split(".").reduce((currentNode, segment) => {
+    if (
+      currentNode === null ||
+      currentNode === undefined ||
+      typeof currentNode !== "object"
+    ) {
+      return undefined;
+    }
+
+    return currentNode[segment];
+  }, node);
+}
+
+function normalizeTokenColorValue(tokenPath, value) {
+  if (value === null || value === undefined) {
+    throw new Error(
+      `${tokenPath}: expected a color token value, received null.`,
+    );
+  }
+
+  if (typeof value === "object" && !Array.isArray(value)) {
+    if (Object.prototype.hasOwnProperty.call(value, "$value")) {
+      return normalizeTokenColorValue(tokenPath, value.$value);
+    }
+
+    if (typeof value.hex === "string") {
+      return value.hex.toLowerCase();
+    }
+
+    if (
+      typeof value.colorSpace === "string" &&
+      Array.isArray(value.components)
+    ) {
+      try {
+        return new Color(value.colorSpace, value.components)
+          .to("srgb")
+          .toString({ format: "hex" })
+          .toLowerCase();
+      } catch (error) {
+        const details = error instanceof Error ? error.message : String(error);
+        throw new Error(
+          `${tokenPath}: failed to parse object color value (${details}).`,
+        );
+      }
+    }
+
+    throw new Error(
+      `${tokenPath}: unsupported color value object ${JSON.stringify(value)}.`,
+    );
+  }
+
+  if (typeof value !== "string") {
+    throw new Error(
+      `${tokenPath}: expected a string color value, received ${typeof value}.`,
+    );
+  }
+
+  try {
+    return new Color(value)
+      .to("srgb")
+      .toString({ format: "hex" })
+      .toLowerCase();
+  } catch {
+    if (tinycolor(value).isValid()) {
+      return tinycolor(value).toHexString().toLowerCase();
+    }
+
+    throw new Error(
+      `${tokenPath}: invalid color value ${JSON.stringify(value)}.`,
+    );
+  }
+}
+
+function resolveSemanticColorHex(semanticColor, tokenPath) {
+  const value = getPathValue(semanticColor, tokenPath);
+
+  if (value === undefined) {
+    throw new Error(
+      `${tokenPath}: token path not found in semantic color tree.`,
+    );
+  }
+
+  return normalizeTokenColorValue(tokenPath, value);
+}
+
+function collectFgBgSiblingPairs(node, pathParts = [], pairs = []) {
+  if (node === null || node === undefined) {
+    return pairs;
+  }
+
+  if (typeof node !== "object" || Array.isArray(node)) {
+    return pairs;
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(node, "bg") &&
+    Object.prototype.hasOwnProperty.call(node, "fg")
+  ) {
+    pairs.push({
+      bg: [...pathParts, "bg"].join("."),
+      fg: [...pathParts, "fg"].join("."),
+    });
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key.startsWith("$")) {
+      continue;
+    }
+    collectFgBgSiblingPairs(value, [...pathParts, key], pairs);
+  }
+
+  return pairs;
+}
+
+function validateSemanticColorContrast(themeName, themeTokens) {
+  const semantic = themeTokens.semantic ?? themeTokens;
+  const semanticColor = semantic.color;
+
+  if (
+    semanticColor === null ||
+    semanticColor === undefined ||
+    typeof semanticColor !== "object"
+  ) {
+    throw new Error(
+      `Semantic color contrast check failed for ${themeName}: semantic.color tree not found.`,
+    );
+  }
+
+  const requiredPairs = [
+    { fg: "text.primary", bg: "background.canvas", minRatio: 4.5 },
+    { fg: "text.primary", bg: "surface.default", minRatio: 4.5 },
+    { fg: "text.primary", bg: "surface.raised", minRatio: 4.5 },
+    { fg: "text.primary", bg: "surface.muted", minRatio: 4.5 },
+    { fg: "text.muted", bg: "background.canvas", minRatio: 4.5 },
+    { fg: "text.muted", bg: "surface.default", minRatio: 4.5 },
+    { fg: "text.inverse", bg: "surface.inverse", minRatio: 4.5 },
+    { fg: "focus.ringAccessible", bg: "background.canvas", minRatio: 3 },
+    { fg: "border.control", bg: "background.canvas", minRatio: 3 },
+  ];
+
+  const actionStatusPairs = collectFgBgSiblingPairs(semanticColor)
+    .filter(
+      ({ bg, fg }) =>
+        (bg.startsWith("action.") && fg.startsWith("action.")) ||
+        (bg.startsWith("status.") && fg.startsWith("status.")),
+    )
+    .map(({ fg, bg }) => ({ fg, bg, minRatio: 4.5 }));
+
+  const pairByKey = new Map();
+
+  for (const pair of [...requiredPairs, ...actionStatusPairs]) {
+    pairByKey.set(`${pair.fg}|${pair.bg}`, pair);
+  }
+
+  const errors = [];
+
+  for (const pair of pairByKey.values()) {
+    try {
+      const fgHex = resolveSemanticColorHex(semanticColor, pair.fg);
+      const bgHex = resolveSemanticColorHex(semanticColor, pair.bg);
+      const ratio = tinycolor.readability(fgHex, bgHex);
+
+      if (ratio < pair.minRatio) {
+        errors.push(
+          `- ${pair.fg} on ${pair.bg}: ${ratio.toFixed(2)} (required >= ${pair.minRatio.toFixed(1)})`,
+        );
+      }
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error);
+      errors.push(`- ${pair.fg} on ${pair.bg}: ${details}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(
+      `Semantic color contrast check failed for ${themeName}:\n${errors.join("\n")}`,
+    );
+  }
 }
 
 function extractVariableDeclarations(cssText) {
@@ -465,6 +658,8 @@ const lightCss = readFileSync(path.join(tempBuildDir, "light.css"), "utf8");
 const darkCss = readFileSync(path.join(tempBuildDir, "dark.css"), "utf8");
 
 validateSemanticTokenParity(lightTokens, darkTokens);
+validateSemanticColorContrast("light", lightTokens);
+validateSemanticColorContrast("dark", darkTokens);
 
 writeGeneratedFiles(baseTokens, lightTokens, darkTokens, lightCss, darkCss);
 writeNativeFile(baseTokens, lightTokens, darkTokens);

@@ -251,11 +251,13 @@ export const tokens = {
           },
           "border": {
             "default": "oklch(0.8175 0.0431 75.34)",
+            "control": "oklch(0.5534 0.0116 58.07)",
             "subtle": "oklch(0.9232 0.0026 48.72)",
             "strong": "oklch(0.7161 0.0091 56.26)"
           },
           "focus": {
             "ring": "oklch(0.6932 0.1067 128.04)",
+            "ringAccessible": "oklch(0.5407 0.1021 128.36)",
             "ringSoft": "oklch(0.8362 0.0574 122.96)"
           },
           "action": {
@@ -337,11 +339,13 @@ export const tokens = {
           },
           "border": {
             "default": "oklch(0.4129 0.0384 64.89)",
+            "control": "oklch(0.5534 0.0116 58.07)",
             "subtle": "oklch(0.3741 0.0087 67.56)",
             "strong": "oklch(0.5534 0.0116 58.07)"
           },
           "focus": {
             "ring": "oklch(0.8426 0.1096 127.06)",
+            "ringAccessible": "oklch(0.6888 0.1248 127.03)",
             "ringSoft": "oklch(0.5473 0.0634 122.49)"
           },
           "action": {

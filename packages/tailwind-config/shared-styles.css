@@ -27,8 +27,10 @@
     --color-accent-foreground: var(--fd-semantic-color-text-primary);
 
     --color-border: var(--fd-semantic-color-border-default);
-    --color-input: var(--fd-semantic-color-border-default);
+    --color-input: var(--fd-semantic-color-border-control);
+    --color-border-control: var(--fd-semantic-color-border-control);
     --color-ring: var(--fd-semantic-color-focus-ring);
+    --color-ring-accessible: var(--fd-semantic-color-focus-ring-accessible);
     --color-ring-soft: var(--fd-semantic-color-focus-ring-soft);
 
     --color-primary: var(--fd-semantic-color-action-primary-bg);
@@ -85,8 +87,10 @@
   --color-accent-foreground: var(--fd-semantic-color-text-primary);
 
   --color-border: var(--fd-semantic-color-border-default);
-  --color-input: var(--fd-semantic-color-border-default);
+  --color-input: var(--fd-semantic-color-border-control);
+  --color-border-control: var(--fd-semantic-color-border-control);
   --color-ring: var(--fd-semantic-color-focus-ring);
+  --color-ring-accessible: var(--fd-semantic-color-focus-ring-accessible);
   --color-ring-soft: var(--fd-semantic-color-focus-ring-soft);
 
   --color-primary: var(--fd-semantic-color-action-primary-bg);

@@ -335,7 +335,9 @@ const semanticColorRows: SemanticColorGridRow[] = semanticAllPaths.map(
 
 const semanticByPath = new Map(semanticColorRows.map((row) => [row.path, row]));
 const requiredSemanticColorPaths = [
+  "semantic.color.focus.ringAccessible",
   "semantic.color.focus.ringSoft",
+  "semantic.color.border.control",
   "semantic.color.action.destructive.bg",
   "semantic.color.action.destructive.bgHover",
   "semantic.color.action.destructive.fg",
@@ -896,6 +898,12 @@ export const Showcase: Story = {
     ).not.toBe("");
     await expect(
       rootStyles.getPropertyValue("--color-primary").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-ring-accessible").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-border-control").trim(),
     ).not.toBe("");
     await expect(
       rootStyles.getPropertyValue("--color-ring-soft").trim(),
