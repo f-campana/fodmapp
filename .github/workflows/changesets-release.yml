@@ -40,10 +40,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          permissions_json="$(curl -fsSL \
-            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/permissions/workflow")"
+          permissions_response="$(mktemp)"
+          http_code="$(
+            curl -sS -o "$permissions_response" -w "%{http_code}" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/permissions/workflow"
+          )"
+
+          if [[ "$http_code" == "403" ]]; then
+            echo "::warning::Unable to verify Actions workflow permissions via API (HTTP 403) with GITHUB_TOKEN."
+            echo "::warning::Continuing to release step. If PR creation fails, verify:"
+            echo "::warning::Settings > Actions > General > Workflow permissions."
+            exit 0
+          fi
+
+          if [[ "$http_code" != "200" ]]; then
+            echo "::error::Failed to inspect workflow permissions (HTTP ${http_code})."
+            cat "$permissions_response"
+            exit 1
+          fi
+
+          permissions_json="$(cat "$permissions_response")"
 
           PERMISSIONS_JSON="$permissions_json" node <<'NODE'
           const payload = JSON.parse(process.env.PERMISSIONS_JSON || "{}");
