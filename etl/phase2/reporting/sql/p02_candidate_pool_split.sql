@@ -1,16 +1,17 @@
 \set ON_ERROR_STOP on
 
 WITH stages AS (
-  SELECT *
-  FROM (
-    VALUES
-      (1, 'fructan_wave01', 16, 10, 26, 0.6154::numeric),
-      (2, 'fructan_wave02', 15, 6, 21, 0.7143::numeric),
-      (3, 'gos_wave01', 9, 6, 15, 0.6000::numeric),
-      (4, 'gos_wave02', 6, 3, 9, 0.6667::numeric),
-      (5, 'polyol_wave01', 1, 2, 3, 0.3333::numeric),
-      (6, 'polyol_wave02', 0, 0, 0, 1.0000::numeric)
-  ) AS t(stage_order, stage_id, with_candidates_rows, without_candidates_rows, unresolved_rows, pool_closure_rate)
+  SELECT
+    stage_order,
+    stage_id,
+    with_candidates_rows,
+    without_candidates_rows,
+    unresolved_rows,
+    CASE
+      WHEN unresolved_rows = 0 THEN 1.0000::numeric
+      ELSE ROUND((with_candidates_rows::numeric / unresolved_rows::numeric), 4)
+    END AS pool_closure_rate
+  FROM reporting_stage_contract_snapshot
 )
 SELECT jsonb_build_object(
   '_contract_refs', jsonb_build_array(

@@ -9,3 +9,4 @@ storybook-static
 dist
 packages/design-tokens/src/generated
 pnpm-lock.yaml
+etl/phase2/reporting/contracts/baselines/render/**

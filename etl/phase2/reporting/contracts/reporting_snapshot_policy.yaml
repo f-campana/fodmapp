@@ -83,9 +83,31 @@ baseline_update:
     allow:
       - "etl/phase2/reporting/contracts/generated/*.generated.yaml"
       - "etl/phase2/reporting/contracts/baselines/**/*.json"
+    deny:
+      - "etl/phase2/reporting/contracts/baselines/render/**"
+      - "etl/phase2/reporting/contracts/schema/*"
+      - "etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml"
+      - "etl/phase2/reporting/docs/**"
+      - "etl/phase2/reporting/tests/**"
+      - ".github/workflows/phase2-reporting.yml"
+
+render_baseline_update:
+  input_name: "render_baseline_update"
+  approval_input_name: "baseline_update_approved_by"
+  approval_confirm_input_name: "baseline_update_confirmed"
+  clean_tree_required: true
+  requires_workflow_dispatch: true
+  log_entry_fields:
+    - "schema_version"
+    - "run_id"
+  writable_scope:
+    allow:
       - "etl/phase2/reporting/contracts/baselines/render/**/*.svg"
       - "etl/phase2/reporting/contracts/baselines/render/**/*.html"
+      - "etl/phase2/reporting/contracts/baselines/render/**/*.json"
     deny:
+      - "etl/phase2/reporting/contracts/generated/*.generated.yaml"
+      - "etl/phase2/reporting/contracts/baselines/now/**"
       - "etl/phase2/reporting/contracts/schema/*"
       - "etl/phase2/reporting/contracts/reporting_snapshot_policy.yaml"
       - "etl/phase2/reporting/docs/**"

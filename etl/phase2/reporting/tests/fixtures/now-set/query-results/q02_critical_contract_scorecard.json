@@ -8,9 +8,9 @@
   "fixture_id": "Q-02",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:TODO",
-    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO",
-    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:TODO"
+    "api/app/sql.py": "sha256:b9042cb928674f099b13c5ed23f0182310fd8fef53360fe958107e47c841e851",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a"
   },
   "source_rows": {
     "contract_checks": {

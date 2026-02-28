@@ -1,8 +1,8 @@
 {
   "schema_version": "phase2-render-baseline-manifest-v1",
-  "generated_at_utc": "2026-02-28T18:03:24.791Z",
+  "generated_at_utc": "2026-02-28T23:44:07.550Z",
   "source_run": {
-    "run_id": "local-render-smoke",
+    "run_id": "local-render-smoke-20260301004405",
     "git_sha": "placeholder",
     "source_db_ref": "fixture://now-set",
     "contract_version": "v1"
@@ -81,7 +81,7 @@
       "artifact_id": "phase2_dashboard_html",
       "file": "phase2_dashboard.html",
       "title": "Phase 2 Reporting Dashboard",
-      "sha256": "sha256:1eb34e4d1f9c07c55c5640da18b65dec9df43ea6c3f44bf2a8c217152d705715"
+      "sha256": "sha256:9215582662c4175b13759303a0c0aa938dd89d052c560762a8837ac86177b3da"
     }
   ]
 }

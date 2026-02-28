@@ -7,8 +7,8 @@
   "fixture_id": "E-04",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:TODO",
-    "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:TODO"
+    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:bfe7df545a9f5a23988d6d63a689fae550e7ae79274cd14b4a1e11d124aeefba",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5"
   },
   "source_rows": {
     "cohort_note_count": 1,

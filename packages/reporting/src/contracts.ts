@@ -163,7 +163,12 @@ export interface ReportingRun {
     redacted: boolean;
   };
   contract_version: string;
-  trigger?: "pr_smoke" | "main_full" | "manual_full" | "manual_baseline_update";
+  trigger?:
+    | "pr_smoke"
+    | "main_full"
+    | "manual_full"
+    | "manual_baseline_update"
+    | "manual_render_baseline_update";
   source_file_hashes?: Record<string, string>;
   figures: FigurePayload[];
   summary?: {

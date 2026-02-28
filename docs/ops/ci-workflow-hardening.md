@@ -1,35 +1,29 @@
 # CI Workflow Hardening Runbook
 
-Last updated: 2026-02-28
+Last updated: 2026-03-01
 
 ## Scope
 
 This runbook documents operations controls introduced by CI workflow hardening:
 
 - deterministic required checks for branch protection
-- staged enforcement for `Phase 2 Reporting` full-lane checks
+- blocking enforcement for `Phase 2 Reporting` full-lane checks
 - native `GITHUB_TOKEN` guardrails for `Changesets release`
 - PR-scoped Turbo CI execution (`pr-scope`) for heavy jobs
 - Turbo cache mode selection: remote cache when configured, `.turbo` restore/save fallback when not
 - strict local Turbo binary invocation in CI via `pnpm exec turbo run ...`
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 
-## Repository Variable: `PHASE2_FULL_RUN_ENFORCE`
+## Phase 2 Reporting Gate Mode
 
-Controls whether `Phase 2 Reporting` full-lane compare failures block `main`.
+`Phase 2 Reporting` full lane is always blocking.
 
-- Variable name: `PHASE2_FULL_RUN_ENFORCE`
-- Expected values:
-  - `"false"`: non-blocking ramp mode (default)
-  - `"true"`: blocking enforcement mode
-
-In non-blocking mode, compare failures are visible but do not fail the full-lane job.
-In blocking mode, compare failures fail the job and the `Phase 2 Reporting Gate`.
-
-Rollout policy:
-
-- Keep `PHASE2_FULL_RUN_ENFORCE=false` initially after merge.
-- Flip to `true` only after 3 consecutive green `main` runs for `Phase 2 Reporting Gate`.
+- No ramp variable is used.
+- Compare failures fail the full-lane job and fail the `Phase 2 Reporting Gate`.
+- Baseline refresh remains manual and approval-gated through:
+  - `workflow_dispatch baseline_update=true`
+  - `workflow_dispatch render_baseline_update=true`
+  - mutual exclusion (`baseline_update` and `render_baseline_update` cannot both be true)
 
 ## Changesets Release Permissions
 
