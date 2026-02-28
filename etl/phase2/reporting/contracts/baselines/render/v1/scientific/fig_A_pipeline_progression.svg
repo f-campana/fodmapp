@@ -3,17 +3,17 @@
 <title>Figure A Pipeline Progression</title>
 <defs>
 <style><![CDATA[
-.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
-.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
-.grid{stroke:#d7e0eb;stroke-width:1;}
-.axis{stroke:#64748b;stroke-width:1.2;}
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
 ]]></style>
 </defs>
-<rect x="0" y="0" width="1200" height="520" fill="#f8fafc"/>
+<rect x="0" y="0" width="1200" height="520" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
 <text class="title" x="24" y="36">A - Pipeline Progression (Resolved vs Unresolved)</text>
 <text class="subtitle" x="24" y="58">Source: P-01_stage_progression_contract_curve</text>
 <line class="grid" x1="72" y1="446" x2="1168" y2="446"/>
@@ -32,43 +32,43 @@
 <text class="muted" x="62" y="90" text-anchor="end">42</text>
 <line class="axis" x1="72" y1="86" x2="72" y2="446"/>
 <line class="axis" x1="72" y1="446" x2="1168" y2="446"/>
-<rect x="126.28571428571428" y="446" width="22" height="0" fill="#0ea5e9"/>
-<rect x="152.28571428571428" y="86" width="22" height="360" fill="#f59e0b"/>
+<rect x="126.28571428571428" y="446" width="22" height="0" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="152.28571428571428" y="86" width="22" height="360" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="137.28571428571428" y="440" text-anchor="middle">0</text>
 <text class="value" x="163.28571428571428" y="80" text-anchor="middle">42</text>
 <text class="label" x="150.28571428571428" y="462" text-anchor="middle">Start</text>
-<rect x="282.8571428571429" y="308.8571428571429" width="22" height="137.14285714285714" fill="#0ea5e9"/>
-<rect x="308.8571428571429" y="223.14285714285714" width="22" height="222.85714285714286" fill="#f59e0b"/>
+<rect x="282.8571428571429" y="308.8571428571429" width="22" height="137.14285714285714" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="308.8571428571429" y="223.14285714285714" width="22" height="222.85714285714286" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="293.8571428571429" y="302.8571428571429" text-anchor="middle">16</text>
 <text class="value" x="319.8571428571429" y="217.14285714285714" text-anchor="middle">26</text>
 <text class="label" x="306.8571428571429" y="462" text-anchor="middle">fructan_wave01</text>
-<rect x="439.42857142857144" y="266" width="22" height="180" fill="#0ea5e9"/>
-<rect x="465.42857142857144" y="266" width="22" height="180" fill="#f59e0b"/>
+<rect x="439.42857142857144" y="266" width="22" height="180" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="465.42857142857144" y="266" width="22" height="180" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="450.42857142857144" y="260" text-anchor="middle">21</text>
 <text class="value" x="476.42857142857144" y="260" text-anchor="middle">21</text>
 <text class="label" x="463.42857142857144" y="462" text-anchor="middle">fructan_wave02</text>
-<rect x="596.0000000000001" y="214.57142857142856" width="22" height="231.42857142857144" fill="#0ea5e9"/>
-<rect x="622.0000000000001" y="317.42857142857144" width="22" height="128.57142857142858" fill="#f59e0b"/>
+<rect x="596.0000000000001" y="214.57142857142856" width="22" height="231.42857142857144" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="622.0000000000001" y="317.42857142857144" width="22" height="128.57142857142858" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="607.0000000000001" y="208.57142857142856" text-anchor="middle">27</text>
 <text class="value" x="633.0000000000001" y="311.42857142857144" text-anchor="middle">15</text>
 <text class="label" x="620.0000000000001" y="462" text-anchor="middle">gos_wave01</text>
-<rect x="752.5714285714287" y="163.14285714285717" width="22" height="282.85714285714283" fill="#0ea5e9"/>
-<rect x="778.5714285714287" y="368.8571428571429" width="22" height="77.14285714285714" fill="#f59e0b"/>
+<rect x="752.5714285714287" y="163.14285714285717" width="22" height="282.85714285714283" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="778.5714285714287" y="368.8571428571429" width="22" height="77.14285714285714" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="763.5714285714287" y="157.14285714285717" text-anchor="middle">33</text>
 <text class="value" x="789.5714285714287" y="362.8571428571429" text-anchor="middle">9</text>
 <text class="label" x="776.5714285714287" y="462" text-anchor="middle">gos_wave02</text>
-<rect x="909.1428571428572" y="111.71428571428572" width="22" height="334.2857142857143" fill="#0ea5e9"/>
-<rect x="935.1428571428572" y="420.2857142857143" width="22" height="25.71428571428571" fill="#f59e0b"/>
+<rect x="909.1428571428572" y="111.71428571428572" width="22" height="334.2857142857143" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="935.1428571428572" y="420.2857142857143" width="22" height="25.71428571428571" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="920.1428571428572" y="105.71428571428572" text-anchor="middle">39</text>
 <text class="value" x="946.1428571428572" y="414.2857142857143" text-anchor="middle">3</text>
 <text class="label" x="933.1428571428572" y="462" text-anchor="middle">polyol_wave01</text>
-<rect x="1065.7142857142858" y="86" width="22" height="360" fill="#0ea5e9"/>
-<rect x="1091.7142857142858" y="446" width="22" height="0" fill="#f59e0b"/>
+<rect x="1065.7142857142858" y="86" width="22" height="360" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
+<rect x="1091.7142857142858" y="446" width="22" height="0" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="1076.7142857142858" y="80" text-anchor="middle">42</text>
 <text class="value" x="1102.7142857142858" y="440" text-anchor="middle">0</text>
 <text class="label" x="1089.7142857142858" y="462" text-anchor="middle">polyol_wave02</text>
-<rect x="930" y="440" width="12" height="12" fill="#0ea5e9"/>
+<rect x="930" y="440" width="12" height="12" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
 <text class="label" x="948" y="450">Resolved</text>
-<rect x="1030" y="440" width="12" height="12" fill="#f59e0b"/>
+<rect x="1030" y="440" width="12" height="12" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="label" x="1048" y="450">Unresolved</text>
 </svg>

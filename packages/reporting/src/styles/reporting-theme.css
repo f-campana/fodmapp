@@ -20,6 +20,16 @@
   );
   --fd-reporting-color-text: var(--fd-semantic-color-text-primary, #0f172a);
   --fd-reporting-color-text-muted: var(--fd-semantic-color-text-muted, #475569);
+  --fd-reporting-color-grid: var(--fd-reporting-color-border-subtle, #d7e0eb);
+  --fd-reporting-color-axis: var(--fd-reporting-color-text-muted, #64748b);
+  --fd-reporting-color-info-bg: var(
+    --fd-semantic-color-status-info-bg,
+    #0ea5e9
+  );
+  --fd-reporting-color-warning-bg: var(
+    --fd-semantic-color-status-warning-bg,
+    #f59e0b
+  );
   --fd-reporting-color-accent: var(
     --fd-semantic-color-action-primary-bg,
     #0f766e
@@ -39,6 +49,18 @@
   --fd-reporting-color-danger-fg: var(
     --fd-semantic-color-status-danger-fg,
     #fef2f2
+  );
+  --fd-reporting-color-danger-strong: var(
+    --fd-semantic-color-action-destructive-bg-hover,
+    #dc2626
+  );
+  --fd-reporting-color-surface-success-soft: var(
+    --fd-semantic-color-status-success-fg,
+    #dcfce7
+  );
+  --fd-reporting-color-surface-danger-soft: var(
+    --fd-semantic-color-status-danger-fg,
+    #fee2e2
   );
 
   font-family: var(

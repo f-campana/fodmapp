@@ -6,6 +6,33 @@ export interface ScientificRenderOptions {
   height?: number;
 }
 
+const scientificColor = {
+  canvas:
+    "var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))",
+  surface:
+    "var(--fd-reporting-color-surface, var(--fd-semantic-color-surface-default))",
+  border:
+    "var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))",
+  borderSubtle:
+    "var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))",
+  text: "var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary))",
+  textMuted:
+    "var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted))",
+  info: "var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))",
+  warning:
+    "var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))",
+  success:
+    "var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))",
+  successSoft:
+    "var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))",
+  danger:
+    "var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))",
+  dangerStrong:
+    "var(--fd-reporting-color-danger-strong, var(--fd-semantic-color-action-destructive-bg-hover))",
+  dangerSoft:
+    "var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))",
+} as const;
+
 function escapeXml(text: string): string {
   return text
     .replaceAll("&", "&amp;")
@@ -27,17 +54,17 @@ function svgRoot(
     `<title>${escapeXml(title)}</title>`,
     `<defs>`,
     `<style><![CDATA[`,
-    `.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}`,
-    `.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}`,
-    `.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}`,
-    `.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}`,
-    `.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}`,
-    `.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}`,
-    `.grid{stroke:#d7e0eb;stroke-width:1;}`,
-    `.axis{stroke:#64748b;stroke-width:1.2;}`,
+    `.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.text};}`,
+    `.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.textMuted};}`,
+    `.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.textMuted};}`,
+    `.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.text};}`,
+    `.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.textMuted};}`,
+    `.mono{font:500 12px 'JetBrains Mono',monospace;fill:${scientificColor.textMuted};}`,
+    `.grid{stroke:${scientificColor.borderSubtle};stroke-width:1;}`,
+    `.axis{stroke:${scientificColor.textMuted};stroke-width:1.2;}`,
     `]]></style>`,
     `</defs>`,
-    `<rect x="0" y="0" width="${width}" height="${height}" fill="#f8fafc"/>`,
+    `<rect x="0" y="0" width="${width}" height="${height}" fill="${scientificColor.canvas}"/>`,
     body,
     `</svg>`,
   ].join("\n");
@@ -110,10 +137,10 @@ function renderFigureA(run: ReportingRun): string {
     const unresolvedHeight = (row.unresolved / maxY) * chartH;
 
     body.push(
-      `<rect x="${cx - barWidth - 2}" y="${chartY + chartH - resolvedHeight}" width="${barWidth}" height="${resolvedHeight}" fill="#0ea5e9"/>`,
+      `<rect x="${cx - barWidth - 2}" y="${chartY + chartH - resolvedHeight}" width="${barWidth}" height="${resolvedHeight}" fill="${scientificColor.info}"/>`,
     );
     body.push(
-      `<rect x="${cx + 2}" y="${chartY + chartH - unresolvedHeight}" width="${barWidth}" height="${unresolvedHeight}" fill="#f59e0b"/>`,
+      `<rect x="${cx + 2}" y="${chartY + chartH - unresolvedHeight}" width="${barWidth}" height="${unresolvedHeight}" fill="${scientificColor.warning}"/>`,
     );
 
     body.push(
@@ -129,13 +156,13 @@ function renderFigureA(run: ReportingRun): string {
   });
 
   body.push(
-    `<rect x="${width - 270}" y="${height - 80}" width="12" height="12" fill="#0ea5e9"/>`,
+    `<rect x="${width - 270}" y="${height - 80}" width="12" height="12" fill="${scientificColor.info}"/>`,
   );
   body.push(
     `<text class="label" x="${width - 252}" y="${height - 70}">Resolved</text>`,
   );
   body.push(
-    `<rect x="${width - 170}" y="${height - 80}" width="12" height="12" fill="#f59e0b"/>`,
+    `<rect x="${width - 170}" y="${height - 80}" width="12" height="12" fill="${scientificColor.warning}"/>`,
   );
   body.push(
     `<text class="label" x="${width - 152}" y="${height - 70}">Unresolved</text>`,
@@ -182,13 +209,13 @@ function renderFigureB(run: ReportingRun): string {
       `<text class="label" x="${chartX - 10}" y="${y + 22}" text-anchor="end">${escapeXml(row.stage_id)}</text>`,
     );
     body.push(
-      `<rect x="${chartX}" y="${y + 8}" width="${barW}" height="20" fill="#e2e8f0" opacity="0.38"/>`,
+      `<rect x="${chartX}" y="${y + 8}" width="${barW}" height="20" fill="${scientificColor.borderSubtle}" opacity="0.38"/>`,
     );
     body.push(
-      `<rect x="${chartX}" y="${y + 9}" width="${withWidth}" height="18" fill="#10b981"/>`,
+      `<rect x="${chartX}" y="${y + 9}" width="${withWidth}" height="18" fill="${scientificColor.success}"/>`,
     );
     body.push(
-      `<rect x="${chartX + withWidth}" y="${y + 9}" width="${withoutWidth}" height="18" fill="#ef4444"/>`,
+      `<rect x="${chartX + withWidth}" y="${y + 9}" width="${withoutWidth}" height="18" fill="${scientificColor.danger}"/>`,
     );
     body.push(
       `<text class="value" x="${chartX + Math.max(withWidth - 6, 16)}" y="${y + 22}" text-anchor="end">${row.with_candidates_rows}</text>`,
@@ -202,13 +229,13 @@ function renderFigureB(run: ReportingRun): string {
   });
 
   body.push(
-    `<rect x="${width - 280}" y="${height - 74}" width="12" height="12" fill="#10b981"/>`,
+    `<rect x="${width - 280}" y="${height - 74}" width="12" height="12" fill="${scientificColor.success}"/>`,
   );
   body.push(
     `<text class="label" x="${width - 262}" y="${height - 64}">with candidates</text>`,
   );
   body.push(
-    `<rect x="${width - 150}" y="${height - 74}" width="12" height="12" fill="#ef4444"/>`,
+    `<rect x="${width - 150}" y="${height - 74}" width="12" height="12" fill="${scientificColor.danger}"/>`,
   );
   body.push(
     `<text class="label" x="${width - 132}" y="${height - 64}">without candidates</text>`,
@@ -263,10 +290,10 @@ function renderFigureC(run: ReportingRun): string {
       const value = Number(row[col.key] ?? 0);
       const color =
         col.key.includes("unresolved") || col.key.includes("pending")
-          ? "#fee2e2"
-          : "#dcfce7";
+          ? scientificColor.dangerSoft
+          : scientificColor.successSoft;
       body.push(
-        `<rect x="${startX + colIndex * cellW + 1}" y="${y + 1}" width="${cellW - 2}" height="${cellH - 2}" fill="${color}" stroke="#cbd5e1"/>`,
+        `<rect x="${startX + colIndex * cellW + 1}" y="${y + 1}" width="${cellW - 2}" height="${cellH - 2}" fill="${color}" stroke="${scientificColor.border}"/>`,
       );
       body.push(
         `<text class="value" x="${startX + colIndex * cellW + cellW / 2}" y="${y + 33}" text-anchor="middle">${value}</text>`,
@@ -335,7 +362,7 @@ function renderFigureD(run: ReportingRun): string {
   cards.forEach((card, index) => {
     const x = 48 + index * (boxW + 40);
     body.push(
-      `<rect x="${x}" y="${boxY}" width="${boxW}" height="${boxH}" fill="#ffffff" stroke="#cbd5e1"/>`,
+      `<rect x="${x}" y="${boxY}" width="${boxW}" height="${boxH}" fill="${scientificColor.surface}" stroke="${scientificColor.border}"/>`,
     );
     body.push(
       `<text class="subtitle" x="${x + 14}" y="${boxY + 24}">${escapeXml(card.label)}</text>`,
@@ -377,22 +404,22 @@ function renderFigureE(run: ReportingRun): string {
     {
       label: "reviewed_snapshot_rows",
       value: metrics.reviewed_snapshot_rows,
-      color: "#0ea5e9",
+      color: scientificColor.info,
     },
     {
       label: "snapshot_mismatch_rows",
       value: metrics.snapshot_mismatch_rows,
-      color: "#ef4444",
+      color: scientificColor.danger,
     },
     {
       label: "auto_eligible_mismatch_rows",
       value: metrics.auto_eligible_mismatch_rows,
-      color: "#f59e0b",
+      color: scientificColor.warning,
     },
     {
       label: "approve_for_ineligible_rows",
       value: metrics.approve_for_ineligible_rows,
-      color: "#dc2626",
+      color: scientificColor.dangerStrong,
     },
   ];
 
@@ -445,17 +472,17 @@ function renderFigureF(run: ReportingRun): string {
     {
       label: "phase2_rank2_current_target_measurements",
       value: metrics.phase2_rank2_current_target_measurements,
-      color: "#ef4444",
+      color: scientificColor.danger,
     },
     {
       label: "phase3_rules_touching_rank2",
       value: metrics.phase3_rules_touching_rank2,
-      color: "#f59e0b",
+      color: scientificColor.warning,
     },
     {
       label: "api_rank2_leak_rows",
       value: metrics.api_rank2_leak_rows,
-      color: "#dc2626",
+      color: scientificColor.dangerStrong,
     },
   ];
   const max = Math.max(...rows.map((row) => row.value), 1);
@@ -483,7 +510,7 @@ function renderFigureF(run: ReportingRun): string {
   });
 
   body.push(
-    `<rect x="40" y="330" width="560" height="56" fill="#ffffff" stroke="#cbd5e1"/>`,
+    `<rect x="40" y="330" width="560" height="56" fill="${scientificColor.surface}" stroke="${scientificColor.border}"/>`,
   );
   body.push(
     `<text class="subtitle" x="56" y="354">overall_pass=${metrics.overall_pass}</text>`,
@@ -509,17 +536,17 @@ function renderFigureG(run: ReportingRun): string {
     {
       label: "invalid_threshold_source_rows",
       value: metrics.invalid_threshold_source_rows,
-      color: "#ef4444",
+      color: scientificColor.danger,
     },
     {
       label: "missing_default_threshold_citation_rows",
       value: metrics.missing_default_threshold_citation_rows,
-      color: "#f59e0b",
+      color: scientificColor.warning,
     },
     {
       label: "invalid_rows_total",
       value: metrics.invalid_rows_total ?? 0,
-      color: "#dc2626",
+      color: scientificColor.dangerStrong,
     },
   ];
   const max = Math.max(...rows.map((row) => row.value), 1);
@@ -572,7 +599,7 @@ function renderFigureH(run: ReportingRun): string {
   );
 
   body.push(
-    `<rect x="36" y="96" width="540" height="260" fill="#ffffff" stroke="#cbd5e1"/>`,
+    `<rect x="36" y="96" width="540" height="260" fill="${scientificColor.surface}" stroke="${scientificColor.border}"/>`,
   );
   body.push(`<text class="subtitle" x="56" y="130">mode</text>`);
   body.push(
@@ -593,7 +620,7 @@ function renderFigureH(run: ReportingRun): string {
   );
 
   body.push(
-    `<rect x="620" y="96" width="540" height="260" fill="#ffffff" stroke="#cbd5e1"/>`,
+    `<rect x="620" y="96" width="540" height="260" fill="${scientificColor.surface}" stroke="${scientificColor.border}"/>`,
   );
   body.push(`<text class="subtitle" x="640" y="130">cohort_note_count</text>`);
   body.push(
