@@ -1,5 +1,15 @@
 # @fodmap/reporting
 
+## 0.1.6
+
+### Patch Changes
+
+- [#104](https://github.com/f-campana/Fodmap/pull/104) [`e072c1c`](https://github.com/f-campana/Fodmap/commit/e072c1c75eff6126b42314bbfee05c523357aa40) Thanks [@f-campana](https://github.com/f-campana)! - Finalize Phase 4 reporting delivery hardening:
+  - load deterministic stage contract snapshots for reporting full-lane extraction
+  - harden now-set collector semantics and fixture hash provenance checks
+  - align reporting render CLI logging with lint rules
+  - refresh reporting and storybook/research reporting integration sources after lint/format convergence
+
 ## 0.1.5
 
 ### Patch Changes
