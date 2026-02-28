@@ -1,5 +1,12 @@
 # @fodmap/app
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @fodmap/ui@1.0.1
+
 ## 0.1.3
 
 ### Patch Changes
