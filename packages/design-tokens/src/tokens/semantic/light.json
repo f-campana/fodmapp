@@ -38,11 +38,16 @@
           "$value": "{base.color.brand.borderLight}",
           "$type": "color"
         },
+        "control": { "$value": "{base.color.neutral.500}", "$type": "color" },
         "subtle": { "$value": "{base.color.neutral.200}", "$type": "color" },
         "strong": { "$value": "{base.color.neutral.400}", "$type": "color" }
       },
       "focus": {
         "ring": { "$value": "{base.color.brand.ringLight}", "$type": "color" },
+        "ringAccessible": {
+          "$value": "{base.color.brand.accentLight}",
+          "$type": "color"
+        },
         "ringSoft": {
           "$value": "{base.color.brand.ringSoftLight}",
           "$type": "color"

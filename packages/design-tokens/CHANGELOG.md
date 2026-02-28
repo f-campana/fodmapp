@@ -1,5 +1,23 @@
 # @fodmap/design-tokens
 
+## 0.2.3
+
+### Patch Changes
+
+- [#96](https://github.com/f-campana/Fodmap/pull/96) [`aa225ca`](https://github.com/f-campana/Fodmap/commit/aa225ca3e92b2f4ad23be0f93525d32a516c2852) Thanks [@f-campana](https://github.com/f-campana)! - Add accessible control color roles and runtime slots (`focus.ringAccessible` and `border.control`), enforce semantic parity and contrast guardrails in token generation, migrate shared primitives to the new focus ring slot, and extend Storybook token/runtime assertions for the updated contract.
+
+## 0.2.2
+
+### Patch Changes
+
+- [#84](https://github.com/f-campana/Fodmap/pull/84) [`b3bd589`](https://github.com/f-campana/Fodmap/commit/b3bd58900fe16c3c2432b8f43136db03bffd1403) Thanks [@f-campana](https://github.com/f-campana)! - Normalize native token dimension output so `radius.full` is generated as a number (`9999`) instead of a string (`"9999px"`). This keeps the native token contract consistent for React Native consumers and aligns generated artifacts with lint/type expectations.
+
+## 0.2.1
+
+### Patch Changes
+
+- [#92](https://github.com/f-campana/Fodmap/pull/92) [`f9bcf60`](https://github.com/f-campana/Fodmap/commit/f9bcf60c668f1b27b240ccd5bc0aa8687a0eca52) Thanks [@f-campana](https://github.com/f-campana)! - Track `FD_BUILD_TARGET` and `FD_OUTPUT_PATH` in Turborepo build hashing for `@fodmap/design-tokens` to prevent stale cache replays across target/output variants.
+
 ## 0.2.0
 
 ### Minor Changes

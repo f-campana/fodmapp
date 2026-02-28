@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
@@ -29,7 +33,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -45,7 +49,7 @@ jobs:
 
       - name: Build UI package for lint imports
         run: |
-          pnpm --filter @fodmap/ui build
+          pnpm exec turbo run build --filter=@fodmap/ui
 
       - name: Run JavaScript lint
         run: |
@@ -59,7 +63,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -74,11 +78,39 @@ jobs:
           node-version: "22"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
 
       - name: Run Python lint checks
         run: |
           pnpm python:ci
+
+  pr-scope:
+    name: pr-scope
+    runs-on: ubuntu-latest
+    outputs:
+      design_tokens: ${{ steps.scope.outputs.design_tokens }}
+      ui_foundation: ${{ steps.scope.outputs.ui_foundation }}
+      app_scaffold: ${{ steps.scope.outputs.app_scaffold }}
+      content_scaffolds: ${{ steps.scope.outputs.content_scaffolds }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Detect CI scope
+        id: scope
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node .github/scripts/detect-ci-scope.mjs
 
   openapi-types:
     name: openapi-types
@@ -88,7 +120,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -104,17 +136,23 @@ jobs:
 
       - name: Verify OpenAPI generated types are up to date
         run: |
-          pnpm --filter @fodmap/types openapi:check
+          pnpm exec turbo run openapi:check --filter=@fodmap/types
 
   design-tokens:
     name: design-tokens
+    needs:
+      - pr-scope
+    if: ${{ needs.pr-scope.outputs.design_tokens == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -127,24 +165,59 @@ jobs:
       - name: Install workspace dependencies
         run: |
           pnpm install --frozen-lockfile
+
+      - name: Determine Turbo cache mode
+        id: turbo-cache
+        run: |
+          if [[ -n "${TURBO_TEAM:-}" && -n "${TURBO_TOKEN:-}" ]]; then
+            echo "use_remote=true" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache configured."
+          else
+            echo "use_remote=false" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache unavailable. Falling back to .turbo cache."
+          fi
+
+      - name: Restore Turbo local cache fallback
+        if: steps.turbo-cache.outputs.use_remote != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.job }}-
+            ${{ runner.os }}-turbo-
 
       - name: Verify generated token artifacts are up to date
         run: |
-          pnpm turbo run tokens:check --filter=@fodmap/design-tokens
+          pnpm exec turbo run tokens:check --filter=@fodmap/design-tokens
 
       - name: Build design token artifacts
         run: |
-          pnpm turbo run build --filter=@fodmap/design-tokens
+          pnpm exec turbo run build --filter=@fodmap/design-tokens
+
+      - name: Save Turbo local cache fallback
+        if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
 
   ui-foundation:
     name: ui-foundation
+    needs:
+      - pr-scope
+    if: ${{ needs.pr-scope.outputs.ui_foundation == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -158,25 +231,47 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      - name: Determine Turbo cache mode
+        id: turbo-cache
+        run: |
+          if [[ -n "${TURBO_TEAM:-}" && -n "${TURBO_TOKEN:-}" ]]; then
+            echo "use_remote=true" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache configured."
+          else
+            echo "use_remote=false" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache unavailable. Falling back to .turbo cache."
+          fi
+
+      - name: Restore Turbo local cache fallback
+        if: steps.turbo-cache.outputs.use_remote != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.job }}-
+            ${{ runner.os }}-turbo-
+
       - name: Verify Tailwind shared style mapping is up to date
         run: |
-          pnpm turbo run styles:check --filter=@fodmap/tailwind-config
+          pnpm exec turbo run styles:check --filter=@fodmap/tailwind-config
 
       - name: Build and validate UI package
         run: |
-          pnpm turbo run build typecheck test --filter=@fodmap/ui
+          pnpm exec turbo run build typecheck test --filter=@fodmap/ui
 
       - name: Verify UI style contract
         run: |
-          pnpm turbo run styles:check --filter=@fodmap/ui
+          pnpm exec turbo run styles:check --filter=@fodmap/ui
 
       - name: Typecheck Storybook sources
         run: |
-          pnpm turbo run typecheck --filter=@fodmap/storybook
+          pnpm exec turbo run typecheck --filter=@fodmap/storybook
 
       - name: Build Storybook
         run: |
-          pnpm turbo run storybook:build --filter=@fodmap/storybook
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
       - name: Install Chromium for Storybook tests
         run: |
@@ -184,17 +279,30 @@ jobs:
 
       - name: Run Storybook interaction and a11y tests
         run: |
-          pnpm turbo run storybook:test --filter=@fodmap/storybook
+          pnpm exec turbo run storybook:test --filter=@fodmap/storybook
+
+      - name: Save Turbo local cache fallback
+        if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
 
   app-scaffold:
     name: app-scaffold
+    needs:
+      - pr-scope
+    if: ${{ needs.pr-scope.outputs.app_scaffold == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -207,22 +315,57 @@ jobs:
       - name: Install workspace dependencies
         run: |
           pnpm install --frozen-lockfile
+
+      - name: Determine Turbo cache mode
+        id: turbo-cache
+        run: |
+          if [[ -n "${TURBO_TEAM:-}" && -n "${TURBO_TOKEN:-}" ]]; then
+            echo "use_remote=true" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache configured."
+          else
+            echo "use_remote=false" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache unavailable. Falling back to .turbo cache."
+          fi
+
+      - name: Restore Turbo local cache fallback
+        if: steps.turbo-cache.outputs.use_remote != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.job }}-
+            ${{ runner.os }}-turbo-
 
       - name: Test, build, and typecheck app scaffold
         run: |
-          pnpm turbo run test --filter=@fodmap/app
-          pnpm turbo run typecheck --filter=@fodmap/app
-          pnpm turbo run build --filter=@fodmap/app
+          pnpm exec turbo run test --filter=@fodmap/app
+          pnpm exec turbo run typecheck --filter=@fodmap/app
+          pnpm exec turbo run build --filter=@fodmap/app
+
+      - name: Save Turbo local cache fallback
+        if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
 
   content-scaffolds:
     name: content-scaffolds
+    needs:
+      - pr-scope
+    if: ${{ needs.pr-scope.outputs.content_scaffolds == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -236,6 +379,79 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
 
+      - name: Determine Turbo cache mode
+        id: turbo-cache
+        run: |
+          if [[ -n "${TURBO_TEAM:-}" && -n "${TURBO_TOKEN:-}" ]]; then
+            echo "use_remote=true" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache configured."
+          else
+            echo "use_remote=false" >> "$GITHUB_OUTPUT"
+            echo "Turbo remote cache unavailable. Falling back to .turbo cache."
+          fi
+
+      - name: Restore Turbo local cache fallback
+        if: steps.turbo-cache.outputs.use_remote != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.job }}-
+            ${{ runner.os }}-turbo-
+
       - name: Build and typecheck marketing and research scaffolds
         run: |
-          pnpm turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
+          pnpm exec turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
+
+      - name: Save Turbo local cache fallback
+        if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
+
+  ci-gate:
+    name: CI
+    if: ${{ always() }}
+    needs:
+      - pr-scope
+      - quality
+      - eslint
+      - python-lint
+      - openapi-types
+      - design-tokens
+      - ui-foundation
+      - app-scaffold
+      - content-scaffolds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate CI workflow results
+        run: |
+          set -euo pipefail
+
+          for result in \
+            "${{ needs.pr-scope.result }}" \
+            "${{ needs.quality.result }}" \
+            "${{ needs.eslint.result }}" \
+            "${{ needs.python-lint.result }}" \
+            "${{ needs.openapi-types.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "::error::CI gate failed because a required dependency result was '$result'."
+              exit 1
+            fi
+          done
+
+          for result in \
+            "${{ needs.design-tokens.result }}" \
+            "${{ needs.ui-foundation.result }}" \
+            "${{ needs.app-scaffold.result }}" \
+            "${{ needs.content-scaffolds.result }}"; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "::error::CI gate failed because a scoped dependency result was '$result'."
+              exit 1
+            fi
+          done
+
+          echo "CI gate passed."

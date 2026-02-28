@@ -8,7 +8,7 @@
 - [ ] `pnpm lint:ci` (including warnings as failures)
 - [ ] `pnpm lint:llm` for agent-generated code paths (if applicable), with findings fixed before merge
 - [ ] `pnpm python:ci` for Python path changes
-- [ ] `pnpm --filter @fodmap/types openapi:check` for OpenAPI contract changes
+- [ ] `pnpm openapi:check` for OpenAPI contract changes
 - [ ] `./.github/scripts/ci-api-pr.sh` for DB-auth-sensitive API test/helper changes
 - [ ] If using changeset exemption path, this PR has the `changeset-exempt` label and only allowlisted prototype packages are touched
 - [ ] No secrets introduced

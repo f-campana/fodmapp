@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
@@ -41,7 +45,7 @@ jobs:
           python-version: "3.12"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
 
       - name: Install API dependencies
         run: |
@@ -85,7 +89,7 @@ jobs:
           python-version: "3.12"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
 
       - name: Install system PostgreSQL client
         run: |
@@ -150,3 +154,24 @@ jobs:
       - name: Run API integration tests
         run: |
           uv run --project api pytest -m integration api/tests
+
+  api-gate:
+    name: API
+    if: ${{ always() }}
+    needs:
+      - api-tests
+      - api-integration-seeded
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate API workflow results
+        run: |
+          set -euo pipefail
+
+          for result in "${{ needs.api-tests.result }}" "${{ needs.api-integration-seeded.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "::error::API gate failed because a dependency result was '$result'."
+              exit 1
+            fi
+          done
+
+          echo "API gate passed."

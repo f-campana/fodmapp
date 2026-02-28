@@ -1,5 +1,28 @@
 # @fodmap/ui
 
+## 1.0.3
+
+### Patch Changes
+
+- [#96](https://github.com/f-campana/Fodmap/pull/96) [`aa225ca`](https://github.com/f-campana/Fodmap/commit/aa225ca3e92b2f4ad23be0f93525d32a516c2852) Thanks [@f-campana](https://github.com/f-campana)! - Add accessible control color roles and runtime slots (`focus.ringAccessible` and `border.control`), enforce semantic parity and contrast guardrails in token generation, migrate shared primitives to the new focus ring slot, and extend Storybook token/runtime assertions for the updated contract.
+
+- Updated dependencies [[`aa225ca`](https://github.com/f-campana/Fodmap/commit/aa225ca3e92b2f4ad23be0f93525d32a516c2852)]:
+  - @fodmap/tailwind-config@0.2.3
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @fodmap/tailwind-config@0.2.2
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @fodmap/tailwind-config@0.2.1
+
 ## 1.0.0
 
 ### Major Changes

@@ -38,11 +38,16 @@
           "$value": "{base.color.brand.borderDark}",
           "$type": "color"
         },
+        "control": { "$value": "{base.color.neutral.500}", "$type": "color" },
         "subtle": { "$value": "{base.color.neutral.700}", "$type": "color" },
         "strong": { "$value": "{base.color.neutral.500}", "$type": "color" }
       },
       "focus": {
         "ring": { "$value": "{base.color.brand.ringDark}", "$type": "color" },
+        "ringAccessible": {
+          "$value": "{base.color.brand.accentDark}",
+          "$type": "color"
+        },
         "ringSoft": {
           "$value": "{base.color.brand.ringSoftDark}",
           "$type": "color"

@@ -174,14 +174,10 @@ function parseStatusOutput(sinceSha) {
   } catch (err) {
     diagnostic = `${err.stdout || ""}\n${err.stderr || ""}`;
 
-    if (isNoChangesetOutput(diagnostic)) {
-      if (existsSync(statusPath)) {
-        rmSync(statusPath, { force: true });
-      }
-      return { changesets: [], releases: [] };
-    }
-
     if (!existsSync(statusPath)) {
+      if (isNoChangesetOutput(diagnostic)) {
+        return { changesets: [], releases: [] };
+      }
       throw new Error(
         `Failed to run \`pnpm changeset status\` and no JSON output was produced.\n${diagnostic}`.trim(),
       );
@@ -220,6 +216,13 @@ try {
   if (!changes.shouldCheck) {
     logLine(
       "[changeset-check] No workspace or releasable root changes detected. Skipping.",
+    );
+    process.exit(0);
+  }
+
+  if (!changes.changedPackagesOrApps && changes.changedReleasableRootFiles) {
+    logLine(
+      "[changeset-check] Only releasable root files changed. Skipping package changeset coverage.",
     );
     process.exit(0);
   }

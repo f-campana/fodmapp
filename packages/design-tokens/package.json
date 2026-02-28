@@ -1,12 +1,17 @@
 {
   "name": "@fodmap/design-tokens",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.3",
   "type": "module",
   "exports": {
     ".": {
       "types": "./src/generated/tokens.d.ts",
       "import": "./src/generated/tokens.js"
+    },
+    "./native": {
+      "types": "./src/generated/tokens.native.d.ts",
+      "import": "./src/generated/tokens.native.js",
+      "require": "./src/generated/tokens.native.js"
     },
     "./css": "./src/generated/tokens.css",
     "./json": "./src/generated/tokens.json"

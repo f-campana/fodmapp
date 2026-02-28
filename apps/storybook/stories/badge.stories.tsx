@@ -17,7 +17,14 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Neutral: Story = {};
+export const Neutral: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const badge = canvas.getByText("Niveau bas");
+    await expect(badge.className).toContain("focus:ring-ring-accessible");
+    await expect(badge.className).not.toContain("focus:ring-ring ");
+  },
+};
 
 export const Secondary: Story = {
   args: {

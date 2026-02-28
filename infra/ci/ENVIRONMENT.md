@@ -30,6 +30,22 @@ This document defines environment variables used across the current Python/SQL s
 | `CIQUAL_GRP_XML`  | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim_grp` XML override.                     |
 | `SEED_DB_URL`     | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml`                                                  | yes for non-arg usage         | `postgresql://.../fodmap_test`        | Phase3 seed DB connection string.                   |
 
+## CI Turborepo Cache Variables
+
+These keys are optional and used only by `.github/workflows/ci.yml` Turbo-scoped jobs.
+
+| Variable      | Used by                    | Required | Default/Example     | Notes                                                      |
+| ------------- | -------------------------- | -------- | ------------------- | ---------------------------------------------------------- |
+| `TURBO_TEAM`  | `.github/workflows/ci.yml` | no       | Vercel team slug    | Enables Turbo remote cache when paired with `TURBO_TOKEN`. |
+| `TURBO_TOKEN` | `.github/workflows/ci.yml` | no       | Vercel access token | Enables Turbo remote cache when paired with `TURBO_TEAM`.  |
+
+When either key is missing, CI automatically falls back to local `.turbo` cache restore/save steps.
+
+CI Turbo command policy:
+
+- Turbo-eligible CI commands should use `pnpm exec turbo run ...` so workflows always resolve the pinned local Turbo version.
+- Non-Turbo CI exceptions are intentional where Turbo caching does not apply, including Storybook Playwright browser install and Phase 2 reporting `render:*` commands.
+
 ## App Runtime Integration Variables (`apps/app`)
 
 These keys are now actively consumed by `apps/app` runtime adapters. All integrations are env-gated and default to safe no-op/disabled behavior when values are missing.
