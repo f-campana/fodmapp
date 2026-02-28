@@ -1,7 +1,7 @@
 {
   "name": "@fodmap/tailwind-config",
   "private": true,
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "exports": {
     "./shared-styles.css": "./shared-styles.css"
