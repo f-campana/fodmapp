@@ -55,11 +55,16 @@ Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are n
 ## Root Command Contract
 
 - `pnpm lint`: formatting/lint baseline (`prettier --check`).
-- `pnpm typecheck`: Turbo-orchestrated typecheck using `turbo run typecheck --only` with explicit filters for `content-config`, `types`, `ui`, `reporting`, `storybook`, `app`, `marketing`, and `research`.
+- `pnpm typecheck`: Turbo-orchestrated typecheck using `pnpm exec turbo run typecheck --only` with explicit filters for `content-config`, `types`, `ui`, `reporting`, `storybook`, `app`, `marketing`, and `research`.
 - `pnpm test`: fast deterministic unit test coverage (`ui`, `app`).
 - `pnpm test:storybook`: browser-based Storybook interaction/a11y tests.
 - `pnpm check:all`: full local CI mirror for governance + tokens + styles + UI + Storybook + scaffold apps.
 - `./.github/scripts/ci-api-pr.sh`: API CI parity runner (contract/unit tests + seeded integration flow).
+
+Turbo command policy:
+
+- Scripts that map to Turbo tasks should use `pnpm exec turbo run ...` for strict local binary resolution.
+- Keep direct package commands only when Turbo orchestration is not the right fit (for example `app:dev`, `tokens:generate`, `openapi:generate`).
 
 ## Merge Policy
 

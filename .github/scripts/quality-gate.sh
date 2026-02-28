@@ -77,19 +77,19 @@ echo "[OK] governance quality gate passed"
 
 if [[ "$run_full" == "true" ]]; then
   run_cmd "format check" pnpm format:check
-  run_cmd "UI package build for lint imports" pnpm --filter @fodmap/ui build
+  run_cmd "UI package build for lint imports" pnpm exec turbo run build --filter=@fodmap/ui
   run_cmd "lint (CI)" pnpm lint:ci
   run_cmd "python lint (CI)" pnpm python:ci
   run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
   run_cmd "CI scope tests" pnpm ci:scope:test
-  run_cmd "openapi check" pnpm --filter @fodmap/types openapi:check
+  run_cmd "openapi check" pnpm exec turbo run openapi:check --filter=@fodmap/types
   run_cmd "design token check" pnpm tokens:check
   run_cmd "tailwind style check" pnpm tailwind:styles:check
   run_cmd "UI package build" pnpm ui:build
   run_cmd "UI package style check" pnpm ui:styles:check
   run_cmd "UI package typecheck" pnpm ui:typecheck
   run_cmd "UI package tests" pnpm ui:test
-  run_cmd "Storybook typecheck" pnpm --filter @fodmap/storybook typecheck
+  run_cmd "Storybook typecheck" pnpm exec turbo run typecheck --filter=@fodmap/storybook
   run_cmd "Storybook build" pnpm storybook:build
   run_cmd "Storybook tests" pnpm storybook:test
   run_cmd "App tests" pnpm app:test

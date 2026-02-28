@@ -220,6 +220,13 @@ try {
     process.exit(0);
   }
 
+  if (!changes.changedPackagesOrApps && changes.changedReleasableRootFiles) {
+    logLine(
+      "[changeset-check] Only releasable root files changed. Skipping package changeset coverage.",
+    );
+    process.exit(0);
+  }
+
   const status = parseStatusOutput(baseSha);
   const releases = Array.isArray(status?.releases) ? status.releases : [];
   const releasePackages = new Set(

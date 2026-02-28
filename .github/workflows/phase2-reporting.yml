@@ -226,6 +226,7 @@ jobs:
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
       - name: Render scientific baseline artifacts (smoke)
         run: |
+          # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
           pnpm --filter @fodmap/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
@@ -372,6 +373,7 @@ jobs:
             --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
       - name: Render scientific baseline artifacts (full lane)
         run: |
+          # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
           pnpm --filter @fodmap/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
@@ -537,6 +539,7 @@ jobs:
             --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
       - name: Re-render run outputs for render drift verification
         run: |
+          # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
           pnpm --filter @fodmap/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
