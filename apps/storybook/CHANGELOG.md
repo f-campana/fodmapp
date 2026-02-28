@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies [[`b3bd589`](https://github.com/f-campana/Fodmap/commit/b3bd58900fe16c3c2432b8f43136db03bffd1403)]:
+  - @fodmap/design-tokens@0.2.2
+  - @fodmap/reporting@0.1.3
+  - @fodmap/ui@1.0.2
+
 ## 0.1.3
 
 ### Patch Changes
