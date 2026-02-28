@@ -1,7 +1,7 @@
 {
   "name": "@fodmap/reporting",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -20,7 +20,8 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "colors:check": "if rg -n -- '#[0-9a-fA-F]{3,6}' src/scientific/render-scientific.ts; then echo 'Hex literals are not allowed in scientific renderer'; exit 1; fi",
+    "test": "pnpm run colors:check && vitest run --passWithNoTests",
     "render:scientific": "tsx src/cli/render-scientific.ts",
     "render:dashboard": "tsx src/cli/render-dashboard.ts",
     "render:compare": "tsx src/cli/compare-render-baseline.ts"

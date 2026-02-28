@@ -3,30 +3,30 @@
 <title>Figure D Critical Contract Scorecard</title>
 <defs>
 <style><![CDATA[
-.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
-.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
-.grid{stroke:#d7e0eb;stroke-width:1;}
-.axis{stroke:#64748b;stroke-width:1.2;}
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
 ]]></style>
 </defs>
-<rect x="0" y="0" width="1200" height="520" fill="#f8fafc"/>
+<rect x="0" y="0" width="1200" height="520" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
 <text class="title" x="24" y="36">D - Critical Contract Scorecard</text>
 <text class="subtitle" x="24" y="58">Source: Q-02_critical_contract_scorecard</text>
-<rect x="48" y="110" width="250" height="120" fill="#ffffff" stroke="#cbd5e1"/>
+<rect x="48" y="110" width="250" height="120" fill="var(--fd-reporting-color-surface, var(--fd-semantic-color-surface-default))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="subtitle" x="62" y="134">Phase2 Priority</text>
 <text class="mono" x="62" y="160">total=42</text>
 <text class="mono" x="62" y="180">resolved=42</text>
 <text class="mono" x="62" y="200">unresolved=0</text>
-<rect x="338" y="110" width="250" height="120" fill="#ffffff" stroke="#cbd5e1"/>
+<rect x="338" y="110" width="250" height="120" fill="var(--fd-reporting-color-surface, var(--fd-semantic-color-surface-default))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="subtitle" x="352" y="134">Swap Status</text>
 <text class="mono" x="352" y="160">active=11</text>
 <text class="mono" x="352" y="180">draft=1</text>
 <text class="mono" x="352" y="200">rollups=42</text>
-<rect x="628" y="110" width="250" height="120" fill="#ffffff" stroke="#cbd5e1"/>
+<rect x="628" y="110" width="250" height="120" fill="var(--fd-reporting-color-surface, var(--fd-semantic-color-surface-default))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="subtitle" x="642" y="134">Contract Checks</text>
 <text class="mono" x="642" y="160">phase2_ok=true</text>
 <text class="mono" x="642" y="180">phase3_ok=true</text>

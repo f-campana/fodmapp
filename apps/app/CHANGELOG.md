@@ -1,5 +1,12 @@
 # @fodmap/app
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`1779d31`](https://github.com/f-campana/Fodmap/commit/1779d31fe4a036dc325a89964400512ad1f7f388)]:
+  - @fodmap/ui@1.0.4
+
 ## 0.1.6
 
 ### Patch Changes
