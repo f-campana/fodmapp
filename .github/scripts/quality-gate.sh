@@ -49,6 +49,8 @@ required_files=(
   ".github/workflows/semantic-pr-title.yml"
   ".github/dependabot.yml"
   ".githooks/commit-msg"
+  ".github/scripts/check-pr-changesets.mjs"
+  ".github/scripts/check-pr-changesets.test.mjs"
   ".github/scripts/detect-ci-scope.mjs"
   ".github/scripts/detect-ci-scope.test.mjs"
 )
@@ -70,6 +72,8 @@ for f in "${required_files[@]}"; do
 done
 
 run_cmd "commit-msg hook syntax" bash -n .githooks/commit-msg
+run_cmd "changeset checker syntax" node --check .github/scripts/check-pr-changesets.mjs
+run_cmd "changeset checker tests syntax" node --check .github/scripts/check-pr-changesets.test.mjs
 run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mjs
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
 run_cmd "reporting python script syntax" python3 -m py_compile \
@@ -88,6 +92,7 @@ if [[ "$run_full" == "true" ]]; then
   run_cmd "UI package build for lint imports" pnpm exec turbo run build --filter=@fodmap/ui
   run_cmd "lint (CI)" pnpm lint:ci
   run_cmd "python lint (CI)" pnpm python:ci
+  run_cmd "changeset checker unit tests" pnpm changeset:ci:test
   run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
   run_cmd "CI scope tests" pnpm ci:scope:test
   run_cmd "openapi check" pnpm exec turbo run openapi:check --filter=@fodmap/types

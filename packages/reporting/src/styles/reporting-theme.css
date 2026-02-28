@@ -1,20 +1,74 @@
 @import "@fodmap/design-tokens/css";
 
 .fd-reporting-root {
-  --fd-reporting-color-canvas: var(--fd-semantic-color-background-canvas, #f8fafc);
-  --fd-reporting-color-surface: var(--fd-semantic-color-surface-default, #ffffff);
-  --fd-reporting-color-surface-muted: var(--fd-semantic-color-surface-muted, #f1f5f9);
+  --fd-reporting-color-canvas: var(
+    --fd-semantic-color-background-canvas,
+    #f8fafc
+  );
+  --fd-reporting-color-surface: var(
+    --fd-semantic-color-surface-default,
+    #ffffff
+  );
+  --fd-reporting-color-surface-muted: var(
+    --fd-semantic-color-surface-muted,
+    #f1f5f9
+  );
   --fd-reporting-color-border: var(--fd-semantic-color-border-default, #cbd5e1);
-  --fd-reporting-color-border-subtle: var(--fd-semantic-color-border-subtle, #e2e8f0);
+  --fd-reporting-color-border-subtle: var(
+    --fd-semantic-color-border-subtle,
+    #e2e8f0
+  );
   --fd-reporting-color-text: var(--fd-semantic-color-text-primary, #0f172a);
   --fd-reporting-color-text-muted: var(--fd-semantic-color-text-muted, #475569);
-  --fd-reporting-color-accent: var(--fd-semantic-color-action-primary-bg, #0f766e);
-  --fd-reporting-color-success-bg: var(--fd-semantic-color-status-success-bg, #10b981);
-  --fd-reporting-color-success-fg: var(--fd-semantic-color-status-success-fg, #f0fdf4);
-  --fd-reporting-color-danger-bg: var(--fd-semantic-color-status-danger-bg, #ef4444);
-  --fd-reporting-color-danger-fg: var(--fd-semantic-color-status-danger-fg, #fef2f2);
+  --fd-reporting-color-grid: var(--fd-reporting-color-border-subtle, #d7e0eb);
+  --fd-reporting-color-axis: var(--fd-reporting-color-text-muted, #64748b);
+  --fd-reporting-color-info-bg: var(
+    --fd-semantic-color-status-info-bg,
+    #0ea5e9
+  );
+  --fd-reporting-color-warning-bg: var(
+    --fd-semantic-color-status-warning-bg,
+    #f59e0b
+  );
+  --fd-reporting-color-accent: var(
+    --fd-semantic-color-action-primary-bg,
+    #0f766e
+  );
+  --fd-reporting-color-success-bg: var(
+    --fd-semantic-color-status-success-bg,
+    #10b981
+  );
+  --fd-reporting-color-success-fg: var(
+    --fd-semantic-color-status-success-fg,
+    #f0fdf4
+  );
+  --fd-reporting-color-danger-bg: var(
+    --fd-semantic-color-status-danger-bg,
+    #ef4444
+  );
+  --fd-reporting-color-danger-fg: var(
+    --fd-semantic-color-status-danger-fg,
+    #fef2f2
+  );
+  --fd-reporting-color-danger-strong: var(
+    --fd-semantic-color-action-destructive-bg-hover,
+    #dc2626
+  );
+  --fd-reporting-color-surface-success-soft: var(
+    --fd-semantic-color-status-success-fg,
+    #dcfce7
+  );
+  --fd-reporting-color-surface-danger-soft: var(
+    --fd-semantic-color-status-danger-fg,
+    #fee2e2
+  );
 
-  font-family: var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+  font-family: var(
+    --fd-semantic-typography-font-family-body,
+    "Source Sans 3",
+    Arial,
+    sans-serif
+  );
   color: var(--fd-reporting-color-text);
   background: var(--fd-reporting-color-canvas);
   padding: var(--fd-base-space-6, 1.5rem);
@@ -33,18 +87,27 @@
   margin: 0;
   color: var(--fd-reporting-color-text);
   font: var(--fd-base-typography-font-weight-bold, 700)
-    var(--fd-base-typography-font-size-3xl, 1.875rem)
-    / var(--fd-base-typography-line-height-tight, 1.2)
-    var(--fd-semantic-typography-font-family-display, "Cormorant Garamond", serif);
+    var(--fd-base-typography-font-size-3xl, 1.875rem) /
+    var(--fd-base-typography-line-height-tight, 1.2)
+    var(
+      --fd-semantic-typography-font-family-display,
+      "Cormorant Garamond",
+      serif
+    );
 }
 
 .fd-reporting-subtitle {
   margin: var(--fd-base-space-1-5, 0.375rem) 0 0;
   color: var(--fd-reporting-color-text-muted);
   font: var(--fd-base-typography-font-weight-medium, 500)
-    var(--fd-base-typography-font-size-sm, 0.875rem)
-    / var(--fd-base-typography-line-height-relaxed, 1.625)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-sm, 0.875rem) /
+    var(--fd-base-typography-line-height-relaxed, 1.625)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-meta {
@@ -65,17 +128,27 @@
   text-transform: uppercase;
   letter-spacing: var(--fd-base-typography-letter-spacing-wider, 0.025em);
   font: var(--fd-base-typography-font-weight-semibold, 600)
-    var(--fd-base-typography-font-size-xs, 0.75rem)
-    / var(--fd-base-typography-line-height-tight, 1.2)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-xs, 0.75rem) /
+    var(--fd-base-typography-line-height-tight, 1.2)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-pill-value {
   color: var(--fd-reporting-color-text);
   font: var(--fd-base-typography-font-weight-bold, 700)
-    var(--fd-base-typography-font-size-xl, 1.25rem)
-    / var(--fd-base-typography-line-height-snug, 1.35)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-xl, 1.25rem) /
+    var(--fd-base-typography-line-height-snug, 1.35)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-grid {
@@ -96,18 +169,28 @@
   margin: 0 0 var(--fd-base-space-2, 0.5rem);
   color: var(--fd-reporting-color-text);
   font: var(--fd-base-typography-font-weight-bold, 700)
-    var(--fd-base-typography-font-size-lg, 1.125rem)
-    / var(--fd-base-typography-line-height-snug, 1.35)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-lg, 1.125rem) /
+    var(--fd-base-typography-line-height-snug, 1.35)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-card p {
   margin: var(--fd-base-space-1, 0.25rem) 0;
   color: var(--fd-reporting-color-text-muted);
   font: var(--fd-base-typography-font-weight-medium, 500)
-    var(--fd-base-typography-font-size-sm, 0.875rem)
-    / var(--fd-base-typography-line-height-normal, 1.5)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-sm, 0.875rem) /
+    var(--fd-base-typography-line-height-normal, 1.5)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-table {
@@ -122,9 +205,14 @@
   padding: var(--fd-base-space-1-5, 0.375rem) var(--fd-base-space-1, 0.25rem);
   text-align: left;
   font: var(--fd-base-typography-font-weight-medium, 500)
-    var(--fd-base-typography-font-size-sm, 0.875rem)
-    / var(--fd-base-typography-line-height-normal, 1.5)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-sm, 0.875rem) /
+    var(--fd-base-typography-line-height-normal, 1.5)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-table th {
@@ -146,17 +234,22 @@
   margin: 0;
   color: var(--fd-reporting-color-text-muted);
   font: var(--fd-base-typography-font-weight-semibold, 600)
-    var(--fd-base-typography-font-size-sm, 0.875rem)
-    / var(--fd-base-typography-line-height-normal, 1.5)
-    var(--fd-semantic-typography-font-family-body, "Source Sans 3", Arial, sans-serif);
+    var(--fd-base-typography-font-size-sm, 0.875rem) /
+    var(--fd-base-typography-line-height-normal, 1.5)
+    var(
+      --fd-semantic-typography-font-family-body,
+      "Source Sans 3",
+      Arial,
+      sans-serif
+    );
 }
 
 .fd-reporting-kv dd {
   margin: 0;
   color: var(--fd-reporting-color-text);
   font: var(--fd-base-typography-font-weight-semibold, 600)
-    var(--fd-base-typography-font-size-sm, 0.875rem)
-    / var(--fd-base-typography-line-height-normal, 1.5)
+    var(--fd-base-typography-font-size-sm, 0.875rem) /
+    var(--fd-base-typography-line-height-normal, 1.5)
     var(--fd-base-typography-font-family-mono, "JetBrains Mono", monospace);
 }
 

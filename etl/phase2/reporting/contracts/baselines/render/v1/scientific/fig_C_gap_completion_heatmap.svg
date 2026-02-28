@@ -3,17 +3,17 @@
 <title>Figure C Gap Completion Matrix</title>
 <defs>
 <style><![CDATA[
-.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
-.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
-.grid{stroke:#d7e0eb;stroke-width:1;}
-.axis{stroke:#64748b;stroke-width:1.2;}
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
 ]]></style>
 </defs>
-<rect x="0" y="0" width="1200" height="464" fill="#f8fafc"/>
+<rect x="0" y="0" width="1200" height="464" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
 <text class="title" x="24" y="36">C - Gap Completion Matrix</text>
 <text class="subtitle" x="24" y="58">Source: P-03_gap_completion_matrix</text>
 <text class="label" x="305" y="106" text-anchor="middle">priority</text>
@@ -22,48 +22,48 @@
 <text class="label" x="755" y="106" text-anchor="middle">unresolved</text>
 <text class="label" x="905" y="106" text-anchor="middle">pending</text>
 <text class="label" x="220" y="152" text-anchor="end">fructan/fructan</text>
-<rect x="231" y="121" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="231" y="121" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="305" y="153" text-anchor="middle">17</text>
-<rect x="381" y="121" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="381" y="121" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="455" y="153" text-anchor="middle">17</text>
-<rect x="531" y="121" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="531" y="121" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="605" y="153" text-anchor="middle">16</text>
-<rect x="681" y="121" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="681" y="121" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="755" y="153" text-anchor="middle">0</text>
-<rect x="831" y="121" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="831" y="121" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="905" y="153" text-anchor="middle">1</text>
 <text class="label" x="220" y="208" text-anchor="end">gos/gos</text>
-<rect x="231" y="177" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="231" y="177" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="305" y="209" text-anchor="middle">12</text>
-<rect x="381" y="177" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="381" y="177" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="455" y="209" text-anchor="middle">12</text>
-<rect x="531" y="177" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="531" y="177" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="605" y="209" text-anchor="middle">12</text>
-<rect x="681" y="177" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="681" y="177" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="755" y="209" text-anchor="middle">0</text>
-<rect x="831" y="177" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="831" y="177" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="905" y="209" text-anchor="middle">0</text>
 <text class="label" x="220" y="264" text-anchor="end">polyol/sorbitol</text>
-<rect x="231" y="233" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="231" y="233" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="305" y="265" text-anchor="middle">7</text>
-<rect x="381" y="233" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="381" y="233" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="455" y="265" text-anchor="middle">7</text>
-<rect x="531" y="233" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="531" y="233" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="605" y="265" text-anchor="middle">7</text>
-<rect x="681" y="233" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="681" y="233" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="755" y="265" text-anchor="middle">0</text>
-<rect x="831" y="233" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="831" y="233" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="905" y="265" text-anchor="middle">0</text>
 <text class="label" x="220" y="320" text-anchor="end">polyol/mannitol</text>
-<rect x="231" y="289" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="231" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="305" y="321" text-anchor="middle">6</text>
-<rect x="381" y="289" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="381" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="455" y="321" text-anchor="middle">6</text>
-<rect x="531" y="289" width="148" height="54" fill="#dcfce7" stroke="#cbd5e1"/>
+<rect x="531" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-success-soft, var(--fd-semantic-color-status-success-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="605" y="321" text-anchor="middle">6</text>
-<rect x="681" y="289" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="681" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="755" y="321" text-anchor="middle">0</text>
-<rect x="831" y="289" width="148" height="54" fill="#fee2e2" stroke="#cbd5e1"/>
+<rect x="831" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="905" y="321" text-anchor="middle">0</text>
 <text class="mono" x="24" y="426">completion_ratio=1 readiness_gap=1</text>
 </svg>

@@ -3,30 +3,30 @@
 <title>Figure E Snapshot Lock Drift</title>
 <defs>
 <style><![CDATA[
-.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:#334155;}
-.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:#0f172a;}
-.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:#64748b;}
-.mono{font:500 12px 'JetBrains Mono',monospace;fill:#334155;}
-.grid{stroke:#d7e0eb;stroke-width:1;}
-.axis{stroke:#64748b;stroke-width:1.2;}
+.title{font:700 22px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.subtitle{font:600 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.label{font:500 13px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
+.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
+.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
 ]]></style>
 </defs>
-<rect x="0" y="0" width="1200" height="420" fill="#f8fafc"/>
+<rect x="0" y="0" width="1200" height="420" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
 <text class="title" x="24" y="36">E - Snapshot Lock Drift</text>
 <text class="subtitle" x="24" y="58">Source: Q-03_snapshot_lock_drift_panel</text>
 <text class="label" x="270" y="118" text-anchor="end">reviewed_snapshot_rows</text>
-<rect x="280" y="102" width="840" height="20" fill="#0ea5e9"/>
+<rect x="280" y="102" width="840" height="20" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
 <text class="value" x="1128" y="118">8</text>
 <text class="label" x="270" y="176" text-anchor="end">snapshot_mismatch_rows</text>
-<rect x="280" y="160" width="0" height="20" fill="#ef4444"/>
+<rect x="280" y="160" width="0" height="20" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="288" y="176">0</text>
 <text class="label" x="270" y="234" text-anchor="end">auto_eligible_mismatch_rows</text>
-<rect x="280" y="218" width="0" height="20" fill="#f59e0b"/>
+<rect x="280" y="218" width="0" height="20" fill="var(--fd-reporting-color-warning-bg, var(--fd-semantic-color-status-warning-bg))"/>
 <text class="value" x="288" y="234">0</text>
 <text class="label" x="270" y="292" text-anchor="end">approve_for_ineligible_rows</text>
-<rect x="280" y="276" width="0" height="20" fill="#dc2626"/>
+<rect x="280" y="276" width="0" height="20" fill="var(--fd-reporting-color-danger-strong, var(--fd-semantic-color-action-destructive-bg-hover))"/>
 <text class="value" x="288" y="292">0</text>
 <text class="mono" x="24" y="376">scoring_version_snapshot_actual=v3.1b</text>
 <text class="mono" x="24" y="396">fodmap_safety_score_snapshot_actual=0.500</text>

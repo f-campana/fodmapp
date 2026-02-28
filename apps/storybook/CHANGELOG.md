@@ -1,5 +1,24 @@
 # @fodmap/storybook
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`1779d31`](https://github.com/f-campana/Fodmap/commit/1779d31fe4a036dc325a89964400512ad1f7f388)]:
+  - @fodmap/reporting@0.1.5
+  - @fodmap/ui@1.0.4
+
+## 0.1.5
+
+### Patch Changes
+
+- [#96](https://github.com/f-campana/Fodmap/pull/96) [`aa225ca`](https://github.com/f-campana/Fodmap/commit/aa225ca3e92b2f4ad23be0f93525d32a516c2852) Thanks [@f-campana](https://github.com/f-campana)! - Add accessible control color roles and runtime slots (`focus.ringAccessible` and `border.control`), enforce semantic parity and contrast guardrails in token generation, migrate shared primitives to the new focus ring slot, and extend Storybook token/runtime assertions for the updated contract.
+
+- Updated dependencies [[`aa225ca`](https://github.com/f-campana/Fodmap/commit/aa225ca3e92b2f4ad23be0f93525d32a516c2852)]:
+  - @fodmap/design-tokens@0.2.3
+  - @fodmap/ui@1.0.3
+  - @fodmap/reporting@0.1.4
+
 ## 0.1.4
 
 ### Patch Changes

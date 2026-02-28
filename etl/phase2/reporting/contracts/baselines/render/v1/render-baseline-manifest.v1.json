@@ -1,8 +1,8 @@
 {
   "schema_version": "phase2-render-baseline-manifest-v1",
-  "generated_at_utc": "2026-02-26T14:30:06.303Z",
+  "generated_at_utc": "2026-02-28T18:03:24.791Z",
   "source_run": {
-    "run_id": "baseline-now-v1",
+    "run_id": "local-render-smoke",
     "git_sha": "placeholder",
     "source_db_ref": "fixture://now-set",
     "contract_version": "v1"
@@ -31,49 +31,49 @@
       "figure_id": "P-01_stage_progression_contract_curve",
       "file": "fig_A_pipeline_progression.svg",
       "title": "Pipeline Progression",
-      "sha256": "sha256:fe45ab9731aedb88629caef1dbf2a4a58167640e359e77c901ae162e905136b5"
+      "sha256": "sha256:480d0ec7f55fc3ca71437dc4325559cd60bd6dd78a77b17f3d2cd9b4c6d1cfb3"
     },
     {
       "figure_id": "P-02_candidate_pool_split_by_stage",
       "file": "fig_B_candidate_pool_evolution.svg",
       "title": "Candidate Pool Evolution",
-      "sha256": "sha256:04671207055bd6b967103c56fb94beeab9ef31ad6fd3ca8ccd3d556b50ecefbc"
+      "sha256": "sha256:e2ae8065f279f5c17eafa3a105ef0ee16912d027bf27d8e87b7cc0b4925b6198"
     },
     {
       "figure_id": "P-03_gap_completion_matrix",
       "file": "fig_C_gap_completion_heatmap.svg",
       "title": "Gap Completion Matrix",
-      "sha256": "sha256:363f0b5eab4329a7ca56379a6471c5629330d1fcac0964d3961f803577d7eba0"
+      "sha256": "sha256:aec1043fc279507f21b140871bea78e3820576f853cca561e78b7b455910006d"
     },
     {
       "figure_id": "Q-02_critical_contract_scorecard",
       "file": "fig_D_status_distribution.svg",
       "title": "Critical Contract Scorecard",
-      "sha256": "sha256:b823aec5cbd43b105997b2908064379b66c99cf0b3bbd1713b69940c323f991c"
+      "sha256": "sha256:2910e082956203c2532bd9887a668d65366abf39a597292bab0bc2633b520dcd"
     },
     {
       "figure_id": "Q-03_snapshot_lock_drift_panel",
       "file": "fig_E_evidence_quality.svg",
       "title": "Snapshot Lock Drift",
-      "sha256": "sha256:6b0ae6b8ae24a76f0bdd63dee315386d8a19c555985e5b28486235119abb069f"
+      "sha256": "sha256:375853ff2101ff4e000dcf8a4195c0fb51aacf54f3e01479764bcc230a8fc1ff"
     },
     {
       "figure_id": "Q-04_rank2_exclusion_audit",
       "file": "fig_F_serving_load_vs_thresholds.svg",
       "title": "Rank2 Exclusion Audit",
-      "sha256": "sha256:c965da8524d1f415feaaf21af363f24d095cfae32bf6634ec35fac7b58b142e2"
+      "sha256": "sha256:2de8e01ece77c2f411b389a42df186b2133ccea91f038d1b7b3038dffc4b6aab"
     },
     {
       "figure_id": "E-03_threshold_provenance_completeness",
       "file": "fig_G_source_provenance.svg",
       "title": "Threshold Provenance",
-      "sha256": "sha256:6a3692d2f5e910e1d18df5d7cb06ce562276f491f78af4f94dc41e6bd539131a"
+      "sha256": "sha256:daaa1c0f8b4e14f1d77084ea3e5928af11a374839fee50164aeaa1e149afcf78"
     },
     {
       "figure_id": "E-04_rank2_quarantine_case_study",
       "file": "fig_H_quarantine_impact.svg",
       "title": "Quarantine Case Study",
-      "sha256": "sha256:ec84ff703ae587671bcb9a23a95d2efd7c9a26f3aa62af11eba4721cdd72580c"
+      "sha256": "sha256:3334db4d0eaa8fdae3458828d588b2a174ce807ab8437ee48298178311a2ba23"
     }
   ],
   "public": [
@@ -81,7 +81,7 @@
       "artifact_id": "phase2_dashboard_html",
       "file": "phase2_dashboard.html",
       "title": "Phase 2 Reporting Dashboard",
-      "sha256": "sha256:9215582662c4175b13759303a0c0aa938dd89d052c560762a8837ac86177b3da"
+      "sha256": "sha256:1eb34e4d1f9c07c55c5640da18b65dec9df43ea6c3f44bf2a8c217152d705715"
     }
   ]
 }

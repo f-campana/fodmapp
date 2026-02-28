@@ -1,9 +1,9 @@
-import { logInfo } from "./logger";
 import { captureSentryEvent, getSentryBootstrapStatus } from "./sentry";
 
 export type MonitoringEvent =
   | "layout_bootstrap_rendered"
   | "app_shell_rendered"
+  | "espace_page_rendered"
   | "gated_placeholder_rendered";
 
 export interface MonitoringBootstrapStatus {
@@ -27,6 +27,4 @@ export function captureArchitectureEvent(
   attributes: Record<string, string> = {},
 ): void {
   captureSentryEvent(event, attributes);
-
-  logInfo(`[monitoring-runtime] ${event}`, attributes);
 }
