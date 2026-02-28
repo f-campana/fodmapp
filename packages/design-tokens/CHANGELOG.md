@@ -1,5 +1,11 @@
 # @fodmap/design-tokens
 
+## 0.2.2
+
+### Patch Changes
+
+- [#84](https://github.com/f-campana/Fodmap/pull/84) [`b3bd589`](https://github.com/f-campana/Fodmap/commit/b3bd58900fe16c3c2432b8f43136db03bffd1403) Thanks [@f-campana](https://github.com/f-campana)! - Normalize native token dimension output so `radius.full` is generated as a number (`9999`) instead of a string (`"9999px"`). This keeps the native token contract consistent for React Native consumers and aligns generated artifacts with lint/type expectations.
+
 ## 0.2.1
 
 ### Patch Changes
