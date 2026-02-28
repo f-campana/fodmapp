@@ -29,9 +29,14 @@ export const Primary: Story = {
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalled();
     await expect(button.className).toContain("hover:bg-primary-hover");
-    await expect(button.className).toContain("focus-visible:ring-ring-soft");
+    await expect(button.className).toContain(
+      "focus-visible:ring-ring-accessible",
+    );
     await expect(button.className).not.toContain("hover:bg-primary/90");
     await expect(button.className).not.toContain("focus-visible:ring-ring/50");
+    await expect(button.className).not.toContain(
+      "focus-visible:ring-ring-soft",
+    );
   },
 };
 

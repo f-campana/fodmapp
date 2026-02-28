@@ -75,12 +75,22 @@ export const semanticSlotMap = [
   {
     group: "borders",
     slot: "--color-input",
-    token: "--fd-semantic-color-border-default",
+    token: "--fd-semantic-color-border-control",
+  },
+  {
+    group: "borders",
+    slot: "--color-border-control",
+    token: "--fd-semantic-color-border-control",
   },
   {
     group: "borders",
     slot: "--color-ring",
     token: "--fd-semantic-color-focus-ring",
+  },
+  {
+    group: "borders",
+    slot: "--color-ring-accessible",
+    token: "--fd-semantic-color-focus-ring-accessible",
   },
   {
     group: "borders",

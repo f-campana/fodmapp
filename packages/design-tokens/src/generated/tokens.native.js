@@ -251,11 +251,13 @@ export const nativeTokens = {
           },
           "border": {
             "default": "#d4c0a5",
+            "control": "#78716c",
             "subtle": "#e7e5e4",
             "strong": "#a8a29e"
           },
           "focus": {
             "ring": "#89a95f",
+            "ringAccessible": "#5d7a35",
             "ringSoft": "#c2d0a7"
           },
           "action": {
@@ -337,11 +339,13 @@ export const nativeTokens = {
           },
           "border": {
             "default": "#5a4735",
+            "control": "#78716c",
             "subtle": "#44403c",
             "strong": "#78716c"
           },
           "focus": {
             "ring": "#b8d98a",
+            "ringAccessible": "#86a94f",
             "ringSoft": "#6a774d"
           },
           "action": {
