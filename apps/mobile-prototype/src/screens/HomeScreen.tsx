@@ -1,13 +1,56 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 
 import { Card, PrimaryButton, Screen, StateView } from "../components/ui";
 import { getDashboardSnapshot } from "../data/repository";
 import { rnTheme } from "../theme/rn-adapter";
-import { theme } from "../theme/tokens";
+import { useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
+
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    flex: { flex: 1 },
+    heroCard: {
+      backgroundColor: colors.surfaceRaised,
+      borderLeftWidth: 3,
+      borderLeftColor: colors.accent,
+    },
+    kicker: {
+      color: colors.accentStrong,
+      fontSize: 14,
+      fontWeight: "700",
+      textTransform: "uppercase",
+    },
+    metric: {
+      color: colors.text,
+      fontSize: 28,
+      fontWeight: "800",
+      marginBottom: 8,
+      marginTop: 8,
+    },
+    muted: {
+      color: colors.textMuted,
+      fontSize: 16,
+      lineHeight: 22,
+      marginBottom: theme.spacing.sm,
+    },
+    row: { flexDirection: "row", gap: theme.spacing.sm },
+    stat: { color: colors.text, fontSize: 34, fontWeight: "800" },
+    statCard: { justifyContent: "flex-end", minHeight: 130 },
+    tipCard: { backgroundColor: colors.surfaceMuted },
+    tipTitle: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "700",
+      marginBottom: 6,
+    },
+  });
+}
 
 export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [data, setData] = useState<{
@@ -100,41 +143,3 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  heroCard: {
-    backgroundColor: rnTheme.color.surfaceRaised,
-    borderLeftWidth: 3,
-    borderLeftColor: rnTheme.color.accent,
-  },
-  kicker: {
-    color: theme.color.accentStrong,
-    fontSize: 14,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
-  metric: {
-    color: theme.color.text,
-    fontSize: 28,
-    fontWeight: "800",
-    marginBottom: 8,
-    marginTop: 8,
-  },
-  muted: {
-    color: theme.color.textMuted,
-    fontSize: 16,
-    lineHeight: 22,
-    marginBottom: theme.spacing.sm,
-  },
-  row: { flexDirection: "row", gap: theme.spacing.sm },
-  stat: { color: theme.color.text, fontSize: 34, fontWeight: "800" },
-  statCard: { justifyContent: "flex-end", minHeight: 130 },
-  tipCard: { backgroundColor: rnTheme.color.surfaceMuted },
-  tipTitle: {
-    color: theme.color.text,
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 6,
-  },
-});

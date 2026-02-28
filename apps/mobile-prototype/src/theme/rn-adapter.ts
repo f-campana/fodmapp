@@ -1,57 +1,62 @@
 import { nativeTokens } from "@fodmap/design-tokens/native";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const light = (nativeTokens.themes.light.semantic as any).color as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const base = nativeTokens.base as any;
 
-export const severityColors = {
-  none: {
-    bg: base.color.emerald["100"] as string,
-    fg: base.color.emerald["800"] as string,
-  },
-  low: {
-    bg: base.color.amber["100"] as string,
-    fg: base.color.amber["800"] as string,
-  },
-  moderate: {
-    bg: base.color.amber["200"] as string,
-    fg: base.color.amber["900"] as string,
-  },
-  high: {
-    bg: base.color.red["100"] as string,
-    fg: base.color.red["800"] as string,
-  },
-} as const;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildColors(semantic: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const c = (semantic as any).color;
+  return {
+    canvas: c.background.canvas as string,
+    surface: c.surface.default as string,
+    surfaceRaised: c.surface.raised as string,
+    surfaceMuted: c.surface.muted as string,
+    text: c.text.primary as string,
+    textMuted: c.text.muted as string,
+    textInverse: c.text.inverse as string,
+    border: c.border.default as string,
+    borderSubtle: c.border.subtle as string,
+    accent: c.action.primary.bg as string,
+    accentStrong: c.action.primary.bgHover as string,
+    accentFg: c.action.primary.fg as string,
+    actionSecondaryBg: c.action.secondary.bg as string,
+    actionSecondaryFg: c.action.secondary.fg as string,
+    danger: c.action.destructive.bg as string,
+    dangerFg: c.action.destructive.fg as string,
+    warning: c.status.warning.bg as string,
+    warningFg: c.status.warning.fg as string,
+    statusInfoBg: c.status.info.bg as string,
+    statusSuccessBg: c.status.success.bg as string,
+  };
+}
 
-export type SeverityColors = typeof severityColors;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildSeverityColors(semantic: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const s = (semantic as any).color.status;
+  return {
+    none: { bg: s.success.bg as string, fg: s.success.fg as string },
+    low: { bg: s.warning.bg as string, fg: s.warning.fg as string },
+    moderate: { bg: s.warning.bg as string, fg: s.warning.fg as string },
+    high: { bg: s.danger.bg as string, fg: s.danger.fg as string },
+  };
+}
 
+export type RNColors = ReturnType<typeof buildColors>;
+export type SeverityColors = ReturnType<typeof buildSeverityColors>;
+
+export const lightColors = buildColors(nativeTokens.themes.light.semantic);
+export const darkColors = buildColors(nativeTokens.themes.dark.semantic);
+export const lightSeverityColors = buildSeverityColors(
+  nativeTokens.themes.light.semantic,
+);
+export const darkSeverityColors = buildSeverityColors(
+  nativeTokens.themes.dark.semantic,
+);
+
+// rnTheme.color REMOVED — use useTheme().colors
 export const rnTheme = {
-  color: {
-    canvas: light.background.canvas as string,
-    surface: light.surface.default as string,
-    surfaceRaised: light.surface.raised as string,
-    surfaceMuted: light.surface.muted as string,
-    text: light.text.primary as string,
-    textMuted: light.text.muted as string,
-    textInverse: light.text.inverse as string,
-    border: light.border.default as string,
-    borderSubtle: light.border.subtle as string,
-    accent: light.action.primary.bg as string,
-    accentStrong: light.action.primary.bgHover as string,
-    accentFg: light.action.primary.fg as string,
-    actionSecondaryBg: light.action.secondary.bg as string,
-    actionSecondaryFg: light.action.secondary.fg as string,
-    danger: light.action.destructive.bg as string,
-    dangerFg: light.action.destructive.fg as string,
-    warning: light.status.warning.bg as string,
-    warningFg: light.status.warning.fg as string,
-    statusInfoBg: light.status.info.bg as string,
-    statusSuccessBg: light.status.success.bg as string,
-  },
-
-  severityColors,
-
   radius: {
     control: base.radius.lg as number,
     container: base.radius.xl as number,

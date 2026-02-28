@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { getDefaultPreferences, type Preferences } from "../data/repository";
+import type { ColorSchemePreference } from "../theme/ThemeContext";
 import {
   parseOnboardingCompleted,
   serializeOnboardingCompleted,
@@ -39,4 +40,20 @@ export async function saveOnboardingCompleted(
     ONBOARDING_COMPLETED_KEY,
     serializeOnboardingCompleted(completed),
   );
+}
+
+export const COLOR_SCHEME_KEY = "@fodmap/prototype/color-scheme";
+
+export async function loadColorScheme(): Promise<ColorSchemePreference> {
+  const raw = await AsyncStorage.getItem(COLOR_SCHEME_KEY);
+  if (raw === "light" || raw === "dark" || raw === "system") {
+    return raw;
+  }
+  return "system";
+}
+
+export async function saveColorScheme(
+  scheme: ColorSchemePreference,
+): Promise<void> {
+  await AsyncStorage.setItem(COLOR_SCHEME_KEY, scheme);
 }

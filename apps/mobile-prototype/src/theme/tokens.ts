@@ -1,19 +1,9 @@
-import { type RNTheme, rnTheme } from "./rn-adapter";
+import { rnTheme } from "./rn-adapter";
 
+export type { RNColors, RNTheme, SeverityColors } from "./rn-adapter";
+
+// theme.color REMOVED — colors come from useTheme().colors
 export const theme = {
-  color: {
-    canvas: rnTheme.color.canvas,
-    surface: rnTheme.color.surface,
-    surfaceMuted: rnTheme.color.surfaceMuted,
-    text: rnTheme.color.text,
-    textMuted: rnTheme.color.textMuted,
-    border: rnTheme.color.border,
-    accent: rnTheme.color.accent,
-    accentStrong: rnTheme.color.accentStrong,
-    accentSoft: rnTheme.color.surfaceMuted,
-    infoSoft: rnTheme.color.surfaceRaised,
-    danger: rnTheme.color.danger,
-  },
   // Numeric keys + backward-compat named aliases
   radius: {
     ...rnTheme.radius,
@@ -33,5 +23,4 @@ export const theme = {
   shadow: { card: rnTheme.shadow.card },
 } as const;
 
-export type { RNTheme };
 export { rnTheme };

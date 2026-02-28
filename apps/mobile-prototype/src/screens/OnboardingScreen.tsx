@@ -13,7 +13,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Card } from "../components/ui";
 import { rnTheme } from "../theme/rn-adapter";
-import { theme } from "../theme/tokens";
+import { useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
 
 const STEPS = [
   {
@@ -33,11 +34,107 @@ const STEPS = [
   },
 ] as const;
 
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    actions: {
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      marginTop: theme.spacing.lg,
+    },
+    body: {
+      color: colors.textMuted,
+      fontSize: 18,
+      lineHeight: 30,
+      marginTop: theme.spacing.sm,
+      textAlign: "center",
+    },
+    brand: {
+      color: colors.accentStrong,
+      fontSize: 34,
+      fontWeight: "800",
+      letterSpacing: -1,
+      marginBottom: theme.spacing.md,
+      textAlign: "center",
+    },
+    container: {
+      backgroundColor: colors.canvas,
+      flex: 1,
+      justifyContent: "center",
+      padding: theme.spacing.md,
+    },
+    dot: {
+      backgroundColor: colors.border,
+      borderRadius: 999,
+      height: 10,
+      width: 10,
+    },
+    dotActive: {
+      backgroundColor: colors.accent,
+      width: 30,
+    },
+    dots: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.xs,
+      justifyContent: "center",
+      marginTop: theme.spacing.sm,
+    },
+    fullWidth: {
+      flex: 1,
+    },
+    heroCard: {
+      minHeight: 260,
+    },
+    heroIcon: {
+      fontSize: 48,
+      textAlign: "center",
+    },
+    primaryButton: {
+      alignItems: "center",
+      backgroundColor: colors.accent,
+      borderRadius: theme.radius.sm,
+      flex: 1,
+      justifyContent: "center",
+      minHeight: 56,
+    },
+    primaryLabel: {
+      color: "white",
+      fontSize: 22,
+      fontWeight: "700",
+    },
+    secondaryButton: {
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      flex: 1,
+      justifyContent: "center",
+      minHeight: 56,
+    },
+    secondaryLabel: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "600",
+    },
+    title: {
+      color: colors.text,
+      fontSize: 38,
+      fontWeight: "800",
+      letterSpacing: -0.8,
+      marginTop: theme.spacing.sm,
+      textAlign: "center",
+    },
+  });
+}
+
 export function OnboardingScreen({ onComplete }: { onComplete: () => void }) {
+  const { colors } = useTheme();
   const [stepIndex, setStepIndex] = useState(0);
   const step = STEPS[stepIndex];
   const isLast = useMemo(() => stepIndex === STEPS.length - 1, [stepIndex]);
   const [contentOpacity] = useState(() => new Animated.Value(1));
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const advanceStep = () => {
     if (isLast) {
@@ -102,95 +199,3 @@ export function OnboardingScreen({ onComplete }: { onComplete: () => void }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  actions: {
-    flexDirection: "row",
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-  },
-  body: {
-    color: theme.color.textMuted,
-    fontSize: 18,
-    lineHeight: 30,
-    marginTop: theme.spacing.sm,
-    textAlign: "center",
-  },
-  brand: {
-    color: theme.color.accentStrong,
-    fontSize: 34,
-    fontWeight: "800",
-    letterSpacing: -1,
-    marginBottom: theme.spacing.md,
-    textAlign: "center",
-  },
-  container: {
-    backgroundColor: theme.color.canvas,
-    flex: 1,
-    justifyContent: "center",
-    padding: theme.spacing.md,
-  },
-  dot: {
-    backgroundColor: theme.color.border,
-    borderRadius: 999,
-    height: 10,
-    width: 10,
-  },
-  dotActive: {
-    backgroundColor: theme.color.accent,
-    width: 30,
-  },
-  dots: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: theme.spacing.xs,
-    justifyContent: "center",
-    marginTop: theme.spacing.sm,
-  },
-  fullWidth: {
-    flex: 1,
-  },
-  heroCard: {
-    minHeight: 260,
-  },
-  heroIcon: {
-    fontSize: 48,
-    textAlign: "center",
-  },
-  primaryButton: {
-    alignItems: "center",
-    backgroundColor: theme.color.accent,
-    borderRadius: theme.radius.sm,
-    flex: 1,
-    justifyContent: "center",
-    minHeight: 56,
-  },
-  primaryLabel: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "700",
-  },
-  secondaryButton: {
-    alignItems: "center",
-    backgroundColor: theme.color.surface,
-    borderColor: theme.color.border,
-    borderRadius: theme.radius.sm,
-    borderWidth: 1,
-    flex: 1,
-    justifyContent: "center",
-    minHeight: 56,
-  },
-  secondaryLabel: {
-    color: theme.color.text,
-    fontSize: 22,
-    fontWeight: "600",
-  },
-  title: {
-    color: theme.color.text,
-    fontSize: 38,
-    fontWeight: "800",
-    letterSpacing: -0.8,
-    marginTop: theme.spacing.sm,
-    textAlign: "center",
-  },
-});

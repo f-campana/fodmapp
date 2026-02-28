@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Animated,
@@ -14,13 +14,87 @@ import { Badge, Card, Screen, StateView } from "../components/ui";
 import { type Preferences } from "../data/repository";
 import {
   loadPreferences,
+  saveColorScheme,
   saveOnboardingCompleted,
   savePreferences,
 } from "../storage/preferencesStore";
 import { rnTheme } from "../theme/rn-adapter";
-import { theme } from "../theme/tokens";
+import { type ColorSchemePreference, useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
+
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    autosaveIndicator: {
+      alignItems: "center",
+      paddingVertical: rnTheme.spacing[3],
+    },
+    autosaveText: {
+      color: colors.accent,
+      fontSize: 16,
+      textAlign: "center",
+    },
+    chip: {
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      flex: 1,
+      justifyContent: "center",
+      paddingVertical: 10,
+    },
+    chipActive: {
+      backgroundColor: colors.accent,
+      borderColor: colors.accent,
+    },
+    chipLabel: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+    chipLabelActive: {
+      color: colors.accentFg,
+    },
+    label: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "800",
+      marginBottom: 4,
+    },
+    row: {
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 10,
+      paddingVertical: 12,
+    },
+    rowText: { color: colors.text, flex: 1, fontSize: 20, marginRight: 8 },
+    schemeRow: {
+      flexDirection: "row",
+      gap: theme.spacing.xs,
+    },
+    secondaryAction: {
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      minHeight: 52,
+      justifyContent: "center",
+    },
+    secondaryActionText: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    tags: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
+    value: { color: colors.textMuted, fontSize: 20, marginTop: 2 },
+  });
+}
 
 export function SettingsScreen() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -89,6 +163,11 @@ export function SettingsScreen() {
       </Card>
 
       <Card>
+        <Text style={styles.label}>Appearance</Text>
+        <ColorSchemeRow />
+      </Card>
+
+      <Card>
         <SettingRow
           label="Strict low-FODMAP mode"
           value={prefs.strictMode}
@@ -136,6 +215,36 @@ export function SettingsScreen() {
   );
 }
 
+function ColorSchemeRow() {
+  const { preference, setPreference, colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const options: ColorSchemePreference[] = ["system", "light", "dark"];
+
+  return (
+    <View style={styles.schemeRow}>
+      {options.map((opt) => (
+        <Pressable
+          key={opt}
+          onPress={() => {
+            setPreference(opt);
+            void saveColorScheme(opt);
+          }}
+          style={[styles.chip, opt === preference && styles.chipActive]}
+        >
+          <Text
+            style={[
+              styles.chipLabel,
+              opt === preference && styles.chipLabelActive,
+            ]}
+          >
+            {opt.charAt(0).toUpperCase() + opt.slice(1)}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
 function SettingRow({
   label,
   value,
@@ -145,56 +254,17 @@ function SettingRow({
   value: boolean;
   onChange: (next: boolean) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.row}>
       <Text style={styles.rowText}>{label}</Text>
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: theme.color.accent }}
+        trackColor={{ true: colors.accent }}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  autosaveIndicator: {
-    alignItems: "center",
-    paddingVertical: rnTheme.spacing[3],
-  },
-  autosaveText: {
-    color: rnTheme.color.accent,
-    fontSize: 16,
-    textAlign: "center",
-  },
-  label: {
-    color: theme.color.text,
-    fontSize: 18,
-    fontWeight: "800",
-    marginBottom: 4,
-  },
-  row: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-    paddingVertical: 12,
-  },
-  rowText: { color: theme.color.text, flex: 1, fontSize: 20, marginRight: 8 },
-  secondaryAction: {
-    alignItems: "center",
-    backgroundColor: theme.color.surface,
-    borderColor: theme.color.border,
-    borderRadius: theme.radius.sm,
-    borderWidth: 1,
-    minHeight: 52,
-    justifyContent: "center",
-  },
-  secondaryActionText: {
-    color: theme.color.text,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  tags: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
-  value: { color: theme.color.textMuted, fontSize: 20, marginTop: 2 },
-});

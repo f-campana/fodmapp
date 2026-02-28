@@ -1,8 +1,9 @@
+import { type ReactNode, useMemo } from "react";
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import type { ReactNode } from "react";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -10,7 +11,8 @@ import { FoodDetailScreen } from "../screens/FoodDetailScreen";
 import { FoodsScreen } from "../screens/FoodsScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
-import { theme } from "../theme/tokens";
+import { useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<TabParamList>();
@@ -26,19 +28,43 @@ export type TabParamList = {
   SettingsTab: undefined;
 };
 
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    screen: {
+      backgroundColor: colors.canvas,
+      flex: 1,
+      paddingHorizontal: theme.spacing.md,
+    },
+    tabBar: {
+      borderTopColor: colors.border,
+      height: 78,
+      paddingBottom: 10,
+      paddingTop: 8,
+    },
+  });
+}
+
+const staticStyles = StyleSheet.create({
+  tabIcon: { fontSize: 18 },
+  tabLabel: { fontSize: 12, fontWeight: "600", marginBottom: 2 },
+});
+
 function TabIcon({ icon, color }: { icon: string; color: string }) {
-  return <Text style={[styles.tabIcon, { color }]}>{icon}</Text>;
+  return <Text style={[staticStyles.tabIcon, { color }]}>{icon}</Text>;
 }
 
 function TabNavigator() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <Tabs.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.color.accent,
-        tabBarInactiveTintColor: theme.color.textMuted,
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarStyle: [styles.tabBar, { backgroundColor: theme.color.surface }],
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarLabelStyle: staticStyles.tabLabel,
+        tabBarStyle: [styles.tabBar, { backgroundColor: colors.surface }],
       }}
     >
       <Tabs.Screen
@@ -88,17 +114,19 @@ function TabNavigator() {
 }
 
 export function AppNavigator() {
+  const { colors } = useTheme();
+
   return (
     <NavigationContainer
       theme={{
         ...DefaultTheme,
         colors: {
           ...DefaultTheme.colors,
-          background: theme.color.canvas,
-          text: theme.color.text,
-          card: theme.color.surface,
-          border: theme.color.border,
-          primary: theme.color.accent,
+          background: colors.canvas,
+          text: colors.text,
+          card: colors.surface,
+          border: colors.border,
+          primary: colors.accent,
         },
       }}
     >
@@ -114,7 +142,7 @@ export function AppNavigator() {
             title: route.params.foodName ?? "Food",
             headerBackButtonDisplayMode: "minimal",
             headerShadowVisible: false,
-            headerStyle: { backgroundColor: theme.color.canvas },
+            headerStyle: { backgroundColor: colors.canvas },
           })}
         >
           {({ route }) => (
@@ -129,31 +157,12 @@ export function AppNavigator() {
 }
 
 function ScreenPad({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <SafeAreaView edges={["top"]} style={styles.screen}>
       {children}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    backgroundColor: theme.color.canvas,
-    flex: 1,
-    paddingHorizontal: theme.spacing.md,
-  },
-  tabBar: {
-    borderTopColor: theme.color.border,
-    height: 78,
-    paddingBottom: 10,
-    paddingTop: 8,
-  },
-  tabIcon: {
-    fontSize: 18,
-  },
-  tabLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-});

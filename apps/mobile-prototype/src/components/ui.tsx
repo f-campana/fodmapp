@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 import {
   ActivityIndicator,
@@ -13,8 +13,98 @@ import {
 } from "react-native";
 
 import type { Severity } from "../data/mockData";
-import { rnTheme, severityColors } from "../theme/rn-adapter";
-import { theme } from "../theme/tokens";
+import { rnTheme } from "../theme/rn-adapter";
+import { useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
+
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    badge: {
+      alignSelf: "flex-start",
+      borderRadius: 999,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 0.4,
+      marginTop: theme.spacing.sm,
+      overflow: "hidden",
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      textTransform: "uppercase",
+    },
+    card: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      marginBottom: theme.spacing.sm,
+      padding: theme.spacing.md,
+      ...theme.shadow.card,
+    },
+    centered: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 200,
+      paddingHorizontal: theme.spacing.lg,
+    },
+    divider: {
+      backgroundColor: colors.border,
+      height: 1,
+      marginVertical: rnTheme.spacing[2],
+    },
+    muted: {
+      color: colors.textMuted,
+      marginBottom: theme.spacing.sm,
+      marginTop: theme.spacing.xs,
+      textAlign: "center",
+    },
+    primaryButton: {
+      alignItems: "center",
+      backgroundColor: colors.accent,
+      borderRadius: theme.radius.sm,
+      minHeight: 52,
+      justifyContent: "center",
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+    },
+    primaryButtonPressed: {
+      backgroundColor: colors.accentStrong,
+    },
+    primaryLabel: {
+      color: "white",
+      fontSize: 18,
+      fontWeight: "700",
+    },
+    screenContent: {
+      flex: 1,
+      gap: theme.spacing.sm,
+    },
+    screenHeader: {
+      marginBottom: rnTheme.spacing[4],
+      marginTop: theme.spacing.xs,
+    },
+    screenSubtitle: {
+      color: colors.textMuted,
+      fontSize: 16,
+      marginTop: 2,
+    },
+    screenTitle: {
+      color: colors.text,
+      fontSize: rnTheme.typography.fontSize["3xl"],
+      fontWeight: "700",
+      letterSpacing: -0.4,
+    },
+    scrollContent: {
+      paddingBottom: theme.spacing.xl,
+    },
+    sectionTitle: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "800",
+      marginBottom: theme.spacing.xs,
+    },
+  });
+}
 
 export function Screen({
   title,
@@ -27,6 +117,9 @@ export function Screen({
   children: ReactNode;
   scroll?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const content = (
     <View style={styles.screenContent}>
       <View style={styles.screenHeader}>
@@ -41,7 +134,10 @@ export function Screen({
 
   if (scroll) {
     return (
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {content}
       </ScrollView>
     );
@@ -57,10 +153,14 @@ export function Card({
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
 export function Divider() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return <View style={styles.divider} />;
 }
 
@@ -71,6 +171,8 @@ export function PrimaryButton({
   label: string;
   onPress?: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [scaleAnim] = useState(() => new Animated.Value(1));
 
   const handlePressIn = () =>
@@ -112,14 +214,19 @@ export function Badge({
   label: string;
   variant?: Severity | "default";
 }) {
-  const colors =
+  const { colors, severityColors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const badgeColors =
     variant && variant !== "default"
       ? { bg: severityColors[variant].bg, fg: severityColors[variant].fg }
-      : { bg: theme.color.accentSoft, fg: theme.color.accentStrong };
+      : { bg: colors.surfaceMuted, fg: colors.accentStrong };
 
   return (
     <Text
-      style={[styles.badge, { backgroundColor: colors.bg, color: colors.fg }]}
+      style={[
+        styles.badge,
+        { backgroundColor: badgeColors.bg, color: badgeColors.fg },
+      ]}
     >
       {label}
     </Text>
@@ -127,6 +234,8 @@ export function Badge({
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return <Text style={styles.sectionTitle}>{children}</Text>;
 }
 
@@ -141,9 +250,12 @@ export function StateView({
   action?: () => void;
   actionLabel?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.centered}>
-      {loading ? <ActivityIndicator color={theme.color.accent} /> : null}
+      {loading ? <ActivityIndicator color={colors.accent} /> : null}
       <Text style={styles.muted}>{message}</Text>
       {action ? (
         <PrimaryButton label={actionLabel ?? "Retry"} onPress={action} />
@@ -151,90 +263,3 @@ export function StateView({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    alignSelf: "flex-start",
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 0.4,
-    marginTop: theme.spacing.sm,
-    overflow: "hidden",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    textTransform: "uppercase",
-  },
-  card: {
-    backgroundColor: theme.color.surface,
-    borderColor: theme.color.border,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    marginBottom: theme.spacing.sm,
-    padding: theme.spacing.md,
-    ...theme.shadow.card,
-  },
-  centered: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 200,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  divider: {
-    backgroundColor: theme.color.border,
-    height: 1,
-    marginVertical: rnTheme.spacing[2],
-  },
-  muted: {
-    color: theme.color.textMuted,
-    marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.xs,
-    textAlign: "center",
-  },
-  primaryButton: {
-    alignItems: "center",
-    backgroundColor: theme.color.accent,
-    borderRadius: theme.radius.sm,
-    minHeight: 52,
-    justifyContent: "center",
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.sm,
-  },
-  primaryButtonPressed: {
-    backgroundColor: rnTheme.color.accentStrong,
-  },
-  primaryLabel: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  screenContent: {
-    flex: 1,
-    gap: theme.spacing.sm,
-  },
-  screenHeader: {
-    marginBottom: rnTheme.spacing[4],
-    marginTop: theme.spacing.xs,
-  },
-  screenSubtitle: {
-    color: theme.color.textMuted,
-    fontSize: 16,
-    marginTop: 2,
-  },
-  screenTitle: {
-    color: theme.color.text,
-    fontSize: rnTheme.typography.fontSize["3xl"],
-    fontWeight: "700",
-    letterSpacing: -0.4,
-  },
-  scrollContent: {
-    paddingBottom: theme.spacing.xl,
-  },
-  sectionTitle: {
-    color: theme.color.text,
-    fontSize: 22,
-    fontWeight: "800",
-    marginBottom: theme.spacing.xs,
-  },
-});

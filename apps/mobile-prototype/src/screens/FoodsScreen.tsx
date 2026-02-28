@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Animated,
@@ -14,13 +14,46 @@ import {
 import { Badge, Card, Screen, StateView } from "../components/ui";
 import { type Food, listFoods } from "../data/repository";
 import { rnTheme } from "../theme/rn-adapter";
-import { theme } from "../theme/tokens";
+import { useTheme } from "../theme/ThemeContext";
+import { type RNColors, theme } from "../theme/tokens";
+
+function createStyles(colors: RNColors) {
+  return StyleSheet.create({
+    headerRow: {
+      alignItems: "flex-start",
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    meta: { color: colors.textMuted, fontSize: 16, marginTop: 2 },
+    name: {
+      color: colors.text,
+      fontSize: rnTheme.typography.fontSize["2xl"],
+      fontWeight: "800",
+      letterSpacing: -0.3,
+      maxWidth: "72%",
+    },
+    search: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      color: colors.text,
+      fontSize: 18,
+      marginBottom: theme.spacing.sm,
+      minHeight: 54,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+  });
+}
 
 export function FoodsScreen({
   onSelectFood,
 }: {
   onSelectFood: (foodId: string, foodName?: string) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [rawQuery, setRawQuery] = useState("");
   const [query, setQuery] = useState("");
   const [foods, setFoods] = useState<Food[]>([]);
@@ -77,7 +110,7 @@ export function FoodsScreen({
         placeholder="Search foods or trigger tags"
         value={rawQuery}
         onChangeText={setRawQuery}
-        placeholderTextColor={theme.color.textMuted}
+        placeholderTextColor={colors.textMuted}
       />
 
       {loading ? <StateView loading message="Loading foods..." /> : null}
@@ -138,31 +171,3 @@ export function FoodsScreen({
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  headerRow: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  meta: { color: theme.color.textMuted, fontSize: 16, marginTop: 2 },
-  name: {
-    color: theme.color.text,
-    fontSize: rnTheme.typography.fontSize["2xl"],
-    fontWeight: "800",
-    letterSpacing: -0.3,
-    maxWidth: "72%",
-  },
-  search: {
-    backgroundColor: theme.color.surface,
-    borderColor: theme.color.border,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    color: theme.color.text,
-    fontSize: 18,
-    marginBottom: theme.spacing.sm,
-    minHeight: 54,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-});
