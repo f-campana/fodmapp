@@ -1,5 +1,11 @@
 # @fodmap/app
 
+## 0.1.8
+
+### Patch Changes
+
+- [#89](https://github.com/f-campana/Fodmap/pull/89) [`707e6f0`](https://github.com/f-campana/Fodmap/commit/707e6f07e97217d981a27f4364fdd6e99cf178e5) Thanks [@f-campana](https://github.com/f-campana)! - Enforce authenticated-only rights access on `/espace`, keep analytics fail-closed, and tighten FR/EN copy runtime behavior for the iOS pilot phase.
+
 ## 0.1.7
 
 ### Patch Changes
