@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Optional, Set
 from urllib.parse import urlparse
 
-
 NOW_FIGURE_IDS = {
     "P-01_stage_progression_contract_curve",
     "P-02_candidate_pool_split_by_stage",
@@ -316,7 +315,10 @@ def _validate_p02(metrics: Dict[str, Any], errors: List[str]) -> None:
 
         if with_candidates + without_candidates != unresolved_rows:
             errors.append(
-                f"{figure_id} stage {stage_id} with_candidates_rows + without_candidates_rows must equal unresolved_rows"
+                (
+                    f"{figure_id} stage {stage_id} with_candidates_rows + "
+                    "without_candidates_rows must equal unresolved_rows"
+                )
             )
 
         if unresolved_rows == 0:
@@ -627,9 +629,7 @@ def _run_psql_json(db_url: str, sql_file: pathlib.Path, cwd: pathlib.Path) -> Di
     cmd = ["psql", db_url, "-v", "ON_ERROR_STOP=1", "-q", "-t", "-A", "-f", str(sql_file)]
     proc = subprocess.run(cmd, cwd=str(cwd), text=True, capture_output=True)
     if proc.returncode != 0:
-        raise RuntimeError(
-            f"psql failed for {sql_file}:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
-        )
+        raise RuntimeError(f"psql failed for {sql_file}:\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}")
 
     lines = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
     if not lines:
@@ -652,9 +652,7 @@ def _collect_from_db(
     requested_figures: Set[str], db_url: str, sql_dir: pathlib.Path, repo_root: pathlib.Path
 ) -> List[Dict[str, Any]]:
     missing_sql = [
-        FIGURE_SQL_FILE[fid]
-        for fid in sorted(requested_figures)
-        if not (sql_dir / FIGURE_SQL_FILE[fid]).exists()
+        FIGURE_SQL_FILE[fid] for fid in sorted(requested_figures) if not (sql_dir / FIGURE_SQL_FILE[fid]).exists()
     ]
     if missing_sql:
         raise FileNotFoundError(f"missing SQL extractors: {missing_sql}")
@@ -675,9 +673,7 @@ def _collect_from_db(
     return results
 
 
-def _merge_source_hashes(
-    figure_payloads: Iterable[Dict[str, Any]], repo_root: pathlib.Path
-) -> Dict[str, str]:
+def _merge_source_hashes(figure_payloads: Iterable[Dict[str, Any]], repo_root: pathlib.Path) -> Dict[str, str]:
     hashes: Dict[str, str] = {}
     for payload in figure_payloads:
         for path, digest in (payload.get("source_file_hashes") or {}).items():
@@ -722,9 +718,7 @@ def main() -> int:
 
     try:
         if args.source == "fixture":
-            raw_payloads = _collect_from_fixtures(
-                requested_figures, pathlib.Path(args.fixture_dir), repo_root
-            )
+            raw_payloads = _collect_from_fixtures(requested_figures, pathlib.Path(args.fixture_dir), repo_root)
         else:
             raw_payloads = _collect_from_db(
                 requested_figures=requested_figures,
@@ -816,9 +810,7 @@ def main() -> int:
         },
         "artifact": {
             "out_path": str(out_dir),
-            "sha256": _sha256_bytes(
-                json.dumps(figures, sort_keys=True, separators=(",", ":")).encode("utf-8")
-            ),
+            "sha256": _sha256_bytes(json.dumps(figures, sort_keys=True, separators=(",", ":")).encode("utf-8")),
         },
     }
 

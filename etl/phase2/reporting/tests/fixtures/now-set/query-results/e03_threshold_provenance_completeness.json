@@ -1,7 +1,5 @@
 {
-  "contract_refs": [
-    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
-  ],
+  "contract_refs": ["etl/phase3/sql/phase3_rollups_6subtype_checks.sql"],
   "figure_id": "E-03_threshold_provenance_completeness",
   "fixture_id": "E-03",
   "mode": "fixture_smoke",

@@ -35,25 +35,34 @@
 9. [now][M] Add SQL extractor set for DB full-lane collection
    - `p01`..`e04` extractor SQL files
 10. [now][M] Add reporting module README and plan cross-links
-   - execution notes for run modes and manual refresh process.
+
+- execution notes for run modes and manual refresh process.
+
 11. [now][M] Add acceptance checklist
-   - parser fail-loud coverage (unknown source/missing scalar/empty now row)
-   - Q-03 reviewed-snapshot scope non-empty
-   - E-04 frozen mode + source stage fields fixed.
+
+- parser fail-loud coverage (unknown source/missing scalar/empty now row)
+- Q-03 reviewed-snapshot scope non-empty
+- E-04 frozen mode + source stage fields fixed.
+
 12. [now][M] Split baseline refresh governance into two controlled modes
-   - `baseline_update` for generated contracts + baseline JSON only
-   - `render_baseline_update` for render baseline assets only (`svg/html/render-manifest json`)
-   - enforce mutual exclusion at workflow level
+
+- `baseline_update` for generated contracts + baseline JSON only
+- `render_baseline_update` for render baseline assets only (`svg/html/render-manifest json`)
+- enforce mutual exclusion at workflow level
+
 13. [now][S] Add review/self-reflection gate before CI/manual runs
-   - author `docs/plans/phase2-reporting-review-checkpoint.md`
-   - include findings dispositions, residual risks, and exact verification commands/outcomes
+
+- author `docs/plans/phase2-reporting-review-checkpoint.md`
+- include findings dispositions, residual risks, and exact verification commands/outcomes
+
 14. [now][M] Phase 4 delivery hardening (post-remediation)
-   - materialize deterministic stage contracts into DB snapshot table for full lane
-   - remove static stage constants from `p01/p02` SQL extractors
-   - add figure-level semantic fail-loud checks in `collect_reporting.py`
-   - enforce fixture source hash freshness checks
-   - add fixture/baseline semantic parity tests + optional DB parity gate
-   - align docs with blocking full lane and split baseline update modes
+
+- materialize deterministic stage contracts into DB snapshot table for full lane
+- remove static stage constants from `p01/p02` SQL extractors
+- add figure-level semantic fail-loud checks in `collect_reporting.py`
+- enforce fixture source hash freshness checks
+- add fixture/baseline semantic parity tests + optional DB parity gate
+- align docs with blocking full lane and split baseline update modes
 
 ## Next set (deferred)
 

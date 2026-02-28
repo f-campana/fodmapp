@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Set
 
 import yaml
 
-
 MODE_ALLOWED_WRITES: Dict[str, Set[str]] = {
     "baseline_update": {
         "etl/phase2/reporting/contracts/generated/*.generated.yaml",
@@ -122,8 +121,10 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
         raise ValueError(f"figure {figure_id} missing metrics object")
 
     contract_refs = figure.get("contract_refs")
-    if not isinstance(contract_refs, list) or not contract_refs or not all(
-        isinstance(x, str) and x for x in contract_refs
+    if (
+        not isinstance(contract_refs, list)
+        or not contract_refs
+        or not all(isinstance(x, str) and x for x in contract_refs)
     ):
         raise ValueError(f"figure {figure_id} must include non-empty contract_refs")
 
@@ -135,24 +136,16 @@ def _normalize_figure(figure: Dict[str, Any]) -> Dict[str, Any]:
         "hard_gate": str(figure.get("hard_gate", "fail")),
         "contract_refs": sorted(set(contract_refs)),
         "metrics": copy.deepcopy(metrics),
-        "validation": copy.deepcopy(
-            figure.get("validation", {"ok": True, "error_count": 0, "errors": []})
-        ),
+        "validation": copy.deepcopy(figure.get("validation", {"ok": True, "error_count": 0, "errors": []})),
         "artifact": {
             "path": f"baseline://now/{figure_id}.json",
             "sha256": _sha256_json(metrics),
-            "row_count": int(
-                (figure.get("artifact") or {}).get(
-                    "row_count", _stable_row_count(figure_id, metrics)
-                )
-            ),
+            "row_count": int((figure.get("artifact") or {}).get("row_count", _stable_row_count(figure_id, metrics))),
         },
     }
 
 
-def _refresh_source_hashes(
-    source_file_hashes: Dict[str, Any], repo_root: pathlib.Path
-) -> Dict[str, str]:
+def _refresh_source_hashes(source_file_hashes: Dict[str, Any], repo_root: pathlib.Path) -> Dict[str, str]:
     refreshed: Dict[str, str] = {}
     for raw_path, raw_digest in sorted(source_file_hashes.items()):
         if not isinstance(raw_path, str) or not raw_path:
@@ -165,9 +158,7 @@ def _refresh_source_hashes(
     return refreshed
 
 
-def _refresh_stage_contract_hashes(
-    stage_contracts: Dict[str, Any], repo_root: pathlib.Path
-) -> int:
+def _refresh_stage_contract_hashes(stage_contracts: Dict[str, Any], repo_root: pathlib.Path) -> int:
     updated = 0
     source_inputs = stage_contracts.get("source_inputs")
     if not isinstance(source_inputs, list):
@@ -404,12 +395,8 @@ def main() -> int:
                     "summary",
                     {
                         "now_set_ok": all(f["status"] != "fail" for f in normalized_figures),
-                        "now_set_fail_count": sum(
-                            1 for f in normalized_figures if f["status"] == "fail"
-                        ),
-                        "now_set_warn_count": sum(
-                            1 for f in normalized_figures if f["status"] == "warn"
-                        ),
+                        "now_set_fail_count": sum(1 for f in normalized_figures if f["status"] == "fail"),
+                        "now_set_warn_count": sum(1 for f in normalized_figures if f["status"] == "warn"),
                         "snapshot_drift_count": 0,
                     },
                 )
@@ -422,9 +409,7 @@ def main() -> int:
         if "source_db_meta" in run_bundle:
             normalized_run["source_db_meta"] = copy.deepcopy(run_bundle["source_db_meta"])
 
-        stage_contract_source_inputs_updated = _refresh_stage_contract_hashes(
-            stage_contracts, repo_root
-        )
+        stage_contract_source_inputs_updated = _refresh_stage_contract_hashes(stage_contracts, repo_root)
         _write_json(baseline_path, normalized_run)
         _write_yaml(stage_contracts_path, stage_contracts)
         updated_files = [baseline_rel, stage_rel]

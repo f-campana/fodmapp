@@ -7,7 +7,6 @@ from typing import Any, Dict, Iterable, List
 import psycopg2
 import yaml
 
-
 REQUIRED_STAGE_KEYS = {
     "id",
     "order",
@@ -86,9 +85,7 @@ def _parse_stage_rows(stage_doc: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "source_file": source_file,
                 "resolved_rows": _as_int(raw.get("resolved_rows"), "resolved_rows", stage_id),
                 "unresolved_rows": _as_int(raw.get("unresolved_rows"), "unresolved_rows", stage_id),
-                "threshold_set_rows": _as_int(
-                    raw.get("threshold_set_rows"), "threshold_set_rows", stage_id
-                ),
+                "threshold_set_rows": _as_int(raw.get("threshold_set_rows"), "threshold_set_rows", stage_id),
                 "with_candidates_rows": _as_int(
                     candidate_pool.get("with_candidates_rows"),
                     "candidate_pool.with_candidates_rows",
@@ -153,9 +150,7 @@ def _write_snapshot(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Load deterministic reporting stage contracts into DB snapshot table"
-    )
+    parser = argparse.ArgumentParser(description="Load deterministic reporting stage contracts into DB snapshot table")
     parser.add_argument("--db-url", required=True)
     parser.add_argument(
         "--stage-contracts",

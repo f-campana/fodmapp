@@ -3,9 +3,7 @@ import pathlib
 
 
 def _load_collect_module():
-    script_path = (
-        pathlib.Path(__file__).resolve().parents[1] / "scripts" / "collect_reporting.py"
-    )
+    script_path = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "collect_reporting.py"
     spec = importlib.util.spec_from_file_location("collect_reporting", script_path)
     if spec is None or spec.loader is None:
         raise RuntimeError("failed to load collect_reporting.py")

@@ -81,7 +81,9 @@ def _db_env_from_url(db_url: str):
         "PGPORT": port,
         "REPLAY_DB": db_name,
         "REPLAY_DB_URL": db_url,
-        "ADMIN_DB_URL": f"postgresql://{user}:{parsed.password or os.getenv('PGPASSWORD','postgres')}@{host}:{port}/postgres",
+        "ADMIN_DB_URL": (
+            f"postgresql://{user}:{parsed.password or os.getenv('PGPASSWORD', 'postgres')}@{host}:{port}/postgres"
+        ),
     }
 
 
@@ -101,9 +103,7 @@ def main() -> int:
     phase3_seed_script = repo_root / "etl/phase3/scripts/phase3_seed_for_api_ci.sh"
     load_stage_contracts_script = repo_root / "etl/phase2/reporting/scripts/load_stage_contracts.py"
     stage_snapshot_sql = repo_root / "etl/phase2/reporting/sql/reporting_stage_contract_snapshot.sql"
-    stage_contracts_yaml = (
-        repo_root / "etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml"
-    )
+    stage_contracts_yaml = repo_root / "etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml"
 
     if not replay_script.exists():
         print(f"[FAIL] replay script missing: {replay_script}", file=sys.stderr)
@@ -142,7 +142,14 @@ def main() -> int:
 
     steps = []
 
-    steps.append(_run(["bash", "-n", str(replay_script)], cwd=repo_root, env=env, label="validate_phase2_replay_syntax"))
+    steps.append(
+        _run(
+            ["bash", "-n", str(replay_script)],
+            cwd=repo_root,
+            env=env,
+            label="validate_phase2_replay_syntax",
+        )
+    )
     if steps[-1]["returncode"] != 0:
         _write_manifest(
             out_dir / "replay_seed_manifest.json",

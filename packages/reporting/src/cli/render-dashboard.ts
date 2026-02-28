@@ -1,13 +1,14 @@
 import { createHash } from "node:crypto";
-import { dirname, resolve, isAbsolute, join } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, join, resolve } from "node:path";
 
 import {
   parseRenderBaselineManifest,
   parseReportingRun,
-  renderStandaloneDashboardHtml,
   type RenderBaselineManifest,
+  renderStandaloneDashboardHtml,
 } from "../index";
+import { logError, logInfo } from "./logger";
 
 interface Args {
   input: string;
@@ -126,11 +127,11 @@ function main(): number {
       );
     }
 
-    console.log(`rendered standalone dashboard to ${outputPath}`);
+    logInfo(`rendered standalone dashboard to ${outputPath}`);
     return 0;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[FAIL] ${message}`);
+    logError(`[FAIL] ${message}`);
     return 1;
   }
 }

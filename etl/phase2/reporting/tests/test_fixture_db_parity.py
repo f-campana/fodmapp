@@ -5,15 +5,9 @@ import pathlib
 import subprocess
 from typing import Any, Dict
 
-
 REPO_ROOT = pathlib.Path(__file__).resolve().parents[4]
-FIXTURE_DIR = (
-    REPO_ROOT / "etl/phase2/reporting/tests/fixtures/now-set/query-results"
-)
-BASELINE_PATH = (
-    REPO_ROOT
-    / "etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json"
-)
+FIXTURE_DIR = REPO_ROOT / "etl/phase2/reporting/tests/fixtures/now-set/query-results"
+BASELINE_PATH = REPO_ROOT / "etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json"
 SQL_DIR = REPO_ROOT / "etl/phase2/reporting/sql"
 
 FIGURE_SQL_FILE = {
@@ -70,8 +64,7 @@ def test_optional_db_parity_matches_fixture_contracts():
         return
 
     fixtures = {
-        _load_json(path)["figure_id"]: _load_json(path)["source_rows"]
-        for path in sorted(FIXTURE_DIR.glob("*.json"))
+        _load_json(path)["figure_id"]: _load_json(path)["source_rows"] for path in sorted(FIXTURE_DIR.glob("*.json"))
     }
 
     for figure_id, sql_file in FIGURE_SQL_FILE.items():
