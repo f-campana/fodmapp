@@ -18,6 +18,8 @@ Apply these instructions to the whole repository root.
   - `./.github/scripts/quality-gate.sh` (run with `--full` for full format/lint/tests/typecheck/build checks)
 - A local `pre-push` Git hook is installed via `.githooks` and runs `./.github/scripts/quality-gate.sh --full` automatically on `git push` (requires `pnpm hook:install`/`pnpm prepare`, which runs during install).
 - Watch for CI completion, when all green ask before merge
+- When CI workflow semantics or CI environment contract changes, update `docs/ops/ci-workflow-hardening.md` and `infra/ci/ENVIRONMENT.md` in the same PR when applicable.
+- New CI helper scripts must be covered by `./.github/scripts/quality-gate.sh`.
 
 ## Safety Rules
 

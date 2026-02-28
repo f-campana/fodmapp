@@ -11,6 +11,11 @@
 These files are versioned in-repo. If a Codex session does not list them as available skills,
 install/sync them into `$CODEX_HOME/skills` first, then use the profile shortcuts below.
 
+## Turbo 2.8.x Constraint Note
+
+In Turbo `2.8.x`, `--affected` cannot be combined with `--filter` in the same command.
+For this repository, prefer PR path-gating in CI (`pr-scope`) while keeping explicit `--filter` task commands.
+
 ## Profile Shortcuts
 
 1. Official baseline: `$turborepo`
