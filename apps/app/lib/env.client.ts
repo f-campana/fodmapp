@@ -16,6 +16,7 @@ export interface ClientRuntimeEnv {
   axeptioClientId: string | null;
   axeptioCookiesVersion: string | null;
   analyticsConsentGranted: boolean;
+  apiBaseUrl: string | null;
 }
 
 export function getClientRuntimeEnv(): ClientRuntimeEnv {
@@ -33,6 +34,7 @@ export function getClientRuntimeEnv(): ClientRuntimeEnv {
     analyticsConsentGranted: readBooleanEnv(
       process.env.NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED,
     ),
+    apiBaseUrl: readOptionalEnv(process.env.NEXT_PUBLIC_API_BASE_URL),
   };
 }
 

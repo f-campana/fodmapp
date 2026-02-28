@@ -1,7 +1,7 @@
 import { getClientFeatureFlags, getClientRuntimeEnv } from "./env.client";
-import { logDebug } from "./logger";
 
 const DEFAULT_PLAUSIBLE_SRC = "https://plausible.io/js/script.js";
+const ANALYTICS_RUNTIME_ENABLED = false;
 
 export interface AnalyticsBootstrapStatus {
   provider: "plausible";
@@ -14,12 +14,13 @@ export interface AnalyticsBootstrapStatus {
 export function getAnalyticsBootstrapStatus(): AnalyticsBootstrapStatus {
   const env = getClientRuntimeEnv();
   const flags = getClientFeatureFlags(env);
+  const configured = ANALYTICS_RUNTIME_ENABLED && flags.analyticsConfigured;
 
   return {
     provider: "plausible",
-    mode: flags.analyticsConfigured ? "runtime" : "disabled",
-    configured: flags.analyticsConfigured,
-    domain: env.plausibleDomain,
+    mode: configured ? "runtime" : "disabled",
+    configured,
+    domain: configured ? env.plausibleDomain : null,
     scriptSrc: env.plausibleScriptSrc ?? DEFAULT_PLAUSIBLE_SRC,
   };
 }
@@ -32,6 +33,10 @@ export interface PlausibleScriptConfig {
 export function getPlausibleScriptConfig(
   status: AnalyticsBootstrapStatus = getAnalyticsBootstrapStatus(),
 ): PlausibleScriptConfig | null {
+  if (!ANALYTICS_RUNTIME_ENABLED) {
+    return null;
+  }
+
   if (!status.configured || !status.domain) {
     return null;
   }
@@ -59,6 +64,13 @@ export function trackAnalyticsEvent(
   event: string,
   attributes: Record<string, string> = {},
 ): void {
+  void event;
+  void attributes;
+
+  if (!ANALYTICS_RUNTIME_ENABLED) {
+    return;
+  }
+
   const status = getAnalyticsBootstrapStatus();
 
   if (!status.configured) {
@@ -66,7 +78,6 @@ export function trackAnalyticsEvent(
   }
 
   if (typeof window === "undefined") {
-    logDebug("[analytics-runtime] skipped server event", event, attributes);
     return;
   }
 
@@ -75,9 +86,5 @@ export function trackAnalyticsEvent(
     return;
   }
 
-  logDebug(
-    "[analytics-runtime] plausible queue unavailable",
-    event,
-    attributes,
-  );
+  return;
 }
