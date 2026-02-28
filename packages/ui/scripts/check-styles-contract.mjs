@@ -18,6 +18,7 @@ const bannedSelectors = [
   ".hover\\:bg-destructive\\/80:hover",
   ".hover\\:bg-destructive\\/90:hover",
   ".focus-visible\\:ring-ring\\/50:focus-visible",
+  ".focus-visible\\:ring-ring-soft:focus-visible",
 ];
 
 const requiredSelectors = [
@@ -27,7 +28,7 @@ const requiredSelectors = [
   ".hover\\:bg-secondary-hover:hover",
   ".bg-destructive",
   ".hover\\:bg-destructive-hover:hover",
-  ".focus-visible\\:ring-ring-soft:focus-visible",
+  ".focus-visible\\:ring-ring-accessible:focus-visible",
 ];
 
 const failures = [];
