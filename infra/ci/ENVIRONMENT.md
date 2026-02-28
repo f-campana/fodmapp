@@ -50,9 +50,9 @@ CI Turbo command policy:
 
 These keys are optional and used by CI governance helper scripts.
 
-| Variable                | Used by                                   | Required | Default/Example | Notes                                                           |
-| ----------------------- | ----------------------------------------- | -------- | --------------- | --------------------------------------------------------------- |
-| `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`             | Enables verbose debug logs for changeset gate diagnostics only. |
+| Variable                | Used by                                   | Required | Default/Example | Notes                                                                                                                                                                            |
+| ----------------------- | ----------------------------------------- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`             | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
 
 ## App Runtime Integration Variables (`apps/app`)
 

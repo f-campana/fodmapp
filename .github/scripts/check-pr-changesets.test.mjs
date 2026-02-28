@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   evaluateCoverage,
+  findUnknownChangesetPackages,
   hasWorkspaceOrReleasableChanges,
   parseChangesetFrontmatter,
 } from "./check-pr-changesets.mjs";
@@ -97,15 +98,15 @@ test("malformed changeset frontmatter fails with file-specific message", () => {
   );
 });
 
-test("root releasable file changed without changeset fails", () => {
+test("root releasable file changed without changeset passes", () => {
   const result = evaluate({
     changedFiles: ["package.json"],
     changedPackageNames: [],
     changesetPackageNames: [],
   });
 
-  assert.equal(result.ok, false);
-  assert.match(result.errors[0], /No pending releases found/);
+  assert.equal(result.ok, true);
+  assert.match(result.infos[0], /Releasable root-only changes detected/);
 });
 
 test("exemption label misuse fails when no allowlisted package is touched", () => {
@@ -121,4 +122,40 @@ test("exemption label misuse fails when no allowlisted package is touched", () =
     result.errors[0],
     /"changeset-exempt" label is only valid for allowlisted packages/,
   );
+});
+
+test("unknown/non-workspace changeset package is detected with source file", () => {
+  const packageSources = new Map([
+    ["fodmap-platform", new Set([".changeset/invalid-root.md"])],
+    ["@fodmap/design-tokens", new Set([".changeset/valid.md"])],
+  ]);
+  const workspacePackageNames = new Set(["@fodmap/design-tokens"]);
+
+  const unknown = findUnknownChangesetPackages(
+    packageSources,
+    workspacePackageNames,
+  );
+
+  assert.deepEqual(unknown, [
+    {
+      packageName: "fodmap-platform",
+      sourceFiles: [".changeset/invalid-root.md"],
+    },
+  ]);
+});
+
+test("root-only change would pass coverage but unknown changed changeset package is still flagged", () => {
+  const coverage = evaluate({
+    changedFiles: ["package.json"],
+    changedPackageNames: [],
+    changesetPackageNames: ["fodmap-platform"],
+  });
+  assert.equal(coverage.ok, true);
+
+  const unknown = findUnknownChangesetPackages(
+    new Map([["fodmap-platform", new Set([".changeset/invalid-root.md"])]]),
+    new Set(["@fodmap/design-tokens"]),
+  );
+  assert.equal(unknown.length, 1);
+  assert.equal(unknown[0].packageName, "fodmap-platform");
 });
