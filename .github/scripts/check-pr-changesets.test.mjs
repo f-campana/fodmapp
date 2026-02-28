@@ -1,0 +1,161 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import {
+  evaluateCoverage,
+  findUnknownChangesetPackages,
+  hasWorkspaceOrReleasableChanges,
+  parseChangesetFrontmatter,
+} from "./check-pr-changesets.mjs";
+
+const exemptLabel = "changeset-exempt";
+const exemptPackages = new Set(["@fodmap/mobile-prototype"]);
+
+function evaluate({
+  changedFiles,
+  changedPackageNames,
+  changesetPackageNames,
+  hasExemptLabel = false,
+}) {
+  const changes = hasWorkspaceOrReleasableChanges(changedFiles);
+
+  return evaluateCoverage({
+    changedFiles,
+    changes,
+    changedPackageNames: new Set(changedPackageNames),
+    changesetPackageNames: new Set(changesetPackageNames),
+    exemptPackages,
+    exemptLabel,
+    hasExemptLabel,
+  });
+}
+
+test("package changed + valid changeset file passes", () => {
+  const parsed = parseChangesetFrontmatter(
+    ["---", '"@fodmap/design-tokens": patch', "---", "release note", ""].join(
+      "\n",
+    ),
+    ".changeset/design-tokens.md",
+  );
+
+  const result = evaluate({
+    changedFiles: [
+      "packages/design-tokens/src/tokens/base/color.json",
+      ".changeset/design-tokens.md",
+    ],
+    changedPackageNames: ["@fodmap/design-tokens"],
+    changesetPackageNames: [...parsed],
+  });
+
+  assert.equal(result.ok, true);
+});
+
+test("package changed + no matching changeset fails", () => {
+  const result = evaluate({
+    changedFiles: ["packages/design-tokens/src/index.ts"],
+    changedPackageNames: ["@fodmap/design-tokens"],
+    changesetPackageNames: [],
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(
+    result.errors[0],
+    /Missing changeset coverage for: @fodmap\/design-tokens/,
+  );
+});
+
+test("allowlisted package + exemption label passes without changeset", () => {
+  const result = evaluate({
+    changedFiles: ["packages/mobile-prototype/src/index.ts"],
+    changedPackageNames: ["@fodmap/mobile-prototype"],
+    changesetPackageNames: [],
+    hasExemptLabel: true,
+  });
+
+  assert.equal(result.ok, true);
+  assert.match(result.infos[0], /Exemption label "changeset-exempt" accepted/);
+});
+
+test("docs-only changes skip the changeset gate", () => {
+  const changes = hasWorkspaceOrReleasableChanges(["docs/README.md"]);
+  assert.equal(changes.shouldCheck, false);
+});
+
+test("malformed changeset frontmatter fails with file-specific message", () => {
+  assert.throws(
+    () =>
+      parseChangesetFrontmatter(
+        [
+          "---",
+          "@fodmap/design-tokens patch",
+          "---",
+          "broken frontmatter",
+          "",
+        ].join("\n"),
+        ".changeset/broken.md",
+      ),
+    /\.changeset\/broken\.md: invalid frontmatter entry/,
+  );
+});
+
+test("root releasable file changed without changeset passes", () => {
+  const result = evaluate({
+    changedFiles: ["package.json"],
+    changedPackageNames: [],
+    changesetPackageNames: [],
+  });
+
+  assert.equal(result.ok, true);
+  assert.match(result.infos[0], /Releasable root-only changes detected/);
+});
+
+test("exemption label misuse fails when no allowlisted package is touched", () => {
+  const result = evaluate({
+    changedFiles: ["packages/design-tokens/src/index.ts"],
+    changedPackageNames: ["@fodmap/design-tokens"],
+    changesetPackageNames: ["@fodmap/design-tokens"],
+    hasExemptLabel: true,
+  });
+
+  assert.equal(result.ok, false);
+  assert.match(
+    result.errors[0],
+    /"changeset-exempt" label is only valid for allowlisted packages/,
+  );
+});
+
+test("unknown/non-workspace changeset package is detected with source file", () => {
+  const packageSources = new Map([
+    ["fodmap-platform", new Set([".changeset/invalid-root.md"])],
+    ["@fodmap/design-tokens", new Set([".changeset/valid.md"])],
+  ]);
+  const workspacePackageNames = new Set(["@fodmap/design-tokens"]);
+
+  const unknown = findUnknownChangesetPackages(
+    packageSources,
+    workspacePackageNames,
+  );
+
+  assert.deepEqual(unknown, [
+    {
+      packageName: "fodmap-platform",
+      sourceFiles: [".changeset/invalid-root.md"],
+    },
+  ]);
+});
+
+test("root-only change would pass coverage but unknown changed changeset package is still flagged", () => {
+  const coverage = evaluate({
+    changedFiles: ["package.json"],
+    changedPackageNames: [],
+    changesetPackageNames: ["fodmap-platform"],
+  });
+  assert.equal(coverage.ok, true);
+
+  const unknown = findUnknownChangesetPackages(
+    new Map([["fodmap-platform", new Set([".changeset/invalid-root.md"])]]),
+    new Set(["@fodmap/design-tokens"]),
+  );
+  assert.equal(unknown.length, 1);
+  assert.equal(unknown[0].packageName, "fodmap-platform");
+});

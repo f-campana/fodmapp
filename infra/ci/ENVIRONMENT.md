@@ -46,6 +46,14 @@ CI Turbo command policy:
 - Turbo-eligible CI commands should use `pnpm exec turbo run ...` so workflows always resolve the pinned local Turbo version.
 - Non-Turbo CI exceptions are intentional where Turbo caching does not apply, including Storybook Playwright browser install and Phase 2 reporting `render:*` commands.
 
+## CI Governance Variables
+
+These keys are optional and used by CI governance helper scripts.
+
+| Variable                | Used by                                   | Required | Default/Example | Notes                                                                                                                                                                            |
+| ----------------------- | ----------------------------------------- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`             | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
+
 ## App Runtime Integration Variables (`apps/app`)
 
 These keys are now actively consumed by `apps/app` runtime adapters. All integrations are env-gated and default to safe no-op/disabled behavior when values are missing.
