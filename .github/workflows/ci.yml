@@ -49,7 +49,7 @@ jobs:
 
       - name: Build UI package for lint imports
         run: |
-          pnpm --filter @fodmap/ui build
+          pnpm exec turbo run build --filter=@fodmap/ui
 
       - name: Run JavaScript lint
         run: |
@@ -136,7 +136,7 @@ jobs:
 
       - name: Verify OpenAPI generated types are up to date
         run: |
-          pnpm --filter @fodmap/types openapi:check
+          pnpm exec turbo run openapi:check --filter=@fodmap/types
 
   design-tokens:
     name: design-tokens
@@ -190,11 +190,11 @@ jobs:
 
       - name: Verify generated token artifacts are up to date
         run: |
-          pnpm turbo run tokens:check --filter=@fodmap/design-tokens
+          pnpm exec turbo run tokens:check --filter=@fodmap/design-tokens
 
       - name: Build design token artifacts
         run: |
-          pnpm turbo run build --filter=@fodmap/design-tokens
+          pnpm exec turbo run build --filter=@fodmap/design-tokens
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
@@ -255,23 +255,23 @@ jobs:
 
       - name: Verify Tailwind shared style mapping is up to date
         run: |
-          pnpm turbo run styles:check --filter=@fodmap/tailwind-config
+          pnpm exec turbo run styles:check --filter=@fodmap/tailwind-config
 
       - name: Build and validate UI package
         run: |
-          pnpm turbo run build typecheck test --filter=@fodmap/ui
+          pnpm exec turbo run build typecheck test --filter=@fodmap/ui
 
       - name: Verify UI style contract
         run: |
-          pnpm turbo run styles:check --filter=@fodmap/ui
+          pnpm exec turbo run styles:check --filter=@fodmap/ui
 
       - name: Typecheck Storybook sources
         run: |
-          pnpm turbo run typecheck --filter=@fodmap/storybook
+          pnpm exec turbo run typecheck --filter=@fodmap/storybook
 
       - name: Build Storybook
         run: |
-          pnpm turbo run storybook:build --filter=@fodmap/storybook
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
       - name: Install Chromium for Storybook tests
         run: |
@@ -279,7 +279,7 @@ jobs:
 
       - name: Run Storybook interaction and a11y tests
         run: |
-          pnpm turbo run storybook:test --filter=@fodmap/storybook
+          pnpm exec turbo run storybook:test --filter=@fodmap/storybook
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
@@ -340,9 +340,9 @@ jobs:
 
       - name: Test, build, and typecheck app scaffold
         run: |
-          pnpm turbo run test --filter=@fodmap/app
-          pnpm turbo run typecheck --filter=@fodmap/app
-          pnpm turbo run build --filter=@fodmap/app
+          pnpm exec turbo run test --filter=@fodmap/app
+          pnpm exec turbo run typecheck --filter=@fodmap/app
+          pnpm exec turbo run build --filter=@fodmap/app
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}
@@ -403,7 +403,7 @@ jobs:
 
       - name: Build and typecheck marketing and research scaffolds
         run: |
-          pnpm turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
+          pnpm exec turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.turbo-cache.outputs.use_remote != 'true' }}

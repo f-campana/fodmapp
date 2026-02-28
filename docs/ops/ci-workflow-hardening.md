@@ -11,6 +11,8 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - native `GITHUB_TOKEN` guardrails for `Changesets release`
 - PR-scoped Turbo CI execution (`pr-scope`) for heavy jobs
 - Turbo cache mode selection: remote cache when configured, `.turbo` restore/save fallback when not
+- strict local Turbo binary invocation in CI via `pnpm exec turbo run ...`
+- explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 
 ## Repository Variable: `PHASE2_FULL_RUN_ENFORCE`
 
@@ -60,6 +62,13 @@ Turbo cache behavior for scoped jobs:
 
 - if both `TURBO_TEAM` and `TURBO_TOKEN` are present, Turbo remote caching is used
 - otherwise, CI restores/saves local `.turbo` cache using `actions/cache/restore@v4` and `actions/cache/save@v4`
+
+Turbo command contract:
+
+- Turbo-eligible CI commands must use `pnpm exec turbo run ...` to ensure local pinned Turbo resolution
+- intentional non-Turbo exceptions remain direct:
+  - `pnpm --filter @fodmap/storybook exec playwright install chromium` (runtime dependency install)
+  - `pnpm --filter @fodmap/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
 
 ## Branch Protection Required Checks (`main`)
 
