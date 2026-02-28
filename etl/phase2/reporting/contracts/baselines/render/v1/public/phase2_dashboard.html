@@ -5,604 +5,277 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Phase 2 Reporting Dashboard</title>
     <style>
-      .fd-reporting-root {
-        --fd-reporting-color-canvas: var(
-          --fd-semantic-color-background-canvas,
-          #f8fafc
-        );
-        --fd-reporting-color-surface: var(
-          --fd-semantic-color-surface-default,
-          #fff
-        );
-        --fd-reporting-color-surface-muted: var(
-          --fd-semantic-color-surface-muted,
-          #f1f5f9
-        );
-        --fd-reporting-color-border: var(
-          --fd-semantic-color-border-default,
-          #cbd5e1
-        );
-        --fd-reporting-color-border-subtle: var(
-          --fd-semantic-color-border-subtle,
-          #e2e8f0
-        );
-        --fd-reporting-color-text: var(
-          --fd-semantic-color-text-primary,
-          #0f172a
-        );
-        --fd-reporting-color-text-muted: var(
-          --fd-semantic-color-text-muted,
-          #475569
-        );
-        --fd-reporting-color-success-bg: var(
-          --fd-semantic-color-status-success-bg,
-          #10b981
-        );
-        --fd-reporting-color-success-fg: var(
-          --fd-semantic-color-status-success-fg,
-          #f0fdf4
-        );
-        --fd-reporting-color-danger-bg: var(
-          --fd-semantic-color-status-danger-bg,
-          #ef4444
-        );
-        --fd-reporting-color-danger-fg: var(
-          --fd-semantic-color-status-danger-fg,
-          #fef2f2
-        );
-        font-family: var(
-          --fd-semantic-typography-font-family-body,
-          "Source Sans 3",
-          Arial,
-          sans-serif
-        );
-        color: var(--fd-reporting-color-text);
-        background: var(--fd-reporting-color-canvas);
-        padding: var(--fd-base-space-6, 1.5rem);
-        border-radius: var(--fd-semantic-radius-container, 1rem);
-      }
-      .fd-reporting-header {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--fd-base-space-4, 1rem);
-        align-items: flex-start;
-        margin-bottom: var(--fd-base-space-5, 1.25rem);
-      }
-      .fd-reporting-title {
-        margin: 0;
-        color: var(--fd-reporting-color-text);
-        font: var(--fd-base-typography-font-weight-bold, 700)
-          var(--fd-base-typography-font-size-3xl, 1.875rem)/var(
-            --fd-base-typography-line-height-tight,
-            1.2
-          )
-          var(
-            --fd-semantic-typography-font-family-display,
-            "Cormorant Garamond",
-            serif
-          );
-      }
-      .fd-reporting-subtitle {
-        margin: var(--fd-base-space-1-5, 0.375rem) 0 0;
-        color: var(--fd-reporting-color-text-muted);
-        font: var(--fd-base-typography-font-weight-medium, 500)
-          var(--fd-base-typography-font-size-sm, 0.875rem)/var(
-            --fd-base-typography-line-height-relaxed,
-            1.625
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-meta {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(132px, 1fr));
-        gap: var(--fd-base-space-2, 0.5rem);
-      }
-      .fd-reporting-pill {
-        background: var(--fd-reporting-color-surface);
-        border: 1px solid var(--fd-reporting-color-border);
-        border-radius: var(--fd-semantic-radius-control, 0.75rem);
-        padding: var(--fd-base-space-2-5, 0.625rem)
-          var(--fd-base-space-3, 0.75rem);
-      }
-      .fd-reporting-pill-label {
-        color: var(--fd-reporting-color-text-muted);
-        text-transform: uppercase;
-        letter-spacing: var(--fd-base-typography-letter-spacing-wider, 0.025em);
-        font: var(--fd-base-typography-font-weight-semibold, 600)
-          var(--fd-base-typography-font-size-xs, 0.75rem)/var(
-            --fd-base-typography-line-height-tight,
-            1.2
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-pill-value {
-        color: var(--fd-reporting-color-text);
-        font: var(--fd-base-typography-font-weight-bold, 700)
-          var(--fd-base-typography-font-size-xl, 1.25rem)/var(
-            --fd-base-typography-line-height-snug,
-            1.35
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--fd-base-space-3-5, 0.875rem);
-      }
-      .fd-reporting-card {
-        background: var(--fd-reporting-color-surface);
-        border: 1px solid var(--fd-reporting-color-border);
-        border-radius: var(--fd-semantic-radius-control, 0.75rem);
-        padding: var(--fd-base-space-3-5, 0.875rem);
-        overflow-x: auto;
-      }
-      .fd-reporting-card h2 {
-        margin: 0 0 var(--fd-base-space-2, 0.5rem);
-        color: var(--fd-reporting-color-text);
-        font: var(--fd-base-typography-font-weight-bold, 700)
-          var(--fd-base-typography-font-size-lg, 1.125rem)/var(
-            --fd-base-typography-line-height-snug,
-            1.35
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-card p {
-        margin: var(--fd-base-space-1, 0.25rem) 0;
-        color: var(--fd-reporting-color-text-muted);
-        font: var(--fd-base-typography-font-weight-medium, 500)
-          var(--fd-base-typography-font-size-sm, 0.875rem)/var(
-            --fd-base-typography-line-height-normal,
-            1.5
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: var(--fd-base-space-2, 0.5rem);
-      }
-      .fd-reporting-table th,
-      .fd-reporting-table td {
-        border-bottom: 1px solid var(--fd-reporting-color-border-subtle);
-        padding: var(--fd-base-space-1-5, 0.375rem)
-          var(--fd-base-space-1, 0.25rem);
-        text-align: left;
-        font: var(--fd-base-typography-font-weight-medium, 500)
-          var(--fd-base-typography-font-size-sm, 0.875rem)/var(
-            --fd-base-typography-line-height-normal,
-            1.5
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-table th {
-        color: var(--fd-reporting-color-text-muted);
-        font-weight: var(--fd-base-typography-font-weight-bold, 700);
-        text-transform: uppercase;
-        letter-spacing: var(--fd-base-typography-letter-spacing-wider, 0.025em);
-        font-size: var(--fd-base-typography-font-size-xs, 0.75rem);
-      }
-      .fd-reporting-kv {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        row-gap: var(--fd-base-space-1-5, 0.375rem);
-        column-gap: var(--fd-base-space-2, 0.5rem);
-      }
-      .fd-reporting-kv dt {
-        margin: 0;
-        color: var(--fd-reporting-color-text-muted);
-        font: var(--fd-base-typography-font-weight-semibold, 600)
-          var(--fd-base-typography-font-size-sm, 0.875rem)/var(
-            --fd-base-typography-line-height-normal,
-            1.5
-          )
-          var(
-            --fd-semantic-typography-font-family-body,
-            "Source Sans 3",
-            Arial,
-            sans-serif
-          );
-      }
-      .fd-reporting-kv dd {
-        margin: 0;
-        color: var(--fd-reporting-color-text);
-        font: var(--fd-base-typography-font-weight-semibold, 600)
-          var(--fd-base-typography-font-size-sm, 0.875rem)/var(
-            --fd-base-typography-line-height-normal,
-            1.5
-          )
-          var(
-            --fd-base-typography-font-family-mono,
-            "JetBrains Mono",
-            monospace
-          );
-      }
-      .fd-reporting-flag-pass {
-        color: var(--fd-reporting-color-success-fg);
-        background: var(--fd-reporting-color-success-bg);
-        border: 1px solid var(--fd-reporting-color-success-bg);
-        border-radius: var(--fd-semantic-radius-pill, 9999px);
-        padding: var(--fd-base-space-0-5, 0.125rem)
-          var(--fd-base-space-2, 0.5rem);
-        font-size: var(--fd-base-typography-font-size-xs, 0.75rem);
-        font-weight: var(--fd-base-typography-font-weight-bold, 700);
-      }
-      .fd-reporting-flag-fail {
-        color: var(--fd-reporting-color-danger-fg);
-        background: var(--fd-reporting-color-danger-bg);
-        border: 1px solid var(--fd-reporting-color-danger-bg);
-        border-radius: var(--fd-semantic-radius-pill, 9999px);
-        padding: var(--fd-base-space-0-5, 0.125rem)
-          var(--fd-base-space-2, 0.5rem);
-        font-size: var(--fd-base-typography-font-size-xs, 0.75rem);
-        font-weight: var(--fd-base-typography-font-weight-bold, 700);
-      }
-      @media (max-width: 960px) {
-        .fd-reporting-grid {
-          grid-template-columns: 1fr;
-        }
-        .fd-reporting-header {
-          flex-direction: column;
-        }
-        .fd-reporting-meta {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          width: 100%;
-        }
-      }
-    </style>
+.fd-reporting-root{--fd-reporting-color-canvas:var(--fd-semantic-color-background-canvas,#f8fafc);--fd-reporting-color-surface:var(--fd-semantic-color-surface-default,#fff);--fd-reporting-color-surface-muted:var(--fd-semantic-color-surface-muted,#f1f5f9);--fd-reporting-color-border:var(--fd-semantic-color-border-default,#cbd5e1);--fd-reporting-color-border-subtle:var(--fd-semantic-color-border-subtle,#e2e8f0);--fd-reporting-color-text:var(--fd-semantic-color-text-primary,#0f172a);--fd-reporting-color-text-muted:var(--fd-semantic-color-text-muted,#475569);--fd-reporting-color-success-bg:var(--fd-semantic-color-status-success-bg,#10b981);--fd-reporting-color-success-fg:var(--fd-semantic-color-status-success-fg,#f0fdf4);--fd-reporting-color-danger-bg:var(--fd-semantic-color-status-danger-bg,#ef4444);--fd-reporting-color-danger-fg:var(--fd-semantic-color-status-danger-fg,#fef2f2);font-family:var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);color:var(--fd-reporting-color-text);background:var(--fd-reporting-color-canvas);padding:var(--fd-base-space-6,1.5rem);border-radius:var(--fd-semantic-radius-container,1rem);}
+.fd-reporting-header{display:flex;justify-content:space-between;gap:var(--fd-base-space-4,1rem);align-items:flex-start;margin-bottom:var(--fd-base-space-5,1.25rem);}
+.fd-reporting-title{margin:0;color:var(--fd-reporting-color-text);font:var(--fd-base-typography-font-weight-bold,700) var(--fd-base-typography-font-size-3xl,1.875rem)/var(--fd-base-typography-line-height-tight,1.2) var(--fd-semantic-typography-font-family-display,'Cormorant Garamond',serif);}
+.fd-reporting-subtitle{margin:var(--fd-base-space-1-5,.375rem) 0 0;color:var(--fd-reporting-color-text-muted);font:var(--fd-base-typography-font-weight-medium,500) var(--fd-base-typography-font-size-sm,.875rem)/var(--fd-base-typography-line-height-relaxed,1.625) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-meta{display:grid;grid-template-columns:repeat(2,minmax(132px,1fr));gap:var(--fd-base-space-2,.5rem);}
+.fd-reporting-pill{background:var(--fd-reporting-color-surface);border:1px solid var(--fd-reporting-color-border);border-radius:var(--fd-semantic-radius-control,.75rem);padding:var(--fd-base-space-2-5,.625rem) var(--fd-base-space-3,.75rem);}
+.fd-reporting-pill-label{color:var(--fd-reporting-color-text-muted);text-transform:uppercase;letter-spacing:var(--fd-base-typography-letter-spacing-wider,.025em);font:var(--fd-base-typography-font-weight-semibold,600) var(--fd-base-typography-font-size-xs,.75rem)/var(--fd-base-typography-line-height-tight,1.2) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-pill-value{color:var(--fd-reporting-color-text);font:var(--fd-base-typography-font-weight-bold,700) var(--fd-base-typography-font-size-xl,1.25rem)/var(--fd-base-typography-line-height-snug,1.35) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--fd-base-space-3-5,.875rem);}
+.fd-reporting-card{background:var(--fd-reporting-color-surface);border:1px solid var(--fd-reporting-color-border);border-radius:var(--fd-semantic-radius-control,.75rem);padding:var(--fd-base-space-3-5,.875rem);overflow-x:auto;}
+.fd-reporting-card h2{margin:0 0 var(--fd-base-space-2,.5rem);color:var(--fd-reporting-color-text);font:var(--fd-base-typography-font-weight-bold,700) var(--fd-base-typography-font-size-lg,1.125rem)/var(--fd-base-typography-line-height-snug,1.35) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-card p{margin:var(--fd-base-space-1,.25rem) 0;color:var(--fd-reporting-color-text-muted);font:var(--fd-base-typography-font-weight-medium,500) var(--fd-base-typography-font-size-sm,.875rem)/var(--fd-base-typography-line-height-normal,1.5) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-table{width:100%;border-collapse:collapse;margin-top:var(--fd-base-space-2,.5rem);}
+.fd-reporting-table th,.fd-reporting-table td{border-bottom:1px solid var(--fd-reporting-color-border-subtle);padding:var(--fd-base-space-1-5,.375rem) var(--fd-base-space-1,.25rem);text-align:left;font:var(--fd-base-typography-font-weight-medium,500) var(--fd-base-typography-font-size-sm,.875rem)/var(--fd-base-typography-line-height-normal,1.5) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-table th{color:var(--fd-reporting-color-text-muted);font-weight:var(--fd-base-typography-font-weight-bold,700);text-transform:uppercase;letter-spacing:var(--fd-base-typography-letter-spacing-wider,.025em);font-size:var(--fd-base-typography-font-size-xs,.75rem);}
+.fd-reporting-kv{display:grid;grid-template-columns:1fr auto;row-gap:var(--fd-base-space-1-5,.375rem);column-gap:var(--fd-base-space-2,.5rem);}
+.fd-reporting-kv dt{margin:0;color:var(--fd-reporting-color-text-muted);font:var(--fd-base-typography-font-weight-semibold,600) var(--fd-base-typography-font-size-sm,.875rem)/var(--fd-base-typography-line-height-normal,1.5) var(--fd-semantic-typography-font-family-body,'Source Sans 3',Arial,sans-serif);}
+.fd-reporting-kv dd{margin:0;color:var(--fd-reporting-color-text);font:var(--fd-base-typography-font-weight-semibold,600) var(--fd-base-typography-font-size-sm,.875rem)/var(--fd-base-typography-line-height-normal,1.5) var(--fd-base-typography-font-family-mono,'JetBrains Mono',monospace);}
+.fd-reporting-flag-pass{color:var(--fd-reporting-color-success-fg);background:var(--fd-reporting-color-success-bg);border:1px solid var(--fd-reporting-color-success-bg);border-radius:var(--fd-semantic-radius-pill,9999px);padding:var(--fd-base-space-0-5,.125rem) var(--fd-base-space-2,.5rem);font-size:var(--fd-base-typography-font-size-xs,.75rem);font-weight:var(--fd-base-typography-font-weight-bold,700);}
+.fd-reporting-flag-fail{color:var(--fd-reporting-color-danger-fg);background:var(--fd-reporting-color-danger-bg);border:1px solid var(--fd-reporting-color-danger-bg);border-radius:var(--fd-semantic-radius-pill,9999px);padding:var(--fd-base-space-0-5,.125rem) var(--fd-base-space-2,.5rem);font-size:var(--fd-base-typography-font-size-xs,.75rem);font-weight:var(--fd-base-typography-font-weight-bold,700);}
+@media (max-width:960px){.fd-reporting-grid{grid-template-columns:1fr;}.fd-reporting-header{flex-direction:column;}.fd-reporting-meta{grid-template-columns:repeat(2,minmax(0,1fr));width:100%;}}
+</style>
   </head>
   <body>
     <section class="fd-reporting-root">
-      <header class="fd-reporting-header">
-        <div>
-          <h1 class="fd-reporting-title">Phase 2 Reporting Dashboard</h1>
-          <p class="fd-reporting-subtitle">
-            Deterministic dashboard from canonical reporting contract
-          </p>
-        </div>
-        <div class="fd-reporting-meta">
-          <div class="fd-reporting-pill">
-            <div class="fd-reporting-pill-label">Phase2 Total</div>
-            <div class="fd-reporting-pill-value">42</div>
-          </div>
-          <div class="fd-reporting-pill">
-            <div class="fd-reporting-pill-label">Resolved</div>
-            <div class="fd-reporting-pill-value">42</div>
-          </div>
-          <div class="fd-reporting-pill">
-            <div class="fd-reporting-pill-label">Unresolved</div>
-            <div class="fd-reporting-pill-value">0</div>
-          </div>
-          <div class="fd-reporting-pill">
-            <div class="fd-reporting-pill-label">Rank2 Gate</div>
-            <div class="fd-reporting-pill-value">
-              <span class="fd-reporting-flag-pass">PASS</span>
-            </div>
-          </div>
-        </div>
-      </header>
+  <header class="fd-reporting-header">
+    <div>
+      <h1 class="fd-reporting-title">Phase 2 Reporting Dashboard</h1>
+      <p class="fd-reporting-subtitle">Deterministic dashboard from canonical reporting contract</p>
+    </div>
+    <div class="fd-reporting-meta">
+      <div class="fd-reporting-pill"><div class="fd-reporting-pill-label">Phase2 Total</div><div class="fd-reporting-pill-value">42</div></div>
+      <div class="fd-reporting-pill"><div class="fd-reporting-pill-label">Resolved</div><div class="fd-reporting-pill-value">42</div></div>
+      <div class="fd-reporting-pill"><div class="fd-reporting-pill-label">Unresolved</div><div class="fd-reporting-pill-value">0</div></div>
+      <div class="fd-reporting-pill"><div class="fd-reporting-pill-label">Rank2 Gate</div><div class="fd-reporting-pill-value"><span class="fd-reporting-flag-pass">PASS</span></div></div>
+    </div>
+  </header>
 
-      <div class="fd-reporting-grid">
-        <article class="fd-reporting-card">
-          <h2>A. Pipeline Progression</h2>
-          <table class="fd-reporting-table">
-            <thead>
-              <tr>
-                <th>Stage</th>
-                <th>Resolved</th>
-                <th>Unresolved</th>
-                <th>Expected</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Start</td>
-                <td>0</td>
-                <td>42</td>
-                <td>-</td>
-              </tr>
+  <div class="fd-reporting-grid">
+    <article class="fd-reporting-card">
+      <h2>A. Pipeline Progression</h2>
+      <table class="fd-reporting-table">
+        <thead><tr><th>Stage</th><th>Resolved</th><th>Unresolved</th><th>Expected</th></tr></thead>
+        <tbody>
+          <tr><td>Start</td><td>0</td><td>42</td><td>-</td></tr>
+          
+        <tr>
+          <td>fructan_wave01</td>
+          <td>16</td>
+          <td>26</td>
+          <td>16/26</td>
+        </tr>
 
-              <tr>
-                <td>fructan_wave01</td>
-                <td>16</td>
-                <td>26</td>
-                <td>16/26</td>
-              </tr>
+        <tr>
+          <td>fructan_wave02</td>
+          <td>21</td>
+          <td>21</td>
+          <td>21/21</td>
+        </tr>
 
-              <tr>
-                <td>fructan_wave02</td>
-                <td>21</td>
-                <td>21</td>
-                <td>21/21</td>
-              </tr>
+        <tr>
+          <td>gos_wave01</td>
+          <td>27</td>
+          <td>15</td>
+          <td>27/15</td>
+        </tr>
 
-              <tr>
-                <td>gos_wave01</td>
-                <td>27</td>
-                <td>15</td>
-                <td>27/15</td>
-              </tr>
+        <tr>
+          <td>gos_wave02</td>
+          <td>33</td>
+          <td>9</td>
+          <td>33/9</td>
+        </tr>
 
-              <tr>
-                <td>gos_wave02</td>
-                <td>33</td>
-                <td>9</td>
-                <td>33/9</td>
-              </tr>
+        <tr>
+          <td>polyol_wave01</td>
+          <td>39</td>
+          <td>3</td>
+          <td>39/3</td>
+        </tr>
 
-              <tr>
-                <td>polyol_wave01</td>
-                <td>39</td>
-                <td>3</td>
-                <td>39/3</td>
-              </tr>
+        <tr>
+          <td>polyol_wave02</td>
+          <td>42</td>
+          <td>0</td>
+          <td>42/0</td>
+        </tr>
+        </tbody>
+      </table>
+    </article>
 
-              <tr>
-                <td>polyol_wave02</td>
-                <td>42</td>
-                <td>0</td>
-                <td>42/0</td>
-              </tr>
-            </tbody>
-          </table>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>B. Candidate Pool Evolution</h2>
+      <table class="fd-reporting-table">
+        <thead><tr><th>Stage</th><th>With</th><th>Without</th><th>Closure</th></tr></thead>
+        <tbody>
+          
+                <tr>
+                  <td>fructan_wave01</td>
+                  <td>16</td>
+                  <td>10</td>
+                  <td>0.6154</td>
+                </tr>
+                <tr>
+                  <td>fructan_wave02</td>
+                  <td>15</td>
+                  <td>6</td>
+                  <td>0.7143</td>
+                </tr>
+                <tr>
+                  <td>gos_wave01</td>
+                  <td>9</td>
+                  <td>6</td>
+                  <td>0.6</td>
+                </tr>
+                <tr>
+                  <td>gos_wave02</td>
+                  <td>6</td>
+                  <td>3</td>
+                  <td>0.6667</td>
+                </tr>
+                <tr>
+                  <td>polyol_wave01</td>
+                  <td>1</td>
+                  <td>2</td>
+                  <td>0.3333</td>
+                </tr>
+                <tr>
+                  <td>polyol_wave02</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>1</td>
+                </tr>
+        </tbody>
+      </table>
+    </article>
 
-        <article class="fd-reporting-card">
-          <h2>B. Candidate Pool Evolution</h2>
-          <table class="fd-reporting-table">
-            <thead>
-              <tr>
-                <th>Stage</th>
-                <th>With</th>
-                <th>Without</th>
-                <th>Closure</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>fructan_wave01</td>
-                <td>16</td>
-                <td>10</td>
-                <td>0.6154</td>
-              </tr>
-              <tr>
-                <td>fructan_wave02</td>
-                <td>15</td>
-                <td>6</td>
-                <td>0.7143</td>
-              </tr>
-              <tr>
-                <td>gos_wave01</td>
-                <td>9</td>
-                <td>6</td>
-                <td>0.6</td>
-              </tr>
-              <tr>
-                <td>gos_wave02</td>
-                <td>6</td>
-                <td>3</td>
-                <td>0.6667</td>
-              </tr>
-              <tr>
-                <td>polyol_wave01</td>
-                <td>1</td>
-                <td>2</td>
-                <td>0.3333</td>
-              </tr>
-              <tr>
-                <td>polyol_wave02</td>
-                <td>0</td>
-                <td>0</td>
-                <td>1</td>
-              </tr>
-            </tbody>
-          </table>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>C. Gap Completion Matrix</h2>
+      <table class="fd-reporting-table">
+        <thead><tr><th>Bucket</th><th>Priority</th><th>Resolved</th><th>Completed</th><th>Unresolved</th><th>Pending</th></tr></thead>
+        <tbody>
+        <tr>
+          <td>fructan/fructan</td>
+          <td>17</td>
+          <td>17</td>
+          <td>16</td>
+          <td>0</td>
+          <td>1</td>
+        </tr>
 
-        <article class="fd-reporting-card">
-          <h2>C. Gap Completion Matrix</h2>
-          <table class="fd-reporting-table">
-            <thead>
-              <tr>
-                <th>Bucket</th>
-                <th>Priority</th>
-                <th>Resolved</th>
-                <th>Completed</th>
-                <th>Unresolved</th>
-                <th>Pending</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>fructan/fructan</td>
-                <td>17</td>
-                <td>17</td>
-                <td>16</td>
-                <td>0</td>
-                <td>1</td>
-              </tr>
+        <tr>
+          <td>gos/gos</td>
+          <td>12</td>
+          <td>12</td>
+          <td>12</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
 
-              <tr>
-                <td>gos/gos</td>
-                <td>12</td>
-                <td>12</td>
-                <td>12</td>
-                <td>0</td>
-                <td>0</td>
-              </tr>
+        <tr>
+          <td>polyol/sorbitol</td>
+          <td>7</td>
+          <td>7</td>
+          <td>7</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
 
-              <tr>
-                <td>polyol/sorbitol</td>
-                <td>7</td>
-                <td>7</td>
-                <td>7</td>
-                <td>0</td>
-                <td>0</td>
-              </tr>
+        <tr>
+          <td>polyol/mannitol</td>
+          <td>6</td>
+          <td>6</td>
+          <td>6</td>
+          <td>0</td>
+          <td>0</td>
+        </tr></tbody>
+      </table>
+      <p>completion_ratio=1 | readiness_gap=1</p>
+    </article>
 
-              <tr>
-                <td>polyol/mannitol</td>
-                <td>6</td>
-                <td>6</td>
-                <td>6</td>
-                <td>0</td>
-                <td>0</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>completion_ratio=1 | readiness_gap=1</p>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>D. Critical Contract Scorecard</h2>
+      <dl class="fd-reporting-kv">
+        <dt>phase3_rollup_row_count</dt><dd>42</dd>
+        <dt>swap_status.active</dt><dd>11</dd>
+        <dt>swap_status.draft</dt><dd>1</dd>
+        <dt>phase2_ok</dt><dd>true</dd>
+        <dt>phase3_ok</dt><dd>true</dd>
+        <dt>rank2_api_ok</dt><dd>true</dd>
+      </dl>
+      <table class="fd-reporting-table">
+        <thead><tr><th>Bucket</th><th>Total</th><th>Resolved</th><th>Unresolved</th><th>OK</th></tr></thead>
+        <tbody>
+        <tr>
+          <td>fructan/fructan</td>
+          <td>17</td>
+          <td>17</td>
+          <td>0</td>
+          <td>ok</td>
+        </tr>
 
-        <article class="fd-reporting-card">
-          <h2>D. Critical Contract Scorecard</h2>
-          <dl class="fd-reporting-kv">
-            <dt>phase3_rollup_row_count</dt>
-            <dd>42</dd>
-            <dt>swap_status.active</dt>
-            <dd>11</dd>
-            <dt>swap_status.draft</dt>
-            <dd>1</dd>
-            <dt>phase2_ok</dt>
-            <dd>true</dd>
-            <dt>phase3_ok</dt>
-            <dd>true</dd>
-            <dt>rank2_api_ok</dt>
-            <dd>true</dd>
-          </dl>
-          <table class="fd-reporting-table">
-            <thead>
-              <tr>
-                <th>Bucket</th>
-                <th>Total</th>
-                <th>Resolved</th>
-                <th>Unresolved</th>
-                <th>OK</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>fructan/fructan</td>
-                <td>17</td>
-                <td>17</td>
-                <td>0</td>
-                <td>ok</td>
-              </tr>
+        <tr>
+          <td>gos/gos</td>
+          <td>12</td>
+          <td>12</td>
+          <td>0</td>
+          <td>ok</td>
+        </tr>
 
-              <tr>
-                <td>gos/gos</td>
-                <td>12</td>
-                <td>12</td>
-                <td>0</td>
-                <td>ok</td>
-              </tr>
+        <tr>
+          <td>polyol/sorbitol</td>
+          <td>7</td>
+          <td>7</td>
+          <td>0</td>
+          <td>ok</td>
+        </tr>
 
-              <tr>
-                <td>polyol/sorbitol</td>
-                <td>7</td>
-                <td>7</td>
-                <td>0</td>
-                <td>ok</td>
-              </tr>
+        <tr>
+          <td>polyol/mannitol</td>
+          <td>6</td>
+          <td>6</td>
+          <td>0</td>
+          <td>ok</td>
+        </tr></tbody>
+      </table>
+    </article>
 
-              <tr>
-                <td>polyol/mannitol</td>
-                <td>6</td>
-                <td>6</td>
-                <td>0</td>
-                <td>ok</td>
-              </tr>
-            </tbody>
-          </table>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>E. Snapshot Lock Drift</h2>
+      <dl class="fd-reporting-kv">
+        <dt>reviewed_snapshot_rows</dt><dd>8</dd>
+        <dt>snapshot_mismatch_rows</dt><dd>0</dd>
+        <dt>auto_eligible_mismatch_rows</dt><dd>0</dd>
+        <dt>approve_for_ineligible_rows</dt><dd>0</dd>
+      </dl>
+      <p>scoring_version_snapshot_actual=v3.1b</p>
+      <p>fodmap_safety_score_snapshot_actual=0.500</p>
+    </article>
 
-        <article class="fd-reporting-card">
-          <h2>E. Snapshot Lock Drift</h2>
-          <dl class="fd-reporting-kv">
-            <dt>reviewed_snapshot_rows</dt>
-            <dd>8</dd>
-            <dt>snapshot_mismatch_rows</dt>
-            <dd>0</dd>
-            <dt>auto_eligible_mismatch_rows</dt>
-            <dd>0</dd>
-            <dt>approve_for_ineligible_rows</dt>
-            <dd>0</dd>
-          </dl>
-          <p>scoring_version_snapshot_actual=v3.1b</p>
-          <p>fodmap_safety_score_snapshot_actual=0.500</p>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>F. Rank2 Exclusion Audit</h2>
+      <dl class="fd-reporting-kv">
+        <dt>phase2_rank2_current_target_measurements</dt><dd>0</dd>
+        <dt>phase3_rules_touching_rank2</dt><dd>0</dd>
+        <dt>api_rank2_leak_rows</dt><dd>0</dd>
+      </dl>
+      <p>overall_pass=<span class="fd-reporting-flag-pass">PASS</span></p>
+    </article>
 
-        <article class="fd-reporting-card">
-          <h2>F. Rank2 Exclusion Audit</h2>
-          <dl class="fd-reporting-kv">
-            <dt>phase2_rank2_current_target_measurements</dt>
-            <dd>0</dd>
-            <dt>phase3_rules_touching_rank2</dt>
-            <dd>0</dd>
-            <dt>api_rank2_leak_rows</dt>
-            <dd>0</dd>
-          </dl>
-          <p>overall_pass=<span class="fd-reporting-flag-pass">PASS</span></p>
-        </article>
+    <article class="fd-reporting-card">
+      <h2>G. Threshold Provenance</h2>
+      <dl class="fd-reporting-kv">
+        <dt>invalid_threshold_source_rows</dt><dd>0</dd>
+        <dt>missing_default_threshold_citation_rows</dt><dd>0</dd>
+        <dt>default_threshold_share</dt><dd>0.17</dd>
+        <dt>invalid_rows_total</dt><dd>0</dd>
+      </dl>
+    </article>
 
-        <article class="fd-reporting-card">
-          <h2>G. Threshold Provenance</h2>
-          <dl class="fd-reporting-kv">
-            <dt>invalid_threshold_source_rows</dt>
-            <dd>0</dd>
-            <dt>missing_default_threshold_citation_rows</dt>
-            <dd>0</dd>
-            <dt>default_threshold_share</dt>
-            <dd>0.17</dd>
-            <dt>invalid_rows_total</dt>
-            <dd>0</dd>
-          </dl>
-        </article>
-
-        <article class="fd-reporting-card">
-          <h2>H. Frozen Quarantine Case Study</h2>
-          <dl class="fd-reporting-kv">
-            <dt>mode</dt>
-            <dd>frozen_case_study</dd>
-            <dt>source_stage</dt>
-            <dd>post_batch10</dd>
-            <dt>rank2_current_target_measurements_expected</dt>
-            <dd>0</dd>
-            <dt>cohort_note_count</dt>
-            <dd>1</dd>
-            <dt>post_batch10_readiness_rows</dt>
-            <dd>9</dd>
-          </dl>
-        </article>
-      </div>
-    </section>
+    <article class="fd-reporting-card">
+      <h2>H. Frozen Quarantine Case Study</h2>
+      <dl class="fd-reporting-kv">
+        <dt>mode</dt><dd>frozen_case_study</dd>
+        <dt>source_stage</dt><dd>post_batch10</dd>
+        <dt>rank2_current_target_measurements_expected</dt><dd>0</dd>
+        <dt>cohort_note_count</dt><dd>1</dd>
+        <dt>post_batch10_readiness_rows</dt><dd>9</dd>
+      </dl>
+    </article>
+  </div>
+</section>
   </body>
 </html>
