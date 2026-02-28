@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
@@ -29,7 +33,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -59,7 +63,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -74,7 +78,7 @@ jobs:
           node-version: "22"
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
 
       - name: Run Python lint checks
         run: |
@@ -88,7 +92,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -114,7 +118,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -144,7 +148,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -194,7 +198,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -222,7 +226,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
         with:
           version: 10.29.3
 
@@ -239,3 +243,38 @@ jobs:
       - name: Build and typecheck marketing and research scaffolds
         run: |
           pnpm turbo run typecheck build --filter=@fodmap/marketing --filter=@fodmap/research
+
+  ci-gate:
+    name: CI
+    if: ${{ always() }}
+    needs:
+      - quality
+      - eslint
+      - python-lint
+      - openapi-types
+      - design-tokens
+      - ui-foundation
+      - app-scaffold
+      - content-scaffolds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate CI workflow results
+        run: |
+          set -euo pipefail
+
+          for result in \
+            "${{ needs.quality.result }}" \
+            "${{ needs.eslint.result }}" \
+            "${{ needs.python-lint.result }}" \
+            "${{ needs.openapi-types.result }}" \
+            "${{ needs.design-tokens.result }}" \
+            "${{ needs.ui-foundation.result }}" \
+            "${{ needs.app-scaffold.result }}" \
+            "${{ needs.content-scaffolds.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "::error::CI gate failed because a dependency result was '$result'."
+              exit 1
+            fi
+          done
+
+          echo "CI gate passed."

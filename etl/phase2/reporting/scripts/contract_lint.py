@@ -46,6 +46,8 @@ REQUIRED_WORKFLOW_INPUTS = {
     "baseline_update_approved_by",
 }
 
+EXPECTED_WORKFLOW_NAME = "Phase 2 Reporting"
+
 
 class LintError(Exception):
     pass
@@ -263,8 +265,8 @@ def validate_fixtures(fixtures_dir: pathlib.Path) -> None:
 
 
 def validate_workflow(workflow: Dict[str, Any]) -> None:
-    if workflow.get("name") != "phase2-reporting":
-        fail("workflow name must remain phase2-reporting")
+    if workflow.get("name") != EXPECTED_WORKFLOW_NAME:
+        fail(f"workflow name must remain {EXPECTED_WORKFLOW_NAME}")
 
     workflow_on = workflow.get("on")
     if workflow_on is None and True in workflow:
