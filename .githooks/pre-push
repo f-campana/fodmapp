@@ -3,6 +3,26 @@ set -euo pipefail
 
 repo_root="$(git rev-parse --show-toplevel)"
 
+zero_sha="0000000000000000000000000000000000000000"
+delete_only="true"
+has_updates="false"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [[ -z "${local_ref:-}" ]]; then
+    continue
+  fi
+
+  has_updates="true"
+  if [[ "$local_ref" != "(delete)" && "$local_sha" != "$zero_sha" ]]; then
+    delete_only="false"
+  fi
+done
+
+if [[ "$has_updates" == "true" && "$delete_only" == "true" ]]; then
+  printf '[HOOK] Delete-only push detected. Skipping full quality gate.\n'
+  exit 0
+fi
+
 printf '[HOOK] Running full quality gate before push...\n'
 "$repo_root/.github/scripts/quality-gate.sh" --full
 printf '[HOOK] Full quality gate passed.\n'
