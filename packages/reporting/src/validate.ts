@@ -144,6 +144,17 @@ export function parseReportingRun(input: unknown): ReportingRun {
     input.contract_version,
     "contract_version",
   );
+  const trigger = input.trigger;
+  if (trigger !== undefined) {
+    assert(
+      trigger === "pr_smoke" ||
+        trigger === "main_full" ||
+        trigger === "manual_full" ||
+        trigger === "manual_baseline_update" ||
+        trigger === "manual_render_baseline_update",
+      "trigger must be one of pr_smoke|main_full|manual_full|manual_baseline_update|manual_render_baseline_update",
+    );
+  }
 
   const figuresRaw = input.figures;
   assert(
@@ -184,7 +195,7 @@ export function parseReportingRun(input: unknown): ReportingRun {
     source_db_ref: sourceDbRef,
     source_db_meta: input.source_db_meta as ReportingRun["source_db_meta"],
     contract_version: contractVersion,
-    trigger: input.trigger as ReportingRun["trigger"],
+    trigger: trigger as ReportingRun["trigger"],
     source_file_hashes: isRecord(input.source_file_hashes)
       ? (input.source_file_hashes as Record<string, string>)
       : undefined,

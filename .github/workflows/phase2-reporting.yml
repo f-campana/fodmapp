@@ -573,7 +573,7 @@ jobs:
       - name: Replay + seed render-baseline-update pipeline
         run: |
           python etl/phase2/reporting/scripts/replay_seed.py \
-            --trigger manual_baseline_update \
+            --trigger manual_render_baseline_update \
             --replay-db-url "$REPLAY_DB_URL" \
             --seed-db-url "$SEED_DB_URL" \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}
@@ -586,7 +586,7 @@ jobs:
             --db-url "$API_DB_URL" \
             --sql-dir etl/phase2/reporting/sql \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
-            --trigger manual_baseline_update
+            --trigger manual_render_baseline_update
       - name: Refresh render baseline artifacts (controlled scope)
         run: |
           python etl/phase2/reporting/scripts/refresh_baselines.py \

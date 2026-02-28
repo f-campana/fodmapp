@@ -39,6 +39,9 @@ describe("reporting renderer package", () => {
     expect(bundle["fig_H_quarantine_impact.svg"]).toContain(
       "Frozen Quarantine Case Study",
     );
+    expect(bundle["fig_F_serving_load_vs_thresholds.svg"]).toContain(
+      "Rank2 Exclusion Audit",
+    );
   });
 
   it("renders deterministic dashboard fragment", () => {
@@ -51,5 +54,13 @@ describe("reporting renderer package", () => {
     expect(html).toContain("Reporting contractuel Phase 2");
     expect(html).toContain("Rank2 Exclusion Audit");
     expect(html).toContain("Frozen Quarantine Case Study");
+  });
+
+  it("accepts manual render baseline update trigger", () => {
+    const run = parseReportingRun({
+      ...sampleReportingRun,
+      trigger: "manual_render_baseline_update",
+    });
+    expect(run.trigger).toBe("manual_render_baseline_update");
   });
 });

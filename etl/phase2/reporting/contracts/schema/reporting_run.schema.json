@@ -69,7 +69,7 @@
     },
     "trigger": {
       "type": "string",
-      "enum": ["pr_smoke", "main_full", "manual_full", "manual_baseline_update"]
+      "enum": ["pr_smoke", "main_full", "manual_full", "manual_baseline_update", "manual_render_baseline_update"]
     },
     "source_file_hashes": {
       "type": "object",

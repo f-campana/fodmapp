@@ -47,6 +47,13 @@
 13. [now][S] Add review/self-reflection gate before CI/manual runs
    - author `docs/plans/phase2-reporting-review-checkpoint.md`
    - include findings dispositions, residual risks, and exact verification commands/outcomes
+14. [now][M] Phase 4 delivery hardening (post-remediation)
+   - materialize deterministic stage contracts into DB snapshot table for full lane
+   - remove static stage constants from `p01/p02` SQL extractors
+   - add figure-level semantic fail-loud checks in `collect_reporting.py`
+   - enforce fixture source hash freshness checks
+   - add fixture/baseline semantic parity tests + optional DB parity gate
+   - align docs with blocking full lane and split baseline update modes
 
 ## Next set (deferred)
 

@@ -8,9 +8,9 @@
   "fixture_id": "P-01",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:TODO",
-    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:TODO",
-    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO"
+    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:72b5bfbcc1f6de20702d928cf73f564e39146f3fa3ba58b4c6045e25fa5d4b43",
+    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f"
   },
   "source_rows": {
     "baseline_resolved": 0,

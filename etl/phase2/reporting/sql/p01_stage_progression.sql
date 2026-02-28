@@ -1,16 +1,26 @@
 \set ON_ERROR_STOP on
 
-WITH stages AS (
-  SELECT *
-  FROM (
-    VALUES
-      (1, 'fructan_wave01', 16, 26, 16, 26, 16, -16),
-      (2, 'fructan_wave02', 21, 21, 21, 21, 5, -5),
-      (3, 'gos_wave01', 27, 15, 27, 15, 6, -6),
-      (4, 'gos_wave02', 33, 9, 33, 9, 6, -6),
-      (5, 'polyol_wave01', 39, 3, 39, 3, 6, -6),
-      (6, 'polyol_wave02', 42, 0, 42, 0, 3, -3)
-  ) AS t(stage_order, stage_id, resolved_rows, unresolved_rows, expected_resolved_rows, expected_unresolved_rows, delta_resolved_rows, delta_unresolved_rows)
+WITH baseline AS (
+  SELECT MAX((resolved_rows + unresolved_rows))::int AS total_rows
+  FROM reporting_stage_contract_snapshot
+),
+stages AS (
+  SELECT
+    s.stage_order,
+    s.stage_id,
+    s.resolved_rows,
+    s.unresolved_rows,
+    s.resolved_rows AS expected_resolved_rows,
+    s.unresolved_rows AS expected_unresolved_rows,
+    s.resolved_rows - COALESCE(
+      LAG(s.resolved_rows) OVER (ORDER BY s.stage_order),
+      0
+    ) AS delta_resolved_rows,
+    s.unresolved_rows - COALESCE(
+      LAG(s.unresolved_rows) OVER (ORDER BY s.stage_order),
+      (SELECT total_rows FROM baseline)
+    ) AS delta_unresolved_rows
+  FROM reporting_stage_contract_snapshot s
 )
 SELECT jsonb_build_object(
   '_contract_refs', jsonb_build_array(
@@ -20,7 +30,7 @@ SELECT jsonb_build_object(
   ),
   'contract_ref', 'etl/phase2/POD_WAVES_RUNBOOK.md',
   'baseline_resolved', 0,
-  'baseline_unresolved', 42,
+  'baseline_unresolved', (SELECT COALESCE(total_rows, 0) FROM baseline),
   'stages', (
     SELECT jsonb_agg(
       jsonb_build_object(

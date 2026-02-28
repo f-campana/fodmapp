@@ -8,9 +8,9 @@
   "fixture_id": "P-03",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:TODO",
-    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:TODO",
-    "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:TODO"
+    "etl/phase2/sql/phase2_post_batch10_checks.sql": "sha256:bfe7df545a9f5a23988d6d63a689fae550e7ae79274cd14b4a1e11d124aeefba",
+    "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
+    "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:f9162b414cb016bd170642fbfab6fc251bc96e00378bd2372b0d63c11b5a8053"
   },
   "source_rows": {
     "bucket_rows": [

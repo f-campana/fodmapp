@@ -1,6 +1,10 @@
 generated_version: v1
 generated_by: phase2-reporting-plan-v4
 generated_at_utc: '2026-02-25T00:00:00Z'
+reporting_snapshot:
+  table: reporting_stage_contract_snapshot
+  source: executed_stage_order
+  write_mode: truncate_then_insert
 source_inputs:
 - path: etl/phase2/POD_WAVES_RUNBOOK.md
   sha256: sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73

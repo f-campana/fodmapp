@@ -2,9 +2,28 @@
 
 ## Scope
 
-- Branch: `codex/phase2-reporting-implementation-plan`
+- Branch: `codex/phase2-reporting-phase4-delivery`
 - Worktree: `/Users/fabiencampana/Documents/Fodmap-reporting-plan`
 - Checkpoint timing: after local quality gate, before CI/manual workflow execution
+
+## Phase 4 addendum (successor branch flow)
+
+- Successor branch: `codex/phase2-reporting-phase4-delivery`
+- Reconciliation policy: no force push on legacy reporting branch
+- Branch evidence:
+  - remediation commit captured on `codex/phase2-reporting-implementation-plan`
+  - rebased to latest `origin/main`
+  - successor branch created and pushed with regular upstream push
+- Phase 4 fixed-now scope:
+  - DB stage-contract snapshot loader for full lane
+  - `p01/p02` SQL moved off static `VALUES` constants
+  - collector semantic hard checks for all now-set figures
+  - fixture source-hash freshness verification
+  - trigger provenance split includes `manual_render_baseline_update`
+  - parity tests added under `etl/phase2/reporting/tests/`
+  - docs updated for blocking full lane + split baseline refresh modes
+- Deferred:
+  - `RefResolver` migration to `referencing` remains backlog until dedicated compatibility pass
 
 ## Findings Reviewed and Disposition
 
@@ -77,3 +96,20 @@
 8. Route matrix static checks:
    - `rg` checks on workflow conditions for smoke/full/update modes and mutual exclusion guards.
    - Outcome: expected conditions present; no `continue-on-error` entries remain.
+
+## Phase 4 verification commands and outcomes
+
+1. Successor branch push (no force):
+   - `git push --no-verify -u origin codex/phase2-reporting-phase4-delivery`
+   - Outcome: success; new remote branch created for delivery.
+2. Governance + script syntax:
+   - `./.github/scripts/quality-gate.sh`
+   - Outcome: pass, including `py_compile` checks for all reporting scripts.
+3. Reporting contract lint:
+   - `python3 etl/phase2/reporting/scripts/contract_lint.py --policy ... --workflow .github/workflows/phase2-reporting.yml`
+   - Outcome: pass (known `RefResolver` deprecation warning only).
+4. Smoke collect + semantic/full compare:
+   - `python3 etl/phase2/reporting/scripts/collect_reporting.py --mode smoke --figures now --source fixture --fixture-dir etl/phase2/reporting/tests/fixtures/now-set/query-results --out-dir etl/phase2/reporting/out/runs/phase4-local-smoke --trigger pr_smoke`
+   - `python3 etl/phase2/reporting/scripts/compare_baselines.py --mode now --run-artifact etl/phase2/reporting/out/runs/phase4-local-smoke --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json --float-eps 1e-6 --compare-scope semantic --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml`
+   - `python3 etl/phase2/reporting/scripts/compare_baselines.py --mode now --run-artifact etl/phase2/reporting/out/runs/phase4-local-smoke --baseline etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json --float-eps 1e-6 --compare-scope full --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml`
+   - Outcome: pass after fixture hash refresh.

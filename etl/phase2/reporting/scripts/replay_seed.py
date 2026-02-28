@@ -99,12 +99,29 @@ def main() -> int:
     repo_root = pathlib.Path(__file__).resolve().parents[4]
     replay_script = repo_root / "etl/phase2/scripts/phase2_replay_from_zero.sh"
     phase3_seed_script = repo_root / "etl/phase3/scripts/phase3_seed_for_api_ci.sh"
+    load_stage_contracts_script = repo_root / "etl/phase2/reporting/scripts/load_stage_contracts.py"
+    stage_snapshot_sql = repo_root / "etl/phase2/reporting/sql/reporting_stage_contract_snapshot.sql"
+    stage_contracts_yaml = (
+        repo_root / "etl/phase2/reporting/contracts/generated/stage_contracts.generated.yaml"
+    )
 
     if not replay_script.exists():
         print(f"[FAIL] replay script missing: {replay_script}", file=sys.stderr)
         return 1
     if not phase3_seed_script.exists():
         print(f"[FAIL] phase3 seed script missing: {phase3_seed_script}", file=sys.stderr)
+        return 1
+    if not load_stage_contracts_script.exists():
+        print(
+            f"[FAIL] load-stage-contracts script missing: {load_stage_contracts_script}",
+            file=sys.stderr,
+        )
+        return 1
+    if not stage_snapshot_sql.exists():
+        print(f"[FAIL] stage snapshot SQL missing: {stage_snapshot_sql}", file=sys.stderr)
+        return 1
+    if not stage_contracts_yaml.exists():
+        print(f"[FAIL] stage contracts YAML missing: {stage_contracts_yaml}", file=sys.stderr)
         return 1
 
     replay_db_url = args.replay_db_url or args.seed_db_url
@@ -150,6 +167,34 @@ def main() -> int:
         return 1
 
     steps.append(_run([str(phase3_seed_script)], cwd=repo_root, env=env, label="phase3_seed_for_api_ci"))
+    if steps[-1]["returncode"] != 0:
+        _write_manifest(
+            out_dir / "replay_seed_manifest.json",
+            trigger=args.trigger,
+            replay_db_url=replay_db_url,
+            seed_db_url=seed_db_url,
+            steps=steps,
+            status="failed",
+        )
+        return 1
+
+    steps.append(
+        _run(
+            [
+                "python",
+                str(load_stage_contracts_script),
+                "--db-url",
+                seed_db_url,
+                "--stage-contracts",
+                str(stage_contracts_yaml),
+                "--snapshot-sql",
+                str(stage_snapshot_sql),
+            ],
+            cwd=repo_root,
+            env=env,
+            label="load_reporting_stage_contracts",
+        )
+    )
     status = "ok" if all(step["returncode"] == 0 for step in steps) else "failed"
     _write_manifest(
         out_dir / "replay_seed_manifest.json",

@@ -72,6 +72,14 @@ done
 run_cmd "commit-msg hook syntax" bash -n .githooks/commit-msg
 run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mjs
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
+run_cmd "reporting python script syntax" python3 -m py_compile \
+  etl/phase2/reporting/scripts/collect_reporting.py \
+  etl/phase2/reporting/scripts/compare_baselines.py \
+  etl/phase2/reporting/scripts/contract_lint.py \
+  etl/phase2/reporting/scripts/load_stage_contracts.py \
+  etl/phase2/reporting/scripts/publish_run.py \
+  etl/phase2/reporting/scripts/refresh_baselines.py \
+  etl/phase2/reporting/scripts/replay_seed.py
 
 echo "[OK] governance quality gate passed"
 
