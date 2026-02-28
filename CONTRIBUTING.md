@@ -47,13 +47,15 @@ feat(schema): add source confidence index
    - Exemption: allowlisted prototype packages may skip `.changeset` only with PR label `changeset-exempt`.
    - Current allowlist (`CHANGESET_EXEMPT_PACKAGES`): `@fodmap/mobile-prototype`.
    - Local parity note: for exemption-path pushes before PR labeling, run `PR_LABELS=changeset-exempt git push`.
+6. CI scope note:
+   - Heavy Turbo jobs are PR-scoped via `pr-scope` and may show as `skipped`; the `CI` gate treats scoped `skipped` jobs as acceptable.
 
 Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are now blocked until `./.github/scripts/quality-gate.sh --full` passes.
 
 ## Root Command Contract
 
 - `pnpm lint`: formatting/lint baseline (`prettier --check`).
-- `pnpm typecheck`: explicit package coverage (`content-config`, `types`, `ui`, `storybook`, `app`, `marketing`, `research`).
+- `pnpm typecheck`: Turbo-orchestrated typecheck using `turbo run typecheck --only` with explicit filters for `content-config`, `types`, `ui`, `reporting`, `storybook`, `app`, `marketing`, and `research`.
 - `pnpm test`: fast deterministic unit test coverage (`ui`, `app`).
 - `pnpm test:storybook`: browser-based Storybook interaction/a11y tests.
 - `pnpm check:all`: full local CI mirror for governance + tokens + styles + UI + Storybook + scaffold apps.

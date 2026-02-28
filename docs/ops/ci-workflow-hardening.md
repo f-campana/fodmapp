@@ -1,6 +1,6 @@
 # CI Workflow Hardening Runbook
 
-Last updated: 2026-02-27
+Last updated: 2026-02-28
 
 ## Scope
 
@@ -9,6 +9,8 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - deterministic required checks for branch protection
 - staged enforcement for `Phase 2 Reporting` full-lane checks
 - native `GITHUB_TOKEN` guardrails for `Changesets release`
+- PR-scoped Turbo CI execution (`pr-scope`) for heavy jobs
+- Turbo cache mode selection: remote cache when configured, `.turbo` restore/save fallback when not
 
 ## Repository Variable: `PHASE2_FULL_RUN_ENFORCE`
 
@@ -38,6 +40,27 @@ Required GitHub repository settings:
 
 The workflow preflight step fails loudly with actionable errors if these settings are not enabled.
 
+## CI PR Scope and Turbo Cache Controls
+
+The main `CI` workflow now uses a `pr-scope` job to compute execution booleans for heavy Turbo jobs:
+
+- `design_tokens`
+- `ui_foundation`
+- `app_scaffold`
+- `content_scaffolds`
+
+`pr-scope` fallback behavior is intentionally fail-open for safety:
+
+- non-PR events: all scoped jobs enabled
+- invalid/missing PR SHAs: all scoped jobs enabled
+- PR diff failures: all scoped jobs enabled
+- changes to global build/workflow files (for example `package.json`, `turbo.json`, CI workflow): all scoped jobs enabled
+
+Turbo cache behavior for scoped jobs:
+
+- if both `TURBO_TEAM` and `TURBO_TOKEN` are present, Turbo remote caching is used
+- otherwise, CI restores/saves local `.turbo` cache using `actions/cache/restore@v4` and `actions/cache/save@v4`
+
 ## Branch Protection Required Checks (`main`)
 
 Configure `main` to require these checks:
@@ -51,10 +74,17 @@ Configure `main` to require these checks:
 ## Manual Verification Checklist
 
 1. Open a docs-only PR.
-2. Confirm required checks are present and pass without missing-status blockers.
-3. Open a PR touching one or more scoped reporting files (for example `etl/phase2/**`).
-4. Confirm `Phase 2 Reporting` scoped jobs execute and the `Phase 2 Reporting Gate` reflects lane success/failure.
-5. Merge a PR to `main` and confirm:
-   - push runs are not canceled by concurrency
-   - superseded PR runs are canceled
-6. Confirm the next eligible `Changesets release` run can create/update its PR using native token settings.
+2. Confirm scoped Turbo jobs are skipped and `CI` still passes.
+3. Open an app-only PR touching `apps/app/**` files.
+4. Confirm `app-scaffold` runs while other scoped Turbo jobs stay skipped.
+5. Open a PR touching global build/workflow files (for example `package.json`, `turbo.json`, `.github/workflows/ci.yml`).
+6. Confirm all scoped Turbo jobs run.
+7. Confirm required checks are present and pass without missing-status blockers.
+8. Open a PR touching one or more scoped reporting files (for example `etl/phase2/**`).
+9. Confirm `Phase 2 Reporting` scoped jobs execute and the `Phase 2 Reporting Gate` reflects lane success/failure.
+10. Merge a PR to `main` and confirm:
+
+- push runs are not canceled by concurrency
+- superseded PR runs are canceled
+
+11. Confirm the next eligible `Changesets release` run can create/update its PR using native token settings.
