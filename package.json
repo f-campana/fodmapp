@@ -24,7 +24,7 @@
     "test": "turbo run test --filter=@fodmap/ui --filter=@fodmap/app",
     "test:storybook": "pnpm --filter @fodmap/storybook test",
     "prepare": "pnpm hook:install",
-    "typecheck": "pnpm --filter @fodmap/content-config typecheck && pnpm --filter @fodmap/types typecheck && pnpm --filter @fodmap/ui typecheck && pnpm --filter @fodmap/reporting typecheck && pnpm --filter @fodmap/storybook typecheck && pnpm --filter @fodmap/app typecheck && pnpm --filter @fodmap/marketing typecheck && pnpm --filter @fodmap/research typecheck",
+    "typecheck": "turbo run typecheck --only --filter=@fodmap/content-config --filter=@fodmap/types --filter=@fodmap/ui --filter=@fodmap/reporting --filter=@fodmap/storybook --filter=@fodmap/app --filter=@fodmap/marketing --filter=@fodmap/research",
     "tokens:generate": "pnpm --filter @fodmap/design-tokens tokens:generate",
     "tokens:check": "turbo run tokens:check --filter=@fodmap/design-tokens",
     "tailwind:styles:check": "turbo run styles:check --filter=@fodmap/tailwind-config",
@@ -50,6 +50,7 @@
     "check:all": "./.github/scripts/quality-gate.sh && pnpm lint:ci && pnpm python:ci && pnpm openapi:check && pnpm tokens:check && pnpm tailwind:styles:check && pnpm ui:build && pnpm ui:styles:check && pnpm ui:typecheck && pnpm ui:test && pnpm --filter @fodmap/storybook typecheck && pnpm storybook:build && pnpm storybook:test && pnpm app:test && pnpm app:typecheck && pnpm app:build && pnpm marketing:typecheck && pnpm marketing:build && pnpm research:typecheck && pnpm research:build",
     "changeset": "changeset",
     "version-packages": "changeset version",
+    "ci:scope:test": "node --test .github/scripts/detect-ci-scope.test.mjs",
     "changeset:ci:status": "node .github/scripts/check-pr-changesets.mjs",
     "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
   },
