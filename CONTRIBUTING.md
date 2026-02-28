@@ -44,10 +44,12 @@ feat(schema): add source confidence index
    - `./.github/scripts/ci-api-pr.sh` for API changes needing seeded integration parity with CI
 5. Changesets policy:
    - Default: if `apps/*` or `packages/*` changed, include a `.changeset/*.md` entry.
+   - Root-only note: if only releasable root files changed (for example `package.json`, `pnpm-lock.yaml`) and no workspace package/app changed, the gate skips changeset coverage requirements.
    - Exemption: allowlisted prototype packages may skip `.changeset` only with PR label `changeset-exempt`.
    - Current allowlist (`CHANGESET_EXEMPT_PACKAGES`): `@fodmap/mobile-prototype`.
+   - Frontmatter package names in changed `.changeset/*.md` files must be valid workspace package names (`apps/*` / `packages/*`).
    - Local parity note: for exemption-path pushes before PR labeling, run `PR_LABELS=changeset-exempt git push`.
-   - Debug note: run `CHANGESET_CHECK_DEBUG=1 pnpm changeset:ci:status:strict` for verbose diff/frontmatter diagnostics.
+   - Debug note: run `CHANGESET_CHECK_DEBUG=1 pnpm changeset:ci:status:strict` for verbose diff/frontmatter/workspace diagnostics.
 6. CI scope note:
    - Heavy Turbo jobs are PR-scoped via `pr-scope` and may show as `skipped`; the `CI` gate treats scoped `skipped` jobs as acceptable.
 

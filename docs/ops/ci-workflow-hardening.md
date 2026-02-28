@@ -50,13 +50,16 @@ The workflow preflight step fails loudly with actionable errors if these setting
 - changed workspace package/app directories (`apps/*`, `packages/*`)
 - changed `.changeset/*.md` files in the same range
 - package names parsed from changeset frontmatter in those changed `.changeset` files
+- workspace package names discovered from `apps/*/package.json` and `packages/*/package.json` at `HEAD_SHA`
 
 The gate no longer relies on `pnpm changeset status` output for pass/fail decisions.
+Changed `.changeset` entries that reference non-workspace package names now fail with explicit package/file diagnostics.
+Root-only releasable file changes (with no workspace package/app changes) now pass without requiring a changeset.
 
 Optional debug mode for local/CI diagnostics:
 
 - set `CHANGESET_CHECK_DEBUG=1` when running `.github/scripts/check-pr-changesets.mjs`
-- debug output includes resolved base/head refs, changed packages, changed changeset files, parsed changeset package names, and final missing package list
+- debug output includes resolved base/head refs, changed packages, changed changeset files, workspace package count, parsed changeset package names, unknown changeset package names, final missing package list, and final decision path
 
 Local hook behavior:
 

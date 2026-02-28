@@ -121,6 +121,23 @@ function readRevisionFile(revision, filePath) {
   });
 }
 
+function listRevisionFiles(revision, roots) {
+  const args = ["ls-tree", "-r", "--name-only", revision];
+  if (Array.isArray(roots) && roots.length > 0) {
+    args.push("--", ...roots);
+  }
+
+  const output = execFileSync("git", args, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+
+  return output
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function readManifestNameAtRevision(revision, pkgDir) {
   const manifestPath = `${pkgDir}/package.json`;
   if (!revisionFileExists(revision, manifestPath)) {
@@ -129,6 +146,26 @@ function readManifestNameAtRevision(revision, pkgDir) {
 
   const rawManifest = readRevisionFile(revision, manifestPath);
   return parseManifestName(rawManifest, manifestPath);
+}
+
+function listWorkspacePackageNames(headSha) {
+  const workspaceManifestPaths = listRevisionFiles(headSha, [
+    "apps",
+    "packages",
+  ]).filter((filePath) =>
+    /^(?:apps|packages)\/[^/]+\/package\.json$/.test(filePath),
+  );
+
+  const names = new Set();
+  for (const manifestPath of workspaceManifestPaths) {
+    const rawManifest = readRevisionFile(headSha, manifestPath);
+    const manifestName = parseManifestName(rawManifest, manifestPath);
+    if (manifestName) {
+      names.add(manifestName);
+    }
+  }
+
+  return names;
 }
 
 function workspaceDirForFile(filePath) {
@@ -233,8 +270,9 @@ export function parseChangesetFrontmatter(markdownContent, filePath) {
   return packageNames;
 }
 
-function collectChangesetPackageNames(changesetFiles, headSha) {
+function collectChangesetPackages(changesetFiles, headSha) {
   const names = new Set();
+  const packageSources = new Map();
 
   for (const filePath of changesetFiles) {
     if (!revisionFileExists(headSha, filePath)) {
@@ -245,10 +283,36 @@ function collectChangesetPackageNames(changesetFiles, headSha) {
     const parsedNames = parseChangesetFrontmatter(markdownContent, filePath);
     for (const packageName of parsedNames) {
       names.add(packageName);
+      if (!packageSources.has(packageName)) {
+        packageSources.set(packageName, new Set());
+      }
+      packageSources.get(packageName).add(filePath);
     }
   }
 
-  return names;
+  return { names, packageSources };
+}
+
+export function findUnknownChangesetPackages(
+  packageSources,
+  workspacePackageNames,
+) {
+  const unknownPackages = [];
+
+  for (const [packageName, sourceFilesSet] of packageSources.entries()) {
+    if (workspacePackageNames.has(packageName)) {
+      continue;
+    }
+
+    unknownPackages.push({
+      packageName,
+      sourceFiles: [...sourceFilesSet].sort(),
+    });
+  }
+
+  return unknownPackages.sort((a, b) =>
+    a.packageName.localeCompare(b.packageName),
+  );
 }
 
 export function evaluateCoverage({
@@ -268,6 +332,7 @@ export function evaluateCoverage({
   if (hasExemptLabel && touchedAllowlistedPackages.length === 0) {
     const allowlist = [...exemptPackages].sort();
     return {
+      decision: "fail_exempt_label_misuse",
       ok: false,
       missing: [],
       errors: [
@@ -287,6 +352,7 @@ export function evaluateCoverage({
     );
     if (nonAllowlistedMissing.length > 0) {
       return {
+        decision: "fail_missing_non_allowlisted",
         ok: false,
         missing,
         errors: [
@@ -299,6 +365,7 @@ export function evaluateCoverage({
 
     if (!hasExemptLabel) {
       return {
+        decision: "fail_missing_allowlisted_without_label",
         ok: false,
         missing,
         errors: [
@@ -310,6 +377,7 @@ export function evaluateCoverage({
     }
 
     return {
+      decision: "pass_allowlisted_with_label",
       ok: true,
       missing,
       errors: [],
@@ -319,22 +387,20 @@ export function evaluateCoverage({
     };
   }
 
-  if (
-    changes.changedReleasableRootFiles &&
-    changedPackageList.length === 0 &&
-    changesetPackageNames.size === 0
-  ) {
+  if (changes.changedReleasableRootFiles && changedPackageList.length === 0) {
     return {
-      ok: false,
+      decision: "pass_root_only_without_workspace_changes",
+      ok: true,
       missing: [],
-      errors: [
-        "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.",
+      errors: [],
+      infos: [
+        "[changeset-check] Releasable root-only changes detected without workspace package/app changes. Skipping changeset requirement.",
       ],
-      infos: [],
     };
   }
 
   return {
+    decision: "pass_full_coverage",
     ok: true,
     missing: [],
     errors: [],
@@ -415,18 +481,26 @@ export function runChangesetCoverageCheck() {
       debugLine(debugEnabled, "changed_packages=(none)");
       debugLine(debugEnabled, "changed_changeset_files=(none)");
       debugLine(debugEnabled, "changeset_packages=(none)");
+      debugLine(debugEnabled, "unknown_changeset_packages=(none)");
       debugLine(debugEnabled, "missing_packages=(none)");
+      debugLine(debugEnabled, "decision=skip_no_releasable_changes");
       logLine(
         "[changeset-check] No workspace or releasable root changes detected. Skipping.",
       );
       return 0;
     }
 
+    const workspacePackageNames = listWorkspacePackageNames(headSha);
     const changedPackageNames = touchedWorkspacePackages(changedFiles, headSha);
     const changedChangesetFiles = listChangedChangesetFiles(changedFiles);
-    const changesetPackageNames = collectChangesetPackageNames(
+    const changesetPackages = collectChangesetPackages(
       changedChangesetFiles,
       headSha,
+    );
+    const changesetPackageNames = changesetPackages.names;
+    const unknownChangesetPackages = findUnknownChangesetPackages(
+      changesetPackages.packageSources,
+      workspacePackageNames,
     );
 
     const result = evaluateCoverage({
@@ -449,13 +523,35 @@ export function runChangesetCoverageCheck() {
     );
     debugLine(
       debugEnabled,
+      `workspace_package_count=${workspacePackageNames.size}`,
+    );
+    debugLine(
+      debugEnabled,
       `changeset_packages=${[...changesetPackageNames].sort().join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `unknown_changeset_packages=${unknownChangesetPackages.map((entry) => entry.packageName).join(", ") || "(none)"}`,
     );
     debugLine(
       debugEnabled,
       `missing_packages=${result.missing.join(", ") || "(none)"}`,
     );
 
+    if (unknownChangesetPackages.length > 0) {
+      failLine(
+        `[changeset-check] Unknown package(s) in changed .changeset frontmatter: ${unknownChangesetPackages.map((entry) => entry.packageName).join(", ")}`,
+      );
+      for (const entry of unknownChangesetPackages) {
+        failLine(
+          `[changeset-check] ${entry.packageName} declared in: ${entry.sourceFiles.join(", ")}`,
+        );
+      }
+      debugLine(debugEnabled, "decision=fail_unknown_changeset_packages");
+      return 1;
+    }
+
+    debugLine(debugEnabled, `decision=${result.decision || "(unspecified)"}`);
     for (const message of result.infos) {
       logLine(message);
     }
