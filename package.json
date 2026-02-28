@@ -51,6 +51,7 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "ci:scope:test": "node --test .github/scripts/detect-ci-scope.test.mjs",
+    "changeset:ci:test": "node --test .github/scripts/check-pr-changesets.test.mjs",
     "changeset:ci:status": "node .github/scripts/check-pr-changesets.mjs",
     "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
   },

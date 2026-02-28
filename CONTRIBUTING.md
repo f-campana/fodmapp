@@ -47,10 +47,11 @@ feat(schema): add source confidence index
    - Exemption: allowlisted prototype packages may skip `.changeset` only with PR label `changeset-exempt`.
    - Current allowlist (`CHANGESET_EXEMPT_PACKAGES`): `@fodmap/mobile-prototype`.
    - Local parity note: for exemption-path pushes before PR labeling, run `PR_LABELS=changeset-exempt git push`.
+   - Debug note: run `CHANGESET_CHECK_DEBUG=1 pnpm changeset:ci:status:strict` for verbose diff/frontmatter diagnostics.
 6. CI scope note:
    - Heavy Turbo jobs are PR-scoped via `pr-scope` and may show as `skipped`; the `CI` gate treats scoped `skipped` jobs as acceptable.
 
-Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are now blocked until `./.github/scripts/quality-gate.sh --full` passes.
+Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are blocked until `./.github/scripts/quality-gate.sh --full` passes (delete-only pushes are skipped).
 
 ## Root Command Contract
 

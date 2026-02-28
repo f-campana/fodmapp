@@ -1,8 +1,17 @@
 #!/usr/bin/env node
 
-import { execSync } from "node:child_process";
-import { existsSync, readFileSync, rmSync } from "node:fs";
-import path from "node:path";
+import { execFileSync, execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+
+const releasableRootFiles = new Set([
+  "package.json",
+  "pnpm-workspace.yaml",
+  "pnpm-lock.yaml",
+  "turbo.json",
+]);
+
+const workspacePrefixes = ["packages/", "apps/"];
 
 function logLine(message) {
   process.stdout.write(`${message}\n`);
@@ -10,6 +19,13 @@ function logLine(message) {
 
 function failLine(message) {
   process.stderr.write(`${message}\n`);
+}
+
+function debugLine(enabled, message) {
+  if (!enabled) {
+    return;
+  }
+  logLine(`[changeset-check][debug] ${message}`);
 }
 
 function parseCsvSet(value) {
@@ -45,7 +61,7 @@ function readPrLabels() {
   }
 }
 
-function isValidRevision(revision) {
+export function isValidRevision(revision) {
   if (!revision) {
     return false;
   }
@@ -60,59 +76,7 @@ function isValidRevision(revision) {
   }
 }
 
-const envBaseSha = (process.env.BASE_SHA || "").trim();
-const envHeadSha = (process.env.HEAD_SHA || "").trim();
-const exemptLabel = (
-  process.env.CHANGESET_EXEMPT_LABEL || "changeset-exempt"
-).trim();
-const exemptPackages = parseCsvSet(
-  process.env.CHANGESET_EXEMPT_PACKAGES || "@fodmap/mobile-prototype",
-);
-const exemptPackageList = [...exemptPackages].sort();
-const prLabels = readPrLabels();
-const hasExemptLabel = Boolean(exemptLabel) && prLabels.has(exemptLabel);
-
-let baseSha = envBaseSha;
-let headSha = envHeadSha;
-
-if (!isValidRevision(headSha)) {
-  try {
-    headSha = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
-  } catch {
-    headSha = "";
-  }
-}
-
-if (!isValidRevision(baseSha)) {
-  try {
-    baseSha = execSync("git merge-base origin/main HEAD", {
-      encoding: "utf8",
-    }).trim();
-  } catch {
-    baseSha = "";
-  }
-}
-
-if (
-  !baseSha ||
-  !headSha ||
-  !isValidRevision(baseSha) ||
-  !isValidRevision(headSha)
-) {
-  failLine(
-    "[changeset-check] Unable to resolve required git refs for changeset validation.",
-  );
-  process.exit(1);
-}
-
-function hasWorkspaceOrReleasableChanges(files) {
-  const releasableRootFiles = new Set([
-    "package.json",
-    "pnpm-workspace.yaml",
-    "pnpm-lock.yaml",
-    "turbo.json",
-  ]);
-
+export function hasWorkspaceOrReleasableChanges(files) {
   const changedPackagesOrApps = files.some((file) => {
     return file.startsWith("packages/") || file.startsWith("apps/");
   });
@@ -127,211 +91,397 @@ function hasWorkspaceOrReleasableChanges(files) {
   };
 }
 
-function touchedWorkspacePackages(files) {
-  const workspacePrefixes = ["packages/", "apps/"];
+function parseManifestName(rawManifest, manifestPath) {
+  let manifest;
+  try {
+    manifest = JSON.parse(rawManifest);
+  } catch {
+    throw new Error(
+      `[changeset-check] Unable to parse JSON at ${manifestPath}`,
+    );
+  }
+  return `${manifest?.name || ""}`.trim();
+}
+
+function revisionFileExists(revision, filePath) {
+  try {
+    execFileSync("git", ["cat-file", "-e", `${revision}:${filePath}`], {
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function readRevisionFile(revision, filePath) {
+  return execFileSync("git", ["show", `${revision}:${filePath}`], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+}
+
+function readManifestNameAtRevision(revision, pkgDir) {
+  const manifestPath = `${pkgDir}/package.json`;
+  if (!revisionFileExists(revision, manifestPath)) {
+    return "";
+  }
+
+  const rawManifest = readRevisionFile(revision, manifestPath);
+  return parseManifestName(rawManifest, manifestPath);
+}
+
+function workspaceDirForFile(filePath) {
+  const [root, pkgName] = filePath.split("/");
+  if (!pkgName) {
+    return "";
+  }
+
+  const prefix = `${root}/`;
+  if (!workspacePrefixes.includes(prefix)) {
+    return "";
+  }
+
+  return `${root}/${pkgName}`;
+}
+
+function touchedWorkspacePackages(files, headSha) {
   const names = new Set();
 
-  files.forEach((file) => {
-    const [root, pkgName] = file.split("/");
-    if (pkgName && workspacePrefixes.includes(`${root}/`)) {
-      const pkgDir = `${root}/${pkgName}`;
-      const manifestPath = path.join(process.cwd(), pkgDir, "package.json");
-      if (!existsSync(manifestPath)) {
-        return;
-      }
-
-      const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-      if (manifest.name) {
-        names.add(manifest.name);
-      }
+  for (const filePath of files) {
+    const pkgDir = workspaceDirForFile(filePath);
+    if (!pkgDir) {
+      continue;
     }
-  });
+
+    const manifestName = readManifestNameAtRevision(headSha, pkgDir);
+    if (manifestName) {
+      names.add(manifestName);
+    }
+  }
 
   return names;
 }
 
-function isNoChangesetOutput(message) {
-  const lower = message.toLowerCase();
-  return (
-    lower.includes("no changesets") ||
-    lower.includes("no packages to be bumped") ||
-    lower.includes("no packages to bump") ||
-    lower.includes("there are no changesets") ||
-    lower.includes("nothing to release")
-  );
+export function listChangedChangesetFiles(files) {
+  return files
+    .filter(
+      (filePath) =>
+        filePath.startsWith(".changeset/") && filePath.endsWith(".md"),
+    )
+    .sort();
 }
 
-function parseStatusOutput(sinceSha) {
-  const statusPath = ".changeset-status.json";
-  const command = `pnpm changeset status --since=${sinceSha} --output=${statusPath}`;
-  let diagnostic = "";
+export function parseChangesetFrontmatter(markdownContent, filePath) {
+  const normalized = markdownContent.replace(/^\uFEFF/, "");
+  const lines = normalized.split(/\r?\n/);
 
-  try {
-    execSync(command, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-  } catch (err) {
-    diagnostic = `${err.stdout || ""}\n${err.stderr || ""}`;
-
-    if (!existsSync(statusPath)) {
-      if (isNoChangesetOutput(diagnostic)) {
-        return { changesets: [], releases: [] };
-      }
-      throw new Error(
-        `Failed to run \`pnpm changeset status\` and no JSON output was produced.\n${diagnostic}`.trim(),
-      );
+  if (lines.length === 0 || lines[0].trim() !== "---") {
+    throw new Error(
+      `[changeset-check] ${filePath}: missing opening frontmatter delimiter '---'.`,
+    );
+  }
+  let closingDelimiter = -1;
+  for (let i = 1; i < lines.length; i += 1) {
+    if (lines[i].trim() === "---") {
+      closingDelimiter = i;
+      break;
     }
   }
 
-  if (!existsSync(statusPath)) {
+  if (closingDelimiter === -1) {
     throw new Error(
-      "Failed to run `pnpm changeset status` and no JSON output was produced.",
+      `[changeset-check] ${filePath}: missing closing frontmatter delimiter '---'.`,
     );
   }
 
-  let payload;
-  try {
-    payload = JSON.parse(readFileSync(statusPath, "utf8"));
-  } catch {
-    throw new Error(`Unable to parse changeset status JSON at ${statusPath}`);
-  } finally {
-    rmSync(statusPath, { force: true });
+  const frontmatterLines = lines.slice(1, closingDelimiter);
+  const packageNames = new Set();
+
+  for (const line of frontmatterLines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
+
+    const entryMatch = trimmed.match(
+      /^(?:"([^"]+)"|'([^']+)'|([^"'\s][^:]*?))\s*:\s*(.+)\s*$/,
+    );
+    if (!entryMatch) {
+      throw new Error(
+        `[changeset-check] ${filePath}: invalid frontmatter entry "${trimmed}".`,
+      );
+    }
+
+    const packageName =
+      `${entryMatch[1] || entryMatch[2] || entryMatch[3] || ""}`.trim();
+    const releaseType = `${entryMatch[4] || ""}`.trim();
+    if (!packageName || !releaseType) {
+      throw new Error(
+        `[changeset-check] ${filePath}: invalid frontmatter entry "${trimmed}".`,
+      );
+    }
+    packageNames.add(packageName);
   }
 
-  return payload;
+  if (packageNames.size === 0) {
+    throw new Error(
+      `[changeset-check] ${filePath}: frontmatter must declare at least one package.`,
+    );
+  }
+
+  return packageNames;
 }
 
-try {
-  const diffOutput = execSync(`git diff --name-only ${baseSha}...${headSha}`, {
-    encoding: "utf8",
-  });
-  const changedFiles = diffOutput
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+function collectChangesetPackageNames(changesetFiles, headSha) {
+  const names = new Set();
 
-  const changes = hasWorkspaceOrReleasableChanges(changedFiles);
+  for (const filePath of changesetFiles) {
+    if (!revisionFileExists(headSha, filePath)) {
+      continue;
+    }
 
-  if (!changes.shouldCheck) {
-    logLine(
-      "[changeset-check] No workspace or releasable root changes detected. Skipping.",
-    );
-    process.exit(0);
+    const markdownContent = readRevisionFile(headSha, filePath);
+    const parsedNames = parseChangesetFrontmatter(markdownContent, filePath);
+    for (const packageName of parsedNames) {
+      names.add(packageName);
+    }
   }
 
-  if (!changes.changedPackagesOrApps && changes.changedReleasableRootFiles) {
-    logLine(
-      "[changeset-check] Only releasable root files changed. Skipping package changeset coverage.",
-    );
-    process.exit(0);
-  }
+  return names;
+}
 
-  const status = parseStatusOutput(baseSha);
-  const releases = Array.isArray(status?.releases) ? status.releases : [];
-  const releasePackages = new Set(
-    releases
-      .flatMap((entry) => {
-        const names = [];
-        if (entry.name) {
-          names.push(entry.name);
-        }
-        if (entry.packageName) {
-          names.push(entry.packageName);
-        }
-        if (entry.pkgName) {
-          names.push(entry.pkgName);
-        }
-        if (entry.pkgDir && entry.pkgDir.startsWith("packages/")) {
-          const manifestPath = path.join(
-            process.cwd(),
-            entry.pkgDir,
-            "package.json",
-          );
-          if (existsSync(manifestPath)) {
-            const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-            if (manifest.name) {
-              names.push(manifest.name);
-            }
-          }
-        }
-        if (entry.package && entry.package.name) {
-          names.push(entry.package.name);
-        }
-        return names;
-      })
-      .filter(Boolean),
-  );
-
-  const changedPackageNames = touchedWorkspacePackages(changedFiles);
+export function evaluateCoverage({
+  changedFiles,
+  changes,
+  changedPackageNames,
+  changesetPackageNames,
+  exemptPackages,
+  exemptLabel,
+  hasExemptLabel,
+}) {
   const changedPackageList = [...changedPackageNames].sort();
   const touchedAllowlistedPackages = changedPackageList.filter((name) =>
     exemptPackages.has(name),
   );
 
   if (hasExemptLabel && touchedAllowlistedPackages.length === 0) {
-    const allowlist = exemptPackageList.length
-      ? exemptPackageList.join(", ")
-      : "(none configured)";
-    failLine(
-      `[changeset-check] "${exemptLabel}" label is only valid for allowlisted packages: ${allowlist}`,
-    );
-    process.exit(1);
+    const allowlist = [...exemptPackages].sort();
+    return {
+      ok: false,
+      missing: [],
+      errors: [
+        `[changeset-check] "${exemptLabel}" label is only valid for allowlisted packages: ${allowlist.length ? allowlist.join(", ") : "(none configured)"}`,
+      ],
+      infos: [],
+    };
   }
 
-  if (changedPackageNames.size > 0) {
-    const missing = changedPackageList.filter(
-      (name) => !releasePackages.has(name),
-    );
+  const missing = changedPackageList.filter(
+    (name) => !changesetPackageNames.has(name),
+  );
 
-    if (missing.length > 0) {
-      const nonAllowlistedMissing = missing.filter(
-        (name) => !exemptPackages.has(name),
-      );
-      if (nonAllowlistedMissing.length > 0) {
-        failLine(
+  if (missing.length > 0) {
+    const nonAllowlistedMissing = missing.filter(
+      (name) => !exemptPackages.has(name),
+    );
+    if (nonAllowlistedMissing.length > 0) {
+      return {
+        ok: false,
+        missing,
+        errors: [
           `[changeset-check] Missing changeset coverage for: ${nonAllowlistedMissing.join(", ")}`,
-        );
-        failLine(`Changed files: ${changedFiles.join(", ")}`);
-        process.exit(1);
-      }
+          `Changed files: ${changedFiles.join(", ")}`,
+        ],
+        infos: [],
+      };
+    }
 
-      if (!hasExemptLabel) {
-        failLine(
+    if (!hasExemptLabel) {
+      return {
+        ok: false,
+        missing,
+        errors: [
           `[changeset-check] Missing changeset coverage for allowlisted package(s): ${missing.join(", ")}`,
-        );
-        failLine(
           `[changeset-check] Add a .changeset file or apply the "${exemptLabel}" PR label.`,
-        );
-        process.exit(1);
-      }
+        ],
+        infos: [],
+      };
+    }
 
-      logLine(
+    return {
+      ok: true,
+      missing,
+      errors: [],
+      infos: [
         `[changeset-check] Exemption label "${exemptLabel}" accepted for allowlisted package(s): ${missing.join(", ")}`,
-      );
-    }
+      ],
+    };
   }
 
-  if (!releases.length) {
-    const onlyAllowlistedPackagesChanged =
-      changedPackageList.length > 0 &&
-      changedPackageList.every((name) => exemptPackages.has(name));
-    const canSkipChangeset =
-      changes.changedPackagesOrApps &&
-      onlyAllowlistedPackagesChanged &&
-      hasExemptLabel;
-
-    if (!canSkipChangeset) {
-      failLine(
+  if (
+    changes.changedReleasableRootFiles &&
+    changedPackageList.length === 0 &&
+    changesetPackageNames.size === 0
+  ) {
+    return {
+      ok: false,
+      missing: [],
+      errors: [
         "[changeset-check] No pending releases found. Add a .changeset file for changed package/app paths.",
-      );
-      process.exit(1);
+      ],
+      infos: [],
+    };
+  }
+
+  return {
+    ok: true,
+    missing: [],
+    errors: [],
+    infos: [],
+  };
+}
+
+function resolveBaseAndHeadRefs() {
+  const envBaseSha = (process.env.BASE_SHA || "").trim();
+  const envHeadSha = (process.env.HEAD_SHA || "").trim();
+  let baseSha = envBaseSha;
+  let headSha = envHeadSha;
+
+  if (!isValidRevision(headSha)) {
+    try {
+      headSha = execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
+    } catch {
+      headSha = "";
     }
   }
 
-  logLine("[changeset-check] Changeset coverage looks valid.");
-  process.exit(0);
-} catch (error) {
-  failLine(`[changeset-check] ${error.message || "Command failed"}`);
-  process.exit(1);
+  if (!isValidRevision(baseSha)) {
+    try {
+      baseSha = execSync("git merge-base origin/main HEAD", {
+        encoding: "utf8",
+      }).trim();
+    } catch {
+      baseSha = "";
+    }
+  }
+
+  return { baseSha, headSha };
+}
+
+function listChangedFiles(baseSha, headSha) {
+  const diffOutput = execSync(`git diff --name-only ${baseSha}...${headSha}`, {
+    encoding: "utf8",
+  });
+
+  return diffOutput
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+export function runChangesetCoverageCheck() {
+  const debugEnabled = process.env.CHANGESET_CHECK_DEBUG === "1";
+  const exemptLabel = (
+    process.env.CHANGESET_EXEMPT_LABEL || "changeset-exempt"
+  ).trim();
+  const exemptPackages = parseCsvSet(
+    process.env.CHANGESET_EXEMPT_PACKAGES || "@fodmap/mobile-prototype",
+  );
+  const prLabels = readPrLabels();
+  const hasExemptLabel = Boolean(exemptLabel) && prLabels.has(exemptLabel);
+
+  const { baseSha, headSha } = resolveBaseAndHeadRefs();
+  if (
+    !baseSha ||
+    !headSha ||
+    !isValidRevision(baseSha) ||
+    !isValidRevision(headSha)
+  ) {
+    failLine(
+      "[changeset-check] Unable to resolve required git refs for changeset validation.",
+    );
+    return 1;
+  }
+
+  try {
+    const changedFiles = listChangedFiles(baseSha, headSha);
+
+    const changes = hasWorkspaceOrReleasableChanges(changedFiles);
+    debugLine(debugEnabled, `base_sha=${baseSha}`);
+    debugLine(debugEnabled, `head_sha=${headSha}`);
+
+    if (!changes.shouldCheck) {
+      debugLine(debugEnabled, "changed_packages=(none)");
+      debugLine(debugEnabled, "changed_changeset_files=(none)");
+      debugLine(debugEnabled, "changeset_packages=(none)");
+      debugLine(debugEnabled, "missing_packages=(none)");
+      logLine(
+        "[changeset-check] No workspace or releasable root changes detected. Skipping.",
+      );
+      return 0;
+    }
+
+    const changedPackageNames = touchedWorkspacePackages(changedFiles, headSha);
+    const changedChangesetFiles = listChangedChangesetFiles(changedFiles);
+    const changesetPackageNames = collectChangesetPackageNames(
+      changedChangesetFiles,
+      headSha,
+    );
+
+    const result = evaluateCoverage({
+      changedFiles,
+      changes,
+      changedPackageNames,
+      changesetPackageNames,
+      exemptPackages,
+      exemptLabel,
+      hasExemptLabel,
+    });
+
+    debugLine(
+      debugEnabled,
+      `changed_packages=${[...changedPackageNames].sort().join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `changed_changeset_files=${changedChangesetFiles.join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `changeset_packages=${[...changesetPackageNames].sort().join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `missing_packages=${result.missing.join(", ") || "(none)"}`,
+    );
+
+    for (const message of result.infos) {
+      logLine(message);
+    }
+    if (!result.ok) {
+      for (const message of result.errors) {
+        failLine(message);
+      }
+      return 1;
+    }
+
+    logLine("[changeset-check] Changeset coverage looks valid.");
+    return 0;
+  } catch (error) {
+    failLine(`[changeset-check] ${error.message || "Command failed"}`);
+    return 1;
+  }
+}
+
+function main() {
+  const exitCode = runChangesetCoverageCheck();
+  process.exit(exitCode);
+}
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  main();
 }

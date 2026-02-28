@@ -31,6 +31,7 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-prototype-alt-prototype-v3` | `codex/mobile-prototype-alt-prototype-v3`    | active             | Mobile prototype alt iteration v3          | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-research-realignment`       | `codex/mobile-research-realignment`          | active (to split)  | Mobile research + ADR + implementation     | Planned split into dedicated worktrees by scope. |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`              | active             | Revolut research reporting                 | In progress.                                     |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`     | active             | Deterministic changeset gate remediation   | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`              | active             | Turbo audit remediation                    | Cache correctness, CI cache, PR scope, scripts.  |
 
 ## On-Hold Remote Track
