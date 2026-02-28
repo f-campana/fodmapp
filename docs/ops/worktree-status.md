@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-02-27
+Last reviewed: 2026-02-28
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,9 +15,10 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                       | Status             | Scope                                      | Notes / blockers                                 |
 | ----------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | ------------------------------------------ | ------------------------------------------------ |
 | `/Users/fabiencampana/Documents/Fodmap`                                             | `main`                                       | active (protected) | Main integration worktree only             | Must remain clean.                               |
+| `/Users/fabiencampana/Documents/Fodmap-changesets-preflight-hotfix`                 | `codex/changesets-preflight-403-hotfix`      | active             | Changesets release preflight 403 hotfix    | Fix false-fail on main release workflow.         |
 | `/Users/fabiencampana/Documents/Fodmap-barcode-v1`                                  | `codex/barcode-feature-v1`                   | on-hold            | Barcode prototype feature                  | Postponed.                                       |
 | `/Users/fabiencampana/Documents/Fodmap-ci-skill-policy-gate`                        | `codex/ci-skill-policy-gate`                 | active             | CI linting policy hardening                | In progress.                                     |
-| `/Users/fabiencampana/Documents/Fodmap-ci-workflow-hardening`                       | `codex/ci-workflow-hardening`                | active             | CI workflow hardening and gate determinism | In progress.                                     |
+| `/Users/fabiencampana/Documents/Fodmap-ci-workflow-hardening`                       | `codex/ci-workflow-hardening`                | merged             | CI workflow hardening and gate determinism | Merged via PR #90; keep until cleanup decision.  |
 | `/Users/fabiencampana/Documents/Fodmap-design-system-skill-pilot`                   | `codex/design-system-skill-pilot`            | active             | Design system skill pilot                  | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-reporting-plan`                              | `codex/phase2-reporting-implementation-plan` | active             | Phase 2 reporting implementation plan      | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-unknown-fodmap-research`                     | `codex/unknown-fodmap-research`              | active             | Unknown FODMAP research                    | In progress.                                     |
