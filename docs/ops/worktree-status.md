@@ -42,10 +42,10 @@ Source of truth: team operational state (live, update as status changes)
 4. Root cause 3 confirmed: lint did not enforce SQL `_contract_refs` parity against policy allowlist.
 5. Active remediation branch intent: deliver hotfix on `codex/phase2-reporting-baseline-remediation` from `main` with no force-push and merge after green checks.
 6. Closure criteria:
-1. `Phase 2 Reporting` full lane green on merge commit to `main`.
-2. Semantic baseline compare drift count is `0` on `main`.
-3. Lint hard-fails on SQL allowlist drift and fixture-origin baseline provenance mismatch.
-4. Post-merge workflow watch completed for `Phase 2 Reporting`, `API`, `CI`, and `Changesets release`.
+7. `Phase 2 Reporting` full lane green on merge commit to `main`.
+8. Semantic baseline compare drift count is `0` on `main`.
+9. Lint hard-fails on SQL allowlist drift and fixture-origin baseline provenance mismatch.
+10. Post-merge workflow watch completed for `Phase 2 Reporting`, `API`, `CI`, and `Changesets release`.
 
 ## On-Hold Remote Track
 

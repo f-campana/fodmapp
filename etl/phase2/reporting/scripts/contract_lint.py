@@ -413,7 +413,10 @@ def validate_baseline_provenance_for_full_lane(baseline: Dict[str, Any], workflo
         and "--compare-scope semantic" in full_run_joined
     )
     if full_lane_uses_db_semantic_compare and source_db_ref.startswith("fixture://"):
-        fail("baseline provenance invalid: fixture-origin baseline is not allowed when full-run semantic compare is DB-based")
+        fail(
+            "baseline provenance invalid: fixture-origin baseline is not allowed "
+            "when full-run semantic compare is DB-based"
+        )
 
 
 def validate_api_sql_rank2_contract(repo_root: pathlib.Path) -> None:
