@@ -29,6 +29,9 @@ jobs:
     name: eslint
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -84,6 +87,11 @@ jobs:
       app_scaffold: ${{ steps.scope.outputs.app_scaffold }}
       content_scaffolds: ${{ steps.scope.outputs.content_scaffolds }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -107,6 +115,9 @@ jobs:
     name: openapi-types
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -127,6 +138,9 @@ jobs:
     if: ${{ needs.pr-scope.outputs.design_tokens == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -165,6 +179,9 @@ jobs:
     if: ${{ needs.pr-scope.outputs.ui_foundation == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -223,6 +240,9 @@ jobs:
     if: ${{ needs.pr-scope.outputs.app_scaffold == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
@@ -259,6 +279,9 @@ jobs:
     if: ${{ needs.pr-scope.outputs.content_scaffolds == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Setup workspace
         id: setup
         uses: ./.github/actions/setup-js-workspace
