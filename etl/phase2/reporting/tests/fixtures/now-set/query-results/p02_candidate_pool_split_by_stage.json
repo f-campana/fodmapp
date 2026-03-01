@@ -11,7 +11,6 @@
   "fixture_id": "P-02",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
     "etl/phase2/sql/phase2_fructan_wave01_checks.sql": "sha256:6ca454f9ff037ffd3c38fb81bfddb0677217131b04aa7279fde3bbc1bd70c1a3",
     "etl/phase2/sql/phase2_fructan_wave02_checks.sql": "sha256:d64e25e14880955033a52c4bf78c16f7b5aabebe8f41abd5f1ac3a9c1aac7d95",
     "etl/phase2/sql/phase2_gos_wave01_checks.sql": "sha256:e2f94d8ab521ffceeb65d337c875fe13f7d72238747e080a7a1850d978c44d2d",

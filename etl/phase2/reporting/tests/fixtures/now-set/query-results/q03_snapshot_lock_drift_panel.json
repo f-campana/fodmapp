@@ -1,7 +1,7 @@
 {
   "contract_refs": [
-    "etl/phase3/sql/phase3_swap_activation_apply.sql",
-    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md"
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md",
+    "etl/phase3/sql/phase3_swap_activation_apply.sql"
   ],
   "figure_id": "Q-03_snapshot_lock_drift_panel",
   "fixture_id": "Q-03",
@@ -13,9 +13,9 @@
   "source_rows": {
     "approve_for_ineligible_rows": 0,
     "auto_eligible_mismatch_rows": 0,
-    "fodmap_safety_score_snapshot_actual": "0.500",
-    "reviewed_snapshot_rows": 8,
-    "scoring_version_snapshot_actual": "v3.1b",
+    "fodmap_safety_score_snapshot_actual": "0.390",
+    "reviewed_snapshot_rows": 12,
+    "scoring_version_snapshot_actual": "v2_full_rollup_2026_02_18",
     "snapshot_mismatch_rows": 0
   }
 }

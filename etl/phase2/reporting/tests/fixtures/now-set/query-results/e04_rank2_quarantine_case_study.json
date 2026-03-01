@@ -1,7 +1,7 @@
 {
   "contract_refs": [
-    "etl/phase2/sql/phase2_post_quarantine_checks.sql",
-    "etl/phase2/sql/phase2_post_batch10_checks.sql"
+    "etl/phase2/sql/phase2_post_batch10_checks.sql",
+    "etl/phase2/sql/phase2_post_quarantine_checks.sql"
   ],
   "figure_id": "E-04_rank2_quarantine_case_study",
   "fixture_id": "E-04",
