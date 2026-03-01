@@ -28,6 +28,8 @@ Status definitions:
 | ADR-014 | Keep strict second-review policy (no waiver)                               | Implemented | Enforced by batch activation SQL checks; deferred queue tracked in issue #26                                              |
 | ADR-015 | Architecture track should avoid collisions with data-engine track          | Accepted    | Worktree isolation and scoped PRs                                                                                         |
 | ADR-016 | Data-engine pause after Batch C due second-review bottleneck               | Implemented | Batch04 probe shows 0 single-review candidates; issue #26 remains sole open blocker                                       |
+| ADR-017 | Security & encryption architecture for mobile offline/online architecture  | Implemented | Source-of-truth backend with encrypted local store concepts, signed offline queue contracts, and deletion/export workflow controls now implemented in production-facing paths |
+| ADR-017b | Security launch-blocking implementation spec for consent evidence, export/delete, and queue integrity | Implemented | Adds production-grade API + DB contracts for immutable consent ledger, deletion/export proofs, queue replay/tamper defenses, and P1 evidence gating |
 
 ## Open Timing Decisions
 
