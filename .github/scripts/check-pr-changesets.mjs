@@ -201,11 +201,20 @@ function touchedWorkspacePackages(files, headSha) {
 }
 
 export function listChangedChangesetFiles(files) {
-  return files
-    .filter(
-      (filePath) =>
-        filePath.startsWith(".changeset/") && filePath.endsWith(".md"),
-    )
+  return files.filter(isChangesetManifestMarkdown).sort();
+}
+
+export function isChangesetManifestMarkdown(filePath) {
+  return (
+    filePath.startsWith(".changeset/") &&
+    filePath.endsWith(".md") &&
+    filePath !== ".changeset/README.md"
+  );
+}
+
+function listAllChangesetFiles(headSha) {
+  return listRevisionFiles(headSha, [".changeset"])
+    .filter(isChangesetManifestMarkdown)
     .sort();
 }
 
@@ -570,8 +579,87 @@ export function runChangesetCoverageCheck() {
   }
 }
 
+export function runChangesetFullLint() {
+  const debugEnabled = process.env.CHANGESET_CHECK_DEBUG === "1";
+  const { headSha } = resolveBaseAndHeadRefs();
+  if (!headSha || !isValidRevision(headSha)) {
+    failLine(
+      "[changeset-check] Unable to resolve required git refs for changeset validation.",
+    );
+    return 1;
+  }
+
+  try {
+    const workspacePackageNames = listWorkspacePackageNames(headSha);
+    const allChangesetFiles = listAllChangesetFiles(headSha);
+    const changesetPackages = collectChangesetPackages(
+      allChangesetFiles,
+      headSha,
+    );
+    const unknownChangesetPackages = findUnknownChangesetPackages(
+      changesetPackages.packageSources,
+      workspacePackageNames,
+    );
+
+    debugLine(debugEnabled, "mode=all");
+    debugLine(debugEnabled, `head_sha=${headSha}`);
+    debugLine(
+      debugEnabled,
+      `all_changeset_files=${allChangesetFiles.join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `workspace_package_count=${workspacePackageNames.size}`,
+    );
+    debugLine(
+      debugEnabled,
+      `changeset_packages=${[...changesetPackages.names].sort().join(", ") || "(none)"}`,
+    );
+    debugLine(
+      debugEnabled,
+      `unknown_changeset_packages=${unknownChangesetPackages.map((entry) => entry.packageName).join(", ") || "(none)"}`,
+    );
+
+    if (unknownChangesetPackages.length > 0) {
+      failLine(
+        `[changeset-check] Unknown package(s) in .changeset frontmatter: ${unknownChangesetPackages.map((entry) => entry.packageName).join(", ")}`,
+      );
+      for (const entry of unknownChangesetPackages) {
+        failLine(
+          `[changeset-check] ${entry.packageName} declared in: ${entry.sourceFiles.join(", ")}`,
+        );
+      }
+      debugLine(debugEnabled, "decision=fail_unknown_changeset_packages");
+      return 1;
+    }
+
+    logLine("[changeset-check] Full changeset lint looks valid.");
+    return 0;
+  } catch (error) {
+    failLine(`[changeset-check] ${error.message || "Command failed"}`);
+    return 1;
+  }
+}
+
+export function parseModeFromArgs(argv) {
+  if (argv.length === 0) {
+    return "coverage";
+  }
+  if (argv.length === 1 && argv[0] === "--all") {
+    return "all";
+  }
+  failLine(`[changeset-check] unsupported arguments: ${argv.join(" ")}`);
+  failLine("Usage: node .github/scripts/check-pr-changesets.mjs [--all]");
+  return null;
+}
+
 function main() {
-  const exitCode = runChangesetCoverageCheck();
+  const mode = parseModeFromArgs(process.argv.slice(2));
+  if (!mode) {
+    process.exit(2);
+  }
+  const exitCode =
+    mode === "all" ? runChangesetFullLint() : runChangesetCoverageCheck();
   process.exit(exitCode);
 }
 

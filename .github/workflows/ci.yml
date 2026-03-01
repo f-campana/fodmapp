@@ -136,7 +136,7 @@ jobs:
 
       - name: Verify OpenAPI generated types are up to date
         run: |
-          pnpm exec turbo run openapi:check --filter=@fodmap/types
+          pnpm --filter @fodmap/types openapi:check
 
   design-tokens:
     name: design-tokens

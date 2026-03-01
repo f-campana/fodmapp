@@ -41,6 +41,7 @@ feat(schema): add source confidence index
    - `./.github/scripts/quality-gate.sh --full`
    - `pnpm lint:ci` for warning-fail-fast PR validation (already included in `--full`)
    - `pnpm lint:llm` for LLM-authored code (warnings as hard failures in CI for `lint:llm:ci`)
+   - `pnpm changeset:ci:lint:all` to validate all `.changeset/*.md` frontmatter package names against workspace manifests
    - `./.github/scripts/ci-api-pr.sh` for API changes needing seeded integration parity with CI
 5. Changesets policy:
    - Default: if `apps/*` or `packages/*` changed, include a `.changeset/*.md` entry.
@@ -54,6 +55,8 @@ feat(schema): add source confidence index
    - Heavy Turbo jobs are PR-scoped via `pr-scope` and may show as `skipped`; the `CI` gate treats scoped `skipped` jobs as acceptable.
 
 Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are blocked until `./.github/scripts/quality-gate.sh --full` passes (delete-only pushes are skipped).
+After branch/worktree sync, run `pnpm install` before pushing.
+The pre-push full quality gate runs monorepo-wide checks, not only changed-package scopes.
 
 ## Root Command Contract
 

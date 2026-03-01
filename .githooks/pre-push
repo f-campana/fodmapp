@@ -23,6 +23,25 @@ if [[ "$has_updates" == "true" && "$delete_only" == "true" ]]; then
   exit 0
 fi
 
+gate_log="$(mktemp)"
+cleanup() {
+  rm -f "$gate_log"
+}
+trap cleanup EXIT
+
 printf '[HOOK] Running full quality gate before push...\n'
-"$repo_root/.github/scripts/quality-gate.sh" --full
-printf '[HOOK] Full quality gate passed.\n'
+if "$repo_root/.github/scripts/quality-gate.sh" --full 2>&1 | tee "$gate_log"; then
+  printf '[HOOK] Full quality gate passed.\n'
+  exit 0
+fi
+
+failure_scope="lint/type/test phase"
+if grep -Eq "\\[FAIL\\] dependency preflight \\(pnpm install --frozen-lockfile --prefer-offline\\)" "$gate_log"; then
+  failure_scope="dependency preflight"
+elif grep -Eq "\\[FAIL\\] changeset full-repository lint|\\[FAIL\\] changeset coverage check" "$gate_log"; then
+  failure_scope="changeset coverage/lint"
+fi
+
+printf '[HOOK][FAIL] Full quality gate failed during: %s\n' "$failure_scope" >&2
+printf '[HOOK][FAIL] Resolve the reported step and retry push.\n' >&2
+exit 1
