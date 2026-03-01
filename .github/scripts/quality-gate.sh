@@ -51,6 +51,9 @@ required_files=(
   ".githooks/commit-msg"
   ".github/scripts/check-pr-changesets.mjs"
   ".github/scripts/check-pr-changesets.test.mjs"
+  ".github/scripts/ci-scope-rules.mjs"
+  ".github/scripts/detect-changeset-pr-scope.mjs"
+  ".github/scripts/detect-changeset-pr-scope.test.mjs"
   ".github/scripts/detect-ci-scope.mjs"
   ".github/scripts/detect-ci-scope.test.mjs"
 )
@@ -79,6 +82,9 @@ done
 run_cmd "commit-msg hook syntax" bash -n .githooks/commit-msg
 run_cmd "changeset checker syntax" node --check .github/scripts/check-pr-changesets.mjs
 run_cmd "changeset checker tests syntax" node --check .github/scripts/check-pr-changesets.test.mjs
+run_cmd "changeset scope rules syntax" node --check .github/scripts/ci-scope-rules.mjs
+run_cmd "changeset scope detector syntax" node --check .github/scripts/detect-changeset-pr-scope.mjs
+run_cmd "changeset scope detector tests syntax" node --check .github/scripts/detect-changeset-pr-scope.test.mjs
 run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mjs
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
 run_cmd "reporting python script syntax" python3 -m py_compile \
@@ -108,6 +114,7 @@ if [[ "$run_full" == "true" ]]; then
   run_cmd "changeset full-repository lint" pnpm changeset:ci:lint:all
   run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
   run_cmd "CI scope tests" pnpm ci:scope:test
+  run_cmd "changeset scope detector tests" node --test .github/scripts/detect-changeset-pr-scope.test.mjs
   run_cmd "openapi check" pnpm --filter @fodmap/types openapi:check
   run_cmd "design token check" pnpm tokens:check
   run_cmd "tailwind style check" pnpm tailwind:styles:check

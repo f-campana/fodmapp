@@ -32,14 +32,17 @@ This document defines environment variables used across the current Python/SQL s
 
 ## CI Turborepo Cache Variables
 
-These keys are optional and used only by `.github/workflows/ci.yml` Turbo-scoped jobs.
+These keys are optional and used by `.github/workflows/ci.yml` Turbo-scoped jobs via the
+`.github/actions/setup-js-workspace` composite action.
 
 | Variable      | Used by                    | Required | Default/Example     | Notes                                                      |
 | ------------- | -------------------------- | -------- | ------------------- | ---------------------------------------------------------- |
 | `TURBO_TEAM`  | `.github/workflows/ci.yml` | no       | Vercel team slug    | Enables Turbo remote cache when paired with `TURBO_TOKEN`. |
 | `TURBO_TOKEN` | `.github/workflows/ci.yml` | no       | Vercel access token | Enables Turbo remote cache when paired with `TURBO_TEAM`.  |
 
-When either key is missing, CI automatically falls back to local `.turbo` cache restore/save steps.
+When both keys are present, `.github/actions/setup-js-workspace` exports them into the job
+environment and remote cache is enabled for Turbo tasks in that job. When either key is missing,
+CI automatically falls back to local `.turbo` cache restore/save steps.
 
 CI Turbo command policy:
 
@@ -89,5 +92,7 @@ These keys are now actively consumed by `apps/app` runtime adapters. All integra
 ## Operational Notes
 
 - `.env.example` is a contract template and should remain credential-free.
-- CI remains explicit via workflow `env` blocks; this file is documentation and local bootstrap aid.
+- Workflow-level secrets are usually passed through workflow inputs to `.github/actions/setup-js-workspace`,
+  which handles cache mode selection and environment export for Turbo commands.
+- CI remains explicit via workflow `env` blocks and/or action inputs; this file is documentation and local bootstrap aid.
 - Any newly introduced runtime variable must be added to both `.env.example` and this document in the same PR.

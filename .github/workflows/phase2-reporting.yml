@@ -70,9 +70,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install lint dependencies
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Collect now-set figures from fixtures
         run: |
           python etl/phase2/reporting/scripts/collect_reporting.py \
@@ -132,9 +132,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install compare dependencies
@@ -169,18 +169,15 @@ jobs:
       (github.event_name == 'workflow_dispatch' && github.event.inputs.baseline_update != 'true' && github.event.inputs.render_baseline_update != 'true' && github.event.inputs.force_full_run != 'true')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup reporting workspace
+        id: setup
+        uses: ./.github/actions/setup-js-workspace
         with:
           node-version: "22"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.29.3
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: "10.29.3"
+          checkout-depth: "1"
+          install-command: "pnpm install --frozen-lockfile"
+          enable-turbo-cache: "false"
       - name: Download now-set artifacts
         uses: actions/download-artifact@v4
         with:
@@ -248,21 +245,21 @@ jobs:
       PSQL_BIN: psql
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup reporting workspace
+        id: setup
+        uses: ./.github/actions/setup-js-workspace
         with:
           node-version: "22"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.29.3
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          checkout-depth: "0"
+          skip-checkout: "true"
+          enable-turbo-cache: "false"
       - name: Install system PostgreSQL client
         run: |
           sudo apt-get update
@@ -368,21 +365,21 @@ jobs:
       PSQL_BIN: psql
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup reporting workspace
+        id: setup
+        uses: ./.github/actions/setup-js-workspace
         with:
           node-version: "22"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.29.3
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          checkout-depth: "0"
+          skip-checkout: "true"
+          enable-turbo-cache: "false"
       - name: Enforce explicit approval
         run: |
           if [ "${{ github.event.inputs.render_baseline_update }}" == "true" ]; then
@@ -513,21 +510,21 @@ jobs:
       PSQL_BIN: psql
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup reporting workspace
+        id: setup
+        uses: ./.github/actions/setup-js-workspace
         with:
           node-version: "22"
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.29.3
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          checkout-depth: "0"
+          skip-checkout: "true"
+          enable-turbo-cache: "false"
       - name: Enforce explicit approval
         run: |
           if [ "${{ github.event.inputs.baseline_update }}" == "true" ]; then
