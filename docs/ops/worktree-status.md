@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-02-28
+Last reviewed: 2026-03-01
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -33,6 +33,19 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`           | active             | Revolut research reporting                 | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`  | active             | Deterministic changeset gate remediation   | In progress.                                     |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`           | active             | Turbo audit remediation                    | Cache correctness, CI cache, PR scope, scripts.  |
+
+## Incident Timeline: Phase2 Reporting Full-Lane Drift (2026-03-01)
+
+1. `main` turned red on `Phase 2 Reporting` full lane semantic baseline compare (run `22532137353`).
+2. Root cause 1 confirmed: reporting SQL used `polyol_split` where contract truth is `polyol_split_needed`.
+3. Root cause 2 confirmed: committed now baseline provenance was fixture-origin/stale relative to DB full-lane output.
+4. Root cause 3 confirmed: lint did not enforce SQL `_contract_refs` parity against policy allowlist.
+5. Active remediation branch intent: deliver hotfix on `codex/phase2-reporting-baseline-remediation` from `main` with no force-push and merge after green checks.
+6. Closure criteria:
+1. `Phase 2 Reporting` full lane green on merge commit to `main`.
+2. Semantic baseline compare drift count is `0` on `main`.
+3. Lint hard-fails on SQL allowlist drift and fixture-origin baseline provenance mismatch.
+4. Post-merge workflow watch completed for `Phase 2 Reporting`, `API`, `CI`, and `Changesets release`.
 
 ## On-Hold Remote Track
 

@@ -115,3 +115,5 @@ Configure `main` to require these checks:
 - superseded PR runs are canceled
 
 11. Confirm the next eligible `Changesets release` run can create/update its PR using native token settings.
+12. Before merging any hotfix touching CI, reporting, release, or workflow logic, check for open mergeable changeset/release PRs and record disposition (merge, retarget, or intentionally defer).
+13. After merging to `main`, watch these workflows to completion before closing the incident: `Phase 2 Reporting`, `API`, `CI`, `Changesets release`.

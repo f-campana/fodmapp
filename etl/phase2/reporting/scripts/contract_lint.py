@@ -2,7 +2,9 @@
 import argparse
 import json
 import pathlib
+import re
 import sys
+from collections import Counter
 from typing import Any, Dict, Iterable, List, Set
 
 import yaml
@@ -54,6 +56,9 @@ REQUIRED_RENDER_ALLOW_WRITES = {
     "etl/phase2/reporting/contracts/baselines/render/**/*.json",
 }
 
+CONTRACT_REFS_BLOCK_RE = re.compile(r"'_contract_refs'\s*,\s*jsonb_build_array\s*\((.*?)\)", re.IGNORECASE | re.DOTALL)
+SINGLE_QUOTED_LITERAL_RE = re.compile(r"'([^']+)'")
+
 
 class LintError(Exception):
     pass
@@ -97,6 +102,9 @@ def validate_policy(policy: Dict[str, Any]) -> None:
     allowed_files = allowed_inputs.get("files")
     if not isinstance(allowed_files, list) or not all(isinstance(x, str) for x in allowed_files):
         fail("policy.allowed_inputs.files must be a string list")
+    duplicates = sorted([item for item, count in Counter(allowed_files).items() if count > 1])
+    if duplicates:
+        fail(f"policy.allowed_inputs.files contains duplicates: {duplicates}")
 
     parser = policy.get("parser")
     if not isinstance(parser, dict):
@@ -364,6 +372,50 @@ def validate_workflow(workflow: Dict[str, Any]) -> None:
         fail("render-baseline-update job must enforce mutual exclusion against baseline_update")
 
 
+def _extract_sql_contract_refs(sql_text: str) -> List[str]:
+    refs: List[str] = []
+    for block in CONTRACT_REFS_BLOCK_RE.findall(sql_text):
+        refs.extend(SINGLE_QUOTED_LITERAL_RE.findall(block))
+    return refs
+
+
+def validate_sql_contract_refs_against_policy(repo_root: pathlib.Path, policy: Dict[str, Any]) -> None:
+    allowed_inputs = policy.get("allowed_inputs", {})
+    allowed_files = allowed_inputs.get("files", [])
+    allowed_set = set(allowed_files)
+    sql_dir = repo_root / "etl/phase2/reporting/sql"
+    sql_files = sorted(sql_dir.glob("*.sql"))
+    if not sql_files:
+        fail(f"no SQL files found under {sql_dir}")
+
+    unknown_refs: List[str] = []
+    for sql_path in sql_files:
+        sql_text = sql_path.read_text(encoding="utf-8")
+        for ref in _extract_sql_contract_refs(sql_text):
+            if ref not in allowed_set:
+                unknown_refs.append(f"{sql_path.relative_to(repo_root)} -> {ref}")
+
+    if unknown_refs:
+        fail(f"reporting SQL _contract_refs outside policy allowlist: {sorted(set(unknown_refs))}")
+
+
+def validate_baseline_provenance_for_full_lane(baseline: Dict[str, Any], workflow: Dict[str, Any]) -> None:
+    source_db_ref = baseline.get("source_db_ref")
+    if not isinstance(source_db_ref, str) or not source_db_ref:
+        fail("baseline source_db_ref must be non-empty string")
+
+    jobs = workflow.get("jobs") or {}
+    full_steps = (jobs.get("full-run") or {}).get("steps") or []
+    full_run_joined = "\n".join(step.get("run", "") for step in full_steps if isinstance(step, dict))
+    full_lane_uses_db_semantic_compare = (
+        "--source db" in full_run_joined
+        and "compare_baselines.py" in full_run_joined
+        and "--compare-scope semantic" in full_run_joined
+    )
+    if full_lane_uses_db_semantic_compare and source_db_ref.startswith("fixture://"):
+        fail("baseline provenance invalid: fixture-origin baseline is not allowed when full-run semantic compare is DB-based")
+
+
 def validate_api_sql_rank2_contract(repo_root: pathlib.Path) -> None:
     api_sql_path = repo_root / "api/app/sql.py"
     if not api_sql_path.exists():
@@ -431,6 +483,8 @@ def main() -> int:
         )
         validate_fixtures(fixtures_dir)
         validate_workflow(workflow)
+        validate_sql_contract_refs_against_policy(repo_root, policy)
+        validate_baseline_provenance_for_full_lane(baseline, workflow)
         validate_render_manifest(repo_root, policy)
         validate_api_sql_rank2_contract(repo_root)
 
