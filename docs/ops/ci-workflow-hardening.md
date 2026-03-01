@@ -12,6 +12,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - PR-scoped Turbo CI execution (`pr-scope`) for heavy jobs
 - Turbo cache mode selection: remote cache when configured, `.turbo` restore/save fallback when not
 - strict local Turbo binary invocation in CI via `pnpm exec turbo run ...`
+- centralized workspace setup and cache orchestration through `.github/actions/setup-js-workspace`
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 
 ## Phase 2 Reporting Gate Mode
@@ -107,6 +108,10 @@ Turbo cache behavior for scoped jobs:
 
 - if both `TURBO_TEAM` and `TURBO_TOKEN` are present, Turbo remote caching is used
 - otherwise, CI restores/saves local `.turbo` cache using `actions/cache/restore@v4` and `actions/cache/save@v4`
+
+The composite action (`.github/actions/setup-js-workspace`) centralizes this selection logic and
+exports `TURBO_TEAM` / `TURBO_TOKEN` into the workspace step environment when both values are
+available, so downstream `turbo run` commands can use remote caching.
 
 Turbo command contract:
 

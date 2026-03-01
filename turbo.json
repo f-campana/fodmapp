@@ -36,6 +36,7 @@
       "outputs": []
     },
     "openapi:check": {
+      "cache": false,
       "outputs": []
     },
     "tokens:check": {
