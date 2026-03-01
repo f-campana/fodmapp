@@ -1,8 +1,8 @@
 {
   "contract_refs": [
+    "api/app/sql.py",
     "etl/phase2/sql/phase2_replay_final_checks.sql",
-    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql",
-    "api/app/sql.py"
+    "etl/phase3/sql/phase3_rollups_6subtype_checks.sql"
   ],
   "figure_id": "Q-02_critical_contract_scorecard",
   "fixture_id": "Q-02",

@@ -5,15 +5,15 @@ WITH rows_src AS (
     CASE
       WHEN gap_bucket = 'fructan_dominant' AND target_subtype = 'fructan' THEN 1
       WHEN gap_bucket = 'gos_dominant' AND target_subtype = 'gos' THEN 2
-      WHEN gap_bucket = 'polyol_split' AND target_subtype = 'sorbitol' THEN 3
-      WHEN gap_bucket = 'polyol_split' AND target_subtype = 'mannitol' THEN 4
+      WHEN gap_bucket = 'polyol_split_needed' AND target_subtype = 'sorbitol' THEN 3
+      WHEN gap_bucket = 'polyol_split_needed' AND target_subtype = 'mannitol' THEN 4
       ELSE 99
     END AS row_order,
     CASE
       WHEN gap_bucket = 'fructan_dominant' AND target_subtype = 'fructan' THEN 'fructan/fructan'
       WHEN gap_bucket = 'gos_dominant' AND target_subtype = 'gos' THEN 'gos/gos'
-      WHEN gap_bucket = 'polyol_split' AND target_subtype = 'sorbitol' THEN 'polyol/sorbitol'
-      WHEN gap_bucket = 'polyol_split' AND target_subtype = 'mannitol' THEN 'polyol/mannitol'
+      WHEN gap_bucket = 'polyol_split_needed' AND target_subtype = 'sorbitol' THEN 'polyol/sorbitol'
+      WHEN gap_bucket = 'polyol_split_needed' AND target_subtype = 'mannitol' THEN 'polyol/mannitol'
       ELSE gap_bucket || '/' || target_subtype
     END AS bucket,
     priority_rows,
@@ -26,7 +26,7 @@ WITH rows_src AS (
   FROM v_phase2_gap_completion
   WHERE (gap_bucket = 'fructan_dominant' AND target_subtype = 'fructan')
      OR (gap_bucket = 'gos_dominant' AND target_subtype = 'gos')
-     OR (gap_bucket = 'polyol_split' AND target_subtype IN ('sorbitol', 'mannitol'))
+     OR (gap_bucket = 'polyol_split_needed' AND target_subtype IN ('sorbitol', 'mannitol'))
 )
 SELECT jsonb_build_object(
   '_contract_refs', jsonb_build_array(

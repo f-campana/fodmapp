@@ -25,5 +25,5 @@
 <text class="label" x="36" y="252">invalid_rows_total</text>
 <rect x="36" y="258" width="3" height="16" fill="var(--fd-reporting-color-danger-strong, var(--fd-semantic-color-action-destructive-bg-hover))"/>
 <text class="value" x="47" y="271">0</text>
-<text class="subtitle" x="36" y="346">default_threshold_share=0.17</text>
+<text class="subtitle" x="36" y="346">default_threshold_share=0.83</text>
 </svg>

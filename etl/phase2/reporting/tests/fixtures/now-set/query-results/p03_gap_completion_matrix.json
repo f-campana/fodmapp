@@ -1,8 +1,8 @@
 {
   "contract_refs": [
-    "etl/phase2/sql/phase2_scaffold_views.sql",
+    "etl/phase2/sql/phase2_post_batch10_checks.sql",
     "etl/phase2/sql/phase2_replay_final_checks.sql",
-    "etl/phase2/sql/phase2_post_batch10_checks.sql"
+    "etl/phase2/sql/phase2_scaffold_views.sql"
   ],
   "figure_id": "P-03_gap_completion_matrix",
   "fixture_id": "P-03",
@@ -27,7 +27,7 @@
       {
         "bucket": "gos/gos",
         "completed_rows": 12,
-        "completion_ratio": 1,
+        "completion_ratio": 1.0,
         "pending_measurement_rows": 0,
         "priority_rows": 12,
         "readiness_gap": 0,
@@ -37,7 +37,7 @@
       {
         "bucket": "polyol/sorbitol",
         "completed_rows": 7,
-        "completion_ratio": 1,
+        "completion_ratio": 1.0,
         "pending_measurement_rows": 0,
         "priority_rows": 7,
         "readiness_gap": 0,
@@ -47,7 +47,7 @@
       {
         "bucket": "polyol/mannitol",
         "completed_rows": 6,
-        "completion_ratio": 1,
+        "completion_ratio": 1.0,
         "pending_measurement_rows": 0,
         "priority_rows": 6,
         "readiness_gap": 0,
@@ -55,7 +55,7 @@
         "unresolved_rows": 0
       }
     ],
-    "completion_ratio": 1,
+    "completion_ratio": 0.976,
     "readiness_gap": 1
   }
 }

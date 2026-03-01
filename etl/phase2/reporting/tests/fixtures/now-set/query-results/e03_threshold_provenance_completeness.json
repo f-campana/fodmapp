@@ -7,7 +7,7 @@
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a"
   },
   "source_rows": {
-    "default_threshold_share": 0.17,
+    "default_threshold_share": 0.83,
     "invalid_rows_total": 0,
     "invalid_threshold_source_rows": 0,
     "missing_default_threshold_citation_rows": 0

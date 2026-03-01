@@ -7,7 +7,7 @@ reporting_snapshot:
   write_mode: truncate_then_insert
 source_inputs:
   - path: etl/phase2/POD_WAVES_RUNBOOK.md
-    sha256: sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73
+    sha256: sha256:72b5bfbcc1f6de20702d928cf73f564e39146f3fa3ba58b4c6045e25fa5d4b43
   - path: etl/phase2/decisions/phase2_wave_manifest.csv
     sha256: sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e
   - path: etl/phase2/sql/phase2_replay_final_checks.sql

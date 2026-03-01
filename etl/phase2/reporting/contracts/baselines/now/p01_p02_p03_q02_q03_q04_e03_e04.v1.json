@@ -1,7 +1,7 @@
 {
   "artifact": {
     "out_path": "baseline://etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json",
-    "sha256": "sha256:08fa84b748daaa0f8ba518fa77c43a202871894e4f1ec89759600b1f530ad660"
+    "sha256": "sha256:cfbf4af78755b68e29aa28d336c3f50bf4a989ea2d8d6bb10b7e7479c04b7bcf"
   },
   "contract_version": "v1",
   "figures": [
@@ -9,13 +9,13 @@
       "artifact": {
         "path": "baseline://now/E-03_threshold_provenance_completeness.json",
         "row_count": 1,
-        "sha256": "sha256:b29153059cf407289f41b9c8e658b2f8826325c1ddd7a37bbea71c5364c37020"
+        "sha256": "sha256:b36a75f91b224482b4fc575c0dde194d2d68e2a9774c776b7be1946dc690938b"
       },
       "contract_refs": ["etl/phase3/sql/phase3_rollups_6subtype_checks.sql"],
       "figure_id": "E-03_threshold_provenance_completeness",
       "hard_gate": "pass",
       "metrics": {
-        "default_threshold_share": 0.17,
+        "default_threshold_share": 0.83,
         "invalid_rows_total": 0,
         "invalid_threshold_source_rows": 0,
         "missing_default_threshold_citation_rows": 0
@@ -223,7 +223,7 @@
       "artifact": {
         "path": "baseline://now/P-03_gap_completion_matrix.json",
         "row_count": 4,
-        "sha256": "sha256:3d78c078ff5aa96c543b7feb40a7694a3d979611a61eeb65d283a52be7842c9b"
+        "sha256": "sha256:2f85776113d202106161b070e5e71c3d5febe25f883b0a63a9af49daadf50648"
       },
       "contract_refs": [
         "etl/phase2/sql/phase2_post_batch10_checks.sql",
@@ -247,7 +247,7 @@
           {
             "bucket": "gos/gos",
             "completed_rows": 12,
-            "completion_ratio": 1,
+            "completion_ratio": 1.0,
             "pending_measurement_rows": 0,
             "priority_rows": 12,
             "readiness_gap": 0,
@@ -257,7 +257,7 @@
           {
             "bucket": "polyol/sorbitol",
             "completed_rows": 7,
-            "completion_ratio": 1,
+            "completion_ratio": 1.0,
             "pending_measurement_rows": 0,
             "priority_rows": 7,
             "readiness_gap": 0,
@@ -267,7 +267,7 @@
           {
             "bucket": "polyol/mannitol",
             "completed_rows": 6,
-            "completion_ratio": 1,
+            "completion_ratio": 1.0,
             "pending_measurement_rows": 0,
             "priority_rows": 6,
             "readiness_gap": 0,
@@ -275,7 +275,7 @@
             "unresolved_rows": 0
           }
         ],
-        "completion_ratio": 1,
+        "completion_ratio": 0.976,
         "readiness_gap": 1
       },
       "payload_version": "v1",
@@ -368,7 +368,7 @@
       "artifact": {
         "path": "baseline://now/Q-03_snapshot_lock_drift_panel.json",
         "row_count": 1,
-        "sha256": "sha256:af2e1ed9355aff8d82588f7964df780d35d4d3d363887b9cf8a1a3ac43dd92ab"
+        "sha256": "sha256:9766b1951b999872a0693c362d3165ebb7647b8cd763236fab91cbdf9197ff4a"
       },
       "contract_refs": [
         "etl/phase3/PRODUCT_LAYER_RUNBOOK.md",
@@ -379,9 +379,9 @@
       "metrics": {
         "approve_for_ineligible_rows": 0,
         "auto_eligible_mismatch_rows": 0,
-        "fodmap_safety_score_snapshot_actual": "0.500",
-        "reviewed_snapshot_rows": 8,
-        "scoring_version_snapshot_actual": "v3.1b",
+        "fodmap_safety_score_snapshot_actual": "0.390",
+        "reviewed_snapshot_rows": 12,
+        "scoring_version_snapshot_actual": "v2_full_rollup_2026_02_18",
         "snapshot_mismatch_rows": 0
       },
       "payload_version": "v1",
@@ -403,7 +403,8 @@
         "api/app/sql.py",
         "api/tests/test_swaps.py",
         "etl/phase2/sql/phase2_post_quarantine_checks.sql",
-        "etl/phase2/sql/phase2_replay_final_checks.sql"
+        "etl/phase2/sql/phase2_replay_final_checks.sql",
+        "etl/phase3/sql/phase3_mvp_checks.sql"
       ],
       "figure_id": "Q-04_rank2_exclusion_audit",
       "hard_gate": "pass",
@@ -423,15 +424,21 @@
       }
     }
   ],
-  "generated_at_utc": "2026-02-26T14:30:04Z",
+  "generated_at_utc": "2026-03-01T00:34:29Z",
   "git_sha": "placeholder",
-  "run_id": "baseline-now-v1",
+  "run_id": "local-remed-20260301013142",
   "schema_version": "phase2-reporting-bundle-v1",
-  "source_db_ref": "fixture://now-set",
+  "source_db_meta": {
+    "database": "fodmap_reporting_ci",
+    "host": "localhost",
+    "kind": "db",
+    "redacted": true
+  },
+  "source_db_ref": "db://localhost/fodmap_reporting_ci",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:4407949a9647e8fcd25bbcaba55235ed9e542165d96acfcb1debd9584aaeddeb",
-    "api/tests/test_swaps.py": "sha256:33261a9ff863019697d7242700188c84dd783bacb46edb6869aa4524c3171c65",
-    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:a2a9b929dce2bc965b23b9e5a7cef240217cb6f48214820859056f73274a5f73",
+    "api/app/sql.py": "sha256:b9042cb928674f099b13c5ed23f0182310fd8fef53360fe958107e47c841e851",
+    "api/tests/test_swaps.py": "sha256:e003c4beeffa779317fdc8fd91498ce604fa6525edbbaf013f11bdc5f06dbea6",
+    "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:72b5bfbcc1f6de20702d928cf73f564e39146f3fa3ba58b4c6045e25fa5d4b43",
     "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
     "etl/phase2/sql/phase2_fructan_wave01_checks.sql": "sha256:6ca454f9ff037ffd3c38fb81bfddb0677217131b04aa7279fde3bbc1bd70c1a3",
     "etl/phase2/sql/phase2_fructan_wave02_checks.sql": "sha256:d64e25e14880955033a52c4bf78c16f7b5aabebe8f41abd5f1ac3a9c1aac7d95",
@@ -443,6 +450,8 @@
     "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5",
     "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
     "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:f9162b414cb016bd170642fbfab6fc251bc96e00378bd2372b0d63c11b5a8053",
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:e16840661607d5125db53a581cc6123ab02f29b4b618b1eefbd58fc81acb0852",
+    "etl/phase3/sql/phase3_mvp_checks.sql": "sha256:d37cd53d77fd1a3229ad079e8fc581021f54dc54331d0857952df66156c33215",
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a",
     "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:0f82a61fe2c057b46f4b2a3d4ee694331a7e757e2db067b7d6e8ff54b4b505c4"
   },
