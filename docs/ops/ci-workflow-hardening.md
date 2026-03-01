@@ -120,7 +120,6 @@ Turbo command contract:
   - `pnpm --filter @fodmap/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
   - `pnpm --filter @fodmap/storybook exec playwright install chromium` (runtime dependency install)
   - `pnpm --filter @fodmap/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
-- `openapi:check` is run through Turbo for consistency, but Turbo cache is explicitly disabled for this task (`cache: false`) in `turbo.json` to avoid cache ambiguity in generated type checks.
 
 ## Branch Protection Required Checks (`main`)
 
