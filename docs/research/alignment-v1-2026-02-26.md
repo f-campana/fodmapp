@@ -3,6 +3,7 @@
 Status: Approved alignment baseline for controlled execution.
 
 Scope reference:
+
 - Source-of-truth decisions: `docs/research/mobile-original-instruction-tracker.md` (Section 6).
 - Implementation control: `docs/research/mobile-implementation-control-plan.md`.
 
@@ -21,9 +22,11 @@ Scope reference:
 ## PR-01 activation boundary
 
 Active slice:
+
 - `fix(app): stabilize consent bootstrap and espace runtime`
 
 Allowed in PR-01:
+
 1. `/espace` routing/import/runtime correctness.
 2. Consent bootstrap + analytics gating correctness.
 3. `ConsentRightsClient` type/runtime fixes.
@@ -31,6 +34,7 @@ Allowed in PR-01:
 5. Test updates required for corrected behavior.
 
 Not allowed in PR-01:
+
 1. New product features.
 2. New release/legal scope.
 3. Broad backend contract expansion unrelated to bootstrap/runtime stabilization.

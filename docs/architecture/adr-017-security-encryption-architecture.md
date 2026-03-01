@@ -1,6 +1,7 @@
 # ADR-017: Security & Encryption Architecture for Mobile FODMAP Recommendation App
 
 ## Context
+
 - Mobile app strategy is React Native + Expo with offline-first cache and local mutation queue.
 - App supports two modes: anonymous (no account identity) and authenticated account mode.
 - Recommendation logic is backend-authoritative (`/v0/swaps` active rules only, deterministic sort).
@@ -8,10 +9,13 @@
 - French-first launch requires GDPR alignment and auditable privacy/deletion behavior.
 
 ## Status
+
 - **Implemented** (controls referenced in launch evidence pack are operational and bound to API flows).
 
 ## Decision
+
 Adopt a **three-layer trust model**:
+
 1. **Transport-first integrity**: mTLS at auth + TLS 1.3 everywhere with API audience-scoped auth tokens and integrity headers for queue envelopes.
 2. **Device envelope encryption**: encrypted local database + encrypted offline queue using hardware-protected root keys and per-user data keys.
 3. **Backend encryption integration**: provider-managed disk encryption (KMS + envelope encryption) plus app-level tokenization/pseudonymization at sensitive fields.
@@ -88,6 +92,7 @@ flowchart LR
 ## Encryption Design
 
 ### Data in transit
+
 - HTTPS/TLS 1.3 with strong cipher suites only; HSTS on API and web origin.
 - Access tokens use OAuth2/OIDC short-lived JWTs + refresh tokens.
 - Queue API requests are additionally wrapped in a **signed envelope**:
@@ -95,6 +100,7 @@ flowchart LR
   - Signature uses Ed25519 or ECDSA key provisioned at install.
 
 ### Data at rest (device)
+
 - Local DB: SQLCipher/AES-256-GCM with page-level encryption.
 - Queue item payload: per-item random CEK (symmetric key) encrypted by app-level KEK.
 - KEK is generated/stored in Secure Storage tied to the OS key store/biometric unlock policy.
@@ -105,6 +111,7 @@ flowchart LR
   - `SIGK_device`: signing key for queue integrity/non-repudiation.
 
 ### Data at rest (backend)
+
 - Cloud/Postgres: managed volume and backup encryption (platform KMS).
 - Sensitive columns use deterministic tokenization where analytics/joins are still needed.
 - Object backups (exports, logs, queue dead letters): envelope encryption with dedicated KMS key per environment.
@@ -172,6 +179,7 @@ flowchart LR
 ## Secure deletion and export (GDPR-style)
 
 ### Export sequence
+
 ```mermaid
 sequenceDiagram
   autonumber
@@ -194,6 +202,7 @@ sequenceDiagram
 ```
 
 ### Deletion sequence
+
 ```mermaid
 sequenceDiagram
   autonumber
@@ -216,6 +225,7 @@ sequenceDiagram
 ```
 
 ### Proof of completion requirements
+
 - Store and expose:
   - deletion/export ticket ID,
   - affected entity counts by domain,
@@ -226,16 +236,16 @@ sequenceDiagram
 
 ## Threat + mitigation matrix
 
-| Threat | Impact | Likelihood | Mitigation | Detection | Containment/Recovery |
-| --- | --- | --- | --- | --- | --- |
-| Secure storage compromise (physical device theft) | Unauthorized read of local DB | High | Encrypted-at-rest + PIN/biometric gate + minimum local data retention | OS security event + unlock failure telemetry | Remote revoke + key rotation + force local wipe when reauthenticated |
-| Offline queue tampering | Fake symptom/swap entries | Medium | Envelope AEAD + signature + queue idempotency | Signature mismatch ratio > threshold, duplicate event IDs | Quarantine queue batch, require re-sync from server |
-| Replay attack | Duplicate actions / duplicate points | Medium | Idempotency keys + one-time batch IDs + short replay window | Duplicate insert attempts with same hash | Drop duplicates, notify user/session |
-| Stale mutation replay | Inconsistent symptom chronology | Medium | Version check + conflict resolver + audit diff logs | version mismatch response spike | Resolve per-entity with fresh fetch + user conflict banner |
-| Conflict injection across accounts | Data exfiltration via forged IDs | Low | Ownership checks + signed user binding in envelope | unauthorized relation errors | 429/fail-closed, reset token, invalidate suspicious signing keys |
-| Queue backlog DOS (stale tokens) | Sync delays, stale recommendations | Medium | Size limits, TTL expiry, prioritized uploads | abnormal retry storms | Backoff, circuit-breaker, manual recovery export |
-| Unbounded logging leak | Sensitive fields in logs | High | Structured redaction, secret scanning, retention policy | log scan alerts | rotate, purge logs, rotate API keys |
-| Key leakage via crash reports | Secrets exfiltration | Medium | Crash sanitizer + allowlist logging | PII scanner in logs and tickets | sanitize, incident response, customer notice |
+| Threat                                            | Impact                               | Likelihood | Mitigation                                                            | Detection                                                 | Containment/Recovery                                                 |
+| ------------------------------------------------- | ------------------------------------ | ---------- | --------------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------- |
+| Secure storage compromise (physical device theft) | Unauthorized read of local DB        | High       | Encrypted-at-rest + PIN/biometric gate + minimum local data retention | OS security event + unlock failure telemetry              | Remote revoke + key rotation + force local wipe when reauthenticated |
+| Offline queue tampering                           | Fake symptom/swap entries            | Medium     | Envelope AEAD + signature + queue idempotency                         | Signature mismatch ratio > threshold, duplicate event IDs | Quarantine queue batch, require re-sync from server                  |
+| Replay attack                                     | Duplicate actions / duplicate points | Medium     | Idempotency keys + one-time batch IDs + short replay window           | Duplicate insert attempts with same hash                  | Drop duplicates, notify user/session                                 |
+| Stale mutation replay                             | Inconsistent symptom chronology      | Medium     | Version check + conflict resolver + audit diff logs                   | version mismatch response spike                           | Resolve per-entity with fresh fetch + user conflict banner           |
+| Conflict injection across accounts                | Data exfiltration via forged IDs     | Low        | Ownership checks + signed user binding in envelope                    | unauthorized relation errors                              | 429/fail-closed, reset token, invalidate suspicious signing keys     |
+| Queue backlog DOS (stale tokens)                  | Sync delays, stale recommendations   | Medium     | Size limits, TTL expiry, prioritized uploads                          | abnormal retry storms                                     | Backoff, circuit-breaker, manual recovery export                     |
+| Unbounded logging leak                            | Sensitive fields in logs             | High       | Structured redaction, secret scanning, retention policy               | log scan alerts                                           | rotate, purge logs, rotate API keys                                  |
+| Key leakage via crash reports                     | Secrets exfiltration                 | Medium     | Crash sanitizer + allowlist logging                                   | PII scanner in logs and tickets                           | sanitize, incident response, customer notice                         |
 
 ## Incident response sketch (concise)
 
@@ -247,6 +257,7 @@ sequenceDiagram
 6. **Post-incident**: update threat model and matrix; add regression cases for queue validation and delete/export receipts.
 
 ## Operational references (for implementation)
+
 - GDPR principles: data minimization, purpose limitation, right to erasure/access, auditability.
 - CNIL-aligned approach for sensitive health-adjacent datasets.
 - OWASP MASVS/MASTG as security baseline for mobile controls.

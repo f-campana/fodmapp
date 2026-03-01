@@ -1,10 +1,12 @@
 # ADR-017b: Launch-Blocking Security Implementation Spec (Consent, Export/Delete, Queue Integrity)
 
 ## Status
+
 - **Implemented**
 - Supersedes/operationalizes the security posture from `ADR-017` for production readiness.
 
 ## Current implementation status (2026-02-25)
+
 - **Consent evidence**
   - `user_consent_ledger` and `user_consent_ledger_events` are available in migration `2026-02-25_security_consent_export_delete.sql`.
   - Consent events are append-only with hash chaining fields (`event_hash`, `prev_hash`).
@@ -19,6 +21,7 @@
   - Account binding and recovery workflows for anonymous mode are defined in policy but still need dedicated key bootstrap/rebind endpoints.
 
 ## Scope
+
 - Launch-blocking security controls for:
   - Durable consent evidence and revocation history
   - User data export/delete endpoints and proof artifacts
@@ -28,7 +31,9 @@
 ## 1) Minimal production schema: durable consent ledger
 
 ### 1.1 Core principle
+
 Consent is a first-class legal artifact, immutable by business logic and independently auditable.
+
 - No implicit defaults.
 - Never delete consent records without legal retention constraints.
 - Consent state is versioned with revocation history.
@@ -108,6 +113,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 ### 1.3 Required minimal columns
+
 - `policy_version`: legal text revision identifier.
 - `legal_basis`: explicit GDPR basis.
 - `consent_scope`: feature-level granularity.
@@ -119,6 +125,7 @@ create index if not exists ix_consent_events_consent
 ## 2) Concrete API contracts
 
 ### 2.1 Conventions
+
 - Base path: `/v0/me`
 - Auth required for account mode: Bearer + active session.
 - Anonymous mode uses device-bound one-time grant tokens for queue and data export/delete scoped to that device subject.
@@ -128,10 +135,12 @@ create index if not exists ix_consent_events_consent
 ## 2.2 `GET /v0/me/consent`
 
 #### Query
+
 - Optional `?policy_version=...` to retrieve consent for latest or specific policy version
 - Optional `?as_of=...` for historical read
 
 #### Response 200
+
 ```json
 {
   "user_id": "uuid",
@@ -170,6 +179,7 @@ create index if not exists ix_consent_events_consent
 ### 2.3 `POST /v0/me/consent`
 
 #### Request
+
 ```json
 {
   "policy_version": "gdpr-v2.1.0",
@@ -192,6 +202,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 #### Response 201/200
+
 ```json
 {
   "consent_id": "uuid",
@@ -206,6 +217,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 #### Error semantics
+
 - `409 CONFLICT`: pending deletion mode or mismatched signature payload.
 - `410 GONE`: user account hard-deleted.
 - `422 UNPROCESSABLE_ENTITY`: malformed scope or unknown policy version.
@@ -213,6 +225,7 @@ create index if not exists ix_consent_events_consent
 ### 2.4 `GET /v0/me/export`
 
 #### Request
+
 - Query:
   - `format=ndjson|json`
   - `from_ts_utc`, `to_ts_utc`
@@ -220,6 +233,7 @@ create index if not exists ix_consent_events_consent
   - `anonymize=true|false` (default true for anonymous export, false only in explicit account flow)
 
 #### Response 202
+
 ```json
 {
   "export_id": "uuid",
@@ -227,11 +241,12 @@ create index if not exists ix_consent_events_consent
   "requested_at_utc": "2026-02-25T10:05:00Z",
   "expiry_at_utc": "2026-02-25T10:35:00Z",
   "status_uri": "/v0/me/export/{export_id}",
-  "status":"queued"
+  "status": "queued"
 }
 ```
 
 #### Poll response 200 (`/v0/me/export/{export_id}`)
+
 ```json
 {
   "export_id": "uuid",
@@ -268,6 +283,7 @@ create index if not exists ix_consent_events_consent
 ### 2.5 `POST /v0/me/delete`
 
 #### Request
+
 ```json
 {
   "scope": "all|symptoms_only|diet_only|analytics_only",
@@ -281,6 +297,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 #### Response 202
+
 ```json
 {
   "delete_request_id": "uuid",
@@ -295,6 +312,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 #### Poll response
+
 ```json
 {
   "delete_request_id": "uuid",
@@ -360,6 +378,7 @@ create index if not exists ix_consent_events_consent
 ```
 
 ### 3.2 Rules
+
 1. **idempotency_key requirement**
    - Required on every mutation write request.
    - Key derived from immutable tuple and monotonic `client_seq`.
@@ -393,6 +412,7 @@ create index if not exists ix_consent_events_consent
    - `500`: crypto subsystem failure; mark as retryable and keep local copy.
 
 ### 3.3 Sync-reject behavior
+
 - Rejected queue items remain encrypted locally with server reason code.
 - Client schedules exponential backoff with max attempts and user-visible status.
 - Tamper/replay violations move item to a local **quarantine lane** and stop automatic retries pending user intervention.
@@ -400,6 +420,7 @@ create index if not exists ix_consent_events_consent
 ## 4) Secure deletion semantics
 
 ### 4.1 Local wipe
+
 - Remove local cleartext cache after encryption key discard.
 - Purge:
   - symptom and diet drafts,
@@ -410,6 +431,7 @@ create index if not exists ix_consent_events_consent
   - anonymous app preferences and non-sensitive app telemetry unless privacy mode configured.
 
 ### 4.2 Server purge
+
 - Identity resolution -> scope filtering -> transactional purge per domain:
   - profile, consent metadata,
   - symptom logs, diet logs, swap interactions,
@@ -420,11 +442,13 @@ create index if not exists ix_consent_events_consent
 - Legal hold / fraud lockouts are explicit exceptions; then action marked partial with reason.
 
 ### 4.3 Queue purge
+
 - Remove pending user-bound queue rows immediately on successful delete request.
 - Remove queued items already ingested from local dedupe index but retain immutable audit journal entry with hash-only evidence.
 - Invalidate idempotency and replay records after purge window.
 
 ### 4.4 Purge proof receipt (both export and delete)
+
 ```text
 {
   receipt_id: uuid,
@@ -447,6 +471,7 @@ create index if not exists ix_consent_events_consent
 ## 5) Key lifecycle and recovery constraints (anon vs account)
 
 ### 5.1 Anonymous mode
+
 - Key derivation tied to app install and optionally device biometrics.
 - No durable identity keys persisted across uninstall.
 - Sync is disabled for health data by default unless opt-in, in which case pseudo-account key rotates per session grant.
@@ -458,6 +483,7 @@ create index if not exists ix_consent_events_consent
 - Recovery after reinstall requires fresh user action; no silent rebind.
 
 ### 5.2 Account mode
+
 - Keys:
   - device encryption key wrapped by OS secure element,
   - server sync wrapping key tied to user identity + device trust policy,
@@ -468,6 +494,7 @@ create index if not exists ix_consent_events_consent
   - in-flight queue items may be dropped if replay impossible.
 
 ### 5.3 Failure constraints
+
 - If key cannot be unwrapped, app enters safe mode:
   - read-only local content only,
   - queue sync disabled,
@@ -580,16 +607,17 @@ sequenceDiagram
 
 ### 7.1 Implemented-mapping snapshot
 
-| Threat | Control in code | Route / artifact |
-| --- | --- | --- |
-| Consent forgery via replayed signatures | Immutable event chain on consent writes (`user_consent_ledger_events.event_hash`) and server-side signature hash fallback for scope payload | `API /v0/me/consent`, `user_consent_ledger`, `user_consent_ledger_events` |
-| Export poisoning / unauthorized extraction | Authenticated `X-User-Id`, consent scope checks, idempotent export jobs, signed export receipts | `API /v0/me/export`, `me_export_jobs`, `_build_export_receipt` |
-| Delete false completion notice | Signed deletion receipts, transactional purge summaries, key rotation/invalidation during hard delete | `API /v0/me/delete`, `me_delete_jobs`, `_build_delete_receipt`, `SQL_DELETE_DEVICE_KEYS` |
-| Queue key theft / forged payload | Per-device key lookup + HMAC verification + signature algorithm constraint + replay cache/TTL | `API /v0/sync/mutations`, `me_device_signing_keys`, `me_mutation_queue` |
-| Replay/stale mutation injection | `idempotency_key` required, duplicate payload hash check, stale-key purge before re-acceptance, base_version guard | `API /v0/sync/mutations`, `SQL_GET_QUEUE_BY_IDEMPOTENCY`, `SQL_DELETE_QUEUE_BY_IDEMPOTENCY`, `SQL_GET_ENTITY_VERSION` |
-| Partial legal-hold claims | Failed/partial delete status with retained summary counts and proof artifact | `me_delete_jobs.summary`, `DeletePollResponse.proof` |
+| Threat                                     | Control in code                                                                                                                             | Route / artifact                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Consent forgery via replayed signatures    | Immutable event chain on consent writes (`user_consent_ledger_events.event_hash`) and server-side signature hash fallback for scope payload | `API /v0/me/consent`, `user_consent_ledger`, `user_consent_ledger_events`                                             |
+| Export poisoning / unauthorized extraction | Authenticated `X-User-Id`, consent scope checks, idempotent export jobs, signed export receipts                                             | `API /v0/me/export`, `me_export_jobs`, `_build_export_receipt`                                                        |
+| Delete false completion notice             | Signed deletion receipts, transactional purge summaries, key rotation/invalidation during hard delete                                       | `API /v0/me/delete`, `me_delete_jobs`, `_build_delete_receipt`, `SQL_DELETE_DEVICE_KEYS`                              |
+| Queue key theft / forged payload           | Per-device key lookup + HMAC verification + signature algorithm constraint + replay cache/TTL                                               | `API /v0/sync/mutations`, `me_device_signing_keys`, `me_mutation_queue`                                               |
+| Replay/stale mutation injection            | `idempotency_key` required, duplicate payload hash check, stale-key purge before re-acceptance, base_version guard                          | `API /v0/sync/mutations`, `SQL_GET_QUEUE_BY_IDEMPOTENCY`, `SQL_DELETE_QUEUE_BY_IDEMPOTENCY`, `SQL_GET_ENTITY_VERSION` |
+| Partial legal-hold claims                  | Failed/partial delete status with retained summary counts and proof artifact                                                                | `me_delete_jobs.summary`, `DeletePollResponse.proof`                                                                  |
 
 ### 7.2 Immediate follow-ups
+
 - Implement explicit anonymization mode and fresh key bootstrap on anonymous-mode re-install/recovery.
 - Add `delete`/`export` payload signature fields for optional anti-tamper over request body before persistence.
 - Add durable idempotency table for sync accept/reject outcomes (audit + quarantine lane metadata).
