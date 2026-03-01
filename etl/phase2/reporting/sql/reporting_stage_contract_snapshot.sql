@@ -1,5 +1,3 @@
-\set ON_ERROR_STOP on
-
 CREATE TABLE IF NOT EXISTS reporting_stage_contract_snapshot (
   stage_order INTEGER PRIMARY KEY,
   stage_id TEXT NOT NULL UNIQUE,

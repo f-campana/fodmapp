@@ -188,7 +188,7 @@ def main() -> int:
     steps.append(
         _run(
             [
-                "python",
+                sys.executable,
                 str(load_stage_contracts_script),
                 "--db-url",
                 seed_db_url,
