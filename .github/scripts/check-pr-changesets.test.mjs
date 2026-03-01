@@ -5,7 +5,9 @@ import {
   evaluateCoverage,
   findUnknownChangesetPackages,
   hasWorkspaceOrReleasableChanges,
+  listChangedChangesetFiles,
   parseChangesetFrontmatter,
+  parseModeFromArgs,
 } from "./check-pr-changesets.mjs";
 
 const exemptLabel = "changeset-exempt";
@@ -79,6 +81,22 @@ test("allowlisted package + exemption label passes without changeset", () => {
 test("docs-only changes skip the changeset gate", () => {
   const changes = hasWorkspaceOrReleasableChanges(["docs/README.md"]);
   assert.equal(changes.shouldCheck, false);
+});
+
+test("changed changeset file listing excludes README.md", () => {
+  const files = listChangedChangesetFiles([
+    ".changeset/README.md",
+    ".changeset/valid.md",
+    ".changeset/config.json",
+  ]);
+
+  assert.deepEqual(files, [".changeset/valid.md"]);
+});
+
+test("mode parser accepts --all and rejects unknown args", () => {
+  assert.equal(parseModeFromArgs([]), "coverage");
+  assert.equal(parseModeFromArgs(["--all"]), "all");
+  assert.equal(parseModeFromArgs(["--bogus"]), null);
 });
 
 test("malformed changeset frontmatter fails with file-specific message", () => {

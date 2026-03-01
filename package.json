@@ -53,6 +53,7 @@
     "ci:scope:test": "node --test .github/scripts/detect-ci-scope.test.mjs",
     "changeset:ci:test": "node --test .github/scripts/check-pr-changesets.test.mjs",
     "changeset:ci:status": "node .github/scripts/check-pr-changesets.mjs",
+    "changeset:ci:lint:all": "node .github/scripts/check-pr-changesets.mjs --all",
     "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
   },
   "devDependencies": {

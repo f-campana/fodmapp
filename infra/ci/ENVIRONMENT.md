@@ -44,7 +44,10 @@ When either key is missing, CI automatically falls back to local `.turbo` cache 
 CI Turbo command policy:
 
 - Turbo-eligible CI commands should use `pnpm exec turbo run ...` so workflows always resolve the pinned local Turbo version.
-- Non-Turbo CI exceptions are intentional where Turbo caching does not apply, including Storybook Playwright browser install and Phase 2 reporting `render:*` commands.
+- Non-Turbo CI exceptions are intentional where Turbo caching does not apply, including:
+  - `pnpm --filter @fodmap/types openapi:check` for deterministic OpenAPI parity validation
+  - Storybook Playwright browser install
+  - Phase 2 reporting `render:*` commands
 
 ## CI Governance Variables
 

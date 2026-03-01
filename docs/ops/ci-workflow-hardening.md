@@ -59,6 +59,33 @@ Local hook behavior:
 
 - `.githooks/pre-push` still enforces `./.github/scripts/quality-gate.sh --full` for normal pushes
 - delete-only pushes (for example `git push --delete`) skip the full gate
+- pre-push now emits explicit failure scope (`dependency preflight`, `changeset coverage/lint`, or `lint/type/test phase`) when `--full` fails
+
+### Local Dependency Preflight Contract
+
+`quality-gate.sh --full` runs a dependency preflight before lint/test/typecheck:
+
+- command: `pnpm install --frozen-lockfile --prefer-offline`
+- failure behavior: stops immediately with actionable error:
+  - `Workspace dependencies not in sync; run pnpm install and retry push.`
+
+This prevents non-deterministic pre-push failures caused by stale worktree installs.
+
+### Full Changeset Lint Contract
+
+`quality-gate.sh --full` now runs:
+
+- `pnpm changeset:ci:lint:all`
+
+This validates every `.changeset/*.md` entry in `HEAD` (excluding `.changeset/README.md`):
+
+- frontmatter must parse correctly
+- each declared package must exist in workspace manifests (`apps/*/package.json`, `packages/*/package.json`)
+
+Failure examples:
+
+- unknown package name in changeset frontmatter
+- malformed changeset frontmatter in any tracked changeset file
 
 ## CI PR Scope and Turbo Cache Controls
 
@@ -85,6 +112,7 @@ Turbo command contract:
 
 - Turbo-eligible CI commands must use `pnpm exec turbo run ...` to ensure local pinned Turbo resolution
 - intentional non-Turbo exceptions remain direct:
+  - `pnpm --filter @fodmap/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
   - `pnpm --filter @fodmap/storybook exec playwright install chromium` (runtime dependency install)
   - `pnpm --filter @fodmap/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
 

@@ -60,8 +60,13 @@ run_cmd() {
   shift
 
   echo "[RUN] $label"
-  "$@"
-  echo "[OK] $label"
+  if "$@"; then
+    echo "[OK] $label"
+    return 0
+  fi
+
+  echo "[FAIL] $label" >&2
+  return 1
 }
 
 for f in "${required_files[@]}"; do
@@ -88,14 +93,22 @@ run_cmd "reporting python script syntax" python3 -m py_compile \
 echo "[OK] governance quality gate passed"
 
 if [[ "$run_full" == "true" ]]; then
+  if ! run_cmd \
+    "dependency preflight (pnpm install --frozen-lockfile --prefer-offline)" \
+    pnpm install --frozen-lockfile --prefer-offline; then
+    echo "[FAIL] Workspace dependencies not in sync; run pnpm install and retry push." >&2
+    exit 1
+  fi
+
   run_cmd "format check" pnpm format:check
   run_cmd "UI package build for lint imports" pnpm exec turbo run build --filter=@fodmap/ui
   run_cmd "lint (CI)" pnpm lint:ci
   run_cmd "python lint (CI)" pnpm python:ci
   run_cmd "changeset checker unit tests" pnpm changeset:ci:test
+  run_cmd "changeset full-repository lint" pnpm changeset:ci:lint:all
   run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
   run_cmd "CI scope tests" pnpm ci:scope:test
-  run_cmd "openapi check" pnpm exec turbo run openapi:check --filter=@fodmap/types
+  run_cmd "openapi check" pnpm --filter @fodmap/types openapi:check
   run_cmd "design token check" pnpm tokens:check
   run_cmd "tailwind style check" pnpm tailwind:styles:check
   run_cmd "UI package build" pnpm ui:build
