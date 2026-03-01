@@ -65,5 +65,5 @@
 <text class="value" x="755" y="321" text-anchor="middle">0</text>
 <rect x="831" y="289" width="148" height="54" fill="var(--fd-reporting-color-surface-danger-soft, var(--fd-semantic-color-status-danger-fg))" stroke="var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))"/>
 <text class="value" x="905" y="321" text-anchor="middle">0</text>
-<text class="mono" x="24" y="426">completion_ratio=1 readiness_gap=1</text>
+<text class="mono" x="24" y="426">completion_ratio=0.976 readiness_gap=1</text>
 </svg>

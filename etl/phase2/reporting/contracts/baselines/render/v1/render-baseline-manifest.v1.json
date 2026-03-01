@@ -1,10 +1,10 @@
 {
   "schema_version": "phase2-render-baseline-manifest-v1",
-  "generated_at_utc": "2026-02-28T23:44:07.550Z",
+  "generated_at_utc": "2026-03-01T00:44:24.017Z",
   "source_run": {
-    "run_id": "local-render-smoke-20260301004405",
+    "run_id": "local-remed-20260301013142",
     "git_sha": "placeholder",
-    "source_db_ref": "fixture://now-set",
+    "source_db_ref": "db://localhost/fodmap_reporting_ci",
     "contract_version": "v1"
   },
   "contract_refs": [
@@ -23,6 +23,7 @@
     "etl/phase2/sql/phase2_replay_final_checks.sql",
     "etl/phase2/sql/phase2_scaffold_views.sql",
     "etl/phase3/PRODUCT_LAYER_RUNBOOK.md",
+    "etl/phase3/sql/phase3_mvp_checks.sql",
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql",
     "etl/phase3/sql/phase3_swap_activation_apply.sql"
   ],
@@ -43,7 +44,7 @@
       "figure_id": "P-03_gap_completion_matrix",
       "file": "fig_C_gap_completion_heatmap.svg",
       "title": "Gap Completion Matrix",
-      "sha256": "sha256:aec1043fc279507f21b140871bea78e3820576f853cca561e78b7b455910006d"
+      "sha256": "sha256:eaa48b5d43662c02d9a5a15de91e1cd31a3631d5304fc7dd10df606f4eebc722"
     },
     {
       "figure_id": "Q-02_critical_contract_scorecard",
@@ -55,7 +56,7 @@
       "figure_id": "Q-03_snapshot_lock_drift_panel",
       "file": "fig_E_evidence_quality.svg",
       "title": "Snapshot Lock Drift",
-      "sha256": "sha256:375853ff2101ff4e000dcf8a4195c0fb51aacf54f3e01479764bcc230a8fc1ff"
+      "sha256": "sha256:cc9fd472454487195481781226e5a147d6e596ba42ac37e5629b55e85cc43551"
     },
     {
       "figure_id": "Q-04_rank2_exclusion_audit",
@@ -67,7 +68,7 @@
       "figure_id": "E-03_threshold_provenance_completeness",
       "file": "fig_G_source_provenance.svg",
       "title": "Threshold Provenance",
-      "sha256": "sha256:daaa1c0f8b4e14f1d77084ea3e5928af11a374839fee50164aeaa1e149afcf78"
+      "sha256": "sha256:c274b8aeb2c9f7a92a12e24887c2c5af0562adaedf78137e21fa1fc074dcbce6"
     },
     {
       "figure_id": "E-04_rank2_quarantine_case_study",
@@ -81,7 +82,7 @@
       "artifact_id": "phase2_dashboard_html",
       "file": "phase2_dashboard.html",
       "title": "Phase 2 Reporting Dashboard",
-      "sha256": "sha256:9215582662c4175b13759303a0c0aa938dd89d052c560762a8837ac86177b3da"
+      "sha256": "sha256:ebf7243b515b9636e6ebc5211869f788407a79a0295112b5eaf3aecc161c4b10"
     }
   ]
 }

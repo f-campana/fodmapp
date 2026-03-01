@@ -18,7 +18,7 @@
 <text class="subtitle" x="24" y="58">Source: Q-03_snapshot_lock_drift_panel</text>
 <text class="label" x="270" y="118" text-anchor="end">reviewed_snapshot_rows</text>
 <rect x="280" y="102" width="840" height="20" fill="var(--fd-reporting-color-info-bg, var(--fd-semantic-color-status-info-bg))"/>
-<text class="value" x="1128" y="118">8</text>
+<text class="value" x="1128" y="118">12</text>
 <text class="label" x="270" y="176" text-anchor="end">snapshot_mismatch_rows</text>
 <rect x="280" y="160" width="0" height="20" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="288" y="176">0</text>
@@ -28,6 +28,6 @@
 <text class="label" x="270" y="292" text-anchor="end">approve_for_ineligible_rows</text>
 <rect x="280" y="276" width="0" height="20" fill="var(--fd-reporting-color-danger-strong, var(--fd-semantic-color-action-destructive-bg-hover))"/>
 <text class="value" x="288" y="292">0</text>
-<text class="mono" x="24" y="376">scoring_version_snapshot_actual=v3.1b</text>
-<text class="mono" x="24" y="396">fodmap_safety_score_snapshot_actual=0.500</text>
+<text class="mono" x="24" y="376">scoring_version_snapshot_actual=v2_full_rollup_2026_02_18</text>
+<text class="mono" x="24" y="396">fodmap_safety_score_snapshot_actual=0.390</text>
 </svg>
