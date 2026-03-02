@@ -118,7 +118,7 @@ jobs:
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }} \
             --trigger pr_smoke
       - name: Upload now-set artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-now-set-${{ github.run_id }}
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
@@ -142,7 +142,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2
       - name: Download now-set artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: reporting-now-set-${{ github.run_id }}
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
@@ -156,7 +156,7 @@ jobs:
             --compare-scope semantic \
             --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
       - name: Upload baseline diff
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-baseline-diff-${{ github.run_id }}
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}/baseline-diff.json
@@ -182,7 +182,7 @@ jobs:
           install-command: "pnpm install --frozen-lockfile"
           enable-turbo-cache: "false"
       - name: Download now-set artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: reporting-now-set-${{ github.run_id }}
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
@@ -208,7 +208,7 @@ jobs:
             --float-eps 1e-6 \
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
       - name: Upload render smoke artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-render-smoke-${{ github.run_id }}
           path: |
@@ -272,7 +272,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
@@ -334,7 +334,7 @@ jobs:
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
       - name: Upload full-run artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-full-run-${{ github.run_id }}
           path: etl/phase2/reporting/out/runs/${{ github.run_id }}
@@ -412,7 +412,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
@@ -475,7 +475,7 @@ jobs:
             --compare-scope semantic \
             --semantic-policy etl/phase2/reporting/contracts/schema/semantic_compare_fields.yaml
       - name: Upload baseline update artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-baseline-update-${{ github.run_id }}
           path: |
@@ -557,7 +557,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
@@ -632,7 +632,7 @@ jobs:
             --float-eps 1e-6 \
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-diff.json
       - name: Upload render baseline update artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reporting-render-baseline-update-${{ github.run_id }}
           path: |

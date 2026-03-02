@@ -21,6 +21,22 @@
     "tailwindCSS.hovers": true,
     "tailwindCSS.suggestions": true,
     "tailwindCSS.codeActions": true,
+    // Editor Config
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.formatDocument": "always",
+      "source.addMissingImports": "always",
+      // Keep import/export ordering deterministic via ESLint simple-import-sort.
+      // TypeScript organizeImports can fight with that order on manual save.
+      "source.organizeImports": "never",
+      "source.fixAll.eslint": "always",
+      "source.fixAll.stylelint": "explicit",
+    },
+    "[typescript][javascript][typescriptreact][javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true,
+    },
   },
   "extensions": {
     "recommendations": [
