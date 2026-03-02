@@ -23,10 +23,9 @@ export const Default: Story = {
     const input = canvas.getByPlaceholderText("Saisir un aliment");
     await userEvent.type(input, "courgette");
     await expect(input).toHaveValue("courgette");
-    await expect(input.className).toContain(
-      "focus-visible:ring-ring-accessible",
-    );
-    await expect(input.className).not.toContain("focus-visible:ring-ring-soft");
+    await expect(input.className).toContain("focus-visible:border-ring");
+    await expect(input.className).toContain("focus-visible:ring-ring-soft");
+    await expect(input).toHaveAttribute("data-slot", "input");
   },
 };
 

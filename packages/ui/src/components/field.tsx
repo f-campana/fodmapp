@@ -71,11 +71,11 @@ export function Field({
   });
 
   return (
-    <div className={cn("grid gap-1.5", className)}>
+    <div data-slot="field" className={cn("grid gap-1.5", className)}>
       <label
         htmlFor={controlId}
         className={cn(
-          "text-sm font-semibold tracking-wide text-(--color-text)",
+          "text-sm font-semibold tracking-wide text-foreground",
           labelClassName,
         )}
       >
@@ -86,7 +86,7 @@ export function Field({
       </label>
       {control}
       {hint ? (
-        <p id={hintId} className="text-xs text-(--color-text-muted)">
+        <p id={hintId} className="text-xs text-muted-foreground">
           {hint}
         </p>
       ) : null}

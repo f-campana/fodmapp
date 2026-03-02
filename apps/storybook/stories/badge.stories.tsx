@@ -21,8 +21,9 @@ export const Neutral: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const badge = canvas.getByText("Niveau bas");
-    await expect(badge.className).toContain("focus:ring-ring-accessible");
-    await expect(badge.className).not.toContain("focus:ring-ring ");
+    await expect(badge.className).toContain("focus-visible:border-ring");
+    await expect(badge.className).toContain("focus-visible:ring-ring-soft");
+    await expect(badge).toHaveAttribute("data-slot", "badge");
   },
 };
 
