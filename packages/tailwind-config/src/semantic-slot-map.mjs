@@ -143,6 +143,26 @@ export const semanticSlotMap = [
     slot: "--color-destructive-foreground",
     token: "--fd-semantic-color-action-destructive-fg",
   },
+  {
+    group: "actions",
+    slot: "--color-destructive-subtle",
+    token: "--fd-semantic-color-action-destructive-bg-subtle",
+  },
+  {
+    group: "actions",
+    slot: "--color-destructive-subtle-hover",
+    token: "--fd-semantic-color-action-destructive-bg-subtle-hover",
+  },
+  {
+    group: "actions",
+    slot: "--color-destructive-subtle-foreground",
+    token: "--fd-semantic-color-action-destructive-fg-subtle",
+  },
+  {
+    group: "actions",
+    slot: "--color-destructive-subtle-border",
+    token: "--fd-semantic-color-action-destructive-border-subtle",
+  },
 
   {
     group: "status",

@@ -48,16 +48,11 @@ const buttonVariants = cva(
           "dark:hover:bg-muted/50",
           "aria-expanded:bg-muted aria-expanded:text-foreground",
         ].join(" "),
-        // Subtle tinted destructive — alpha values are intentional design
-        // (auto-adapts to light/dark themes). Dedicated tokens
-        // (--color-destructive-subtle, etc.) should be added to the slot map
-        // to replace these opacity modifiers in a future token pass.
+        // Subtle destructive now uses dedicated semantic tokens (no opacity hacks).
         destructive: [
-          "bg-destructive/10 text-destructive",
-          "hover:bg-destructive/20",
-          "dark:bg-destructive/10 dark:hover:bg-destructive/20",
-          "focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
-          "dark:focus-visible:ring-destructive/40",
+          "bg-destructive-subtle text-destructive-subtle-foreground",
+          "hover:bg-destructive-subtle-hover",
+          "focus-visible:border-destructive-subtle-border focus-visible:ring-destructive-subtle-border/30",
         ].join(" "),
         link: "text-primary underline-offset-4 hover:underline",
       },

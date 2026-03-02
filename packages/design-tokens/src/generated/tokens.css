@@ -79,6 +79,10 @@
   --fd-base-color-brand-danger-light: oklch(0.4910 0.1197 26.91);
   --fd-base-color-brand-danger-strong-light: oklch(0.4133 0.1042 27.16);
   --fd-base-color-brand-danger-foreground-light: oklch(0.9776 0.0109 24.32);
+  --fd-base-color-brand-danger-subtle-light: oklch(0.9550 0.0250 24.00);
+  --fd-base-color-brand-danger-subtle-strong-light: oklch(0.9100 0.0450 24.00);
+  --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
+  --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
   --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
   --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
   --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);
@@ -96,6 +100,10 @@
   --fd-base-color-brand-danger-dark: oklch(0.6753 0.1098 25.96);
   --fd-base-color-brand-danger-strong-dark: oklch(0.7365 0.1076 25.29);
   --fd-base-color-brand-danger-foreground-dark: oklch(0.2166 0.0467 23.79);
+  --fd-base-color-brand-danger-subtle-dark: oklch(0.2400 0.0350 25.00);
+  --fd-base-color-brand-danger-subtle-strong-dark: oklch(0.2900 0.0450 25.00);
+  --fd-base-color-brand-danger-subtle-fg-dark: oklch(0.7200 0.1100 25.00);
+  --fd-base-color-brand-danger-subtle-border-dark: oklch(0.5500 0.0900 25.00);
   --fd-base-motion-duration-instant: 0ms;
   --fd-base-motion-duration-fast: 120ms;
   --fd-base-motion-duration-normal: 180ms;
@@ -203,6 +211,10 @@
   --fd-semantic-color-action-destructive-bg: oklch(0.4910 0.1197 26.91);
   --fd-semantic-color-action-destructive-bg-hover: oklch(0.4133 0.1042 27.16);
   --fd-semantic-color-action-destructive-fg: oklch(0.9776 0.0109 24.32);
+  --fd-semantic-color-action-destructive-bg-subtle: oklch(0.9550 0.0250 24.00);
+  --fd-semantic-color-action-destructive-bg-subtle-hover: oklch(0.9100 0.0450 24.00);
+  --fd-semantic-color-action-destructive-fg-subtle: oklch(0.4600 0.1200 26.00);
+  --fd-semantic-color-action-destructive-border-subtle: oklch(0.6000 0.0900 25.00);
   --fd-semantic-color-status-info-bg: oklch(0.5000 0.1193 242.75);
   --fd-semantic-color-status-info-fg: oklch(0.9848 0.0013 106.42);
   --fd-semantic-color-status-success-bg: oklch(0.5081 0.1049 165.61);
@@ -324,6 +336,10 @@
   --fd-base-color-brand-danger-light: oklch(0.4910 0.1197 26.91);
   --fd-base-color-brand-danger-strong-light: oklch(0.4133 0.1042 27.16);
   --fd-base-color-brand-danger-foreground-light: oklch(0.9776 0.0109 24.32);
+  --fd-base-color-brand-danger-subtle-light: oklch(0.9550 0.0250 24.00);
+  --fd-base-color-brand-danger-subtle-strong-light: oklch(0.9100 0.0450 24.00);
+  --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
+  --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
   --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
   --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
   --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);
@@ -341,6 +357,10 @@
   --fd-base-color-brand-danger-dark: oklch(0.6753 0.1098 25.96);
   --fd-base-color-brand-danger-strong-dark: oklch(0.7365 0.1076 25.29);
   --fd-base-color-brand-danger-foreground-dark: oklch(0.2166 0.0467 23.79);
+  --fd-base-color-brand-danger-subtle-dark: oklch(0.2400 0.0350 25.00);
+  --fd-base-color-brand-danger-subtle-strong-dark: oklch(0.2900 0.0450 25.00);
+  --fd-base-color-brand-danger-subtle-fg-dark: oklch(0.7200 0.1100 25.00);
+  --fd-base-color-brand-danger-subtle-border-dark: oklch(0.5500 0.0900 25.00);
   --fd-base-motion-duration-instant: 0ms;
   --fd-base-motion-duration-fast: 120ms;
   --fd-base-motion-duration-normal: 180ms;
@@ -448,6 +468,10 @@
   --fd-semantic-color-action-destructive-bg: oklch(0.6753 0.1098 25.96);
   --fd-semantic-color-action-destructive-bg-hover: oklch(0.7365 0.1076 25.29);
   --fd-semantic-color-action-destructive-fg: oklch(0.2166 0.0467 23.79);
+  --fd-semantic-color-action-destructive-bg-subtle: oklch(0.2400 0.0350 25.00);
+  --fd-semantic-color-action-destructive-bg-subtle-hover: oklch(0.2900 0.0450 25.00);
+  --fd-semantic-color-action-destructive-fg-subtle: oklch(0.7200 0.1100 25.00);
+  --fd-semantic-color-action-destructive-border-subtle: oklch(0.5500 0.0900 25.00);
   --fd-semantic-color-status-info-bg: oklch(0.7535 0.1390 232.66);
   --fd-semantic-color-status-info-fg: oklch(0.1469 0.0041 49.25);
   --fd-semantic-color-status-success-bg: oklch(0.7729 0.1535 163.22);
@@ -570,6 +594,10 @@
     --fd-base-color-brand-danger-light: oklch(0.4910 0.1197 26.91);
     --fd-base-color-brand-danger-strong-light: oklch(0.4133 0.1042 27.16);
     --fd-base-color-brand-danger-foreground-light: oklch(0.9776 0.0109 24.32);
+    --fd-base-color-brand-danger-subtle-light: oklch(0.9550 0.0250 24.00);
+    --fd-base-color-brand-danger-subtle-strong-light: oklch(0.9100 0.0450 24.00);
+    --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
+    --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
     --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
     --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
     --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);
@@ -587,6 +615,10 @@
     --fd-base-color-brand-danger-dark: oklch(0.6753 0.1098 25.96);
     --fd-base-color-brand-danger-strong-dark: oklch(0.7365 0.1076 25.29);
     --fd-base-color-brand-danger-foreground-dark: oklch(0.2166 0.0467 23.79);
+    --fd-base-color-brand-danger-subtle-dark: oklch(0.2400 0.0350 25.00);
+    --fd-base-color-brand-danger-subtle-strong-dark: oklch(0.2900 0.0450 25.00);
+    --fd-base-color-brand-danger-subtle-fg-dark: oklch(0.7200 0.1100 25.00);
+    --fd-base-color-brand-danger-subtle-border-dark: oklch(0.5500 0.0900 25.00);
     --fd-base-motion-duration-instant: 0ms;
     --fd-base-motion-duration-fast: 120ms;
     --fd-base-motion-duration-normal: 180ms;
@@ -694,6 +726,10 @@
     --fd-semantic-color-action-destructive-bg: oklch(0.6753 0.1098 25.96);
     --fd-semantic-color-action-destructive-bg-hover: oklch(0.7365 0.1076 25.29);
     --fd-semantic-color-action-destructive-fg: oklch(0.2166 0.0467 23.79);
+    --fd-semantic-color-action-destructive-bg-subtle: oklch(0.2400 0.0350 25.00);
+    --fd-semantic-color-action-destructive-bg-subtle-hover: oklch(0.2900 0.0450 25.00);
+    --fd-semantic-color-action-destructive-fg-subtle: oklch(0.7200 0.1100 25.00);
+    --fd-semantic-color-action-destructive-border-subtle: oklch(0.5500 0.0900 25.00);
     --fd-semantic-color-status-info-bg: oklch(0.7535 0.1390 232.66);
     --fd-semantic-color-status-info-fg: oklch(0.1469 0.0041 49.25);
     --fd-semantic-color-status-success-bg: oklch(0.7729 0.1535 163.22);

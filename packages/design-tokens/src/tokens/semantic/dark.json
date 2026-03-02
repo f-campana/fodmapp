@@ -79,6 +79,22 @@
           "fg": {
             "$value": "{base.color.brand.dangerForegroundDark}",
             "$type": "color"
+          },
+          "bgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleDark}",
+            "$type": "color"
+          },
+          "bgSubtleHover": {
+            "$value": "{base.color.brand.dangerSubtleStrongDark}",
+            "$type": "color"
+          },
+          "fgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleFgDark}",
+            "$type": "color"
+          },
+          "borderSubtle": {
+            "$value": "{base.color.brand.dangerSubtleBorderDark}",
+            "$type": "color"
           }
         }
       },

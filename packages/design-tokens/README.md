@@ -59,3 +59,19 @@ pnpm --filter @fodmap/design-tokens tokens:check
 ```
 
 `tokens:check` regenerates outputs and fails if `src/generated` is stale.
+
+## Destructive-Subtle Contract
+
+The semantic destructive action set includes a dedicated subtle variant for
+controls that render tinted backgrounds with destructive text:
+
+- `semantic.color.action.destructive.bgSubtle`
+- `semantic.color.action.destructive.bgSubtleHover`
+- `semantic.color.action.destructive.fgSubtle`
+- `semantic.color.action.destructive.borderSubtle`
+
+Generation enforces contrast minimums for these pairs in both themes:
+
+- `fgSubtle` on `bgSubtle` >= `4.5:1`
+- `fgSubtle` on `bgSubtleHover` >= `4.5:1`
+- `borderSubtle` on `bgSubtle` >= `3.0:1`

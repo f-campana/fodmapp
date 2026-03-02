@@ -341,6 +341,10 @@ const requiredSemanticColorPaths = [
   "semantic.color.action.destructive.bg",
   "semantic.color.action.destructive.bgHover",
   "semantic.color.action.destructive.fg",
+  "semantic.color.action.destructive.bgSubtle",
+  "semantic.color.action.destructive.bgSubtleHover",
+  "semantic.color.action.destructive.fgSubtle",
+  "semantic.color.action.destructive.borderSubtle",
 ] as const;
 
 const semanticPairCards: SemanticPairCard[] = semanticColorRows
@@ -910,6 +914,9 @@ export const Showcase: Story = {
     ).not.toBe("");
     await expect(
       rootStyles.getPropertyValue("--color-destructive-hover").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-destructive-subtle").trim(),
     ).not.toBe("");
 
     for (const path of requiredSemanticColorPaths) {

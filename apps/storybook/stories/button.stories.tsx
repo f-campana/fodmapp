@@ -156,9 +156,16 @@ export const Destructive: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole("button", { name: "Supprimer" });
-    // Subtle tinted pattern — not solid red
-    await expect(button.className).toContain("bg-destructive/10");
-    await expect(button.className).toContain("text-destructive");
+    // Token-based subtle pattern
+    await expect(button.className).toContain("bg-destructive-subtle");
+    await expect(button.className).toContain(
+      "text-destructive-subtle-foreground",
+    );
+    await expect(button.className).toContain(
+      "hover:bg-destructive-subtle-hover",
+    );
+    // No opacity modifiers
+    await expect(button.className).not.toContain("bg-destructive/10");
     await expect(button.className).not.toContain("text-destructive-foreground");
   },
 };

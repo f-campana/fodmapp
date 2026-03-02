@@ -369,6 +369,21 @@ function validateSemanticColorContrast(themeName, themeTokens) {
     { fg: "text.inverse", bg: "surface.inverse", minRatio: 4.5 },
     { fg: "focus.ringAccessible", bg: "background.canvas", minRatio: 3 },
     { fg: "border.control", bg: "background.canvas", minRatio: 3 },
+    {
+      fg: "action.destructive.fgSubtle",
+      bg: "action.destructive.bgSubtle",
+      minRatio: 4.5,
+    },
+    {
+      fg: "action.destructive.fgSubtle",
+      bg: "action.destructive.bgSubtleHover",
+      minRatio: 4.5,
+    },
+    {
+      fg: "action.destructive.borderSubtle",
+      bg: "action.destructive.bgSubtle",
+      minRatio: 3,
+    },
   ];
 
   const actionStatusPairs = collectFgBgSiblingPairs(semanticColor)

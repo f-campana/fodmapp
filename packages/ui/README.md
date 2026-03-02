@@ -48,3 +48,11 @@ Wave-1 components follow shadcn-style APIs:
 - `Button` supports `asChild`
 - `Input` uses native input props (`aria-invalid` for invalid state)
 - `Badge` variants: `default | secondary | destructive | outline`
+
+Destructive button styling uses semantic subtle tokens (no opacity-modified
+background classes):
+
+- `bg-destructive-subtle`
+- `text-destructive-subtle-foreground`
+- `hover:bg-destructive-subtle-hover`
+- `focus-visible:border-destructive-subtle-border`

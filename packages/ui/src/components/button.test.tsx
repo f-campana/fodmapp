@@ -132,10 +132,14 @@ describe("Button", () => {
   it("renders destructive as subtle tinted variant", () => {
     render(<Button variant="destructive">Supprimer</Button>);
     const classes = screen.getByRole("button", { name: "Supprimer" }).className;
-    // New subtle pattern: tinted bg + destructive text
-    expect(classes).toContain("text-destructive");
-    expect(classes).toContain("bg-destructive/10");
-    // NOT solid red background
+    // Token-based subtle pattern — no opacity modifiers
+    expect(classes).toContain("bg-destructive-subtle");
+    expect(classes).toContain("text-destructive-subtle-foreground");
+    expect(classes).toContain("hover:bg-destructive-subtle-hover");
+    // No opacity hacks
+    expect(classes).not.toContain("bg-destructive/10");
+    expect(classes).not.toContain("hover:bg-destructive/20");
+    // Not the solid destructive pattern
     expect(classes).not.toContain("text-destructive-foreground");
   });
 

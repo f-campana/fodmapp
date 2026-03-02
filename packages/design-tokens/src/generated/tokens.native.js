@@ -100,6 +100,10 @@ export const nativeTokens = {
         "dangerLight": "#99413a",
         "dangerStrongLight": "#7a302b",
         "dangerForegroundLight": "#fff5f4",
+        "dangerSubtleLight": "#ffeae8",
+        "dangerSubtleStrongLight": "#fed6d3",
+        "dangerSubtleFgLight": "#8f3833",
+        "dangerSubtleBorderLight": "#b06a65",
         "canvasDark": "#1b1510",
         "surfaceDark": "#292018",
         "surfaceStrongDark": "#362a1f",
@@ -116,7 +120,11 @@ export const nativeTokens = {
         "warningForegroundDark": "#271507",
         "dangerDark": "#d27b73",
         "dangerStrongDark": "#e68e87",
-        "dangerForegroundDark": "#2c100f"
+        "dangerForegroundDark": "#2c100f",
+        "dangerSubtleDark": "#2e1817",
+        "dangerSubtleStrongDark": "#3f2220",
+        "dangerSubtleFgDark": "#e18881",
+        "dangerSubtleBorderDark": "#a05c57"
       }
     },
     "motion": {
@@ -274,7 +282,11 @@ export const nativeTokens = {
             "destructive": {
               "bg": "#99413a",
               "bgHover": "#7a302b",
-              "fg": "#fff5f4"
+              "fg": "#fff5f4",
+              "bgSubtle": "#ffeae8",
+              "bgSubtleHover": "#fed6d3",
+              "fgSubtle": "#8f3833",
+              "borderSubtle": "#b06a65"
             }
           },
           "status": {
@@ -362,7 +374,11 @@ export const nativeTokens = {
             "destructive": {
               "bg": "#d27b73",
               "bgHover": "#e68e87",
-              "fg": "#2c100f"
+              "fg": "#2c100f",
+              "bgSubtle": "#2e1817",
+              "bgSubtleHover": "#3f2220",
+              "fgSubtle": "#e18881",
+              "borderSubtle": "#a05c57"
             }
           },
           "status": {

@@ -556,6 +556,38 @@
           },
           "$type": "color"
         },
+        "dangerSubtleLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.955, 0.025, 24],
+            "hex": "#ffeae8"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleStrongLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.91, 0.045, 24],
+            "hex": "#fed6d3"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleFgLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.46, 0.12, 26],
+            "hex": "#8f3833"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleBorderLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.6, 0.09, 25],
+            "hex": "#b06a65"
+          },
+          "$type": "color"
+        },
         "canvasDark": {
           "$value": {
             "colorSpace": "oklch",
@@ -689,6 +721,38 @@
             "colorSpace": "oklch",
             "components": [0.2166, 0.0467, 23.79],
             "hex": "#2c100f"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.24, 0.035, 25],
+            "hex": "#2e1817"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleStrongDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.29, 0.045, 25],
+            "hex": "#3f2220"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleFgDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.72, 0.11, 25],
+            "hex": "#e18881"
+          },
+          "$type": "color"
+        },
+        "dangerSubtleBorderDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.55, 0.09, 25],
+            "hex": "#a05c57"
           },
           "$type": "color"
         }
