@@ -12,6 +12,21 @@ const releasableRootFiles = new Set([
 ]);
 
 const workspacePrefixes = ["packages/", "apps/"];
+const dependabotAuthorLogins = new Set(["dependabot[bot]", "app/dependabot"]);
+const dependencyRootFiles = new Set([
+  "package.json",
+  "pnpm-lock.yaml",
+  "pnpm-workspace.yaml",
+  "package-lock.json",
+  "yarn.lock",
+  "npm-shrinkwrap.json",
+  "bun.lock",
+  "bun.lockb",
+]);
+const workspaceDependencyManifestPattern =
+  /^(?:apps|packages)\/[^/]+\/package\.json$/;
+const workspaceDependencyLockfilePattern =
+  /^(?:apps|packages)\/[^/]+\/(?:pnpm-lock\.yaml|package-lock\.json|yarn\.lock|npm-shrinkwrap\.json|bun\.lock|bun\.lockb)$/;
 
 function logLine(message) {
   process.stdout.write(`${message}\n`);
@@ -35,6 +50,31 @@ function parseCsvSet(value) {
       .map((entry) => entry.trim())
       .filter(Boolean),
   );
+}
+
+function normalizeLogin(value) {
+  return `${value || ""}`.trim().toLowerCase();
+}
+
+export function isDependabotAuthor(login) {
+  return dependabotAuthorLogins.has(normalizeLogin(login));
+}
+
+function isDependencyManifestOrLockfile(filePath) {
+  if (dependencyRootFiles.has(filePath)) {
+    return true;
+  }
+  if (workspaceDependencyManifestPattern.test(filePath)) {
+    return true;
+  }
+  if (workspaceDependencyLockfilePattern.test(filePath)) {
+    return true;
+  }
+  return false;
+}
+
+export function isDependencyOnlyChange(files) {
+  return files.length > 0 && files.every(isDependencyManifestOrLockfile);
 }
 
 function readPrLabels() {
@@ -465,6 +505,10 @@ export function runChangesetCoverageCheck() {
   );
   const prLabels = readPrLabels();
   const hasExemptLabel = Boolean(exemptLabel) && prLabels.has(exemptLabel);
+  const prAuthorLogin = normalizeLogin(
+    process.env.PR_AUTHOR_LOGIN || process.env.GITHUB_ACTOR || "",
+  );
+  const dependabotAuthor = isDependabotAuthor(prAuthorLogin);
 
   const { baseSha, headSha } = resolveBaseAndHeadRefs();
   if (
@@ -495,6 +539,18 @@ export function runChangesetCoverageCheck() {
       debugLine(debugEnabled, "decision=skip_no_releasable_changes");
       logLine(
         "[changeset-check] No workspace or releasable root changes detected. Skipping.",
+      );
+      return 0;
+    }
+
+    const dependencyOnly = isDependencyOnlyChange(changedFiles);
+    debugLine(debugEnabled, `pr_author_login=${prAuthorLogin || "(unknown)"}`);
+    debugLine(debugEnabled, `is_dependabot_author=${dependabotAuthor}`);
+    debugLine(debugEnabled, `dependency_only_change=${dependencyOnly}`);
+    if (dependabotAuthor && dependencyOnly) {
+      debugLine(debugEnabled, "decision=pass_dependabot_dependency_only");
+      logLine(
+        "[changeset-check] Dependabot dependency-only PR detected. Changeset requirement auto-exempted.",
       );
       return 0;
     }
