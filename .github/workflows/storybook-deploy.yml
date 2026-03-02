@@ -104,7 +104,7 @@ jobs:
 
           deployment_url="$(
             tr -cs '[:graph:]' '\n' < "$deploy_log" \
-              | grep -E '^https://[^[:space:]]+\\.vercel\\.app$' \
+              | grep -E '^https://[^[:space:]]+\.vercel\.app$' \
               | tail -n1 || true
           )"
 
@@ -236,7 +236,7 @@ jobs:
 
           deployment_url="$(
             tr -cs '[:graph:]' '\n' < "$deploy_log" \
-              | grep -E '^https://[^[:space:]]+\\.vercel\\.app$' \
+              | grep -E '^https://[^[:space:]]+\.vercel\.app$' \
               | tail -n1 || true
           )"
 
