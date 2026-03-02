@@ -168,7 +168,7 @@ jobs:
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.setup.outputs.use_remote != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
@@ -229,7 +229,7 @@ jobs:
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.setup.outputs.use_remote != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
@@ -268,7 +268,7 @@ jobs:
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.setup.outputs.use_remote != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
@@ -305,7 +305,7 @@ jobs:
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.setup.outputs.use_remote != 'true' }}
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.job }}-${{ github.ref_name }}-${{ github.sha }}-${{ hashFiles('pnpm-lock.yaml', 'turbo.json', 'package.json') }}
