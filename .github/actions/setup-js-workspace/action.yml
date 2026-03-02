@@ -21,6 +21,10 @@ inputs:
     description: Dependency install command. Set to empty to skip.
     required: false
     default: "pnpm install --frozen-lockfile"
+  enable-node-cache:
+    description: Whether to enable setup-node pnpm cache integration.
+    required: false
+    default: "true"
   enable-turbo-cache:
     description: Whether to evaluate Turborepo remote/local cache availability.
     required: false
@@ -59,11 +63,18 @@ runs:
       with:
         version: ${{ inputs.pnpm-version }}
 
-    - name: Setup Node
+    - name: Setup Node (pnpm cache enabled)
+      if: ${{ inputs.enable-node-cache == 'true' }}
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
         cache: "pnpm"
+
+    - name: Setup Node (cache disabled)
+      if: ${{ inputs.enable-node-cache != 'true' }}
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
 
     - name: Install workspace dependencies
       if: ${{ inputs.install-command != '' }}
