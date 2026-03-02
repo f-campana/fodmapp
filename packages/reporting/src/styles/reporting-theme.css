@@ -20,8 +20,15 @@
   );
   --fd-reporting-color-text: var(--fd-semantic-color-text-primary, #0f172a);
   --fd-reporting-color-text-muted: var(--fd-semantic-color-text-muted, #475569);
-  --fd-reporting-color-grid: var(--fd-reporting-color-border-subtle, #d7e0eb);
-  --fd-reporting-color-axis: var(--fd-reporting-color-text-muted, #64748b);
+  --fd-reporting-color-grid: var(
+    --fd-semantic-color-data-grid,
+    var(--fd-reporting-color-border-subtle, #d7e0eb)
+  );
+  --fd-reporting-color-axis: var(
+    --fd-semantic-color-data-axis,
+    var(--fd-reporting-color-text-muted, #64748b)
+  );
+  --fd-reporting-color-track: var(--fd-semantic-color-data-track, #d7e0eb);
   --fd-reporting-color-info-bg: var(
     --fd-semantic-color-status-info-bg,
     #0ea5e9
@@ -55,11 +62,11 @@
     #dc2626
   );
   --fd-reporting-color-surface-success-soft: var(
-    --fd-semantic-color-status-success-fg,
-    #dcfce7
+    --fd-semantic-color-status-success-bg-subtle,
+    #d1fae5
   );
   --fd-reporting-color-surface-danger-soft: var(
-    --fd-semantic-color-status-danger-fg,
+    --fd-semantic-color-status-danger-bg-subtle,
     #fee2e2
   );
 

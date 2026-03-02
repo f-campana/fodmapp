@@ -611,7 +611,7 @@ export default function ConsentRightsClient({
           </p>
           <input
             aria-label="confirmation"
-            className="w-full rounded border border-zinc-300 p-2"
+            className="w-full rounded border border-input p-2"
             value={confirmDeleteText}
             onChange={(event) => setConfirmDeleteText(event.target.value)}
             placeholder={copy("screens.deletion.confirmAction")}
