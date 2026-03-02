@@ -15,6 +15,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - centralized workspace setup and cache orchestration through `.github/actions/setup-js-workspace`
 - explicit setup-node cache-mode control (`enable-node-cache`) for jobs that intentionally skip dependency installation
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
+- path-scoped Storybook deployment to Vercel with preview (PR) and production (main) lanes
 
 ## Phase 2 Reporting Gate Mode
 
@@ -126,6 +127,46 @@ Turbo command contract:
   - `pnpm --filter @fodmap/storybook exec playwright install chromium` (runtime dependency install)
   - `pnpm --filter @fodmap/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
 
+## Storybook Deploy Workflow Contract
+
+`Storybook Deploy` (`.github/workflows/storybook-deploy.yml`) publishes `apps/storybook`
+to Vercel with deterministic trigger scope and explicit secret gating.
+
+Trigger policy:
+
+- `pull_request` (preview lane) and `push` to `main` (production lane)
+- path-scoped to:
+  - `apps/storybook/**`
+  - `packages/ui/**`
+  - `packages/design-tokens/**`
+  - `packages/tailwind-config/**`
+  - `packages/reporting/**`
+  - root build contract files (`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `turbo.json`)
+  - workflow/action sources (`.github/workflows/storybook-deploy.yml`, `.github/actions/setup-js-workspace/action.yml`)
+
+Secrets contract:
+
+- required repository secrets:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID`
+  - `VERCEL_PROJECT_ID`
+- workflow fails fast with explicit error if any required secret is missing
+
+Security contract:
+
+- preview deploy lane runs only for non-fork PRs (secrets-safe)
+- fork PRs emit a dedicated skip job with reason
+- deployment access policy is enforced in Vercel project settings:
+  - Vercel Authentication
+
+UX contract:
+
+- preview lane upserts a single sticky PR comment (`<!-- storybook-preview-deploy -->`) with:
+  - preview URL
+  - commit SHA
+  - access mode note
+- production lane writes deployment URL + commit SHA to workflow summary
+
 ## Branch Protection Required Checks (`main`)
 
 Configure `main` to require these checks:
@@ -155,3 +196,6 @@ Configure `main` to require these checks:
 11. Confirm the next eligible `Changesets release` run can create/update its PR using native token settings.
 12. Before merging any hotfix touching CI, reporting, release, or workflow logic, check for open mergeable changeset/release PRs and record disposition (merge, retarget, or intentionally defer).
 13. After merging to `main`, watch these workflows to completion before closing the incident: `Phase 2 Reporting`, `API`, `CI`, `Changesets release`.
+14. Open a PR touching `apps/storybook/**` and confirm `Storybook Deploy` preview job runs, publishes URL, and updates one sticky comment.
+15. Open a fork PR touching `apps/storybook/**` and confirm preview deploy is skipped with explicit reason.
+16. Merge a Storybook-impacting PR to `main` and confirm `Storybook Deploy` production job publishes and writes URL in job summary.

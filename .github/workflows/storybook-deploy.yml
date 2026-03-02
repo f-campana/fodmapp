@@ -1,0 +1,262 @@
+name: Storybook Deploy
+
+on:
+  pull_request:
+    paths:
+      - "apps/storybook/**"
+      - "packages/ui/**"
+      - "packages/design-tokens/**"
+      - "packages/tailwind-config/**"
+      - "packages/reporting/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/storybook-deploy.yml"
+      - ".github/actions/setup-js-workspace/action.yml"
+  push:
+    branches:
+      - "main"
+    paths:
+      - "apps/storybook/**"
+      - "packages/ui/**"
+      - "packages/design-tokens/**"
+      - "packages/tailwind-config/**"
+      - "packages/reporting/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/storybook-deploy.yml"
+      - ".github/actions/setup-js-workspace/action.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  storybook-preview:
+    name: storybook-preview
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-js-workspace
+        with:
+          node-version: "22"
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          enable-turbo-cache: "false"
+
+      - name: Validate required Vercel secrets
+        run: |
+          set -euo pipefail
+          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing required repository secret: ${key}"
+              exit 1
+            fi
+          done
+
+      - name: Pull Vercel project settings (preview)
+        run: |
+          pnpm dlx vercel@50.20.0 pull --yes --environment=preview --token="$VERCEL_TOKEN"
+
+      - name: Build Storybook static output (preview)
+        run: |
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
+
+      - name: Prepare Vercel prebuilt output (preview)
+        run: |
+          set -euo pipefail
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+          cp -R apps/storybook/storybook-static/. .vercel/output/static/
+          cat > .vercel/output/config.json <<'EOF'
+          {
+            "version": 3
+          }
+          EOF
+
+      - name: Deploy Storybook preview
+        id: deploy
+        run: |
+          set -euo pipefail
+
+          deploy_log="$(mktemp)"
+          if ! pnpm dlx vercel@50.20.0 deploy --prebuilt --target=preview --yes --token "$VERCEL_TOKEN" 2>&1 | tee "$deploy_log"; then
+            echo "::error::Vercel preview deploy command failed."
+            exit 1
+          fi
+
+          deployment_url="$(
+            tr -cs '[:graph:]' '\n' < "$deploy_log" \
+              | grep -E '^https://[^[:space:]]+\.vercel\.app$' \
+              | tail -n1 || true
+          )"
+
+          if [ -z "$deployment_url" ]; then
+            echo "::error::Could not extract preview deployment URL from Vercel output."
+            cat "$deploy_log"
+            exit 1
+          fi
+
+          echo "preview_url=$deployment_url" >> "$GITHUB_OUTPUT"
+
+      - name: Upsert PR preview comment
+        uses: actions/github-script@v8
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+          COMMIT_SHA: ${{ github.sha }}
+        with:
+          script: |
+            const marker = "<!-- storybook-preview-deploy -->";
+            const body = `${marker}
+            ## Storybook Preview (Internal)
+            - URL: ${process.env.PREVIEW_URL}
+            - Commit: \`${process.env.COMMIT_SHA}\`
+            - Access mode: Vercel Authentication (configured in Vercel project settings).`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existingComment = comments.find(
+              (comment) =>
+                comment.user?.type === "Bot" &&
+                typeof comment.body === "string" &&
+                comment.body.includes(marker),
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existingComment.id,
+                body,
+              });
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body,
+            });
+
+  storybook-preview-fork-skipped:
+    name: storybook-preview-fork-skipped
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain why preview deploy is skipped
+        run: |
+          echo "Skipping Storybook preview deploy for fork PR to avoid exposing Vercel secrets."
+
+  storybook-production:
+    name: storybook-production
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-js-workspace
+        with:
+          node-version: "22"
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          enable-turbo-cache: "false"
+
+      - name: Validate required Vercel secrets
+        run: |
+          set -euo pipefail
+          for key in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing required repository secret: ${key}"
+              exit 1
+            fi
+          done
+
+      - name: Pull Vercel project settings (production)
+        run: |
+          pnpm dlx vercel@50.20.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build Storybook static output (production)
+        run: |
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
+
+      - name: Prepare Vercel prebuilt output (production)
+        run: |
+          set -euo pipefail
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+          cp -R apps/storybook/storybook-static/. .vercel/output/static/
+          cat > .vercel/output/config.json <<'EOF'
+          {
+            "version": 3
+          }
+          EOF
+
+      - name: Deploy Storybook production
+        id: deploy
+        run: |
+          set -euo pipefail
+
+          deploy_log="$(mktemp)"
+          if ! pnpm dlx vercel@50.20.0 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1 | tee "$deploy_log"; then
+            echo "::error::Vercel production deploy command failed."
+            exit 1
+          fi
+
+          deployment_url="$(
+            tr -cs '[:graph:]' '\n' < "$deploy_log" \
+              | grep -E '^https://[^[:space:]]+\.vercel\.app$' \
+              | tail -n1 || true
+          )"
+
+          if [ -z "$deployment_url" ]; then
+            echo "::error::Could not extract production deployment URL from Vercel output."
+            cat "$deploy_log"
+            exit 1
+          fi
+
+          echo "production_url=$deployment_url" >> "$GITHUB_OUTPUT"
+
+      - name: Write deployment summary
+        env:
+          PRODUCTION_URL: ${{ steps.deploy.outputs.production_url }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          {
+            echo "## Storybook Production Deployment"
+            echo
+            echo "- URL: ${PRODUCTION_URL}"
+            echo "- Commit: \`${COMMIT_SHA}\`"
+            echo "- Access mode: Vercel Authentication."
+          } >> "$GITHUB_STEP_SUMMARY"
