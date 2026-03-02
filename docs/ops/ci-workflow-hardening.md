@@ -1,6 +1,6 @@
 # CI Workflow Hardening Runbook
 
-Last updated: 2026-03-01
+Last updated: 2026-03-02
 
 ## Scope
 
@@ -13,6 +13,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - Turbo cache mode selection: remote cache when configured, `.turbo` restore/save fallback when not
 - strict local Turbo binary invocation in CI via `pnpm exec turbo run ...`
 - centralized workspace setup and cache orchestration through `.github/actions/setup-js-workspace`
+- explicit setup-node cache-mode control (`enable-node-cache`) for jobs that intentionally skip dependency installation
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 
 ## Phase 2 Reporting Gate Mode
@@ -50,6 +51,7 @@ The workflow preflight step fails loudly with actionable errors if these setting
 The gate no longer relies on `pnpm changeset status` output for pass/fail decisions.
 Changed `.changeset` entries that reference non-workspace package names now fail with explicit package/file diagnostics.
 Root-only releasable file changes (with no workspace package/app changes) now pass without requiring a changeset.
+Dependabot dependency-only PRs (manifest/lockfile-only changes) are auto-exempted from manual `.changeset` requirements.
 
 Optional debug mode for local/CI diagnostics:
 
@@ -103,6 +105,9 @@ The main `CI` workflow now uses a `pr-scope` job to compute execution booleans f
 - invalid/missing PR SHAs: all scoped jobs enabled
 - PR diff failures: all scoped jobs enabled
 - changes to global build/workflow files (for example `package.json`, `turbo.json`, CI workflow): all scoped jobs enabled
+
+`pr-scope` intentionally skips dependency installation and now sets `enable-node-cache: "false"` in
+`.github/actions/setup-js-workspace` to avoid setup-node cache path validation errors on lockfile-only PRs.
 
 Turbo cache behavior for scoped jobs:
 
