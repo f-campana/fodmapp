@@ -79,13 +79,25 @@ jobs:
         run: |
           pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
+      - name: Prepare Vercel prebuilt output (preview)
+        run: |
+          set -euo pipefail
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+          cp -R apps/storybook/storybook-static/. .vercel/output/static/
+          cat > .vercel/output/config.json <<'EOF'
+          {
+            "version": 3
+          }
+          EOF
+
       - name: Deploy Storybook preview
         id: deploy
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy apps/storybook/storybook-static --target=preview --yes --token "$VERCEL_TOKEN")"
-          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+' | tail -n1)"
+          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --target=preview --yes --token "$VERCEL_TOKEN" 2>&1)"
+          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract preview deployment URL from Vercel output."
@@ -190,13 +202,25 @@ jobs:
         run: |
           pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
+      - name: Prepare Vercel prebuilt output (production)
+        run: |
+          set -euo pipefail
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+          cp -R apps/storybook/storybook-static/. .vercel/output/static/
+          cat > .vercel/output/config.json <<'EOF'
+          {
+            "version": 3
+          }
+          EOF
+
       - name: Deploy Storybook production
         id: deploy
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy apps/storybook/storybook-static --prod --yes --token "$VERCEL_TOKEN")"
-          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+' | tail -n1)"
+          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1)"
+          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract production deployment URL from Vercel output."
