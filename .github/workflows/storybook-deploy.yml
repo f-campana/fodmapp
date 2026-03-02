@@ -75,16 +75,16 @@ jobs:
         run: |
           pnpm dlx vercel@50.20.0 pull --yes --environment=preview --token="$VERCEL_TOKEN"
 
-      - name: Build Storybook deployment bundle (preview)
+      - name: Build Storybook static output (preview)
         run: |
-          pnpm dlx vercel@50.20.0 build --token="$VERCEL_TOKEN"
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
       - name: Deploy Storybook preview
         id: deploy
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --token "$VERCEL_TOKEN")"
+          deploy_output="$(pnpm dlx vercel@50.20.0 deploy apps/storybook/storybook-static --target=preview --yes --token "$VERCEL_TOKEN")"
           deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+' | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
@@ -186,16 +186,16 @@ jobs:
         run: |
           pnpm dlx vercel@50.20.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
 
-      - name: Build Storybook deployment bundle (production)
+      - name: Build Storybook static output (production)
         run: |
-          pnpm dlx vercel@50.20.0 build --prod --token="$VERCEL_TOKEN"
+          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
 
       - name: Deploy Storybook production
         id: deploy
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --prod --token "$VERCEL_TOKEN")"
+          deploy_output="$(pnpm dlx vercel@50.20.0 deploy apps/storybook/storybook-static --prod --yes --token "$VERCEL_TOKEN")"
           deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+' | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
