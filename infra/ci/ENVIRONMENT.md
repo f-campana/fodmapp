@@ -61,6 +61,22 @@ These keys are optional and used by CI governance helper scripts.
 | `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`               | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
 | `PR_AUTHOR_LOGIN`       | `.github/scripts/check-pr-changesets.mjs` | no       | `dependabot[bot]` | Set by `changeset-pr-gate` workflow. Enables Dependabot dependency-only auto-exemption logic while keeping strict checks for human-authored PRs.                                 |
 
+## CI Storybook Deploy Variables
+
+These keys are required by `.github/workflows/storybook-deploy.yml`.
+
+| Variable            | Used by                                  | Required | Default/Example   | Notes                                                                                          |
+| ------------------- | ---------------------------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| `VERCEL_TOKEN`      | `.github/workflows/storybook-deploy.yml` | yes      | Vercel CLI token  | Auth token for `vercel pull`, `vercel build`, and `vercel deploy` in preview/production lanes. |
+| `VERCEL_ORG_ID`     | `.github/workflows/storybook-deploy.yml` | yes      | `team_...` / user | Vercel scope identifier used by CLI with linked project metadata.                              |
+| `VERCEL_PROJECT_ID` | `.github/workflows/storybook-deploy.yml` | yes      | `prj_...`         | Vercel project identifier for Storybook deployment target.                                     |
+
+Storybook deploy security notes:
+
+- Preview deployment is skipped for fork PRs to prevent secrets exposure.
+- Internal-only access enforcement is managed in Vercel project settings:
+  - Vercel Authentication
+
 ## App Runtime Integration Variables (`apps/app`)
 
 These keys are now actively consumed by `apps/app` runtime adapters. All integrations are env-gated and default to safe no-op/disabled behavior when values are missing.

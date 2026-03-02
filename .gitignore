@@ -15,6 +15,7 @@ playwright-report/
 .astro/
 .expo/
 apps/mobile-prototype/.expo/
+.vercel/
 *.tsbuildinfo
 packages/design-tokens/.tmp/
 
