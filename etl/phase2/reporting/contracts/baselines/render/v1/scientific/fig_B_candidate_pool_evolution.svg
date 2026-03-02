@@ -9,50 +9,50 @@
 .value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
 .muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
 .mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
-.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
-.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
+.grid{stroke:var(--fd-reporting-color-grid, var(--fd-semantic-color-data-grid));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-axis, var(--fd-semantic-color-data-axis));stroke-width:1.2;}
 ]]></style>
 </defs>
 <rect x="0" y="0" width="1200" height="520" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
 <text class="title" x="24" y="36">B - Candidate Pool Evolution</text>
 <text class="subtitle" x="24" y="58">Source: P-02_candidate_pool_split_by_stage</text>
 <text class="label" x="170" y="118" text-anchor="end">fructan_wave01</text>
-<rect x="180" y="104" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="104" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="105" width="590.7692307692308" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="770.7692307692308" y="105" width="369.2307692307692" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="764.7692307692308" y="118" text-anchor="end">16</text>
 <text class="value" x="1148" y="118">10</text>
 <text class="muted" x="1150" y="118">unresolved=26</text>
 <text class="label" x="170" y="172" text-anchor="end">fructan_wave02</text>
-<rect x="180" y="158" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="158" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="159" width="553.8461538461538" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="733.8461538461538" y="159" width="221.53846153846155" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="727.8461538461538" y="172" text-anchor="end">15</text>
 <text class="value" x="963.3846153846154" y="172">6</text>
 <text class="muted" x="1150" y="172">unresolved=21</text>
 <text class="label" x="170" y="226" text-anchor="end">gos_wave01</text>
-<rect x="180" y="212" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="212" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="213" width="332.3076923076923" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="512.3076923076924" y="213" width="221.53846153846155" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="506.3076923076923" y="226" text-anchor="end">9</text>
 <text class="value" x="741.8461538461539" y="226">6</text>
 <text class="muted" x="1150" y="226">unresolved=15</text>
 <text class="label" x="170" y="280" text-anchor="end">gos_wave02</text>
-<rect x="180" y="266" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="266" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="267" width="221.53846153846155" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="401.53846153846155" y="267" width="110.76923076923077" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="395.53846153846155" y="280" text-anchor="end">6</text>
 <text class="value" x="520.3076923076924" y="280">3</text>
 <text class="muted" x="1150" y="280">unresolved=9</text>
 <text class="label" x="170" y="334" text-anchor="end">polyol_wave01</text>
-<rect x="180" y="320" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="320" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="321" width="36.92307692307693" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="216.92307692307693" y="321" width="73.84615384615385" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="210.92307692307693" y="334" text-anchor="end">1</text>
 <text class="value" x="298.7692307692308" y="334">2</text>
 <text class="muted" x="1150" y="334">unresolved=3</text>
 <text class="label" x="170" y="388" text-anchor="end">polyol_wave02</text>
-<rect x="180" y="374" width="960" height="20" fill="var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))" opacity="0.38"/>
+<rect x="180" y="374" width="960" height="20" fill="var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))"/>
 <rect x="180" y="375" width="0" height="18" fill="var(--fd-reporting-color-success-bg, var(--fd-semantic-color-status-success-bg))"/>
 <rect x="180" y="375" width="0" height="18" fill="var(--fd-reporting-color-danger-bg, var(--fd-semantic-color-status-danger-bg))"/>
 <text class="value" x="196" y="388" text-anchor="end">0</text>
