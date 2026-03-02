@@ -96,12 +96,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --target=preview --yes --token "$VERCEL_TOKEN" 2>&1)"
-          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' | tail -n1)"
+          deploy_log="$(mktemp)"
+          if ! pnpm dlx vercel@50.20.0 deploy --prebuilt --target=preview --yes --token "$VERCEL_TOKEN" 2>&1 | tee "$deploy_log"; then
+            echo "::error::Vercel preview deploy command failed."
+            exit 1
+          fi
+
+          deployment_url="$(grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' "$deploy_log" | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract preview deployment URL from Vercel output."
-            printf '%s\n' "$deploy_output"
+            cat "$deploy_log"
             exit 1
           fi
 
@@ -219,12 +224,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          deploy_output="$(pnpm dlx vercel@50.20.0 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1)"
-          deployment_url="$(printf '%s\n' "$deploy_output" | grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' | tail -n1)"
+          deploy_log="$(mktemp)"
+          if ! pnpm dlx vercel@50.20.0 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1 | tee "$deploy_log"; then
+            echo "::error::Vercel production deploy command failed."
+            exit 1
+          fi
+
+          deployment_url="$(grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' "$deploy_log" | tail -n1)"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract production deployment URL from Vercel output."
-            printf '%s\n' "$deploy_output"
+            cat "$deploy_log"
             exit 1
           fi
 
