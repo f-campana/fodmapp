@@ -24,6 +24,16 @@ export const semanticSlotMap = [
     slot: "--color-surface-muted",
     token: "--fd-semantic-color-surface-muted",
   },
+  {
+    group: "surface",
+    slot: "--color-surface-inverse",
+    token: "--fd-semantic-color-surface-inverse",
+  },
+  {
+    group: "surface",
+    slot: "--color-foreground-inverse",
+    token: "--fd-semantic-color-text-inverse",
+  },
 
   {
     group: "card",
@@ -84,6 +94,16 @@ export const semanticSlotMap = [
   },
   {
     group: "borders",
+    slot: "--color-border-subtle",
+    token: "--fd-semantic-color-border-subtle",
+  },
+  {
+    group: "borders",
+    slot: "--color-border-strong",
+    token: "--fd-semantic-color-border-strong",
+  },
+  {
+    group: "borders",
     slot: "--color-ring",
     token: "--fd-semantic-color-focus-ring",
   },
@@ -130,6 +150,36 @@ export const semanticSlotMap = [
   },
   {
     group: "actions",
+    slot: "--color-outline",
+    token: "--fd-semantic-color-action-outline-bg",
+  },
+  {
+    group: "actions",
+    slot: "--color-outline-hover",
+    token: "--fd-semantic-color-action-outline-bg-hover",
+  },
+  {
+    group: "actions",
+    slot: "--color-outline-border",
+    token: "--fd-semantic-color-action-outline-border",
+  },
+  {
+    group: "actions",
+    slot: "--color-outline-foreground",
+    token: "--fd-semantic-color-action-outline-fg",
+  },
+  {
+    group: "actions",
+    slot: "--color-ghost-hover",
+    token: "--fd-semantic-color-action-ghost-bg-hover",
+  },
+  {
+    group: "actions",
+    slot: "--color-ghost-foreground",
+    token: "--fd-semantic-color-action-ghost-fg",
+  },
+  {
+    group: "actions",
     slot: "--color-destructive",
     token: "--fd-semantic-color-action-destructive-bg",
   },
@@ -163,6 +213,32 @@ export const semanticSlotMap = [
     slot: "--color-destructive-subtle-border",
     token: "--fd-semantic-color-action-destructive-border-subtle",
   },
+  {
+    group: "actions",
+    slot: "--color-destructive-subtle-ring",
+    token: "--fd-semantic-color-action-destructive-ring-subtle",
+  },
+
+  {
+    group: "validation",
+    slot: "--color-validation-error-border",
+    token: "--fd-semantic-color-validation-error-border",
+  },
+  {
+    group: "validation",
+    slot: "--color-validation-error-ring",
+    token: "--fd-semantic-color-validation-error-ring",
+  },
+  {
+    group: "validation",
+    slot: "--color-validation-error-ring-soft",
+    token: "--fd-semantic-color-validation-error-ring-soft",
+  },
+  {
+    group: "validation",
+    slot: "--color-validation-error-text",
+    token: "--fd-semantic-color-validation-error-text",
+  },
 
   {
     group: "status",
@@ -186,6 +262,11 @@ export const semanticSlotMap = [
   },
   {
     group: "status",
+    slot: "--color-success-subtle",
+    token: "--fd-semantic-color-status-success-bg-subtle",
+  },
+  {
+    group: "status",
     slot: "--color-warning",
     token: "--fd-semantic-color-status-warning-bg",
   },
@@ -203,6 +284,11 @@ export const semanticSlotMap = [
     group: "status",
     slot: "--color-danger-foreground",
     token: "--fd-semantic-color-status-danger-fg",
+  },
+  {
+    group: "status",
+    slot: "--color-danger-subtle",
+    token: "--fd-semantic-color-status-danger-bg-subtle",
   },
 
   {

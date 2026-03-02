@@ -588,6 +588,14 @@
           },
           "$type": "color"
         },
+        "dangerValidationRingLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.6491, 0.0254, 39.35],
+            "hex": "#9d8a84"
+          },
+          "$type": "color"
+        },
         "canvasDark": {
           "$value": {
             "colorSpace": "oklch",
@@ -617,6 +625,30 @@
             "colorSpace": "oklch",
             "components": [0.3225, 0.0298, 60.12],
             "hex": "#3f3024"
+          },
+          "$type": "color"
+        },
+        "surfaceMutedSoftDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.2649, 0.0221, 63.63],
+            "hex": "#2d231a"
+          },
+          "$type": "color"
+        },
+        "controlSubtleDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.2828, 0.0123, 62.19],
+            "hex": "#2e2823"
+          },
+          "$type": "color"
+        },
+        "controlSubtleStrongDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.3882, 0.0127, 57.91],
+            "hex": "#4a433e"
           },
           "$type": "color"
         },
@@ -751,8 +783,24 @@
         "dangerSubtleBorderDark": {
           "$value": {
             "colorSpace": "oklch",
-            "components": [0.55, 0.09, 25],
-            "hex": "#a05c57"
+            "components": [0.565, 0.09, 25],
+            "hex": "#a4605b"
+          },
+          "$type": "color"
+        },
+        "dangerValidationRingDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.5069, 0.0549, 29.43],
+            "hex": "#825953"
+          },
+          "$type": "color"
+        },
+        "dangerValidationBorderDark": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.5083, 0.0644, 27.91],
+            "hex": "#875751"
           },
           "$type": "color"
         }

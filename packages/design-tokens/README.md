@@ -75,3 +75,31 @@ Generation enforces contrast minimums for these pairs in both themes:
 - `fgSubtle` on `bgSubtle` >= `4.5:1`
 - `fgSubtle` on `bgSubtleHover` >= `4.5:1`
 - `borderSubtle` on `bgSubtle` >= `3.0:1`
+- `borderSubtle` on `bgSubtleHover` >= `3.0:1`
+
+## Semantic Remediation Contract
+
+This package also defines semantic-only color roles used to remove runtime
+opacity/dark overrides from consumers:
+
+- Validation: `semantic.color.validation.error.{border,ring,ringSoft,text}`
+- Outline action: `semantic.color.action.outline.{bg,bgHover,border,fg}`
+- Ghost action: `semantic.color.action.ghost.{bgHover,fg}`
+- Destructive subtle focus: `semantic.color.action.destructive.ringSubtle`
+- Status subtle surfaces:
+  - `semantic.color.status.success.bgSubtle`
+  - `semantic.color.status.danger.bgSubtle`
+- Data visualization:
+  - `semantic.color.data.{axis,grid,track}`
+
+Additional enforced contrast checks include:
+
+- `validation.error.text` on `background.canvas` >= `4.5:1`
+- `validation.error.border` on `background.canvas` >= `3.0:1`
+- `validation.error.ringSoft` on `background.canvas` >= `3.0:1`
+- `action.outline.fg` on `action.outline.bg` >= `4.5:1`
+- `action.outline.fg` on `action.outline.bgHover` >= `4.5:1`
+- `action.outline.border` on `action.outline.bg` >= `3.0:1`
+- `text.primary` on `status.success.bgSubtle` >= `4.5:1`
+- `text.primary` on `status.danger.bgSubtle` >= `4.5:1`
+- `action.destructive.ringSubtle` on `bgSubtle` and `bgSubtleHover` >= `3.0:1`
