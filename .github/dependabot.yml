@@ -7,7 +7,11 @@ updates:
       day: monday
       time: "08:00"
       timezone: "Etc/UTC"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 6
+    groups:
+      ci-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: npm
     directory: "/"
@@ -16,4 +20,47 @@ updates:
       day: monday
       time: "08:00"
       timezone: "Etc/UTC"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 6
+    groups:
+      storybook-tooling:
+        patterns:
+          - "@storybook/*"
+          - "storybook"
+          - "chromatic"
+      mobile-runtime:
+        patterns:
+          - "expo"
+          - "expo-*"
+          - "@expo/*"
+          - "react-native"
+          - "react-native-*"
+          - "@react-native/*"
+          - "@react-navigation/*"
+      build-tooling:
+        patterns:
+          - "turbo"
+          - "@turbo/*"
+          - "vite"
+          - "vite-*"
+          - "@vitejs/*"
+          - "typescript"
+          - "tsx"
+          - "rollup"
+          - "rollup-*"
+          - "webpack"
+          - "webpack-*"
+          - "esbuild"
+          - "postcss"
+          - "autoprefixer"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      auth-runtime:
+        patterns:
+          - "next-auth"
+          - "@auth/*"
+          - "jose"
+          - "openid-client"
+    ignore:
+      - dependency-name: "eslint-import-resolver-typescript"
+        update-types:
+          - "version-update:semver-major"

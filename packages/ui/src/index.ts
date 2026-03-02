@@ -1,6 +1,5 @@
 export type { BadgeProps } from "./components/badge";
 export { Badge } from "./components/badge";
-export type { ButtonProps } from "./components/button";
 export { Button } from "./components/button";
 export {
   Card,
