@@ -13,9 +13,13 @@ describe("Input", () => {
 
   it("supports native invalid state through aria-invalid", () => {
     render(<Input aria-invalid="true" placeholder="Email" />);
-    expect(screen.getByPlaceholderText("Email")).toHaveAttribute(
-      "aria-invalid",
-      "true",
+    const input = screen.getByPlaceholderText("Email");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input.className).toContain(
+      "aria-invalid:border-validation-error-border",
+    );
+    expect(input.className).toContain(
+      "aria-invalid:ring-validation-error-ring-soft",
     );
   });
 

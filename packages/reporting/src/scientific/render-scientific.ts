@@ -15,6 +15,9 @@ const scientificColor = {
     "var(--fd-reporting-color-border, var(--fd-semantic-color-border-default))",
   borderSubtle:
     "var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle))",
+  grid: "var(--fd-reporting-color-grid, var(--fd-semantic-color-data-grid))",
+  axis: "var(--fd-reporting-color-axis, var(--fd-semantic-color-data-axis))",
+  track: "var(--fd-reporting-color-track, var(--fd-semantic-color-data-track))",
   text: "var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary))",
   textMuted:
     "var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted))",
@@ -60,8 +63,8 @@ function svgRoot(
     `.value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.text};}`,
     `.muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:${scientificColor.textMuted};}`,
     `.mono{font:500 12px 'JetBrains Mono',monospace;fill:${scientificColor.textMuted};}`,
-    `.grid{stroke:${scientificColor.borderSubtle};stroke-width:1;}`,
-    `.axis{stroke:${scientificColor.textMuted};stroke-width:1.2;}`,
+    `.grid{stroke:${scientificColor.grid};stroke-width:1;}`,
+    `.axis{stroke:${scientificColor.axis};stroke-width:1.2;}`,
     `]]></style>`,
     `</defs>`,
     `<rect x="0" y="0" width="${width}" height="${height}" fill="${scientificColor.canvas}"/>`,
@@ -209,7 +212,7 @@ function renderFigureB(run: ReportingRun): string {
       `<text class="label" x="${chartX - 10}" y="${y + 22}" text-anchor="end">${escapeXml(row.stage_id)}</text>`,
     );
     body.push(
-      `<rect x="${chartX}" y="${y + 8}" width="${barW}" height="20" fill="${scientificColor.borderSubtle}" opacity="0.38"/>`,
+      `<rect x="${chartX}" y="${y + 8}" width="${barW}" height="20" fill="${scientificColor.track}"/>`,
     );
     body.push(
       `<rect x="${chartX}" y="${y + 9}" width="${withWidth}" height="18" fill="${scientificColor.success}"/>`,

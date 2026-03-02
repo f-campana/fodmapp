@@ -338,9 +338,29 @@ const requiredSemanticColorPaths = [
   "semantic.color.focus.ringAccessible",
   "semantic.color.focus.ringSoft",
   "semantic.color.border.control",
+  "semantic.color.validation.error.border",
+  "semantic.color.validation.error.ring",
+  "semantic.color.validation.error.ringSoft",
+  "semantic.color.validation.error.text",
+  "semantic.color.action.outline.bg",
+  "semantic.color.action.outline.bgHover",
+  "semantic.color.action.outline.border",
+  "semantic.color.action.outline.fg",
+  "semantic.color.action.ghost.bgHover",
+  "semantic.color.action.ghost.fg",
   "semantic.color.action.destructive.bg",
   "semantic.color.action.destructive.bgHover",
   "semantic.color.action.destructive.fg",
+  "semantic.color.action.destructive.bgSubtle",
+  "semantic.color.action.destructive.bgSubtleHover",
+  "semantic.color.action.destructive.fgSubtle",
+  "semantic.color.action.destructive.borderSubtle",
+  "semantic.color.action.destructive.ringSubtle",
+  "semantic.color.status.success.bgSubtle",
+  "semantic.color.status.danger.bgSubtle",
+  "semantic.color.data.axis",
+  "semantic.color.data.grid",
+  "semantic.color.data.track",
 ] as const;
 
 const semanticPairCards: SemanticPairCard[] = semanticColorRows
@@ -910,6 +930,60 @@ export const Showcase: Story = {
     ).not.toBe("");
     await expect(
       rootStyles.getPropertyValue("--color-destructive-hover").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-destructive-subtle").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-destructive-subtle-ring").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-outline").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-outline-hover").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-outline-border").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-outline-foreground").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-ghost-hover").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-ghost-foreground").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-validation-error-border").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-validation-error-ring").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-validation-error-ring-soft").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-validation-error-text").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-success-subtle").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-danger-subtle").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-surface-inverse").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-foreground-inverse").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-border-subtle").trim(),
+    ).not.toBe("");
+    await expect(
+      rootStyles.getPropertyValue("--color-border-strong").trim(),
     ).not.toBe("");
 
     for (const path of requiredSemanticColorPaths) {

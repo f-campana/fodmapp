@@ -53,6 +53,26 @@
           "$type": "color"
         }
       },
+      "validation": {
+        "error": {
+          "border": {
+            "$value": "{base.color.brand.dangerValidationBorderDark}",
+            "$type": "color"
+          },
+          "ring": {
+            "$value": "{base.color.brand.dangerDark}",
+            "$type": "color"
+          },
+          "ringSoft": {
+            "$value": "{base.color.brand.dangerValidationRingDark}",
+            "$type": "color"
+          },
+          "text": {
+            "$value": "{base.color.brand.dangerDark}",
+            "$type": "color"
+          }
+        }
+      },
       "action": {
         "primary": {
           "bg": { "$value": "{base.color.brand.accentDark}", "$type": "color" },
@@ -70,6 +90,25 @@
           "bgHover": { "$value": "{base.color.neutral.600}", "$type": "color" },
           "fg": { "$value": "{base.color.neutral.50}", "$type": "color" }
         },
+        "outline": {
+          "bg": {
+            "$value": "{base.color.brand.controlSubtleDark}",
+            "$type": "color"
+          },
+          "bgHover": {
+            "$value": "{base.color.brand.controlSubtleStrongDark}",
+            "$type": "color"
+          },
+          "border": { "$value": "{base.color.neutral.500}", "$type": "color" },
+          "fg": { "$value": "{base.color.brand.textDark}", "$type": "color" }
+        },
+        "ghost": {
+          "bgHover": {
+            "$value": "{base.color.brand.surfaceMutedSoftDark}",
+            "$type": "color"
+          },
+          "fg": { "$value": "{base.color.brand.textDark}", "$type": "color" }
+        },
         "destructive": {
           "bg": { "$value": "{base.color.brand.dangerDark}", "$type": "color" },
           "bgHover": {
@@ -78,6 +117,26 @@
           },
           "fg": {
             "$value": "{base.color.brand.dangerForegroundDark}",
+            "$type": "color"
+          },
+          "bgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleDark}",
+            "$type": "color"
+          },
+          "bgSubtleHover": {
+            "$value": "{base.color.brand.dangerSubtleStrongDark}",
+            "$type": "color"
+          },
+          "fgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleFgDark}",
+            "$type": "color"
+          },
+          "borderSubtle": {
+            "$value": "{base.color.brand.dangerSubtleBorderDark}",
+            "$type": "color"
+          },
+          "ringSubtle": {
+            "$value": "{base.color.brand.dangerSubtleBorderDark}",
             "$type": "color"
           }
         }
@@ -89,7 +148,8 @@
         },
         "success": {
           "bg": { "$value": "{base.color.emerald.400}", "$type": "color" },
-          "fg": { "$value": "{base.color.neutral.950}", "$type": "color" }
+          "fg": { "$value": "{base.color.neutral.950}", "$type": "color" },
+          "bgSubtle": { "$value": "{base.color.emerald.900}", "$type": "color" }
         },
         "warning": {
           "bg": {
@@ -106,8 +166,20 @@
           "fg": {
             "$value": "{base.color.brand.dangerForegroundDark}",
             "$type": "color"
+          },
+          "bgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleDark}",
+            "$type": "color"
           }
         }
+      },
+      "data": {
+        "axis": {
+          "$value": "{base.color.brand.textMutedDark}",
+          "$type": "color"
+        },
+        "grid": { "$value": "{base.color.neutral.700}", "$type": "color" },
+        "track": { "$value": "{base.color.neutral.700}", "$type": "color" }
       }
     },
     "typography": {

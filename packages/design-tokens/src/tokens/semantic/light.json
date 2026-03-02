@@ -53,6 +53,26 @@
           "$type": "color"
         }
       },
+      "validation": {
+        "error": {
+          "border": {
+            "$value": "{base.color.brand.dangerLight}",
+            "$type": "color"
+          },
+          "ring": {
+            "$value": "{base.color.brand.dangerLight}",
+            "$type": "color"
+          },
+          "ringSoft": {
+            "$value": "{base.color.brand.dangerValidationRingLight}",
+            "$type": "color"
+          },
+          "text": {
+            "$value": "{base.color.brand.dangerLight}",
+            "$type": "color"
+          }
+        }
+      },
       "action": {
         "primary": {
           "bg": {
@@ -73,6 +93,25 @@
           "bgHover": { "$value": "{base.color.neutral.200}", "$type": "color" },
           "fg": { "$value": "{base.color.neutral.900}", "$type": "color" }
         },
+        "outline": {
+          "bg": {
+            "$value": "{base.color.brand.canvasLight}",
+            "$type": "color"
+          },
+          "bgHover": {
+            "$value": "{base.color.brand.surfaceMutedLight}",
+            "$type": "color"
+          },
+          "border": { "$value": "{base.color.neutral.500}", "$type": "color" },
+          "fg": { "$value": "{base.color.brand.textLight}", "$type": "color" }
+        },
+        "ghost": {
+          "bgHover": {
+            "$value": "{base.color.brand.surfaceMutedLight}",
+            "$type": "color"
+          },
+          "fg": { "$value": "{base.color.brand.textLight}", "$type": "color" }
+        },
         "destructive": {
           "bg": {
             "$value": "{base.color.brand.dangerLight}",
@@ -85,6 +124,26 @@
           "fg": {
             "$value": "{base.color.brand.dangerForegroundLight}",
             "$type": "color"
+          },
+          "bgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleLight}",
+            "$type": "color"
+          },
+          "bgSubtleHover": {
+            "$value": "{base.color.brand.dangerSubtleStrongLight}",
+            "$type": "color"
+          },
+          "fgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleFgLight}",
+            "$type": "color"
+          },
+          "borderSubtle": {
+            "$value": "{base.color.brand.dangerSubtleBorderLight}",
+            "$type": "color"
+          },
+          "ringSubtle": {
+            "$value": "{base.color.brand.dangerSubtleBorderLight}",
+            "$type": "color"
           }
         }
       },
@@ -95,7 +154,8 @@
         },
         "success": {
           "bg": { "$value": "{base.color.emerald.700}", "$type": "color" },
-          "fg": { "$value": "{base.color.neutral.50}", "$type": "color" }
+          "fg": { "$value": "{base.color.neutral.50}", "$type": "color" },
+          "bgSubtle": { "$value": "{base.color.emerald.100}", "$type": "color" }
         },
         "warning": {
           "bg": {
@@ -115,8 +175,20 @@
           "fg": {
             "$value": "{base.color.brand.dangerForegroundLight}",
             "$type": "color"
+          },
+          "bgSubtle": {
+            "$value": "{base.color.brand.dangerSubtleLight}",
+            "$type": "color"
           }
         }
+      },
+      "data": {
+        "axis": {
+          "$value": "{base.color.brand.textMutedLight}",
+          "$type": "color"
+        },
+        "grid": { "$value": "{base.color.neutral.200}", "$type": "color" },
+        "track": { "$value": "{base.color.neutral.200}", "$type": "color" }
       }
     },
     "typography": {

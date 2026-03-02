@@ -35,6 +35,16 @@ export const Invalid: Story = {
     "aria-invalid": "true",
     placeholder: "Valeur invalide",
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Valeur invalide");
+    await expect(input.className).toContain(
+      "aria-invalid:border-validation-error-border",
+    );
+    await expect(input.className).toContain(
+      "aria-invalid:ring-validation-error-ring-soft",
+    );
+  },
 };
 
 export const Disabled: Story = {

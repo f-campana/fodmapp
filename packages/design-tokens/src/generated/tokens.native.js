@@ -100,10 +100,18 @@ export const nativeTokens = {
         "dangerLight": "#99413a",
         "dangerStrongLight": "#7a302b",
         "dangerForegroundLight": "#fff5f4",
+        "dangerSubtleLight": "#ffeae8",
+        "dangerSubtleStrongLight": "#fed6d3",
+        "dangerSubtleFgLight": "#8f3833",
+        "dangerSubtleBorderLight": "#b06a65",
+        "dangerValidationRingLight": "#9d8a84",
         "canvasDark": "#1b1510",
         "surfaceDark": "#292018",
         "surfaceStrongDark": "#362a1f",
         "surfaceMutedDark": "#3f3024",
+        "surfaceMutedSoftDark": "#2d231a",
+        "controlSubtleDark": "#2e2823",
+        "controlSubtleStrongDark": "#4a433e",
         "textDark": "#f6ebdc",
         "textMutedDark": "#ccbaa4",
         "borderDark": "#5a4735",
@@ -116,7 +124,13 @@ export const nativeTokens = {
         "warningForegroundDark": "#271507",
         "dangerDark": "#d27b73",
         "dangerStrongDark": "#e68e87",
-        "dangerForegroundDark": "#2c100f"
+        "dangerForegroundDark": "#2c100f",
+        "dangerSubtleDark": "#2e1817",
+        "dangerSubtleStrongDark": "#3f2220",
+        "dangerSubtleFgDark": "#e18881",
+        "dangerSubtleBorderDark": "#a4605b",
+        "dangerValidationRingDark": "#825953",
+        "dangerValidationBorderDark": "#875751"
       }
     },
     "motion": {
@@ -260,6 +274,14 @@ export const nativeTokens = {
             "ringAccessible": "#5d7a35",
             "ringSoft": "#c2d0a7"
           },
+          "validation": {
+            "error": {
+              "border": "#99413a",
+              "ring": "#99413a",
+              "ringSoft": "#9d8a84",
+              "text": "#99413a"
+            }
+          },
           "action": {
             "primary": {
               "bg": "#5d7a35",
@@ -271,10 +293,25 @@ export const nativeTokens = {
               "bgHover": "#e7e5e4",
               "fg": "#1c1917"
             },
+            "outline": {
+              "bg": "#faf6ef",
+              "bgHover": "#ece2d2",
+              "border": "#78716c",
+              "fg": "#2d2218"
+            },
+            "ghost": {
+              "bgHover": "#ece2d2",
+              "fg": "#2d2218"
+            },
             "destructive": {
               "bg": "#99413a",
               "bgHover": "#7a302b",
-              "fg": "#fff5f4"
+              "fg": "#fff5f4",
+              "bgSubtle": "#ffeae8",
+              "bgSubtleHover": "#fed6d3",
+              "fgSubtle": "#8f3833",
+              "borderSubtle": "#b06a65",
+              "ringSubtle": "#b06a65"
             }
           },
           "status": {
@@ -284,7 +321,8 @@ export const nativeTokens = {
             },
             "success": {
               "bg": "#047857",
-              "fg": "#fafaf9"
+              "fg": "#fafaf9",
+              "bgSubtle": "#d1fae5"
             },
             "warning": {
               "bg": "#9d5f19",
@@ -292,8 +330,14 @@ export const nativeTokens = {
             },
             "danger": {
               "bg": "#99413a",
-              "fg": "#fff5f4"
+              "fg": "#fff5f4",
+              "bgSubtle": "#ffeae8"
             }
+          },
+          "data": {
+            "axis": "#6d5541",
+            "grid": "#e7e5e4",
+            "track": "#e7e5e4"
           }
         },
         "typography": {
@@ -348,6 +392,14 @@ export const nativeTokens = {
             "ringAccessible": "#86a94f",
             "ringSoft": "#6a774d"
           },
+          "validation": {
+            "error": {
+              "border": "#875751",
+              "ring": "#d27b73",
+              "ringSoft": "#825953",
+              "text": "#d27b73"
+            }
+          },
           "action": {
             "primary": {
               "bg": "#86a94f",
@@ -359,10 +411,25 @@ export const nativeTokens = {
               "bgHover": "#57534e",
               "fg": "#fafaf9"
             },
+            "outline": {
+              "bg": "#2e2823",
+              "bgHover": "#4a433e",
+              "border": "#78716c",
+              "fg": "#f6ebdc"
+            },
+            "ghost": {
+              "bgHover": "#2d231a",
+              "fg": "#f6ebdc"
+            },
             "destructive": {
               "bg": "#d27b73",
               "bgHover": "#e68e87",
-              "fg": "#2c100f"
+              "fg": "#2c100f",
+              "bgSubtle": "#2e1817",
+              "bgSubtleHover": "#3f2220",
+              "fgSubtle": "#e18881",
+              "borderSubtle": "#a4605b",
+              "ringSubtle": "#a4605b"
             }
           },
           "status": {
@@ -372,7 +439,8 @@ export const nativeTokens = {
             },
             "success": {
               "bg": "#34d399",
-              "fg": "#0c0a09"
+              "fg": "#0c0a09",
+              "bgSubtle": "#064e3b"
             },
             "warning": {
               "bg": "#d09147",
@@ -380,8 +448,14 @@ export const nativeTokens = {
             },
             "danger": {
               "bg": "#d27b73",
-              "fg": "#2c100f"
+              "fg": "#2c100f",
+              "bgSubtle": "#2e1817"
             }
+          },
+          "data": {
+            "axis": "#ccbaa4",
+            "grid": "#44403c",
+            "track": "#44403c"
           }
         },
         "typography": {

@@ -18,9 +18,9 @@ const buttonVariants = cva(
     "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
     // Focus — two-layer: solid border (--color-ring) + subtle outer ring (--color-ring-soft)
     "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-    // Invalid — destructive border + subtle destructive halo (intentional alpha tint)
-    "aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20",
-    "dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+    // Invalid — semantic validation tokens (strict token-only contract)
+    "aria-invalid:border-validation-error-border aria-invalid:ring-2",
+    "aria-invalid:ring-validation-error-ring-soft",
     // Disabled
     "disabled:pointer-events-none disabled:opacity-50",
     // Cursor — native <button> doesn't show pointer; our convention adds it
@@ -33,10 +33,9 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary-hover",
         outline: [
-          "border-border bg-background",
-          "hover:bg-muted hover:text-foreground",
-          "dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
-          "aria-expanded:bg-muted aria-expanded:text-foreground",
+          "border-outline-border bg-outline text-outline-foreground",
+          "hover:bg-outline-hover",
+          "aria-expanded:bg-outline aria-expanded:text-outline-foreground",
         ].join(" "),
         secondary: [
           "bg-secondary text-secondary-foreground",
@@ -44,20 +43,14 @@ const buttonVariants = cva(
           "aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ].join(" "),
         ghost: [
-          "hover:bg-muted hover:text-foreground",
-          "dark:hover:bg-muted/50",
-          "aria-expanded:bg-muted aria-expanded:text-foreground",
+          "text-ghost-foreground hover:bg-ghost-hover",
+          "aria-expanded:bg-ghost-hover aria-expanded:text-ghost-foreground",
         ].join(" "),
-        // Subtle tinted destructive — alpha values are intentional design
-        // (auto-adapts to light/dark themes). Dedicated tokens
-        // (--color-destructive-subtle, etc.) should be added to the slot map
-        // to replace these opacity modifiers in a future token pass.
+        // Subtle destructive now uses dedicated semantic tokens (no opacity hacks).
         destructive: [
-          "bg-destructive/10 text-destructive",
-          "hover:bg-destructive/20",
-          "dark:bg-destructive/10 dark:hover:bg-destructive/20",
-          "focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
-          "dark:focus-visible:ring-destructive/40",
+          "bg-destructive-subtle text-destructive-subtle-foreground",
+          "hover:bg-destructive-subtle-hover",
+          "focus-visible:border-destructive-subtle-border focus-visible:ring-destructive-subtle-ring",
         ].join(" "),
         link: "text-primary underline-offset-4 hover:underline",
       },

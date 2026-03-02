@@ -9,8 +9,8 @@
 .value{font:700 14px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text, var(--fd-semantic-color-text-primary));}
 .muted{font:500 12px 'Source Sans 3',Arial,sans-serif;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
 .mono{font:500 12px 'JetBrains Mono',monospace;fill:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));}
-.grid{stroke:var(--fd-reporting-color-border-subtle, var(--fd-semantic-color-border-subtle));stroke-width:1;}
-.axis{stroke:var(--fd-reporting-color-text-muted, var(--fd-semantic-color-text-muted));stroke-width:1.2;}
+.grid{stroke:var(--fd-reporting-color-grid, var(--fd-semantic-color-data-grid));stroke-width:1;}
+.axis{stroke:var(--fd-reporting-color-axis, var(--fd-semantic-color-data-axis));stroke-width:1.2;}
 ]]></style>
 </defs>
 <rect x="0" y="0" width="1200" height="420" fill="var(--fd-reporting-color-canvas, var(--fd-semantic-color-background-canvas))"/>
