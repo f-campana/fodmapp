@@ -3,6 +3,10 @@
   "editor.quickSuggestions": {
     "strings": "on"
   },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never",
+    "source.fixAll.eslint": "always"
+  },
   "tailwindCSS.hovers": true,
   "tailwindCSS.suggestions": true,
   "tailwindCSS.codeActions": true
