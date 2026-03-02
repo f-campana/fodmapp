@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-01
+Last reviewed: 2026-03-02
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,6 +15,7 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                       | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ----------------------------------------------------------- | ------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/Fodmap`                                             | `main`                                    | active (protected) | Main integration worktree only                              | Must remain clean.                                                  |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/dependabot-backlog-remediation`    | `codex/dependabot-backlog-remediation`    | active             | Dependabot backlog remediation + governance hardening       | In progress; CI/cache + changeset policy + Dependabot hardening.    |
 | `/Users/fabiencampana/Documents/Fodmap-color-remediation-core`                      | `codex/color-remediation-core`            | active             | Color remediation PR-1 (tokens + ui + sb)                   | In progress; full validation pending.                               |
 | `/Users/fabiencampana/Documents/Fodmap-color-remediation-reporting`                 | `codex/color-remediation-reporting`       | active             | Color remediation PR-2 (reporting)                          | In progress; scientific color migration pending.                    |
 | `/Users/fabiencampana/Documents/Fodmap-changesets-preflight-hotfix`                 | `codex/changesets-preflight-403-hotfix`   | active             | Changesets release preflight 403 hotfix                     | Fix false-fail on main release workflow.                            |
