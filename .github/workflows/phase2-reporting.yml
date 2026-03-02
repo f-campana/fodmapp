@@ -272,7 +272,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
@@ -412,7 +412,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
@@ -557,7 +557,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml==6.0.2 jsonschema==4.23.0 openpyxl psycopg2-binary
       - name: Cache CIQUAL data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ runner.temp }}/ciqual-data
           key: ciqual-2025-5555c572-e0b1de25-e216928b
