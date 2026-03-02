@@ -56,3 +56,11 @@ background classes):
 - `text-destructive-subtle-foreground`
 - `hover:bg-destructive-subtle-hover`
 - `focus-visible:border-destructive-subtle-border`
+- `focus-visible:ring-destructive-subtle-ring`
+
+Outline/ghost and invalid states also use semantic color slots (no dark-prefixed
+runtime overrides and no color alpha class modifiers):
+
+- Outline: `border-outline-border bg-outline text-outline-foreground hover:bg-outline-hover`
+- Ghost: `text-ghost-foreground hover:bg-ghost-hover`
+- Invalid: `aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft`

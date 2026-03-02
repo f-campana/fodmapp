@@ -121,6 +121,25 @@ describe("Button", () => {
     expect(classes).not.toContain("hover:bg-secondary/80");
   });
 
+  it("uses semantic outline tokens (no dark overrides)", () => {
+    render(<Button variant="outline">Détails</Button>);
+    const classes = screen.getByRole("button", { name: "Détails" }).className;
+    expect(classes).toContain("border-outline-border");
+    expect(classes).toContain("bg-outline");
+    expect(classes).toContain("text-outline-foreground");
+    expect(classes).toContain("hover:bg-outline-hover");
+    expect(classes).not.toContain("dark:border-input");
+    expect(classes).not.toContain("dark:bg-input/30");
+  });
+
+  it("uses semantic ghost tokens (no dark overrides)", () => {
+    render(<Button variant="ghost">Fermer</Button>);
+    const classes = screen.getByRole("button", { name: "Fermer" }).className;
+    expect(classes).toContain("text-ghost-foreground");
+    expect(classes).toContain("hover:bg-ghost-hover");
+    expect(classes).not.toContain("dark:hover:bg-muted/50");
+  });
+
   it("uses two-layer focus: border-ring + ring-ring-soft", () => {
     render(<Button>Focaliser</Button>);
     const classes = screen.getByRole("button", { name: "Focaliser" }).className;
@@ -136,9 +155,13 @@ describe("Button", () => {
     expect(classes).toContain("bg-destructive-subtle");
     expect(classes).toContain("text-destructive-subtle-foreground");
     expect(classes).toContain("hover:bg-destructive-subtle-hover");
+    expect(classes).toContain("focus-visible:ring-destructive-subtle-ring");
     // No opacity hacks
     expect(classes).not.toContain("bg-destructive/10");
     expect(classes).not.toContain("hover:bg-destructive/20");
+    expect(classes).not.toContain(
+      "focus-visible:ring-destructive-subtle-border/30",
+    );
     // Not the solid destructive pattern
     expect(classes).not.toContain("text-destructive-foreground");
   });

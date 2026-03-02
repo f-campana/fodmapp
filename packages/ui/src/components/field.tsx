@@ -81,7 +81,7 @@ export function Field({
       >
         {label}
         {required ? (
-          <span className="ml-1 text-(--color-danger)">*</span>
+          <span className="ml-1 text-validation-error-text">*</span>
         ) : null}
       </label>
       {control}
@@ -91,7 +91,10 @@ export function Field({
         </p>
       ) : null}
       {error ? (
-        <p id={errorId} className="text-xs font-medium text-(--color-danger)">
+        <p
+          id={errorId}
+          className="text-xs font-medium text-validation-error-text"
+        >
           {error}
         </p>
       ) : null}

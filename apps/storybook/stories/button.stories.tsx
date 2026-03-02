@@ -143,8 +143,10 @@ export const Outline: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole("button", { name: "Détails" });
-    await expect(button.className).toContain("border-border");
-    await expect(button.className).toContain("hover:bg-muted");
+    await expect(button.className).toContain("border-outline-border");
+    await expect(button.className).toContain("bg-outline");
+    await expect(button.className).toContain("text-outline-foreground");
+    await expect(button.className).toContain("hover:bg-outline-hover");
   },
 };
 
@@ -164,8 +166,14 @@ export const Destructive: Story = {
     await expect(button.className).toContain(
       "hover:bg-destructive-subtle-hover",
     );
+    await expect(button.className).toContain(
+      "focus-visible:ring-destructive-subtle-ring",
+    );
     // No opacity modifiers
     await expect(button.className).not.toContain("bg-destructive/10");
+    await expect(button.className).not.toContain(
+      "focus-visible:ring-destructive-subtle-border/30",
+    );
     await expect(button.className).not.toContain("text-destructive-foreground");
   },
 };
@@ -178,7 +186,8 @@ export const Ghost: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const button = canvas.getByRole("button", { name: "Fermer" });
-    await expect(button.className).toContain("hover:bg-muted");
+    await expect(button.className).toContain("text-ghost-foreground");
+    await expect(button.className).toContain("hover:bg-ghost-hover");
   },
 };
 
