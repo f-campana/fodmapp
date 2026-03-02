@@ -102,7 +102,11 @@ jobs:
             exit 1
           fi
 
-          deployment_url="$(grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' "$deploy_log" | tail -n1)"
+          deployment_url="$(
+            tr -cs '[:graph:]' '\n' < "$deploy_log" \
+              | grep -E '^https://[^[:space:]]+\\.vercel\\.app$' \
+              | tail -n1 || true
+          )"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract preview deployment URL from Vercel output."
@@ -230,7 +234,11 @@ jobs:
             exit 1
           fi
 
-          deployment_url="$(grep -Eo 'https://[^[:space:]]+\\.vercel\\.app' "$deploy_log" | tail -n1)"
+          deployment_url="$(
+            tr -cs '[:graph:]' '\n' < "$deploy_log" \
+              | grep -E '^https://[^[:space:]]+\\.vercel\\.app$' \
+              | tail -n1 || true
+          )"
 
           if [ -z "$deployment_url" ]; then
             echo "::error::Could not extract production deployment URL from Vercel output."
