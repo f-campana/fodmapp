@@ -1,5 +1,16 @@
 # @fodmap/ui
 
+## 3.0.0
+
+### Major Changes
+
+- [#134](https://github.com/f-campana/Fodmap/pull/134) [`698bdcb`](https://github.com/f-campana/Fodmap/commit/698bdcbdaaecbcc2e0786b4fb97befad44602db0) Thanks [@f-campana](https://github.com/f-campana)! - Expand the semantic color contract (validation, outline/ghost actions, status subtle, and data roles), migrate UI primitives to strict token-only classes, and adopt reporting/app/research updates to remove remaining hardcoded/alpha color patterns.
+
+### Patch Changes
+
+- Updated dependencies [[`698bdcb`](https://github.com/f-campana/Fodmap/commit/698bdcbdaaecbcc2e0786b4fb97befad44602db0)]:
+  - @fodmap/tailwind-config@0.2.4
+
 ## 2.0.0
 
 ### Major Changes
