@@ -56,9 +56,10 @@ CI Turbo command policy:
 
 These keys are optional and used by CI governance helper scripts.
 
-| Variable                | Used by                                   | Required | Default/Example | Notes                                                                                                                                                                            |
-| ----------------------- | ----------------------------------------- | -------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`             | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
+| Variable                | Used by                                   | Required | Default/Example   | Notes                                                                                                                                                                            |
+| ----------------------- | ----------------------------------------- | -------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`               | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
+| `PR_AUTHOR_LOGIN`       | `.github/scripts/check-pr-changesets.mjs` | no       | `dependabot[bot]` | Set by `changeset-pr-gate` workflow. Enables Dependabot dependency-only auto-exemption logic while keeping strict checks for human-authored PRs.                                 |
 
 ## App Runtime Integration Variables (`apps/app`)
 

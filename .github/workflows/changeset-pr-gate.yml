@@ -50,6 +50,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           CHANGESET_EXEMPT_LABEL: changeset-exempt
           CHANGESET_EXEMPT_PACKAGES: "@fodmap/mobile-prototype"

@@ -1,5 +1,15 @@
 # @fodmap/ui
 
+## 2.0.0
+
+### Major Changes
+
+- [#127](https://github.com/f-campana/Fodmap/pull/127) [`77c73ce`](https://github.com/f-campana/Fodmap/commit/77c73cef2ecd1959dd71d0b2cdf39378e1231e6b) Thanks [@f-campana](https://github.com/f-campana)! - Refresh the shared `Button` primitive with new variant/size behavior, Tailwind v4 canonical classes, and improved focus handling (`outline-hidden`).
+
+  `ButtonProps` is no longer exported from package entrypoints; consume button prop types from `React.ComponentProps<typeof Button>` instead.
+
+  Update Storybook button stories and interaction checks to reflect the new button contract.
+
 ## 1.0.4
 
 ### Patch Changes
