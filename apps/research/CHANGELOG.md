@@ -1,5 +1,16 @@
 # @fodmap/research
 
+## 0.1.8
+
+### Patch Changes
+
+- [#134](https://github.com/f-campana/Fodmap/pull/134) [`698bdcb`](https://github.com/f-campana/Fodmap/commit/698bdcbdaaecbcc2e0786b4fb97befad44602db0) Thanks [@f-campana](https://github.com/f-campana)! - Expand the semantic color contract (validation, outline/ghost actions, status subtle, and data roles), migrate UI primitives to strict token-only classes, and adopt reporting/app/research updates to remove remaining hardcoded/alpha color patterns.
+
+- Updated dependencies [[`698bdcb`](https://github.com/f-campana/Fodmap/commit/698bdcbdaaecbcc2e0786b4fb97befad44602db0)]:
+  - @fodmap/design-tokens@0.2.4
+  - @fodmap/ui@3.0.0
+  - @fodmap/reporting@0.1.7
+
 ## 0.1.7
 
 ### Patch Changes
