@@ -78,6 +78,18 @@ const requiredSelectors = [
   ".focus-visible\\:border-destructive-subtle-border:focus-visible",
   ".focus-visible\\:ring-destructive-subtle-ring:focus-visible",
   ".focus-visible\\:ring-ring-soft:focus-visible",
+  ".bg-info",
+  ".text-info-foreground",
+  ".border-info",
+  ".bg-success",
+  ".text-success-foreground",
+  ".border-success",
+  ".bg-warning",
+  ".text-warning-foreground",
+  ".border-warning",
+  ".bg-danger",
+  ".text-danger-foreground",
+  ".border-danger",
 ];
 
 const failures = [];

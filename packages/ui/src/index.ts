@@ -20,6 +20,19 @@ export {
 export { Button } from "./components/button";
 export type { ButtonGroupProps } from "./components/button-group";
 export { ButtonGroup, buttonGroupVariants } from "./components/button-group";
+export type {
+  CalloutDescriptionProps,
+  CalloutIconProps,
+  CalloutProps,
+  CalloutTitleProps,
+} from "./components/callout";
+export {
+  Callout,
+  CalloutDescription,
+  CalloutIcon,
+  CalloutTitle,
+  calloutVariants,
+} from "./components/callout";
 export {
   Card,
   CardAction,
@@ -29,6 +42,10 @@ export {
   CardHeader,
   CardTitle,
 } from "./components/card";
+export type { ChipProps } from "./components/chip";
+export { Chip, chipVariants } from "./components/chip";
+export type { DotProps } from "./components/dot";
+export { Dot, dotVariants } from "./components/dot";
 export type {
   EmptyActionsProps,
   EmptyDescriptionProps,
@@ -84,10 +101,27 @@ export {
 } from "./components/pagination";
 export type { PortalProps } from "./components/portal";
 export { Portal } from "./components/portal";
+export type { ScoreBarProps } from "./components/score-bar";
+export { ScoreBar } from "./components/score-bar";
 export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
 export type { SpinnerProps } from "./components/spinner";
 export { Spinner, spinnerVariants } from "./components/spinner";
+export type {
+  StepperDescriptionProps,
+  StepperLabelProps,
+  StepperProps,
+  StepperSeparatorProps,
+  StepperStepProps,
+} from "./components/stepper";
+export {
+  Stepper,
+  StepperDescription,
+  StepperLabel,
+  StepperSeparator,
+  StepperStep,
+  stepperVariants,
+} from "./components/stepper";
 export type {
   TableBodyProps,
   TableCaptionProps,
