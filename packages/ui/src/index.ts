@@ -5,6 +5,32 @@ export {
   AlertTitle,
   alertVariants,
 } from "./components/alert";
+export type {
+  AlertDialogActionProps,
+  AlertDialogCancelProps,
+  AlertDialogContentProps,
+  AlertDialogDescriptionProps,
+  AlertDialogFooterProps,
+  AlertDialogHeaderProps,
+  AlertDialogOverlayProps,
+  AlertDialogPortalProps,
+  AlertDialogProps,
+  AlertDialogTitleProps,
+  AlertDialogTriggerProps,
+} from "./components/alert-dialog";
+export {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./components/alert-dialog";
 export type { AspectRatioProps } from "./components/aspect-ratio";
 export { AspectRatio } from "./components/aspect-ratio";
 export type {
@@ -108,6 +134,20 @@ export {
 } from "./components/empty";
 export type { FieldProps } from "./components/field";
 export { Field } from "./components/field";
+export type {
+  HoverCardArrowProps,
+  HoverCardContentProps,
+  HoverCardPortalProps,
+  HoverCardProps,
+  HoverCardTriggerProps,
+} from "./components/hover-card";
+export {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardPortal,
+  HoverCardTrigger,
+} from "./components/hover-card";
 export { Input } from "./components/input";
 export type {
   ItemActionsProps,
@@ -147,6 +187,22 @@ export {
   PaginationNext,
   PaginationPrevious,
 } from "./components/pagination";
+export type {
+  PopoverAnchorProps,
+  PopoverArrowProps,
+  PopoverContentProps,
+  PopoverPortalProps,
+  PopoverProps,
+  PopoverTriggerProps,
+} from "./components/popover";
+export {
+  Popover,
+  PopoverAnchor,
+  PopoverArrow,
+  PopoverContent,
+  PopoverPortal,
+  PopoverTrigger,
+} from "./components/popover";
 export type { PortalProps } from "./components/portal";
 export { Portal } from "./components/portal";
 export type { ProgressProps } from "./components/progress";
@@ -162,6 +218,31 @@ export type { ScrollAreaProps, ScrollBarProps } from "./components/scroll-area";
 export { ScrollArea, ScrollBar } from "./components/scroll-area";
 export type { SeparatorProps } from "./components/separator";
 export { Separator } from "./components/separator";
+export type {
+  SheetCloseProps,
+  SheetContentProps,
+  SheetDescriptionProps,
+  SheetFooterProps,
+  SheetHeaderProps,
+  SheetOverlayProps,
+  SheetPortalProps,
+  SheetProps,
+  SheetTitleProps,
+  SheetTriggerProps,
+} from "./components/sheet";
+export {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+  sheetVariants,
+} from "./components/sheet";
 export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
 export type { SliderProps } from "./components/slider";
