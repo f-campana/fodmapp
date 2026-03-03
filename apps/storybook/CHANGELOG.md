@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.14
+
+### Patch Changes
+
+- [#147](https://github.com/f-campana/Fodmap/pull/147) [`c4ee358`](https://github.com/f-campana/Fodmap/commit/c4ee358e1f9658c75d5438da38466c129832d7d3) Thanks [@f-campana](https://github.com/f-campana)! - Add Batch B Radix wrappers set 1 to `@fodmap/ui`: `AspectRatio`, `Avatar`, `Label`, `Separator`, `Progress`, `Checkbox`, `Switch`, and `RadioGroup`, with tests and Storybook coverage.
+
+- Updated dependencies [[`c4ee358`](https://github.com/f-campana/Fodmap/commit/c4ee358e1f9658c75d5438da38466c129832d7d3)]:
+  - @fodmap/ui@3.4.0
+
 ## 0.1.13
 
 ### Patch Changes
