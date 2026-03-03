@@ -1,5 +1,12 @@
 # @fodmap/ui
 
+## 3.8.0
+
+### Minor Changes
+
+- [#155](https://github.com/f-campana/Fodmap/pull/155) [`4452a07`](https://github.com/f-campana/Fodmap/commit/4452a07e881e5b89902e4a786a5c8162f5a97c7e) Thanks [@f-campana](https://github.com/f-campana)! - Add DropdownMenu reference primitive with full shadcn-parity compound surface,
+  unit tests, and Storybook stories for the Batch D reference gate rollout.
+
 ## 3.7.0
 
 ### Minor Changes
