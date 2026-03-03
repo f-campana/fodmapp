@@ -168,6 +168,58 @@ function validateBaseColorTokens() {
   }
 }
 
+function validateBaseBrandLightDarkPairs(baseTokens) {
+  const base = baseTokens.base ?? baseTokens;
+  const brand =
+    base &&
+    typeof base === "object" &&
+    base.color &&
+    typeof base.color === "object" &&
+    base.color.brand &&
+    typeof base.color.brand === "object"
+      ? base.color.brand
+      : null;
+
+  if (!brand) {
+    throw new Error(
+      "Base brand light/dark parity check failed: base.color.brand tree not found.",
+    );
+  }
+
+  const stems = new Map();
+  for (const key of Object.keys(brand)) {
+    const match = key.match(/^(.*)(Light|Dark)$/);
+    if (!match) {
+      continue;
+    }
+
+    const stem = match[1];
+    const variant = match[2].toLowerCase();
+    const variants = stems.get(stem) ?? new Set();
+    variants.add(variant);
+    stems.set(stem, variants);
+  }
+
+  const errors = [];
+  for (const [stem, variants] of [...stems.entries()].sort(([a], [b]) =>
+    a.localeCompare(b),
+  )) {
+    if (!variants.has("light")) {
+      errors.push(`- ${stem}: missing Light variant`);
+    }
+
+    if (!variants.has("dark")) {
+      errors.push(`- ${stem}: missing Dark variant`);
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(
+      `Base brand light/dark parity check failed:\n${errors.join("\n")}`,
+    );
+  }
+}
+
 function collectTokenPaths(node, pathParts = [], paths = []) {
   if (node === null || node === undefined) {
     return paths;
@@ -699,6 +751,7 @@ const darkTokens = readJson("dark.semantic.json");
 const lightCss = readFileSync(path.join(tempBuildDir, "light.css"), "utf8");
 const darkCss = readFileSync(path.join(tempBuildDir, "dark.css"), "utf8");
 
+validateBaseBrandLightDarkPairs(baseTokens);
 validateSemanticTokenParity(lightTokens, darkTokens);
 validateSemanticColorContrast("light", lightTokens);
 validateSemanticColorContrast("dark", darkTokens);

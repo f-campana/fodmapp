@@ -19,6 +19,7 @@ import {
   compareLineHeightRows,
   createSortedRows,
   flattenTokenTree,
+  naturalTokenPathCompare,
   tokenPrimitiveToString,
 } from "./token-docs.helpers";
 
@@ -28,8 +29,20 @@ interface TypographyRow {
   value: string;
 }
 
+interface SemanticTypographyRow {
+  id: string;
+  path: string;
+  light: string;
+  dark: string;
+}
+
 const base = asRecord(tokens.base, "base");
+const themes = asRecord(tokens.themes, "themes");
 const typography = asRecord(base.typography, "base.typography");
+const lightTheme = asRecord(themes.light, "themes.light");
+const darkTheme = asRecord(themes.dark, "themes.dark");
+const semanticLight = asRecord(lightTheme.semantic, "themes.light.semantic");
+const semanticDark = asRecord(darkTheme.semantic, "themes.dark.semantic");
 
 function rowsFor(node: unknown, prefix: string): TypographyRow[] {
   return flattenTokenTree(node, prefix).map((row) => {
@@ -40,6 +53,28 @@ function rowsFor(node: unknown, prefix: string): TypographyRow[] {
       value,
     };
   });
+}
+
+function themedRowsFor(
+  lightNode: unknown,
+  darkNode: unknown,
+  prefix: string,
+): SemanticTypographyRow[] {
+  const lightRows = rowsFor(lightNode, prefix);
+  const darkRows = rowsFor(darkNode, prefix);
+
+  const lightByPath = new Map(lightRows.map((row) => [row.path, row.value]));
+  const darkByPath = new Map(darkRows.map((row) => [row.path, row.value]));
+  const paths = [...new Set([...lightByPath.keys(), ...darkByPath.keys()])].sort(
+    (left, right) => naturalTokenPathCompare(left, right),
+  );
+
+  return paths.map((path) => ({
+    id: path,
+    path,
+    light: lightByPath.get(path) ?? "",
+    dark: darkByPath.get(path) ?? "",
+  }));
 }
 
 function clampRem(value: string, maxRem: number): string {
@@ -70,6 +105,10 @@ function formatTypographyReferenceValue(row: TypographyRow): string {
   }
 
   return row.value;
+}
+
+function formatSemanticTypographyValue(value: string): string {
+  return value.replace(/,\s*/g, ", ");
 }
 
 const MAX_SPECIMEN_REM = 2.5;
@@ -105,6 +144,32 @@ const letterSpacingRows = createSortedRows(
   compareLetterSpacingRows,
 );
 
+const semanticTypographyRows = themedRowsFor(
+  asRecord(
+    asRecord(
+      asRecord(semanticLight.typography, "themes.light.semantic.typography")
+        .font,
+      "themes.light.semantic.typography.font",
+    ).family,
+    "themes.light.semantic.typography.font.family",
+  ),
+  asRecord(
+    asRecord(
+      asRecord(semanticDark.typography, "themes.dark.semantic.typography").font,
+      "themes.dark.semantic.typography.font",
+    ).family,
+    "themes.dark.semantic.typography.font.family",
+  ),
+  "semantic.typography.font.family",
+);
+const semanticTypographyByPath = new Map(
+  semanticTypographyRows.map((row) => [row.path, row]),
+);
+const requiredSemanticTypographyPaths = [
+  "semantic.typography.font.family.body",
+  "semantic.typography.font.family.display",
+] as const;
+
 const lineHeightDefault =
   lineHeightRows.find((row) => row.path.endsWith(".normal"))?.value ?? "1.5";
 
@@ -137,6 +202,14 @@ const groups = [
     id: "letter-spacing",
     label: "Letter Spacing",
     rows: letterSpacingRows,
+  },
+];
+
+const semanticGroups = [
+  {
+    id: "semantic-families",
+    label: "Semantic Font Families",
+    rows: semanticTypographyRows,
   },
 ];
 
@@ -194,6 +267,56 @@ function TypographyReferenceStory() {
               ),
               valueMode: "plain",
               copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+
+      <TokenSection
+        title="Semantic Typography References"
+        description="Theme-level semantic typography family tokens (light and dark)."
+      >
+        <TokenDataGrid
+          gridLabel="semantic-typography-grid"
+          groups={semanticGroups}
+          accordion
+          allowCollapseAll={false}
+          initialOpenGroupId="semantic-families"
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(360px, 1.8fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "light",
+              label: "Light",
+              width: "minmax(300px, 1fr)",
+              getValue: (row) => row.light,
+              render: (row) => (
+                <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
+                  {formatSemanticTypographyValue(row.light)}
+                </span>
+              ),
+              valueMode: "plain",
+              copyValue: (row) => row.light,
+            },
+            {
+              key: "dark",
+              label: "Dark",
+              width: "minmax(300px, 1fr)",
+              getValue: (row) => row.dark,
+              render: (row) => (
+                <span className="fd-tokendocs-value-plain fd-tokendocs-value-wrapSoft">
+                  {formatSemanticTypographyValue(row.dark)}
+                </span>
+              ),
+              valueMode: "plain",
+              copyValue: (row) => row.dark,
             },
           ]}
         />
@@ -316,6 +439,9 @@ export const Reference: Story = {
       canvas.getByRole("heading", { name: "Typography Token Reference" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Typography Primitives")).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Semantic Typography References"),
+    ).toBeInTheDocument();
 
     const familiesSection = canvasElement.querySelector(
       "#typography-grid-families",
@@ -350,6 +476,22 @@ export const Reference: Story = {
     await userEvent.click(familiesToggle);
     await expect(familiesSection).toHaveAttribute("data-expanded", "true");
     await expect(sizesSection).toHaveAttribute("data-expanded", "false");
+
+    for (const path of requiredSemanticTypographyPaths) {
+      const row = semanticTypographyByPath.get(path);
+      await expect(
+        row,
+        `Missing semantic typography token row for ${path}`,
+      ).toBeDefined();
+      await expect(
+        row !== undefined && row.light.trim().length > 0,
+        `Expected light semantic typography value for ${path}`,
+      ).toBe(true);
+      await expect(
+        row !== undefined && row.dark.trim().length > 0,
+        `Expected dark semantic typography value for ${path}`,
+      ).toBe(true);
+    }
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();

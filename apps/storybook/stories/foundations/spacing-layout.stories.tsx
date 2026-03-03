@@ -18,6 +18,7 @@ import {
   compareTokenRowsByPathSuffix,
   createSortedRows,
   flattenTokenTree,
+  naturalTokenPathCompare,
   parseNumberish,
   stripPathPrefix,
   tokenPrimitiveToString,
@@ -29,10 +30,18 @@ interface ScaleRow {
   value: string;
 }
 
+interface SemanticScaleRow {
+  id: string;
+  path: string;
+  light: string;
+  dark: string;
+}
+
 const SHOWCASE_STOPS = ["0_5", "1", "2", "4", "6", "8"];
 const BREAKPOINT_TICKS = 5;
 
 const base = asRecord(tokens.base, "base");
+const themes = asRecord(tokens.themes, "themes");
 const spacing = asRecord(base.space, "base.space");
 const radius = asRecord(base.radius, "base.radius");
 const borderWidth = asRecord(
@@ -42,6 +51,10 @@ const borderWidth = asRecord(
 const opacity = asRecord(base.opacity, "base.opacity");
 const breakpoints = asRecord(base.breakpoint, "base.breakpoint");
 const zIndex = asRecord(base.zIndex, "base.zIndex");
+const lightTheme = asRecord(themes.light, "themes.light");
+const darkTheme = asRecord(themes.dark, "themes.dark");
+const semanticLight = asRecord(lightTheme.semantic, "themes.light.semantic");
+const semanticDark = asRecord(darkTheme.semantic, "themes.dark.semantic");
 
 function toScaleRows(node: unknown, prefix: string): ScaleRow[] {
   return createSortedRows(
@@ -55,6 +68,34 @@ function toScaleRows(node: unknown, prefix: string): ScaleRow[] {
     }),
     compareTokenRowsByPathSuffix,
   );
+}
+
+function toThemedScaleRows(
+  lightNode: unknown,
+  darkNode: unknown,
+  prefix: string,
+): SemanticScaleRow[] {
+  const lightRows = flattenTokenTree(lightNode, prefix).map((row) => ({
+    path: row.path,
+    value: tokenPrimitiveToString(row.value),
+  }));
+  const darkRows = flattenTokenTree(darkNode, prefix).map((row) => ({
+    path: row.path,
+    value: tokenPrimitiveToString(row.value),
+  }));
+
+  const lightByPath = new Map(lightRows.map((row) => [row.path, row.value]));
+  const darkByPath = new Map(darkRows.map((row) => [row.path, row.value]));
+  const paths = [...new Set([...lightByPath.keys(), ...darkByPath.keys()])].sort(
+    (left, right) => naturalTokenPathCompare(left, right),
+  );
+
+  return paths.map((path) => ({
+    id: path,
+    path,
+    light: lightByPath.get(path) ?? "",
+    dark: darkByPath.get(path) ?? "",
+  }));
 }
 
 function toPercent(value: string, maxValue: number): number {
@@ -78,6 +119,28 @@ const breakpointRows = toScaleRows(breakpoints, "base.breakpoint");
 const borderWidthRows = toScaleRows(borderWidth, "base.border.width");
 const opacityRows = toScaleRows(opacity, "base.opacity");
 const zIndexRows = toScaleRows(zIndex, "base.zIndex");
+const semanticRadiusRows = toThemedScaleRows(
+  asRecord(semanticLight.radius, "themes.light.semantic.radius"),
+  asRecord(semanticDark.radius, "themes.dark.semantic.radius"),
+  "semantic.radius",
+);
+const semanticSpaceRows = toThemedScaleRows(
+  asRecord(semanticLight.space, "themes.light.semantic.space"),
+  asRecord(semanticDark.space, "themes.dark.semantic.space"),
+  "semantic.space",
+);
+const requiredSemanticSpacingPaths = [
+  "semantic.radius.control",
+  "semantic.radius.container",
+  "semantic.radius.pill",
+  "semantic.space.controlX",
+  "semantic.space.controlY",
+  "semantic.space.section",
+] as const;
+const semanticSpacingByPath = new Map([
+  ...semanticRadiusRows,
+  ...semanticSpaceRows,
+].map((row) => [row.path, row]));
 
 const maxBreakpointValue = Math.max(
   ...breakpointRows.map((row) => parseNumberish(row.value) ?? 0),
@@ -98,6 +161,10 @@ const layoutReferenceGroups = [
   { id: "opacity", label: "Opacity", rows: opacityRows },
   { id: "breakpoints", label: "Breakpoints", rows: breakpointRows },
   { id: "z-index", label: "Z-Index", rows: zIndexRows },
+];
+const semanticReferenceGroups = [
+  { id: "semantic-radius", label: "Semantic Radius", rows: semanticRadiusRows },
+  { id: "semantic-space", label: "Semantic Space", rows: semanticSpaceRows },
 ];
 
 const meta = {
@@ -207,6 +274,46 @@ function SpacingLayoutReferenceStory() {
               getValue: (row) => row.value,
               valueMode: "plain",
               copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+
+      <TokenSection
+        title="Semantic Layout References"
+        description="Theme-level semantic radius and spacing primitives (light and dark)."
+      >
+        <TokenDataGrid
+          gridLabel="semantic-layout-grid"
+          groups={semanticReferenceGroups}
+          accordion
+          allowCollapseAll={false}
+          initialOpenGroupId="semantic-radius"
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(360px, 1.8fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "light",
+              label: "Light",
+              width: "minmax(280px, 1fr)",
+              getValue: (row) => row.light,
+              valueMode: "plain",
+              copyValue: (row) => row.light,
+            },
+            {
+              key: "dark",
+              label: "Dark",
+              width: "minmax(280px, 1fr)",
+              getValue: (row) => row.dark,
+              valueMode: "plain",
+              copyValue: (row) => row.dark,
             },
           ]}
         />
@@ -463,6 +570,9 @@ export const Reference: Story = {
       canvas.getByRole("heading", { name: "Spacing & Layout Token Reference" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Spacing References")).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Semantic Layout References"),
+    ).toBeInTheDocument();
 
     const valueHeaders = canvas.getAllByRole("columnheader", { name: "Value" });
     await expect(valueHeaders.length).toBeGreaterThan(0);
@@ -529,6 +639,22 @@ export const Reference: Story = {
     await userEvent.click(spacingToggle);
     await expect(spacingSection).toHaveAttribute("data-expanded", "true");
     await expect(borderWidthSection).toHaveAttribute("data-expanded", "false");
+
+    for (const path of requiredSemanticSpacingPaths) {
+      const row = semanticSpacingByPath.get(path);
+      await expect(
+        row,
+        `Missing semantic spacing/layout token row for ${path}`,
+      ).toBeDefined();
+      await expect(
+        row !== undefined && row.light.trim().length > 0,
+        `Expected light semantic spacing/layout value for ${path}`,
+      ).toBe(true);
+      await expect(
+        row !== undefined && row.dark.trim().length > 0,
+        `Expected dark semantic spacing/layout value for ${path}`,
+      ).toBe(true);
+    }
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();

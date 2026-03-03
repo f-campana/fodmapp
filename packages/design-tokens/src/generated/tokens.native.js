@@ -87,6 +87,9 @@ export const nativeTokens = {
         "surfaceLight": "#fffdf8",
         "surfaceStrongLight": "#f0e6d5",
         "surfaceMutedLight": "#ece2d2",
+        "surfaceMutedSoftLight": "#f1eadd",
+        "controlSubtleLight": "#f4eee3",
+        "controlSubtleStrongLight": "#f1e9dc",
         "textLight": "#2d2218",
         "textMutedLight": "#6d5541",
         "borderLight": "#d4c0a5",
@@ -105,6 +108,7 @@ export const nativeTokens = {
         "dangerSubtleFgLight": "#8f3833",
         "dangerSubtleBorderLight": "#b06a65",
         "dangerValidationRingLight": "#9d8a84",
+        "dangerValidationBorderLight": "#9d6458",
         "canvasDark": "#1b1510",
         "surfaceDark": "#292018",
         "surfaceStrongDark": "#362a1f",
@@ -276,7 +280,7 @@ export const nativeTokens = {
           },
           "validation": {
             "error": {
-              "border": "#99413a",
+              "border": "#9d6458",
               "ring": "#99413a",
               "ringSoft": "#9d8a84",
               "text": "#99413a"
@@ -294,13 +298,13 @@ export const nativeTokens = {
               "fg": "#1c1917"
             },
             "outline": {
-              "bg": "#faf6ef",
-              "bgHover": "#ece2d2",
+              "bg": "#f4eee3",
+              "bgHover": "#f1e9dc",
               "border": "#78716c",
               "fg": "#2d2218"
             },
             "ghost": {
-              "bgHover": "#ece2d2",
+              "bgHover": "#f1eadd",
               "fg": "#2d2218"
             },
             "destructive": {

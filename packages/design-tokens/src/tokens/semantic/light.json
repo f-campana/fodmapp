@@ -56,7 +56,7 @@
       "validation": {
         "error": {
           "border": {
-            "$value": "{base.color.brand.dangerLight}",
+            "$value": "{base.color.brand.dangerValidationBorderLight}",
             "$type": "color"
           },
           "ring": {
@@ -95,11 +95,11 @@
         },
         "outline": {
           "bg": {
-            "$value": "{base.color.brand.canvasLight}",
+            "$value": "{base.color.brand.controlSubtleLight}",
             "$type": "color"
           },
           "bgHover": {
-            "$value": "{base.color.brand.surfaceMutedLight}",
+            "$value": "{base.color.brand.controlSubtleStrongLight}",
             "$type": "color"
           },
           "border": { "$value": "{base.color.neutral.500}", "$type": "color" },
@@ -107,7 +107,7 @@
         },
         "ghost": {
           "bgHover": {
-            "$value": "{base.color.brand.surfaceMutedLight}",
+            "$value": "{base.color.brand.surfaceMutedSoftLight}",
             "$type": "color"
           },
           "fg": { "$value": "{base.color.brand.textLight}", "$type": "color" }

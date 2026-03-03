@@ -17,6 +17,7 @@ import {
 import {
   asRecord,
   flattenTokenTree,
+  naturalTokenPathCompare,
   tokenPrimitiveToString,
 } from "./token-docs.helpers";
 
@@ -24,6 +25,13 @@ interface EffectRow {
   id: string;
   path: string;
   value: string;
+}
+
+interface SemanticMotionRow {
+  id: string;
+  path: string;
+  light: string;
+  dark: string;
 }
 
 interface MotionLaneRow {
@@ -48,8 +56,13 @@ const MIN_MOTION_DURATION_MS = 900;
 const MAX_MOTION_DURATION_MS = 3900;
 
 const base = asRecord(tokens.base, "base");
+const themes = asRecord(tokens.themes, "themes");
 const motion = asRecord(base.motion, "base.motion");
 const shadows = asRecord(base.shadow, "base.shadow");
+const lightTheme = asRecord(themes.light, "themes.light");
+const darkTheme = asRecord(themes.dark, "themes.dark");
+const semanticLight = asRecord(lightTheme.semantic, "themes.light.semantic");
+const semanticDark = asRecord(darkTheme.semantic, "themes.dark.semantic");
 
 function toRows(node: unknown, prefix: string): EffectRow[] {
   return flattenTokenTree(node, prefix).map((row) => {
@@ -60,6 +73,28 @@ function toRows(node: unknown, prefix: string): EffectRow[] {
       value,
     };
   });
+}
+
+function themedRowsFor(
+  lightNode: unknown,
+  darkNode: unknown,
+  prefix: string,
+): SemanticMotionRow[] {
+  const lightRows = toRows(lightNode, prefix);
+  const darkRows = toRows(darkNode, prefix);
+
+  const lightByPath = new Map(lightRows.map((row) => [row.path, row.value]));
+  const darkByPath = new Map(darkRows.map((row) => [row.path, row.value]));
+  const paths = [...new Set([...lightByPath.keys(), ...darkByPath.keys()])].sort(
+    (left, right) => naturalTokenPathCompare(left, right),
+  );
+
+  return paths.map((path) => ({
+    id: path,
+    path,
+    light: lightByPath.get(path) ?? "",
+    dark: darkByPath.get(path) ?? "",
+  }));
 }
 
 function parseDurationMs(value: string): number {
@@ -192,6 +227,25 @@ const shadowRows = toRows(shadows, "base.shadow");
 const shadowGroups = [
   { id: "shadow", label: "Shadow Scale", rows: shadowRows },
 ];
+const semanticMotionRows = themedRowsFor(
+  asRecord(semanticLight.motion, "themes.light.semantic.motion"),
+  asRecord(semanticDark.motion, "themes.dark.semantic.motion"),
+  "semantic.motion",
+);
+const semanticMotionGroups = [
+  {
+    id: "semantic-motion",
+    label: "Semantic Motion",
+    rows: semanticMotionRows,
+  },
+];
+const semanticMotionByPath = new Map(
+  semanticMotionRows.map((row) => [row.path, row]),
+);
+const requiredSemanticMotionPaths = [
+  "semantic.motion.interactiveDuration",
+  "semantic.motion.interactiveEasing",
+] as const;
 
 function MotionLaneCompare({ row }: { row: MotionLaneRow }) {
   const compareClassName = row.hasBaseline
@@ -263,7 +317,7 @@ function MotionReferenceStory() {
   useTokenDocsResetScrollOnMount();
 
   const [activeGroup, setActiveGroup] = useState<{
-    gridId: "motion-grid" | "shadow-grid";
+    gridId: "motion-grid" | "shadow-grid" | "semantic-motion-grid";
     groupId: string;
   }>(() => ({
     gridId: "motion-grid",
@@ -271,7 +325,7 @@ function MotionReferenceStory() {
   }));
 
   function setPageActiveGroup(
-    gridId: "motion-grid" | "shadow-grid",
+    gridId: "motion-grid" | "shadow-grid" | "semantic-motion-grid",
     groupId: string | null,
   ) {
     if (!groupId) {
@@ -355,6 +409,53 @@ function MotionReferenceStory() {
               getValue: (row) => row.value,
               valueMode: "plain",
               copyValue: (row) => row.value,
+            },
+          ]}
+        />
+      </TokenSection>
+
+      <TokenSection
+        title="Semantic Motion References"
+        description="Theme-level semantic interactive motion primitives (light and dark)."
+      >
+        <TokenDataGrid
+          gridLabel="semantic-motion-grid"
+          groups={semanticMotionGroups}
+          accordion
+          allowCollapseAll
+          openGroupId={
+            activeGroup.gridId === "semantic-motion-grid"
+              ? activeGroup.groupId
+              : null
+          }
+          onOpenGroupChange={(groupId) =>
+            setPageActiveGroup("semantic-motion-grid", groupId)
+          }
+          columns={[
+            {
+              key: "path",
+              label: "Token Path",
+              width: "minmax(340px, 1.7fr)",
+              getValue: (row) => row.path,
+              render: (row) => <TokenPathText value={row.path} />,
+              valueMode: "plain",
+              copyValue: (row) => row.path,
+            },
+            {
+              key: "light",
+              label: "Light",
+              width: "minmax(280px, 1fr)",
+              getValue: (row) => row.light,
+              valueMode: "plain",
+              copyValue: (row) => row.light,
+            },
+            {
+              key: "dark",
+              label: "Dark",
+              width: "minmax(280px, 1fr)",
+              getValue: (row) => row.dark,
+              valueMode: "plain",
+              copyValue: (row) => row.dark,
             },
           ]}
         />
@@ -520,6 +621,9 @@ export const Reference: Story = {
       canvas.getByRole("heading", { name: "Motion & Effects Token Reference" }),
     ).toBeInTheDocument();
     await expect(canvas.getByText("Motion References")).toBeInTheDocument();
+    await expect(
+      canvas.getByText("Semantic Motion References"),
+    ).toBeInTheDocument();
 
     const durationsSection = canvasElement.querySelector(
       "#motion-grid-durations",
@@ -571,6 +675,22 @@ export const Reference: Story = {
     await expect(durationsSection).toHaveAttribute("data-expanded", "true");
     await expect(easingSection).toHaveAttribute("data-expanded", "false");
     await expect(shadowSection).toHaveAttribute("data-expanded", "false");
+
+    for (const path of requiredSemanticMotionPaths) {
+      const row = semanticMotionByPath.get(path);
+      await expect(
+        row,
+        `Missing semantic motion token row for ${path}`,
+      ).toBeDefined();
+      await expect(
+        row !== undefined && row.light.trim().length > 0,
+        `Expected light semantic motion value for ${path}`,
+      ).toBe(true);
+      await expect(
+        row !== undefined && row.dark.trim().length > 0,
+        `Expected dark semantic motion value for ${path}`,
+      ).toBe(true);
+    }
 
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
