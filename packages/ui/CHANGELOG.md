@@ -1,5 +1,13 @@
 # @fodmap/ui
 
+## 3.11.0
+
+### Minor Changes
+
+- [#161](https://github.com/f-campana/Fodmap/pull/161) [`26f89e7`](https://github.com/f-campana/Fodmap/commit/26f89e713cabfb3a4a6715f75ed1b95860a8d4db) Thanks [@f-campana](https://github.com/f-campana)! - Add batch E forms primitives in `@fodmap/ui`: `Accordion`, `InputGroup`, and `InputOTP` with full compound exports and semantic style contracts.
+
+  Add Storybook coverage and interaction assertions for the new form primitives in `@fodmap/storybook`.
+
 ## 3.10.0
 
 ### Minor Changes
