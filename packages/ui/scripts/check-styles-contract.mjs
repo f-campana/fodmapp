@@ -150,6 +150,14 @@ const requiredSelectors = [
   ".data-\\[state\\=visible\\]\\:fade-in",
   ".data-\\[state\\=hidden\\]\\:fade-out",
   ".data-\\[active\\]\\:bg-accent",
+  ".focus-within\\:border-ring:focus-within",
+  ".focus-within\\:ring-2:focus-within",
+  ".focus-within\\:ring-ring-soft:focus-within",
+  ".has-\\[\\:disabled\\]\\:cursor-not-allowed:has(:disabled)",
+  ".has-\\[\\:disabled\\]\\:opacity-50:has(:disabled)",
+  ".data-\\[active\\=true\\]\\:border-ring",
+  ".data-\\[active\\=true\\]\\:ring-2",
+  ".data-\\[active\\=true\\]\\:ring-ring-soft",
 ];
 
 const failures = [];
