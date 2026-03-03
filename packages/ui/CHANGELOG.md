@@ -1,5 +1,11 @@
 # @fodmap/ui
 
+## 3.5.0
+
+### Minor Changes
+
+- [#149](https://github.com/f-campana/Fodmap/pull/149) [`53d85d5`](https://github.com/f-campana/Fodmap/commit/53d85d527e8b34fbbe86266419ad1133dcf2c9c4) Thanks [@f-campana](https://github.com/f-campana)! - Add batch B Radix wrappers set 2 (`Collapsible`, `ScrollArea`, `Slider`, `Tabs`, `Toggle`, `ToggleGroup`, `Tooltip`) with tests and Storybook coverage.
+
 ## 3.4.0
 
 ### Minor Changes
