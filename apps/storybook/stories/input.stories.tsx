@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { expect, userEvent, within } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import { Input } from "@fodmap/ui";
 
@@ -8,8 +8,48 @@ const meta = {
   title: "Primitives/Input",
   component: Input,
   tags: ["autodocs"],
+  argTypes: {
+    type: {
+      description: "Defines the native input type used for value entry.",
+      control: { type: "radio" },
+      options: ["text", "email", "password", "search", "number"],
+      table: { defaultValue: { summary: "text" } },
+    },
+    placeholder: {
+      description: "Placeholder shown when the input has no value.",
+      control: "text",
+      table: { defaultValue: { summary: "undefined" } },
+    },
+    disabled: {
+      description:
+        "Disables interaction and applies disabled visual state styles.",
+      control: { type: "boolean" },
+      table: { defaultValue: { summary: "false" } },
+    },
+    "aria-invalid": {
+      description:
+        "Marks the input as invalid for accessibility and semantic invalid styling.",
+      control: { type: "boolean" },
+      table: { defaultValue: { summary: "false" } },
+    },
+    className: {
+      description: "Additional CSS classes merged with the input styles.",
+      control: "text",
+      table: { defaultValue: { summary: "undefined" } },
+    },
+    onChange: {
+      description: "Callback fired when the input value changes.",
+    },
+  },
   args: {
+    type: "text",
     placeholder: "Saisir un aliment",
+    disabled: false,
+    "aria-invalid": false,
+    onChange: fn(),
+  },
+  parameters: {
+    controls: { expanded: true },
   },
 } satisfies Meta<typeof Input>;
 
@@ -25,13 +65,14 @@ export const Default: Story = {
     await expect(input).toHaveValue("courgette");
     await expect(input.className).toContain("focus-visible:border-ring");
     await expect(input.className).toContain("focus-visible:ring-ring-soft");
+    await expect(input.className).not.toContain("focus-visible:ring-ring/50");
     await expect(input).toHaveAttribute("data-slot", "input");
   },
 };
 
 export const Invalid: Story = {
   args: {
-    "aria-invalid": "true",
+    "aria-invalid": true,
     placeholder: "Valeur invalide",
   },
   play: async ({ canvasElement }) => {
@@ -43,6 +84,10 @@ export const Invalid: Story = {
     await expect(input.className).toContain(
       "aria-invalid:ring-validation-error-ring-soft",
     );
+    await expect(input.className).not.toContain(
+      "aria-invalid:ring-destructive/20",
+    );
+    await expect(input).toHaveAttribute("data-slot", "input");
   },
 };
 
