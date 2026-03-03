@@ -459,11 +459,11 @@ export function countVisibleRows<
   }).length;
 }
 
-export function groupRowsBySegment(
-  rows: TokenRow[],
+export function groupRowsBySegment<Row extends { id: string; path: string }>(
+  rows: Row[],
   pathSegmentIndex: number,
-): Array<{ id: string; label: string; rows: TokenRow[] }> {
-  const grouped = new Map<string, TokenRow[]>();
+): Array<{ id: string; label: string; rows: Row[] }> {
+  const grouped = new Map<string, Row[]>();
 
   for (const row of rows) {
     const segments = row.path.split(".");
