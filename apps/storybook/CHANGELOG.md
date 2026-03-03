@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.19
+
+### Patch Changes
+
+- [#157](https://github.com/f-campana/Fodmap/pull/157) [`d90543c`](https://github.com/f-campana/Fodmap/commit/d90543c9ccbbfddc42fa60748c21746c2e5af474) Thanks [@f-campana](https://github.com/f-campana)! - Add the Batch D menu primitives: ContextMenu, Menubar, and NavigationMenu.
+  This release includes full component surfaces, tests, Storybook stories, and style contract checks.
+- Updated dependencies [[`d90543c`](https://github.com/f-campana/Fodmap/commit/d90543c9ccbbfddc42fa60748c21746c2e5af474)]:
+  - @fodmap/ui@3.9.0
+
 ## 0.1.18
 
 ### Patch Changes

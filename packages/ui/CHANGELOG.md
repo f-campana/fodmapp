@@ -1,5 +1,12 @@
 # @fodmap/ui
 
+## 3.9.0
+
+### Minor Changes
+
+- [#157](https://github.com/f-campana/Fodmap/pull/157) [`d90543c`](https://github.com/f-campana/Fodmap/commit/d90543c9ccbbfddc42fa60748c21746c2e5af474) Thanks [@f-campana](https://github.com/f-campana)! - Add the Batch D menu primitives: ContextMenu, Menubar, and NavigationMenu.
+  This release includes full component surfaces, tests, Storybook stories, and style contract checks.
+
 ## 3.8.0
 
 ### Minor Changes
