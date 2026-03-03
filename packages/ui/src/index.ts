@@ -66,6 +66,8 @@ export {
 export { Button } from "./components/button";
 export type { ButtonGroupProps } from "./components/button-group";
 export { ButtonGroup, buttonGroupVariants } from "./components/button-group";
+export type { CalendarProps } from "./components/calendar";
+export { Calendar } from "./components/calendar";
 export type {
   CalloutDescriptionProps,
   CalloutIconProps,
@@ -88,6 +90,22 @@ export {
   CardHeader,
   CardTitle,
 } from "./components/card";
+export type {
+  CarouselApi,
+  CarouselContentProps,
+  CarouselItemProps,
+  CarouselNextProps,
+  CarouselPreviousProps,
+  CarouselProps,
+} from "./components/carousel";
+export {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  useCarousel,
+} from "./components/carousel";
 export type { CheckboxProps } from "./components/checkbox";
 export { Checkbox } from "./components/checkbox";
 export type { ChipProps } from "./components/chip";
@@ -186,6 +204,30 @@ export {
 } from "./components/dialog";
 export type { DotProps } from "./components/dot";
 export { Dot, dotVariants } from "./components/dot";
+export type {
+  DrawerCloseProps,
+  DrawerContentProps,
+  DrawerDescriptionProps,
+  DrawerFooterProps,
+  DrawerHeaderProps,
+  DrawerOverlayProps,
+  DrawerPortalProps,
+  DrawerProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+} from "./components/drawer";
+export {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+  DrawerPortal,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./components/drawer";
 export type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,
@@ -397,6 +439,16 @@ export type {
   RadioGroupProps,
 } from "./components/radio-group";
 export { RadioGroup, RadioGroupItem } from "./components/radio-group";
+export type {
+  ResizableHandleProps,
+  ResizablePanelGroupProps,
+  ResizablePanelProps,
+} from "./components/resizable";
+export {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "./components/resizable";
 export type { ScoreBarProps } from "./components/score-bar";
 export { ScoreBar } from "./components/score-bar";
 export type { ScrollAreaProps, ScrollBarProps } from "./components/scroll-area";
@@ -456,6 +508,8 @@ export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
 export type { SliderProps } from "./components/slider";
 export { Slider } from "./components/slider";
+export type { SonnerProps } from "./components/sonner";
+export { Sonner, toast } from "./components/sonner";
 export type { SpinnerProps } from "./components/spinner";
 export { Spinner, spinnerVariants } from "./components/spinner";
 export type {
