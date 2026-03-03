@@ -125,6 +125,7 @@ const requiredSelectors = [
   ".data-\\[side\\=right\\]\\:slide-in-from-left-2",
   ".data-\\[side\\=top\\]\\:slide-in-from-bottom-2",
   ".data-\\[placeholder\\]\\:text-muted-foreground",
+  ".data-\\[empty\\=true\\]\\:text-muted-foreground",
   ".data-\\[side\\=bottom\\]\\:translate-y-1",
   ".data-\\[side\\=left\\]\\:-translate-x-1",
   ".data-\\[side\\=right\\]\\:translate-x-1",
