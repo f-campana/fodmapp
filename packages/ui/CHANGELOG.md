@@ -1,5 +1,15 @@
 # @fodmap/ui
 
+## 3.1.0
+
+### Minor Changes
+
+- [#138](https://github.com/f-campana/Fodmap/pull/138) [`82583ee`](https://github.com/f-campana/Fodmap/commit/82583eeffc3f00491aa58697332542caa16dfe67) Thanks [@f-campana](https://github.com/f-campana)! - PR-01 foundation rollout for the UI library contract:
+  - migrate existing `@fodmap/ui` primitives to React 19 named-function pattern (no `forwardRef`, no explicit `displayName`) and add missing `data-slot` hooks
+  - add shared utilities (`Portal`, `VisuallyHidden`) and core hooks (`useControllableState`, `useMediaQuery`, `useMobile`, `useDebounce`, `useCopyToClipboard`, `useLocale`) with tests and public exports
+  - harden style/source contract checks to enforce token/focus conventions and ban forbidden patterns
+  - update Storybook stories and workspace dependencies to align with the new foundation contract
+
 ## 3.0.0
 
 ### Major Changes
