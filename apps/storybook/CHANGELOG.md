@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.20
+
+### Patch Changes
+
+- [#159](https://github.com/f-campana/Fodmap/pull/159) [`3038044`](https://github.com/f-campana/Fodmap/commit/30380442388ac8f46cdd13ff97266a2bf6313507) Thanks [@f-campana](https://github.com/f-campana)! - Add the reference-gate Select primitive to `@fodmap/ui` with full shadcn-parity surface, tests, and Storybook coverage.
+
+- Updated dependencies [[`3038044`](https://github.com/f-campana/Fodmap/commit/30380442388ac8f46cdd13ff97266a2bf6313507)]:
+  - @fodmap/ui@3.10.0
+
 ## 0.1.19
 
 ### Patch Changes
