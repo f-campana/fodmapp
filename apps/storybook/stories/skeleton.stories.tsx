@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { expect, within } from "storybook/test";
+import type { ReactNode } from "react";
+import { expect } from "storybook/test";
 
 import { Skeleton } from "@fodmap/ui";
 
@@ -13,7 +14,7 @@ const meta = {
       description:
         "Additional utility classes to define skeleton shape and dimensions.",
       control: "text",
-      table: { defaultValue: { summary: "undefined" } },
+      table: { defaultValue: { summary: "h-4 w-48" } },
     },
   },
   args: {
@@ -28,27 +29,39 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function SkeletonPreview({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-fit rounded-lg border border-border bg-card p-4">
+      {children}
+    </div>
+  );
+}
+
 export const Default: Story = {
+  render: (args) => (
+    <SkeletonPreview>
+      <Skeleton {...args} />
+    </SkeletonPreview>
+  ),
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const skeleton = canvasElement.querySelector("[data-slot='skeleton']");
     await expect(skeleton).toBeTruthy();
     await expect(skeleton?.className ?? "").toContain("animate-pulse");
     await expect(skeleton?.className ?? "").toContain("bg-muted");
-    await expect(skeleton?.className ?? "").not.toContain(
-      "hover:bg-primary/90",
-    );
-    await expect(canvas).toBeTruthy();
+    await expect(skeleton?.className ?? "").toContain("h-4");
+    await expect(skeleton?.className ?? "").toContain("w-48");
   },
 };
 
 export const CardLines: Story = {
   render: () => (
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-[220px]" />
-      <Skeleton className="h-4 w-[180px]" />
-      <Skeleton className="h-4 w-[200px]" />
-    </div>
+    <SkeletonPreview>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[220px]" />
+        <Skeleton className="h-4 w-[180px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
+    </SkeletonPreview>
   ),
 };
 

@@ -18,6 +18,8 @@ export {
   BreadcrumbSeparator,
 } from "./components/breadcrumb";
 export { Button } from "./components/button";
+export type { ButtonGroupProps } from "./components/button-group";
+export { ButtonGroup, buttonGroupVariants } from "./components/button-group";
 export {
   Card,
   CardAction,
@@ -27,17 +29,87 @@ export {
   CardHeader,
   CardTitle,
 } from "./components/card";
+export type {
+  EmptyActionsProps,
+  EmptyDescriptionProps,
+  EmptyIconProps,
+  EmptyProps,
+  EmptyTitleProps,
+} from "./components/empty";
+export {
+  Empty,
+  EmptyActions,
+  EmptyDescription,
+  EmptyIcon,
+  EmptyTitle,
+} from "./components/empty";
 export type { FieldProps } from "./components/field";
 export { Field } from "./components/field";
 export { Input } from "./components/input";
+export type {
+  ItemActionsProps,
+  ItemContentProps,
+  ItemDescriptionProps,
+  ItemGroupProps,
+  ItemHeaderProps,
+  ItemMediaProps,
+  ItemProps,
+  ItemSeparatorProps,
+  ItemTitleProps,
+} from "./components/item";
+export {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemHeader,
+  ItemMedia,
+  ItemSeparator,
+  ItemTitle,
+} from "./components/item";
 export type { KbdGroupProps, KbdProps } from "./components/kbd";
 export { Kbd, KbdGroup } from "./components/kbd";
+export type { NativeSelectProps } from "./components/native-select";
+export { NativeSelect } from "./components/native-select";
+export type { PaginationLinkProps } from "./components/pagination";
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "./components/pagination";
 export type { PortalProps } from "./components/portal";
 export { Portal } from "./components/portal";
 export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
 export type { SpinnerProps } from "./components/spinner";
 export { Spinner, spinnerVariants } from "./components/spinner";
+export type {
+  TableBodyProps,
+  TableCaptionProps,
+  TableCellProps,
+  TableFooterProps,
+  TableHeaderProps,
+  TableHeadProps,
+  TableProps,
+  TableRowProps,
+} from "./components/table";
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./components/table";
+export type { TextareaProps } from "./components/textarea";
+export { Textarea } from "./components/textarea";
 export type { TypographyProps } from "./components/typography";
 export { Typography, typographyVariants } from "./components/typography";
 export type { VisuallyHiddenProps } from "./components/visually-hidden";
