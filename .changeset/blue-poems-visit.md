@@ -1,4 +1,5 @@
 ---
+"@fodmap/app": patch
 "@fodmap/ui": minor
 "@fodmap/storybook": patch
 ---
