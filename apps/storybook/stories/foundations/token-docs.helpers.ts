@@ -1,12 +1,5 @@
 export type TokenPrimitive = string | number | boolean;
 export type TokenRecord = Record<string, unknown>;
-export type TokenSortDirection = "asc" | "desc";
-
-export interface TokenSortOption {
-  key: string;
-  label: string;
-}
-
 export interface TokenRow {
   id: string;
   path: string;
@@ -384,10 +377,6 @@ export function stripPathPrefix(path: string, prefix: string): string {
   return path.startsWith(`${prefix}.`) ? path.slice(prefix.length + 1) : path;
 }
 
-export function countTokenLeaves(node: unknown): number {
-  return flattenTokenTree(node).length;
-}
-
 export function isColorTokenValue(value: string): boolean {
   return (
     value.startsWith("oklch(") ||
@@ -429,34 +418,6 @@ export function clamp(value: number, min: number, max: number): number {
     return max;
   }
   return value;
-}
-
-export function normalizeSearchText(...parts: string[]): string {
-  return parts.join(" ").toLowerCase();
-}
-
-export function normalizeFilterQuery(query: string): string {
-  return query.trim().toLowerCase();
-}
-
-export function createSortOptions(
-  ...entries: Array<[key: string, label: string]>
-): TokenSortOption[] {
-  return entries.map(([key, label]) => ({ key, label }));
-}
-
-export function countVisibleRows<
-  Row extends { path: string; searchText?: string },
->(rows: Row[], query: string): number {
-  const normalizedQuery = normalizeFilterQuery(query);
-  if (normalizedQuery.length === 0) {
-    return rows.length;
-  }
-
-  return rows.filter((row) => {
-    const haystack = normalizeSearchText(row.path, row.searchText ?? "");
-    return haystack.includes(normalizedQuery);
-  }).length;
 }
 
 export function groupRowsBySegment<Row extends { id: string; path: string }>(

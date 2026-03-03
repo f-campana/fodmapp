@@ -1,0 +1,141 @@
+.fd-tokendocs-typoShowcase {
+  display: grid;
+  gap: 0.78rem;
+}
+
+.fd-tokendocs-typoShowcase .fd-tokendocs-showcaseTitle:not(:first-child) {
+  margin-top: 0.22rem;
+}
+
+.fd-tokendocs-typoSpecimens {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.62rem;
+}
+
+.fd-tokendocs-typoCard {
+  display: grid;
+  gap: 0.46rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 84%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(
+    in oklab,
+    var(--color-background) 97%,
+    var(--color-surface)
+  );
+  padding: 0.7rem;
+}
+
+.fd-tokendocs-typoSample {
+  margin: 0;
+  color: var(--color-foreground);
+  font-size: 1.12rem;
+  line-height: 1.32;
+}
+
+.fd-tokendocs-typoMeta {
+  display: grid;
+  gap: 0.14rem;
+}
+
+.fd-tokendocs-typoLabel {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-typoValue {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.7rem;
+  line-height: 1.34;
+  color: var(--color-muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-typeScaleList {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.fd-tokendocs-typeScaleItem {
+  display: grid;
+  grid-template-columns: minmax(7.2rem, auto) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.72rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 88%, transparent);
+  border-radius: 0.52rem;
+  background: color-mix(
+    in oklab,
+    var(--color-background) 98%,
+    var(--color-surface)
+  );
+  padding: 0.52rem 0.66rem;
+}
+
+.fd-tokendocs-typeSample {
+  margin: 0;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-typeKey {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.68rem;
+  color: var(--color-muted-foreground);
+}
+
+.fd-tokendocs-weightBand {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.56rem;
+}
+
+.fd-tokendocs-weightBandCell,
+.fd-tokendocs-weightCell {
+  display: grid;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.56rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-background) 96%, var(--color-surface)) 0%,
+    color-mix(in oklab, var(--color-surface-muted) 28%, var(--color-background))
+      100%
+  );
+  padding: 0.54rem 0.6rem;
+}
+
+.fd-tokendocs-weightCellSample {
+  margin: 0;
+  font-size: clamp(1.35rem, 2vw, 1.72rem);
+  line-height: 1.24;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-weightBandMeta {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.fd-tokendocs-weightTokenMeta {
+  font-size: 0.7rem;
+  color: var(--color-muted-foreground);
+  letter-spacing: 0.01em;
+}
