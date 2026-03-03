@@ -126,6 +126,12 @@ const requiredSelectors = [
   ".data-\\[side\\=top\\]\\:slide-in-from-bottom-2",
   ".fill-popover",
   ".stroke-border",
+  ".focus\\:bg-accent:focus",
+  ".focus\\:text-accent-foreground:focus",
+  ".data-\\[state\\=open\\]\\:bg-accent",
+  ".data-\\[state\\=open\\]\\:text-accent-foreground",
+  ".data-\\[disabled\\]\\:pointer-events-none",
+  ".data-\\[disabled\\]\\:opacity-50",
 ];
 
 const failures = [];
