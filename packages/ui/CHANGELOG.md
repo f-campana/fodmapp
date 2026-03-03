@@ -1,5 +1,13 @@
 # @fodmap/ui
 
+## 3.2.0
+
+### Minor Changes
+
+- [#142](https://github.com/f-campana/Fodmap/pull/142) [`ea84a38`](https://github.com/f-campana/Fodmap/commit/ea84a3894c8ab0dd2e623e2ee9cfffb4351317e6) Thanks [@f-campana](https://github.com/f-campana)! - Add Batch A primitives set 1 to `@fodmap/ui` (`Alert`, `Breadcrumb`, `Kbd`,
+  `Skeleton`, `Spinner`, `Typography`) with full tests, stories, and public
+  exports, plus Storybook docs parity updates for the new primitives.
+
 ## 3.1.0
 
 ### Minor Changes
