@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.23
+
+### Patch Changes
+
+- [#169](https://github.com/f-campana/Fodmap/pull/169) [`570a2b8`](https://github.com/f-campana/Fodmap/commit/570a2b8456b2cf4593cfdab14efd8311edec6133) Thanks [@f-campana](https://github.com/f-campana)! - Add the composed `DatePicker` primitive and Sonner-backed `Toast` helper API, including tests, Storybook coverage, and contract-check updates.
+
+- Updated dependencies [[`570a2b8`](https://github.com/f-campana/Fodmap/commit/570a2b8456b2cf4593cfdab14efd8311edec6133)]:
+  - @fodmap/ui@3.13.0
+
 ## 0.1.22
 
 ### Patch Changes
