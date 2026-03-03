@@ -341,6 +341,30 @@ export type { ScoreBarProps } from "./components/score-bar";
 export { ScoreBar } from "./components/score-bar";
 export type { ScrollAreaProps, ScrollBarProps } from "./components/scroll-area";
 export { ScrollArea, ScrollBar } from "./components/scroll-area";
+export type {
+  SelectContentProps,
+  SelectGroupProps,
+  SelectItemProps,
+  SelectLabelProps,
+  SelectProps,
+  SelectScrollDownButtonProps,
+  SelectScrollUpButtonProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
+} from "./components/select";
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "./components/select";
 export type { SeparatorProps } from "./components/separator";
 export { Separator } from "./components/separator";
 export type {
