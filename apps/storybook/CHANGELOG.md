@@ -1,5 +1,13 @@
 # @fodmap/storybook
 
+## 0.1.11
+
+### Patch Changes
+
+- [#140](https://github.com/f-campana/Fodmap/pull/140) [`ccc8e7d`](https://github.com/f-campana/Fodmap/commit/ccc8e7d7c56fd80365cec22d133b7414382aab26) Thanks [@f-campana](https://github.com/f-campana)! - Align primitive stories (`Badge`, `Card`, `Field`, `Input`) with the Button
+  storybook contract by adding complete `argTypes` metadata, expanded controls,
+  and stronger semantic/token/data-slot play assertions.
+
 ## 0.1.10
 
 ### Patch Changes
