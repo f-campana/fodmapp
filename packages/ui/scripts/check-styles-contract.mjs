@@ -90,6 +90,13 @@ const requiredSelectors = [
   ".bg-danger",
   ".text-danger-foreground",
   ".border-danger",
+  ".data-\\[state\\=checked\\]\\:bg-primary",
+  ".data-\\[state\\=checked\\]\\:border-primary",
+  ".data-\\[state\\=checked\\]\\:text-primary-foreground",
+  ".data-\\[state\\=unchecked\\]\\:bg-input",
+  ".bg-input",
+  ".bg-border",
+  ".bg-muted",
 ];
 
 const failures = [];
