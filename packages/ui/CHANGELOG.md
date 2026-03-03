@@ -1,5 +1,15 @@
 # @fodmap/ui
 
+## 3.12.0
+
+### Minor Changes
+
+- [#167](https://github.com/f-campana/Fodmap/pull/167) [`4b6c99e`](https://github.com/f-campana/Fodmap/commit/4b6c99eff3cdc1fa3a01040f6f625873b4b7f036) Thanks [@f-campana](https://github.com/f-campana)! - Add reference-gate Combobox primitives (`Combobox` and `ComboboxMulti`) with compound slots, tests, and Storybook coverage.
+
+- [#163](https://github.com/f-campana/Fodmap/pull/163) [`97111e2`](https://github.com/f-campana/Fodmap/commit/97111e218b14ad5caf8285f08a2c7916ea44c538) Thanks [@f-campana](https://github.com/f-campana)! - feat(ui): add command reference primitive with tests and Storybook stories.
+
+- [#165](https://github.com/f-campana/Fodmap/pull/165) [`d677f5f`](https://github.com/f-campana/Fodmap/commit/d677f5f24cb17d6c2129bc3ac68eee5214701357) Thanks [@f-campana](https://github.com/f-campana)! - feat(ui): add batch F external primitives (calendar carousel drawer resizable sonner).
+
 ## 3.11.0
 
 ### Minor Changes
