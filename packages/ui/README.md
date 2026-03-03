@@ -4,7 +4,7 @@ Shared React UI foundation for the FODMAP platform.
 
 ## Exports
 
-- Components: `Button`, `Input`, `Badge`, `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `Field`
+- Components: `Alert`, `AlertTitle`, `AlertDescription`, `Badge`, `Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`, `Button`, `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `Field`, `Input`, `Kbd`, `KbdGroup`, `Skeleton`, `Spinner`, `Typography`
 - Utilities: `VisuallyHidden`, `Portal`
 - Hooks: `useControllableState`, `useMediaQuery`, `useMobile`, `useDebounce`, `useCopyToClipboard`, `useLocale`
 - Utility: `cn`
