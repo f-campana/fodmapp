@@ -26,3 +26,35 @@
     letter-spacing: 0.01em;
   }
 }
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+@layer utilities {
+  .data-\[state\=open\]\:animate-accordion-down[data-state="open"] {
+    animation: accordion-down var(--transition-duration-interactive)
+      var(--transition-timing-interactive);
+  }
+
+  .data-\[state\=closed\]\:animate-accordion-up[data-state="closed"] {
+    animation: accordion-up var(--transition-duration-interactive)
+      var(--transition-timing-interactive);
+  }
+}
