@@ -23,22 +23,24 @@ export async function playColorShowcase({
   ).not.toBeInTheDocument();
 
   const rootStyles = getComputedStyle(document.documentElement);
-  await expect(rootStyles.getPropertyValue("--color-background").trim()).not.toBe(
+  await expect(
+    rootStyles.getPropertyValue("--color-background").trim(),
+  ).not.toBe("");
+  await expect(
+    rootStyles.getPropertyValue("--color-foreground").trim(),
+  ).not.toBe("");
+  await expect(rootStyles.getPropertyValue("--color-primary").trim()).not.toBe(
     "",
   );
-  await expect(rootStyles.getPropertyValue("--color-foreground").trim()).not.toBe(
-    "",
-  );
-  await expect(rootStyles.getPropertyValue("--color-primary").trim()).not.toBe("");
   await expect(
     rootStyles.getPropertyValue("--color-ring-accessible").trim(),
   ).not.toBe("");
   await expect(
     rootStyles.getPropertyValue("--color-border-control").trim(),
   ).not.toBe("");
-  await expect(rootStyles.getPropertyValue("--color-ring-soft").trim()).not.toBe(
-    "",
-  );
+  await expect(
+    rootStyles.getPropertyValue("--color-ring-soft").trim(),
+  ).not.toBe("");
   await expect(
     rootStyles.getPropertyValue("--color-destructive-hover").trim(),
   ).not.toBe("");
@@ -48,7 +50,9 @@ export async function playColorShowcase({
   await expect(
     rootStyles.getPropertyValue("--color-destructive-subtle-ring").trim(),
   ).not.toBe("");
-  await expect(rootStyles.getPropertyValue("--color-outline").trim()).not.toBe("");
+  await expect(rootStyles.getPropertyValue("--color-outline").trim()).not.toBe(
+    "",
+  );
   await expect(
     rootStyles.getPropertyValue("--color-outline-hover").trim(),
   ).not.toBe("");
@@ -97,7 +101,10 @@ export async function playColorShowcase({
 
   for (const path of requiredSemanticColorPaths) {
     const semanticRow = semanticByPath.get(path);
-    await expect(semanticRow, `Missing semantic token row for ${path}`).toBeDefined();
+    await expect(
+      semanticRow,
+      `Missing semantic token row for ${path}`,
+    ).toBeDefined();
     await expect(
       semanticRow && isColorTokenValue(semanticRow.light),
       `Expected light semantic value for ${path}`,
@@ -144,7 +151,9 @@ export async function playColorReference({
     `#semantic-color-grid-${canonicalSemanticGroup.id}`,
   );
   if (!initialSection || !semanticSection) {
-    throw new Error("Expected canonical base and semantic sections to be present.");
+    throw new Error(
+      "Expected canonical base and semantic sections to be present.",
+    );
   }
 
   await expect(initialSection).toHaveAttribute("data-expanded", "true");
@@ -210,7 +219,9 @@ export async function playColorReference({
     ".fd-tokendocs-copy",
   ) as HTMLButtonElement | null;
   if (!canonicalValueCluster || !canonicalCopy) {
-    throw new Error("Expected canonical value cluster and copy button to exist.");
+    throw new Error(
+      "Expected canonical value cluster and copy button to exist.",
+    );
   }
   await expect(canonicalCopy).toBeEnabled();
 

@@ -34,12 +34,11 @@ function createInlineSwatch(value: string) {
 export function ColorReferenceStory() {
   useTokenDocsResetScrollOnMount();
   const jumpRequestIdRef = useRef(0);
-  const { openGroupIdFor, onOpenGroupChangeFor } = useTokenGroupState<ColorGridId>(
-    {
+  const { openGroupIdFor, onOpenGroupChangeFor } =
+    useTokenGroupState<ColorGridId>({
       gridId: BASE_GRID_ID,
       groupId: baseColorGroups[0]?.id ?? "neutral",
-    },
-  );
+    });
 
   const onBaseGroupChange = onOpenGroupChangeFor(BASE_GRID_ID);
   const onSemanticGroupChange = onOpenGroupChangeFor(SEMANTIC_GRID_ID);

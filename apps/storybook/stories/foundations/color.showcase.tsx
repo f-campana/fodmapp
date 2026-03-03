@@ -7,7 +7,11 @@ import {
   sharedScaleStops,
   sparseScaleStops,
 } from "./color.data";
-import { classNames,TokenDocsPage, TokenSection } from "./token-docs.components";
+import {
+  classNames,
+  TokenDocsPage,
+  TokenSection,
+} from "./token-docs.components";
 
 export function ColorShowcaseStory() {
   const matrixStyle = {
@@ -25,25 +29,34 @@ export function ColorShowcaseStory() {
         title="Base Color Scales"
         description="Union scale stops are shown in one matrix. Families without a stop keep that slot intentionally empty."
       >
-        <div className="fd-tokendocs-showcase" aria-label="Base color scale matrix">
+        <div
+          className="fd-tokendocs-showcase"
+          aria-label="Base color scale matrix"
+        >
           <h3 className="fd-tokendocs-showcaseTitle">Scale Matrix</h3>
           <p className="fd-tokendocs-showcaseHint">
             Core families on rows, shared scale stops on columns.
           </p>
           <p className="fd-tokendocs-matrixNote">
-            Sparse-only stops (for example `950`) render inline as regular matrix
-            values on the owning row.
+            Sparse-only stops (for example `950`) render inline as regular
+            matrix values on the owning row.
           </p>
           <div className="fd-tokendocs-colorMatrix" style={matrixStyle}>
             <div className="fd-tokendocs-colorMatrixHead">
               <span aria-hidden="true" />
               {sharedScaleStops.map((step) => (
-                <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
+                <span
+                  key={`head-${step}`}
+                  className="fd-tokendocs-colorScaleLabel"
+                >
                   {step}
                 </span>
               ))}
               {sparseScaleStops.map((step) => (
-                <span key={`head-${step}`} className="fd-tokendocs-colorScaleLabel">
+                <span
+                  key={`head-${step}`}
+                  className="fd-tokendocs-colorScaleLabel"
+                >
                   {step}
                 </span>
               ))}
@@ -51,7 +64,9 @@ export function ColorShowcaseStory() {
             {matrixRows.map((row) => (
               <div key={row.family} className="fd-tokendocs-colorMatrixRow">
                 <span className="fd-tokendocs-colorFamilyCell">
-                  <span className="fd-tokendocs-colorFamilyLabel">{row.family}</span>
+                  <span className="fd-tokendocs-colorFamilyLabel">
+                    {row.family}
+                  </span>
                 </span>
                 {sharedScaleStops.map((step) => {
                   const value = row.values[step];
@@ -79,7 +94,9 @@ export function ColorShowcaseStory() {
                   );
                 })}
                 {sparseScaleStops.map((step) => {
-                  const sparse = row.sparseStops.find((item) => item.step === step);
+                  const sparse = row.sparseStops.find(
+                    (item) => item.step === step,
+                  );
                   const sparseValue = sparse?.value ?? null;
                   const sparsePath = `base.color.${row.family}.${step}`;
 
@@ -99,7 +116,9 @@ export function ColorShowcaseStory() {
                       <span
                         className="fd-tokendocs-colorSwatchBlock"
                         style={
-                          sparseValue ? { backgroundColor: sparseValue } : undefined
+                          sparseValue
+                            ? { backgroundColor: sparseValue }
+                            : undefined
                         }
                         role="img"
                         aria-label={
@@ -124,7 +143,9 @@ export function ColorShowcaseStory() {
                     <span className="fd-tokendocs-brandLabel">Light</span>
                     <span
                       className="fd-tokendocs-brandSwatchBlock"
-                      style={pair.light ? { backgroundColor: pair.light } : undefined}
+                      style={
+                        pair.light ? { backgroundColor: pair.light } : undefined
+                      }
                       title={pair.light ?? "Missing value"}
                       role="img"
                       aria-label={`base.color.brand.${pair.label}Light: ${pair.light ?? "missing"}`}
@@ -134,7 +155,9 @@ export function ColorShowcaseStory() {
                     <span className="fd-tokendocs-brandLabel">Dark</span>
                     <span
                       className="fd-tokendocs-brandSwatchBlock"
-                      style={pair.dark ? { backgroundColor: pair.dark } : undefined}
+                      style={
+                        pair.dark ? { backgroundColor: pair.dark } : undefined
+                      }
                       title={pair.dark ?? "Missing value"}
                       role="img"
                       aria-label={`base.color.brand.${pair.label}Dark: ${pair.dark ?? "missing"}`}
@@ -151,7 +174,10 @@ export function ColorShowcaseStory() {
         title="Semantic Color Contract"
         description="Role pairs are presented for quick light/dark scanning with minimal text noise."
       >
-        <div className="fd-tokendocs-showcase" aria-label="Semantic role pair previews">
+        <div
+          className="fd-tokendocs-showcase"
+          aria-label="Semantic role pair previews"
+        >
           <h3 className="fd-tokendocs-showcaseTitle">Semantic Role Pairs</h3>
           <p className="fd-tokendocs-showcaseHint">
             Each card uses matching `bg` / `fg` pairs to preview contrast across
