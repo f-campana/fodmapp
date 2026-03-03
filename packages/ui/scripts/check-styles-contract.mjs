@@ -164,6 +164,16 @@ const requiredSelectors = [
   ".data-\\[active\\=true\\]\\:border-ring",
   ".data-\\[active\\=true\\]\\:ring-2",
   ".data-\\[active\\=true\\]\\:ring-ring-soft",
+  ".aria-selected\\:bg-primary",
+  ".aria-selected\\:text-primary-foreground",
+  ".data-\\[orientation\\=vertical\\]\\:flex-col",
+  ".data-\\[panel-group-direction\\=vertical\\]\\:w-px",
+  ".data-\\[panel-group-direction\\=horizontal\\]\\:h-px",
+  ".data-\\[vaul-drawer-direction\\=bottom\\]\\:inset-x-0",
+  ".data-\\[vaul-drawer-direction\\=bottom\\]\\:bottom-0",
+  ".\\[\\&_\\[data-sonner-toast\\]\\]\\:bg-popover",
+  ".\\[\\&_\\[data-sonner-toast\\]\\]\\:text-popover-foreground",
+  ".\\[\\&_\\[data-sonner-toast\\]\\]\\:border-border",
 ];
 
 const failures = [];
