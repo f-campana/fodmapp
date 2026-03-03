@@ -5,6 +5,14 @@ export {
   AlertTitle,
   alertVariants,
 } from "./components/alert";
+export type { AspectRatioProps } from "./components/aspect-ratio";
+export { AspectRatio } from "./components/aspect-ratio";
+export type {
+  AvatarFallbackProps,
+  AvatarImageProps,
+  AvatarProps,
+} from "./components/avatar";
+export { Avatar, AvatarFallback, AvatarImage } from "./components/avatar";
 export type { BadgeProps } from "./components/badge";
 export { Badge } from "./components/badge";
 export type { BreadcrumbLinkProps } from "./components/breadcrumb";
@@ -42,6 +50,8 @@ export {
   CardHeader,
   CardTitle,
 } from "./components/card";
+export type { CheckboxProps } from "./components/checkbox";
+export { Checkbox } from "./components/checkbox";
 export type { ChipProps } from "./components/chip";
 export { Chip, chipVariants } from "./components/chip";
 export type { DotProps } from "./components/dot";
@@ -87,6 +97,8 @@ export {
 } from "./components/item";
 export type { KbdGroupProps, KbdProps } from "./components/kbd";
 export { Kbd, KbdGroup } from "./components/kbd";
+export type { LabelProps } from "./components/label";
+export { Label, labelVariants } from "./components/label";
 export type { NativeSelectProps } from "./components/native-select";
 export { NativeSelect } from "./components/native-select";
 export type { PaginationLinkProps } from "./components/pagination";
@@ -101,8 +113,17 @@ export {
 } from "./components/pagination";
 export type { PortalProps } from "./components/portal";
 export { Portal } from "./components/portal";
+export type { ProgressProps } from "./components/progress";
+export { Progress } from "./components/progress";
+export type {
+  RadioGroupItemProps,
+  RadioGroupProps,
+} from "./components/radio-group";
+export { RadioGroup, RadioGroupItem } from "./components/radio-group";
 export type { ScoreBarProps } from "./components/score-bar";
 export { ScoreBar } from "./components/score-bar";
+export type { SeparatorProps } from "./components/separator";
+export { Separator } from "./components/separator";
 export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
 export type { SpinnerProps } from "./components/spinner";
@@ -122,6 +143,8 @@ export {
   StepperStep,
   stepperVariants,
 } from "./components/stepper";
+export type { SwitchProps } from "./components/switch";
+export { Switch } from "./components/switch";
 export type {
   TableBodyProps,
   TableCaptionProps,
