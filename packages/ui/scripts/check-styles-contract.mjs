@@ -132,6 +132,19 @@ const requiredSelectors = [
   ".data-\\[state\\=open\\]\\:text-accent-foreground",
   ".data-\\[disabled\\]\\:pointer-events-none",
   ".data-\\[disabled\\]\\:opacity-50",
+  ".data-\\[motion\\^\\=from-\\]\\:animate-in",
+  ".data-\\[motion\\^\\=to-\\]\\:animate-out",
+  ".data-\\[motion\\^\\=from-\\]\\:fade-in",
+  ".data-\\[motion\\^\\=to-\\]\\:fade-out",
+  ".data-\\[motion\\=from-end\\]\\:slide-in-from-right-2",
+  ".data-\\[motion\\=from-start\\]\\:slide-in-from-left-2",
+  ".data-\\[motion\\=to-end\\]\\:slide-out-to-right-2",
+  ".data-\\[motion\\=to-start\\]\\:slide-out-to-left-2",
+  ".data-\\[state\\=visible\\]\\:animate-in",
+  ".data-\\[state\\=hidden\\]\\:animate-out",
+  ".data-\\[state\\=visible\\]\\:fade-in",
+  ".data-\\[state\\=hidden\\]\\:fade-out",
+  ".data-\\[active\\]\\:bg-accent",
 ];
 
 const failures = [];
