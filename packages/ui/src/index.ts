@@ -91,6 +91,40 @@ export {
   CollapsibleTrigger,
 } from "./components/collapsible";
 export type {
+  ContextMenuCheckboxItemProps,
+  ContextMenuContentProps,
+  ContextMenuGroupProps,
+  ContextMenuItemProps,
+  ContextMenuLabelProps,
+  ContextMenuPortalProps,
+  ContextMenuProps,
+  ContextMenuRadioGroupProps,
+  ContextMenuRadioItemProps,
+  ContextMenuSeparatorProps,
+  ContextMenuShortcutProps,
+  ContextMenuSubContentProps,
+  ContextMenuSubProps,
+  ContextMenuSubTriggerProps,
+  ContextMenuTriggerProps,
+} from "./components/context-menu";
+export {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuPortal,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "./components/context-menu";
+export type {
   DialogBodyProps,
   DialogCloseProps,
   DialogContentProps,
@@ -209,8 +243,65 @@ export type { KbdGroupProps, KbdProps } from "./components/kbd";
 export { Kbd, KbdGroup } from "./components/kbd";
 export type { LabelProps } from "./components/label";
 export { Label, labelVariants } from "./components/label";
+export type {
+  MenubarCheckboxItemProps,
+  MenubarContentProps,
+  MenubarGroupProps,
+  MenubarItemProps,
+  MenubarLabelProps,
+  MenubarMenuProps,
+  MenubarPortalProps,
+  MenubarProps,
+  MenubarRadioGroupProps,
+  MenubarRadioItemProps,
+  MenubarSeparatorProps,
+  MenubarShortcutProps,
+  MenubarSubContentProps,
+  MenubarSubProps,
+  MenubarSubTriggerProps,
+  MenubarTriggerProps,
+} from "./components/menubar";
+export {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarGroup,
+  MenubarItem,
+  MenubarLabel,
+  MenubarMenu,
+  MenubarPortal,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "./components/menubar";
 export type { NativeSelectProps } from "./components/native-select";
 export { NativeSelect } from "./components/native-select";
+export type {
+  NavigationMenuContentProps,
+  NavigationMenuIndicatorProps,
+  NavigationMenuItemProps,
+  NavigationMenuLinkProps,
+  NavigationMenuListProps,
+  NavigationMenuProps,
+  NavigationMenuTriggerProps,
+  NavigationMenuViewportProps,
+} from "./components/navigation-menu";
+export {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+  NavigationMenuViewport,
+} from "./components/navigation-menu";
 export type { PaginationLinkProps } from "./components/pagination";
 export {
   Pagination,
