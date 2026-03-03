@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -9,6 +9,28 @@ const packageRoot = path.resolve(path.dirname(filename), "..");
 const stylesheetPath = path.join(packageRoot, "dist", "styles.css");
 
 const css = readFileSync(stylesheetPath, "utf8");
+const sourceRootPath = path.join(packageRoot, "src");
+
+function collectSourceFiles(dir) {
+  const entries = readdirSync(dir);
+  const files = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry);
+    const stats = statSync(fullPath);
+
+    if (stats.isDirectory()) {
+      files.push(...collectSourceFiles(fullPath));
+      continue;
+    }
+
+    if (fullPath.endsWith(".ts") || fullPath.endsWith(".tsx")) {
+      files.push(fullPath);
+    }
+  }
+
+  return files;
+}
 
 const bannedSelectors = [
   ".w-\\[340px\\]",
@@ -56,7 +78,6 @@ const requiredSelectors = [
   ".focus-visible\\:border-destructive-subtle-border:focus-visible",
   ".focus-visible\\:ring-destructive-subtle-ring:focus-visible",
   ".focus-visible\\:ring-ring-soft:focus-visible",
-  ".focus-visible\\:ring-ring-accessible:focus-visible",
 ];
 
 const failures = [];
@@ -74,6 +95,41 @@ for (const selector of requiredSelectors) {
     failures.push(
       `Expected selector missing from distributed stylesheet: ${selector}`,
     );
+  }
+}
+
+const sourceFiles = collectSourceFiles(sourceRootPath);
+const sourceChecks = [
+  {
+    pattern: /\bReact\.forwardRef\b/,
+    message:
+      "React.forwardRef is forbidden in @fodmap/ui (use React 19 ref-as-prop pattern).",
+  },
+  {
+    pattern: /\.displayName\s*=/,
+    message:
+      "Explicit displayName assignment is forbidden (use named function declarations).",
+  },
+  {
+    pattern: /data-testid/i,
+    message: "data-testid is forbidden (query by role in tests/stories).",
+  },
+  {
+    pattern:
+      /from\s+["'](?:lucide-react|react-icons(?:\/[^"']+)?|@heroicons\/[^"']+|phosphor-react|@tabler\/icons-react)["']/,
+    message:
+      "Icon library imports are forbidden inside packages/ui (accept ReactNode icon slots instead).",
+  },
+];
+
+for (const filePath of sourceFiles) {
+  const source = readFileSync(filePath, "utf8");
+  const relPath = path.relative(packageRoot, filePath);
+
+  for (const { pattern, message } of sourceChecks) {
+    if (pattern.test(source)) {
+      failures.push(`[${relPath}] ${message}`);
+    }
   }
 }
 

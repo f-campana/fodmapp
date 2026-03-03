@@ -8,7 +8,9 @@ import { Badge } from "./badge";
 describe("Badge", () => {
   it("renders badge label", () => {
     render(<Badge>Compatible</Badge>);
-    expect(screen.getByText("Compatible")).toBeInTheDocument();
+    const badge = screen.getByText("Compatible");
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveAttribute("data-slot", "badge");
   });
 
   it("supports destructive variant", () => {
