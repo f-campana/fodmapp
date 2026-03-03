@@ -1,5 +1,14 @@
 # @fodmap/app
 
+## 0.1.22
+
+### Patch Changes
+
+- [#165](https://github.com/f-campana/Fodmap/pull/165) [`3c3f276`](https://github.com/f-campana/Fodmap/commit/3c3f276ec3ba9f3bdbea50e7af46cd8e4ee1e0da) Thanks [@f-campana](https://github.com/f-campana)! - Add `cmdk` to `serverExternalPackages` for Next.js server runtime compatibility with the expanded `@fodmap/ui` external surface.
+
+- Updated dependencies [[`97111e2`](https://github.com/f-campana/Fodmap/commit/97111e218b14ad5caf8285f08a2c7916ea44c538), [`d677f5f`](https://github.com/f-campana/Fodmap/commit/d677f5f24cb17d6c2129bc3ac68eee5214701357)]:
+  - @fodmap/ui@3.12.0
+
 ## 0.1.21
 
 ### Patch Changes
