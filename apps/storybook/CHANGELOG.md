@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.22
+
+### Patch Changes
+
+- [#163](https://github.com/f-campana/Fodmap/pull/163) [`97111e2`](https://github.com/f-campana/Fodmap/commit/97111e218b14ad5caf8285f08a2c7916ea44c538) Thanks [@f-campana](https://github.com/f-campana)! - feat(ui): add command reference primitive with tests and Storybook stories.
+
+- Updated dependencies [[`97111e2`](https://github.com/f-campana/Fodmap/commit/97111e218b14ad5caf8285f08a2c7916ea44c538)]:
+  - @fodmap/ui@3.12.0
+
 ## 0.1.21
 
 ### Patch Changes

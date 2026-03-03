@@ -1,5 +1,12 @@
 # @fodmap/research
 
+## 0.1.20
+
+### Patch Changes
+
+- Updated dependencies [[`97111e2`](https://github.com/f-campana/Fodmap/commit/97111e218b14ad5caf8285f08a2c7916ea44c538)]:
+  - @fodmap/ui@3.12.0
+
 ## 0.1.19
 
 ### Patch Changes
