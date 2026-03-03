@@ -54,6 +54,16 @@ export type { CheckboxProps } from "./components/checkbox";
 export { Checkbox } from "./components/checkbox";
 export type { ChipProps } from "./components/chip";
 export { Chip, chipVariants } from "./components/chip";
+export type {
+  CollapsibleContentProps,
+  CollapsibleProps,
+  CollapsibleTriggerProps,
+} from "./components/collapsible";
+export {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./components/collapsible";
 export type { DotProps } from "./components/dot";
 export { Dot, dotVariants } from "./components/dot";
 export type {
@@ -122,10 +132,14 @@ export type {
 export { RadioGroup, RadioGroupItem } from "./components/radio-group";
 export type { ScoreBarProps } from "./components/score-bar";
 export { ScoreBar } from "./components/score-bar";
+export type { ScrollAreaProps, ScrollBarProps } from "./components/scroll-area";
+export { ScrollArea, ScrollBar } from "./components/scroll-area";
 export type { SeparatorProps } from "./components/separator";
 export { Separator } from "./components/separator";
 export type { SkeletonProps } from "./components/skeleton";
 export { Skeleton } from "./components/skeleton";
+export type { SliderProps } from "./components/slider";
+export { Slider } from "./components/slider";
 export type { SpinnerProps } from "./components/spinner";
 export { Spinner, spinnerVariants } from "./components/spinner";
 export type {
@@ -165,8 +179,34 @@ export {
   TableHeader,
   TableRow,
 } from "./components/table";
+export type {
+  TabsContentProps,
+  TabsListProps,
+  TabsProps,
+  TabsTriggerProps,
+} from "./components/tabs";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
 export type { TextareaProps } from "./components/textarea";
 export { Textarea } from "./components/textarea";
+export type { ToggleProps } from "./components/toggle";
+export { Toggle, toggleVariants } from "./components/toggle";
+export type {
+  ToggleGroupItemProps,
+  ToggleGroupProps,
+} from "./components/toggle-group";
+export { ToggleGroup, ToggleGroupItem } from "./components/toggle-group";
+export type {
+  TooltipContentProps,
+  TooltipProps,
+  TooltipProviderProps,
+  TooltipTriggerProps,
+} from "./components/tooltip";
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./components/tooltip";
 export type { TypographyProps } from "./components/typography";
 export { Typography, typographyVariants } from "./components/typography";
 export type { VisuallyHiddenProps } from "./components/visually-hidden";

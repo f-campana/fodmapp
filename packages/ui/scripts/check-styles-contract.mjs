@@ -97,6 +97,16 @@ const requiredSelectors = [
   ".bg-input",
   ".bg-border",
   ".bg-muted",
+  ".data-\\[state\\=active\\]\\:bg-background",
+  ".data-\\[state\\=active\\]\\:text-foreground",
+  ".data-\\[state\\=on\\]\\:bg-accent",
+  ".data-\\[state\\=on\\]\\:text-accent-foreground",
+  ".bg-popover",
+  ".text-popover-foreground",
+  ".data-\\[state\\=open\\]\\:animate-accordion-down",
+  ".data-\\[state\\=closed\\]\\:animate-accordion-up",
+  ".data-\\[state\\=open\\]\\:animate-in",
+  ".data-\\[state\\=closed\\]\\:animate-out",
 ];
 
 const failures = [];
