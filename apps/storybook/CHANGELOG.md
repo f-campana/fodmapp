@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.17
+
+### Patch Changes
+
+- [#153](https://github.com/f-campana/Fodmap/pull/153) [`45c9849`](https://github.com/f-campana/Fodmap/commit/45c98496d4cf902c6652760ed7933dc19303de6b) Thanks [@f-campana](https://github.com/f-campana)! - Add batch C overlay primitives: AlertDialog, Sheet, Popover, and HoverCard.
+
+- Updated dependencies [[`45c9849`](https://github.com/f-campana/Fodmap/commit/45c98496d4cf902c6652760ed7933dc19303de6b)]:
+  - @fodmap/ui@3.7.0
+
 ## 0.1.16
 
 ### Patch Changes
