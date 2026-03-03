@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-03
+Last reviewed: 2026-03-04
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,7 +15,8 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                        | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/Fodmap`                                             | `main`                                    | active (protected) | Main integration worktree only                               | Must remain clean.                                                  |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-g-combobox-ref`       | `codex/ui-lib-batch-g-combobox-ref`       | active             | PR-15 Batch G combobox reference gate                        | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-g-composed`           | `codex/ui-lib-batch-g-composed`           | active             | PR-16 Batch G composed (`DatePicker`, `Toast` helper)        | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-g-combobox-ref`       | `codex/ui-lib-batch-g-combobox-ref`       | merged             | PR-15 Batch G combobox reference gate                        | Merged via PR #167 and release PR #168 on March 3, 2026.            |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-f-external`           | `codex/ui-lib-batch-f-external`           | merged             | PR-14 Batch F external primitives                            | Merged via PR #165.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-f-command-ref`        | `codex/ui-lib-batch-f-command-ref`        | merged             | PR-13 Batch F command reference gate                         | Merged via PR #163.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lib-batch-e-forms`              | `codex/ui-lib-batch-e-forms`              | merged             | PR-12 Batch E forms (accordion, input-group, input-otp)      | Merged via PR #161 and release PR #162.                             |
