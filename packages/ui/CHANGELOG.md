@@ -1,5 +1,11 @@
 # @fodmap/ui
 
+## 3.6.0
+
+### Minor Changes
+
+- [#151](https://github.com/f-campana/Fodmap/pull/151) [`3a21931`](https://github.com/f-campana/Fodmap/commit/3a21931680f8a9e0d7cdc71f8a7ccc9d9d7e17bb) Thanks [@f-campana](https://github.com/f-campana)! - Add the Dialog reference primitive set (Dialog root, trigger, portal, overlay, content, close, header/body/footer, title, description) with unit tests, Storybook coverage, and contract checks.
+
 ## 3.5.0
 
 ### Minor Changes
