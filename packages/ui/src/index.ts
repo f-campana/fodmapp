@@ -121,6 +121,30 @@ export {
   CollapsibleTrigger,
 } from "./components/collapsible";
 export type {
+  ComboboxContentProps,
+  ComboboxEmptyProps,
+  ComboboxGroupProps,
+  ComboboxInputProps,
+  ComboboxItemProps,
+  ComboboxListProps,
+  ComboboxMultiProps,
+  ComboboxProps,
+  ComboboxSeparatorProps,
+  ComboboxTriggerProps,
+} from "./components/combobox";
+export {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxMulti,
+  ComboboxSeparator,
+  ComboboxTrigger,
+} from "./components/combobox";
+export type {
   CommandDialogProps,
   CommandEmptyProps,
   CommandGroupProps,
