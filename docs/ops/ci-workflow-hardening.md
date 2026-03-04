@@ -16,6 +16,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit setup-node cache-mode control (`enable-node-cache`) for jobs that intentionally skip dependency installation
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
+- API workflow job timeouts to fail fast on stalled runner container initialization
 
 ## Post-Cutover Status (ADR-018)
 
@@ -182,6 +183,20 @@ Security contract:
 UX contract:
 
 - production lane writes deployment URL + commit SHA to workflow summary
+
+## API Workflow Timeout Contract
+
+`.github/workflows/api.yml` now enforces explicit job-level fail-fast bounds to prevent indefinite hangs during service-container bootstrap on GitHub-hosted runners:
+
+- `api-tests`: `timeout-minutes: 15`
+- `api-integration-seeded`: `timeout-minutes: 25`
+- `api-gate`: `timeout-minutes: 5`
+
+Operational behavior:
+
+- if container initialization or test execution stalls beyond these bounds, the job is force-failed by Actions
+- `api-gate` remains authoritative and fails the required `API` check when either upstream job times out
+- push-to-`main` API runs remain the source of truth after merge; stale PR runs should be canceled if still running
 
 ## Branch Protection Required Checks (`main`)
 

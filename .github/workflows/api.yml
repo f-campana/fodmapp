@@ -17,6 +17,7 @@ jobs:
   api-tests:
     name: api-tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:16
@@ -61,6 +62,7 @@ jobs:
     needs:
       - api-tests
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     services:
       postgres:
         image: postgres:16
@@ -162,6 +164,7 @@ jobs:
       - api-tests
       - api-integration-seeded
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Evaluate API workflow results
         run: |

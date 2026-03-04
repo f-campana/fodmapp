@@ -58,6 +58,16 @@ These keys are optional and used by CI governance helper scripts.
 | `CHANGESET_CHECK_DEBUG` | `.github/scripts/check-pr-changesets.mjs` | no       | `1`               | Enables verbose debug logs for diff refs, changed packages, workspace package inventory, changed changeset files, unknown changeset package names, and final gate decision path. |
 | `PR_AUTHOR_LOGIN`       | `.github/scripts/check-pr-changesets.mjs` | no       | `dependabot[bot]` | Set by `changeset-pr-gate` workflow. Enables Dependabot dependency-only auto-exemption logic while keeping strict checks for human-authored PRs.                                 |
 
+## API Workflow Runtime Guardrails
+
+API workflow runtime guardrails are enforced in workflow config (not via environment variables):
+
+- `.github/workflows/api.yml` sets job timeouts to bound runner/container stalls:
+  - `api-tests`: `timeout-minutes: 15`
+  - `api-integration-seeded`: `timeout-minutes: 25`
+  - `api-gate`: `timeout-minutes: 5`
+- if a timeout is reached, GitHub Actions fails the timed-out job and the required `API` gate fails via `api-gate`
+
 ## CI Storybook Deploy Variables
 
 These keys are required by `.github/workflows/storybook-deploy.yml` through the
