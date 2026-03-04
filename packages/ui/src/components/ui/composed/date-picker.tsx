@@ -5,9 +5,9 @@ import * as React from "react";
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { useLocale } from "../../../hooks/use-locale";
 import { cn } from "../../../lib/cn";
+import { Popover, PopoverContent, PopoverTrigger } from "../adapter/popover";
 import { Button } from "../foundation/button";
 import { Calendar, type CalendarProps } from "./calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "../adapter/popover";
 
 function isSameCalendarDay(left: Date | undefined, right: Date | undefined) {
   if (!left || !right) {
