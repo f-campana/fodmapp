@@ -6,8 +6,8 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
 
-import { cn } from "../../lib/cn";
-import { Button } from "./button";
+import { cn } from "../../../lib/cn";
+import { Button } from "../foundation/button";
 
 type CarouselApi = NonNullable<UseEmblaCarouselType[1]>;
 

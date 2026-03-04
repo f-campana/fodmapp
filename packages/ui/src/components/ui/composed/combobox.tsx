@@ -6,8 +6,8 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { Command as CommandPrimitive } from "cmdk";
 
-import { useControllableState } from "../../hooks/use-controllable-state";
-import { cn } from "../../lib/cn";
+import { useControllableState } from "../../../hooks/use-controllable-state";
+import { cn } from "../../../lib/cn";
 
 type ComboboxMode = "single" | "multiple";
 

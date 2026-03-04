@@ -1,6 +1,6 @@
 "use client";
 
-import { toast } from "./sonner";
+import { toast } from "../adapter/sonner";
 
 export type ToastOptions = Parameters<typeof toast>[1];
 export type ToastPromiseOptions = Parameters<typeof toast.promise>[1];

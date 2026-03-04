@@ -8,7 +8,7 @@ export type {
   CommandProps,
   CommandSeparatorProps,
   CommandShortcutProps,
-} from "./ui/command";
+} from "./ui/composed/command";
 export {
   Command,
   CommandDialog,
@@ -19,4 +19,4 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "./ui/command";
+} from "./ui/composed/command";

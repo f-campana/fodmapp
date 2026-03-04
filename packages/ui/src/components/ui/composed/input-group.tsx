@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 const groupedItemClasses = [
   "rounded-none border-0 border-l border-border first:border-l-0",
