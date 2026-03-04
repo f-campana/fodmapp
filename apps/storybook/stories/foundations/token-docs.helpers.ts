@@ -14,6 +14,19 @@ export interface TokenRow {
   valueText: string;
 }
 
+export interface StringTokenRow {
+  id: string;
+  path: string;
+  value: string;
+}
+
+export interface ThemeTokenRow {
+  id: string;
+  path: string;
+  light: string;
+  dark: string;
+}
+
 const scaleTokenOrder: Record<string, number> = {
   none: 0,
   auto: 1,
@@ -290,6 +303,50 @@ export function tokenPrimitiveToString(value: TokenPrimitive): string {
   return typeof value === "string" ? value : String(value);
 }
 
+export function createStringTokenRows(
+  node: unknown,
+  prefix: string,
+): StringTokenRow[] {
+  return flattenTokenTree(node, prefix).map((row) => ({
+    id: row.id,
+    path: row.path,
+    value: tokenPrimitiveToString(row.value),
+  }));
+}
+
+export function createThemeTokenRows(
+  lightNode: unknown,
+  darkNode: unknown,
+  prefix: string,
+  options?: {
+    filter?: (value: string) => boolean;
+    missingValue?: string;
+  },
+): ThemeTokenRow[] {
+  const filter = options?.filter;
+  const missingValue = options?.missingValue ?? "";
+
+  const lightRows = createStringTokenRows(lightNode, prefix).filter((row) =>
+    filter ? filter(row.value) : true,
+  );
+  const darkRows = createStringTokenRows(darkNode, prefix).filter((row) =>
+    filter ? filter(row.value) : true,
+  );
+
+  const lightByPath = new Map(lightRows.map((row) => [row.path, row.value]));
+  const darkByPath = new Map(darkRows.map((row) => [row.path, row.value]));
+  const allPaths = [...new Set([...lightByPath.keys(), ...darkByPath.keys()])]
+    .sort((left, right) => naturalTokenPathCompare(left, right))
+    .map((path) => ({
+      id: path,
+      path,
+      light: lightByPath.get(path) ?? missingValue,
+      dark: darkByPath.get(path) ?? missingValue,
+    }));
+
+  return allPaths;
+}
+
 export function flattenTokenTree(node: unknown, prefix = ""): TokenRow[] {
   if (!isRecord(node)) {
     return [];
@@ -402,11 +459,11 @@ export function countVisibleRows<
   }).length;
 }
 
-export function groupRowsBySegment(
-  rows: TokenRow[],
+export function groupRowsBySegment<Row extends { id: string; path: string }>(
+  rows: Row[],
   pathSegmentIndex: number,
-): Array<{ id: string; label: string; rows: TokenRow[] }> {
-  const grouped = new Map<string, TokenRow[]>();
+): Array<{ id: string; label: string; rows: Row[] }> {
+  const grouped = new Map<string, Row[]>();
 
   for (const row of rows) {
     const segments = row.path.split(".");

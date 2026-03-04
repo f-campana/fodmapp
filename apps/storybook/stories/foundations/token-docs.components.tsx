@@ -63,6 +63,34 @@ export function useTokenDocsResetScrollOnMount(): void {
   }, []);
 }
 
+export function useTokenGroupState<GridId extends string>(initialState: {
+  gridId: GridId;
+  groupId: string;
+}) {
+  const [activeGroup, setActiveGroup] = useState(initialState);
+
+  function openGroupIdFor(gridId: GridId): string | null {
+    return activeGroup.gridId === gridId ? activeGroup.groupId : null;
+  }
+
+  function onOpenGroupChangeFor(gridId: GridId) {
+    return (groupId: string | null) => {
+      if (!groupId) {
+        return;
+      }
+
+      setActiveGroup({ gridId, groupId });
+    };
+  }
+
+  return {
+    activeGroup,
+    openGroupIdFor,
+    onOpenGroupChangeFor,
+    setActiveGroup,
+  };
+}
+
 interface TokenDataGridProps<Row extends TokenGridRowBase> {
   gridLabel: string;
   columns: TokenGridColumn<Row>[];
@@ -74,7 +102,7 @@ interface TokenDataGridProps<Row extends TokenGridRowBase> {
   allowCollapseAll?: boolean;
 }
 
-function classNames(
+export function classNames(
   ...classes: Array<string | false | null | undefined>
 ): string {
   return classes.filter(Boolean).join(" ");
