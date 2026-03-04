@@ -66,6 +66,9 @@
   --fd-base-color-brand-surface-light: oklch(0.9942 0.0069 88.64);
   --fd-base-color-brand-surface-strong-light: oklch(0.9283 0.0251 81.12);
   --fd-base-color-brand-surface-muted-light: oklch(0.9164 0.0240 79.74);
+  --fd-base-color-brand-surface-muted-soft-light: oklch(0.9397 0.0189 82.41);
+  --fd-base-color-brand-control-subtle-light: oklch(0.9518 0.0158 82.20);
+  --fd-base-color-brand-control-subtle-strong-light: oklch(0.9359 0.0195 81.09);
   --fd-base-color-brand-text-light: oklch(0.2618 0.0244 63.71);
   --fd-base-color-brand-text-muted-light: oklch(0.4688 0.0442 61.23);
   --fd-base-color-brand-border-light: oklch(0.8175 0.0431 75.34);
@@ -84,6 +87,7 @@
   --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
   --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
   --fd-base-color-brand-danger-validation-ring-light: oklch(0.6491 0.0254 39.35);
+  --fd-base-color-brand-danger-validation-border-light: oklch(0.5621 0.0773 32.51);
   --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
   --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
   --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);
@@ -208,7 +212,7 @@
   --fd-semantic-color-focus-ring: oklch(0.6932 0.1067 128.04);
   --fd-semantic-color-focus-ring-accessible: oklch(0.5407 0.1021 128.36);
   --fd-semantic-color-focus-ring-soft: oklch(0.8362 0.0574 122.96);
-  --fd-semantic-color-validation-error-border: oklch(0.4910 0.1197 26.91);
+  --fd-semantic-color-validation-error-border: oklch(0.5621 0.0773 32.51);
   --fd-semantic-color-validation-error-ring: oklch(0.4910 0.1197 26.91);
   --fd-semantic-color-validation-error-ring-soft: oklch(0.6491 0.0254 39.35);
   --fd-semantic-color-validation-error-text: oklch(0.4910 0.1197 26.91);
@@ -218,11 +222,11 @@
   --fd-semantic-color-action-secondary-bg: oklch(0.9699 0.0013 106.42);
   --fd-semantic-color-action-secondary-bg-hover: oklch(0.9232 0.0026 48.72);
   --fd-semantic-color-action-secondary-fg: oklch(0.2161 0.0061 56.04);
-  --fd-semantic-color-action-outline-bg: oklch(0.9743 0.0102 81.80);
-  --fd-semantic-color-action-outline-bg-hover: oklch(0.9164 0.0240 79.74);
+  --fd-semantic-color-action-outline-bg: oklch(0.9518 0.0158 82.20);
+  --fd-semantic-color-action-outline-bg-hover: oklch(0.9359 0.0195 81.09);
   --fd-semantic-color-action-outline-border: oklch(0.5534 0.0116 58.07);
   --fd-semantic-color-action-outline-fg: oklch(0.2618 0.0244 63.71);
-  --fd-semantic-color-action-ghost-bg-hover: oklch(0.9164 0.0240 79.74);
+  --fd-semantic-color-action-ghost-bg-hover: oklch(0.9397 0.0189 82.41);
   --fd-semantic-color-action-ghost-fg: oklch(0.2618 0.0244 63.71);
   --fd-semantic-color-action-destructive-bg: oklch(0.4910 0.1197 26.91);
   --fd-semantic-color-action-destructive-bg-hover: oklch(0.4133 0.1042 27.16);
@@ -345,6 +349,9 @@
   --fd-base-color-brand-surface-light: oklch(0.9942 0.0069 88.64);
   --fd-base-color-brand-surface-strong-light: oklch(0.9283 0.0251 81.12);
   --fd-base-color-brand-surface-muted-light: oklch(0.9164 0.0240 79.74);
+  --fd-base-color-brand-surface-muted-soft-light: oklch(0.9397 0.0189 82.41);
+  --fd-base-color-brand-control-subtle-light: oklch(0.9518 0.0158 82.20);
+  --fd-base-color-brand-control-subtle-strong-light: oklch(0.9359 0.0195 81.09);
   --fd-base-color-brand-text-light: oklch(0.2618 0.0244 63.71);
   --fd-base-color-brand-text-muted-light: oklch(0.4688 0.0442 61.23);
   --fd-base-color-brand-border-light: oklch(0.8175 0.0431 75.34);
@@ -363,6 +370,7 @@
   --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
   --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
   --fd-base-color-brand-danger-validation-ring-light: oklch(0.6491 0.0254 39.35);
+  --fd-base-color-brand-danger-validation-border-light: oklch(0.5621 0.0773 32.51);
   --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
   --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
   --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);
@@ -625,6 +633,9 @@
     --fd-base-color-brand-surface-light: oklch(0.9942 0.0069 88.64);
     --fd-base-color-brand-surface-strong-light: oklch(0.9283 0.0251 81.12);
     --fd-base-color-brand-surface-muted-light: oklch(0.9164 0.0240 79.74);
+    --fd-base-color-brand-surface-muted-soft-light: oklch(0.9397 0.0189 82.41);
+    --fd-base-color-brand-control-subtle-light: oklch(0.9518 0.0158 82.20);
+    --fd-base-color-brand-control-subtle-strong-light: oklch(0.9359 0.0195 81.09);
     --fd-base-color-brand-text-light: oklch(0.2618 0.0244 63.71);
     --fd-base-color-brand-text-muted-light: oklch(0.4688 0.0442 61.23);
     --fd-base-color-brand-border-light: oklch(0.8175 0.0431 75.34);
@@ -643,6 +654,7 @@
     --fd-base-color-brand-danger-subtle-fg-light: oklch(0.4600 0.1200 26.00);
     --fd-base-color-brand-danger-subtle-border-light: oklch(0.6000 0.0900 25.00);
     --fd-base-color-brand-danger-validation-ring-light: oklch(0.6491 0.0254 39.35);
+    --fd-base-color-brand-danger-validation-border-light: oklch(0.5621 0.0773 32.51);
     --fd-base-color-brand-canvas-dark: oklch(0.2013 0.0137 61.72);
     --fd-base-color-brand-surface-dark: oklch(0.2515 0.0200 63.35);
     --fd-base-color-brand-surface-strong-dark: oklch(0.2953 0.0260 64.06);

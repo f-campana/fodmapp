@@ -87,6 +87,9 @@ export const tokens = {
         "surfaceLight": "oklch(0.9942 0.0069 88.64)",
         "surfaceStrongLight": "oklch(0.9283 0.0251 81.12)",
         "surfaceMutedLight": "oklch(0.9164 0.0240 79.74)",
+        "surfaceMutedSoftLight": "oklch(0.9397 0.0189 82.41)",
+        "controlSubtleLight": "oklch(0.9518 0.0158 82.20)",
+        "controlSubtleStrongLight": "oklch(0.9359 0.0195 81.09)",
         "textLight": "oklch(0.2618 0.0244 63.71)",
         "textMutedLight": "oklch(0.4688 0.0442 61.23)",
         "borderLight": "oklch(0.8175 0.0431 75.34)",
@@ -105,6 +108,7 @@ export const tokens = {
         "dangerSubtleFgLight": "oklch(0.4600 0.1200 26.00)",
         "dangerSubtleBorderLight": "oklch(0.6000 0.0900 25.00)",
         "dangerValidationRingLight": "oklch(0.6491 0.0254 39.35)",
+        "dangerValidationBorderLight": "oklch(0.5621 0.0773 32.51)",
         "canvasDark": "oklch(0.2013 0.0137 61.72)",
         "surfaceDark": "oklch(0.2515 0.0200 63.35)",
         "surfaceStrongDark": "oklch(0.2953 0.0260 64.06)",
@@ -276,7 +280,7 @@ export const tokens = {
           },
           "validation": {
             "error": {
-              "border": "oklch(0.4910 0.1197 26.91)",
+              "border": "oklch(0.5621 0.0773 32.51)",
               "ring": "oklch(0.4910 0.1197 26.91)",
               "ringSoft": "oklch(0.6491 0.0254 39.35)",
               "text": "oklch(0.4910 0.1197 26.91)"
@@ -294,13 +298,13 @@ export const tokens = {
               "fg": "oklch(0.2161 0.0061 56.04)"
             },
             "outline": {
-              "bg": "oklch(0.9743 0.0102 81.80)",
-              "bgHover": "oklch(0.9164 0.0240 79.74)",
+              "bg": "oklch(0.9518 0.0158 82.20)",
+              "bgHover": "oklch(0.9359 0.0195 81.09)",
               "border": "oklch(0.5534 0.0116 58.07)",
               "fg": "oklch(0.2618 0.0244 63.71)"
             },
             "ghost": {
-              "bgHover": "oklch(0.9164 0.0240 79.74)",
+              "bgHover": "oklch(0.9397 0.0189 82.41)",
               "fg": "oklch(0.2618 0.0244 63.71)"
             },
             "destructive": {

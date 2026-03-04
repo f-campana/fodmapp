@@ -452,6 +452,30 @@
           },
           "$type": "color"
         },
+        "surfaceMutedSoftLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.9397, 0.0189, 82.41],
+            "hex": "#f1eadd"
+          },
+          "$type": "color"
+        },
+        "controlSubtleLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.9518, 0.0158, 82.2],
+            "hex": "#f4eee3"
+          },
+          "$type": "color"
+        },
+        "controlSubtleStrongLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.9359, 0.0195, 81.09],
+            "hex": "#f1e9dc"
+          },
+          "$type": "color"
+        },
         "textLight": {
           "$value": {
             "colorSpace": "oklch",
@@ -593,6 +617,14 @@
             "colorSpace": "oklch",
             "components": [0.6491, 0.0254, 39.35],
             "hex": "#9d8a84"
+          },
+          "$type": "color"
+        },
+        "dangerValidationBorderLight": {
+          "$value": {
+            "colorSpace": "oklch",
+            "components": [0.5621, 0.0773, 32.51],
+            "hex": "#9d6458"
           },
           "$type": "color"
         },

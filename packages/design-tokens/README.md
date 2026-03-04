@@ -103,3 +103,8 @@ Additional enforced contrast checks include:
 - `text.primary` on `status.success.bgSubtle` >= `4.5:1`
 - `text.primary` on `status.danger.bgSubtle` >= `4.5:1`
 - `action.destructive.ringSubtle` on `bgSubtle` and `bgSubtleHover` >= `3.0:1`
+
+## Brand Light/Dark Pair Contract
+
+Base brand color tokens that use `*Light`/`*Dark` suffixes must be defined as
+pairs. Token generation fails if a brand path has only one side.
