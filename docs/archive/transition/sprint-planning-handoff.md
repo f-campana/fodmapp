@@ -1,3 +1,8 @@
+# Historical / Superseded Artifact
+
+This file is archived for traceability only.
+Canonical active source: [`docs/transition/sprint-planning-handoff.md`](../../transition/sprint-planning-handoff.md).
+
 # Sprint Planning Handoff (Architecture And Scaffolding)
 
 Last updated: 2026-02-24

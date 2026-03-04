@@ -1,37 +1,48 @@
 # FODMAP Documentation Index
 
-Last updated: 2026-02-25
+Last updated: 2026-03-04
 
-This `/docs` tree captures what has been discussed and established so far for the platform transition, frontend foundation, and delivery process.
+This `/docs` tree is the operational and architectural source of truth for this repository.
+It includes active guidance, accepted/implemented decisions, and archived historical material.
 
 ## How To Read This
 
-- `Implemented` means already landed on `main`.
-- `Accepted` means agreed direction, not yet merged.
-- `In progress` means work exists in a dedicated worktree and is not merged yet.
-- `Planned` means a decision is accepted but not yet implemented.
-- `Open` means still under discussion or gated by another milestone.
+- `Implemented`: landed on `main`.
+- `Accepted`: approved direction, not fully landed.
+- `In progress`: active in a dedicated worktree/branch.
+- `Planned`: deferred or queued for a later pass.
+- `Archived`: historical reference only.
 
 ## Structure
 
 - `architecture/`
-  - `boundaries-and-contracts.md`: system boundaries and layer contracts.
-  - `decision-register.md`: locked decisions, open decisions, and status.
+  - ADRs, decision register, and cross-layer contracts.
+- `ops/`
+  - CI hardening, worktree operations, cutover guidance, and maintainer runbooks.
 - `transition/`
-  - `current-state-snapshot.md`: what is currently in the repo.
-  - `discussion-history.md`: timeline of major discussion points.
-  - `pr-sequence-and-gates.md`: recommended sequence and acceptance gates.
-  - `worktree-playbook.md`: isolated worktree workflow for architecture PRs.
-  - `risk-register.md`: near-term risks and mitigations.
+  - Active transition guidance and currently canonical transition artifacts.
 - `frontend/`
-  - `strategy.md`: frontend ownership split and delivery model.
-  - `tailwind-v4-token-architecture.md`: package strategy for Tailwind v4 and tokens.
-  - `shadcn-bootstrap-plan.md`: how to bootstrap the UI library with shadcn/ui.
-  - `delegation-handoff-kit.md`: what to hand off to the frontend team and agents.
-  - `agent-prompts.md`: ready-to-use prompts for parallel frontend agent execution.
+  - UI/design system strategy and implementation references.
+- `plans/`
+  - Near-term execution plans and deferred backlog notes.
+- `research/`
+  - Research summaries that inform implementation decisions.
 - `references/`
-  - `external-research.md`: external references and why they matter.
+  - External references and context.
 - `archive/`
-  - `README.md`: archive index and policy.
-  - `transition/`: completed planning and handoff artifacts.
-  - `reviews/`: resolved/superseded review reports retained for traceability.
+  - Historical/superseded documents retained for traceability.
+
+## Canonicalization Rule
+
+For duplicated transition artifacts, `docs/transition/*` is the canonical active source.
+Archived copies in `docs/archive/transition/*` are explicitly marked as historical/superseded.
+
+## Public Repository Notes
+
+- Public-facing repository policy and intake guidance live in:
+  - `README.md`
+  - `CONTRIBUTING.md`
+  - `SECURITY.md`
+  - `docs/ops/public-repo-maintainer-runbook.md`
+- Full documentation IA rewrite is intentionally deferred and tracked in:
+  - `docs/plans/docs-full-rewrite-backlog.md`

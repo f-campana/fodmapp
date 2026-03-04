@@ -1,3 +1,8 @@
+# Historical / Superseded Artifact
+
+This file is archived for traceability only.
+Canonical active source: [`docs/transition/architecture-scaffolding-sprint-plan.md`](../../transition/architecture-scaffolding-sprint-plan.md).
+
 # Architecture Scaffolding Sprint Plan
 
 Last updated: 2026-02-24
