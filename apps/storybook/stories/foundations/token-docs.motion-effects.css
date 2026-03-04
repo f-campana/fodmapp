@@ -1,0 +1,363 @@
+.fd-tokendocs-motionLab {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.fd-tokendocs-motionLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.fd-tokendocs-motionLegendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  border-radius: 999px;
+  background: color-mix(
+    in oklab,
+    var(--color-background) 94%,
+    var(--color-surface-muted)
+  );
+  padding: 0.16rem 0.5rem;
+  font-size: 0.74rem;
+  color: var(--color-foreground);
+}
+
+.fd-tokendocs-motionLegendItem::before {
+  content: "";
+  width: 0.94rem;
+  height: 0.94rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-border) 44%, transparent);
+}
+
+.fd-tokendocs-motionLegendItem.is-token::before {
+  background: color-mix(in oklab, var(--color-warning) 96%, #000);
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-warning) 52%, transparent);
+}
+
+.fd-tokendocs-motionLegendItem.is-baseline::before {
+  background: color-mix(
+    in oklab,
+    var(--color-foreground, currentColor) 94%,
+    #000
+  );
+  border-color: color-mix(in oklab, var(--color-background) 74%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in oklab, var(--color-foreground, currentColor) 30%, transparent);
+}
+
+.fd-tokendocs-motionLanes {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.fd-tokendocs-motionLaneRow {
+  --fd-motion-duration: 2200ms;
+  --fd-motion-easing: linear;
+  --fd-motion-delay: 0ms;
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.58rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  border-radius: 0.62rem;
+  background: color-mix(
+    in oklab,
+    var(--color-background) 95%,
+    var(--color-surface-muted)
+  );
+  padding: 0.5rem 0.56rem;
+}
+
+.fd-tokendocs-motionLaneLabel {
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.7rem;
+  color: var(--color-foreground);
+  overflow-wrap: anywhere;
+}
+
+.fd-tokendocs-motionLaneCompare {
+  display: grid;
+  gap: 0.36rem;
+  min-height: 2.9rem;
+}
+
+.fd-tokendocs-motionLaneCompare.is-token-only {
+  min-height: 1.36rem;
+  gap: 0;
+}
+
+.fd-tokendocs-motionRailRow {
+  display: grid;
+  grid-template-columns: 1.38rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.46rem;
+}
+
+.fd-tokendocs-motionRailTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.24rem;
+  height: 1.24rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.03em;
+  border: 1px solid color-mix(in oklab, var(--color-border) 58%, transparent);
+  color: color-mix(
+    in oklab,
+    var(--color-background) 92%,
+    var(--color-foreground)
+  );
+}
+
+.fd-tokendocs-motionRailRow.is-baseline .fd-tokendocs-motionRailTag {
+  color: color-mix(
+    in oklab,
+    var(--color-background) 96%,
+    var(--color-foreground)
+  );
+  background: color-mix(
+    in oklab,
+    var(--color-foreground) 88%,
+    var(--color-background)
+  );
+  border-color: color-mix(in oklab, var(--color-background) 72%, transparent);
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--color-foreground) 24%, transparent);
+}
+
+.fd-tokendocs-motionRailRow.is-token .fd-tokendocs-motionRailTag {
+  color: color-mix(in oklab, var(--color-warning) 88%, #111);
+  background: color-mix(
+    in oklab,
+    var(--color-warning) 28%,
+    var(--color-background)
+  );
+  box-shadow: 0 0 0 1px
+    color-mix(in oklab, var(--color-warning) 18%, transparent);
+}
+
+.fd-tokendocs-motionRail {
+  position: relative;
+  min-height: 1.4rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-border) 72%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-border) 84%, var(--color-background)) 0%,
+    color-mix(in oklab, var(--color-surface-muted) 70%, var(--color-background))
+      100%
+  );
+  overflow: hidden;
+}
+
+.fd-tokendocs-motionRail.is-baseline {
+  border-color: color-mix(
+    in oklab,
+    var(--color-muted-foreground) 52%,
+    var(--color-border)
+  );
+  background: linear-gradient(
+    90deg,
+    color-mix(
+        in oklab,
+        var(--color-muted-foreground) 30%,
+        var(--color-background)
+      )
+      0%,
+    color-mix(in oklab, var(--color-surface-muted) 78%, var(--color-background))
+      100%
+  );
+}
+
+.fd-tokendocs-motionRail.is-token {
+  border-color: color-mix(
+    in oklab,
+    var(--color-warning) 68%,
+    var(--color-border)
+  );
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-warning) 8%, var(--color-surface-muted)) 0%,
+    color-mix(in oklab, var(--color-warning) 15%, var(--color-surface-muted))
+      55%,
+    color-mix(in oklab, var(--color-warning) 24%, var(--color-surface-muted))
+      100%
+  );
+}
+
+.fd-tokendocs-motionLaneBall {
+  position: absolute;
+  top: 50%;
+  left: 0.84rem;
+  width: 0.98rem;
+  height: 0.98rem;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  border: 1px solid
+    color-mix(in oklab, var(--color-background) 88%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--color-primary) 84%,
+    var(--color-background)
+  );
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-foreground) 24%, transparent);
+  animation: fd-token-lane-travel
+    var(--fd-lane-duration, var(--fd-motion-duration))
+    var(--fd-lane-easing, var(--fd-motion-easing)) infinite;
+  animation-delay: var(--fd-lane-delay, var(--fd-motion-delay));
+}
+
+.fd-tokendocs-motionLaneBall.is-token {
+  z-index: 2;
+  background: color-mix(in oklab, var(--color-warning) 88%, #111);
+  border-color: color-mix(in oklab, var(--color-warning) 78%, transparent);
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-warning) 54%, transparent);
+}
+
+.fd-tokendocs-motionLaneBall.is-baseline {
+  z-index: 1;
+  width: 0.98rem;
+  height: 0.98rem;
+  border-width: 0;
+  border-color: transparent;
+  background: color-mix(
+    in oklab,
+    var(--color-foreground, currentColor) 88%,
+    #000
+  );
+  box-shadow: 0 8px 16px
+    color-mix(in oklab, var(--color-foreground, currentColor) 42%, transparent);
+}
+
+.fd-tokendocs-motionLaneBall.is-baseline::after {
+  content: none;
+}
+
+.fd-tokendocs-motionLaneBall.is-static {
+  animation: none;
+  left: var(--fd-lane-static-left, calc(100% - 0.98rem));
+}
+
+.fd-tokendocs-motionLaneValue {
+  justify-self: end;
+}
+
+@keyframes fd-token-lane-travel {
+  from {
+    left: 0.98rem;
+  }
+
+  to {
+    left: calc(100% - 0.98rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd-tokendocs-groupPanel,
+  .fd-tokendocs-row,
+  .fd-tokendocs-mobileRow {
+    transition-duration: 0ms;
+  }
+
+  .fd-tokendocs-copy {
+    transition: none;
+  }
+
+  .fd-tokendocs-motionLaneBall {
+    animation: none;
+  }
+
+  .fd-tokendocs-motionLaneBall.is-baseline:not(.is-static) {
+    left: 28%;
+  }
+
+  .fd-tokendocs-motionLaneBall.is-token:not(.is-static) {
+    left: 63%;
+  }
+}
+
+.fd-tokendocs-shadowShowcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14.4rem, 1fr));
+  gap: 0.7rem;
+}
+
+.fd-tokendocs-shadowCard {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 82%, transparent);
+  border-radius: 0.64rem;
+  background: color-mix(
+    in oklab,
+    var(--color-background) 96%,
+    var(--color-surface)
+  );
+  padding: 0.58rem;
+}
+
+.fd-tokendocs-shadowSurface {
+  min-height: 3.5rem;
+  margin-inline: 0.12rem;
+  box-shadow: 0 16px 28px -22px
+    color-mix(in oklab, var(--color-foreground) 32%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-surface-muted) 74%, var(--color-background))
+      0%,
+    color-mix(in oklab, var(--color-background) 94%, var(--color-surface)) 100%
+  );
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--color-border) 78%, transparent);
+}
+
+.fd-tokendocs-shadowMeta {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.fd-tokendocs-shadowPath {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.7rem;
+}
+
+.fd-tokendocs-shadowValue {
+  margin: 0;
+  font-family: var(
+    --font-mono,
+    "JetBrains Mono",
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace
+  );
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--color-muted-foreground);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
