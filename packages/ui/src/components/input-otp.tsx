@@ -3,10 +3,10 @@ export type {
   InputOTPProps,
   InputOTPSeparatorProps,
   InputOTPSlotProps,
-} from "./ui/input-otp";
+} from "./ui/adapter/input-otp";
 export {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "./ui/input-otp";
+} from "./ui/adapter/input-otp";

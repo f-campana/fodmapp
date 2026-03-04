@@ -1,2 +1,2 @@
-export type { SonnerProps } from "./ui/sonner";
-export { Sonner, toast } from "./ui/sonner";
+export type { SonnerProps } from "./ui/adapter/sonner";
+export { Sonner, toast } from "./ui/adapter/sonner";

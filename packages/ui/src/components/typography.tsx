@@ -1,2 +1,2 @@
-export type { TypographyProps } from "./ui/typography";
-export { Typography, typographyVariants } from "./ui/typography";
+export type { TypographyProps } from "./ui/foundation/typography";
+export { Typography, typographyVariants } from "./ui/foundation/typography";

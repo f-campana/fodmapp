@@ -1,2 +1,2 @@
-export type { SliderProps } from "./ui/slider";
-export { Slider } from "./ui/slider";
+export type { SliderProps } from "./ui/adapter/slider";
+export { Slider } from "./ui/adapter/slider";

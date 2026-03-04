@@ -1,2 +1,2 @@
-export type { ToggleProps } from "./ui/toggle";
-export { Toggle, toggleVariants } from "./ui/toggle";
+export type { ToggleProps } from "./ui/adapter/toggle";
+export { Toggle, toggleVariants } from "./ui/adapter/toggle";

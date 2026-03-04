@@ -1,2 +1,7 @@
-export type { AlertProps } from "./ui/alert";
-export { Alert, AlertDescription, AlertTitle, alertVariants } from "./ui/alert";
+export type { AlertProps } from "./ui/foundation/alert";
+export {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  alertVariants,
+} from "./ui/foundation/alert";

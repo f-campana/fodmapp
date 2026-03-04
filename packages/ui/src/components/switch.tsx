@@ -1,2 +1,2 @@
-export type { SwitchProps } from "./ui/switch";
-export { Switch } from "./ui/switch";
+export type { SwitchProps } from "./ui/adapter/switch";
+export { Switch } from "./ui/adapter/switch";

@@ -1,2 +1,2 @@
-export type { LabelProps } from "./ui/label";
-export { Label, labelVariants } from "./ui/label";
+export type { LabelProps } from "./ui/adapter/label";
+export { Label, labelVariants } from "./ui/adapter/label";

@@ -46,7 +46,7 @@ The source of truth for category + title mapping is:
 
 The taxonomy checker must enforce:
 
-1. Every `packages/ui/src/components/*.tsx` component (excluding tests) is mapped in `component-taxonomy.json`.
+1. Every implementation component in `packages/ui/src/components/ui/{adapter,foundation,composed,utilities}/*.tsx` (excluding tests) is mapped in `component-taxonomy.json`.
 2. No taxonomy entry points to a non-existent component.
 3. Every mapped root component story file exists.
 4. Every root component story title exactly matches the mapped title.

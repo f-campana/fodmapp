@@ -10,7 +10,7 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from "./ui/dialog";
+} from "./ui/adapter/dialog";
 export {
   Dialog,
   DialogBody,
@@ -23,4 +23,4 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
+} from "./ui/adapter/dialog";

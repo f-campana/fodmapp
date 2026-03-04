@@ -1,2 +1,2 @@
-export type { CalendarProps } from "./ui/calendar";
-export { Calendar } from "./ui/calendar";
+export type { CalendarProps } from "./ui/composed/calendar";
+export { Calendar } from "./ui/composed/calendar";

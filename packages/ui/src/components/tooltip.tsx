@@ -3,10 +3,10 @@ export type {
   TooltipProps,
   TooltipProviderProps,
   TooltipTriggerProps,
-} from "./ui/tooltip";
+} from "./ui/adapter/tooltip";
 export {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./ui/tooltip";
+} from "./ui/adapter/tooltip";

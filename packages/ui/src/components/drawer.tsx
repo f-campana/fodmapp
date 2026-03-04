@@ -9,7 +9,7 @@ export type {
   DrawerProps,
   DrawerTitleProps,
   DrawerTriggerProps,
-} from "./ui/drawer";
+} from "./ui/adapter/drawer";
 export {
   Drawer,
   DrawerClose,
@@ -21,4 +21,4 @@ export {
   DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
-} from "./ui/drawer";
+} from "./ui/adapter/drawer";

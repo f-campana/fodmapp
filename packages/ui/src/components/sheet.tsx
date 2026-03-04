@@ -9,7 +9,7 @@ export type {
   SheetProps,
   SheetTitleProps,
   SheetTriggerProps,
-} from "./ui/sheet";
+} from "./ui/adapter/sheet";
 export {
   Sheet,
   SheetClose,
@@ -22,4 +22,4 @@ export {
   SheetTitle,
   SheetTrigger,
   sheetVariants,
-} from "./ui/sheet";
+} from "./ui/adapter/sheet";

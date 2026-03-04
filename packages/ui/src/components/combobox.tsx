@@ -9,7 +9,7 @@ export type {
   ComboboxProps,
   ComboboxSeparatorProps,
   ComboboxTriggerProps,
-} from "./ui/combobox";
+} from "./ui/composed/combobox";
 export {
   Combobox,
   ComboboxContent,
@@ -21,4 +21,4 @@ export {
   ComboboxMulti,
   ComboboxSeparator,
   ComboboxTrigger,
-} from "./ui/combobox";
+} from "./ui/composed/combobox";

@@ -3,11 +3,11 @@ export type {
   CalloutIconProps,
   CalloutProps,
   CalloutTitleProps,
-} from "./ui/callout";
+} from "./ui/foundation/callout";
 export {
   Callout,
   CalloutDescription,
   CalloutIcon,
   CalloutTitle,
   calloutVariants,
-} from "./ui/callout";
+} from "./ui/foundation/callout";

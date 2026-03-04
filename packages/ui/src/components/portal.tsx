@@ -1,2 +1,2 @@
-export type { PortalProps } from "./ui/portal";
-export { Portal } from "./ui/portal";
+export type { PortalProps } from "./ui/utilities/portal";
+export { Portal } from "./ui/utilities/portal";

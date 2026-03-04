@@ -1,2 +1,2 @@
-export type { SkeletonProps } from "./ui/skeleton";
-export { Skeleton } from "./ui/skeleton";
+export type { SkeletonProps } from "./ui/foundation/skeleton";
+export { Skeleton } from "./ui/foundation/skeleton";
