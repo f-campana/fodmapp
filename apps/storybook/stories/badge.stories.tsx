@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Badge } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Badge",
+  title: "Primitives/Foundation/Badge",
   component: Badge,
   tags: ["autodocs"],
   argTypes: {

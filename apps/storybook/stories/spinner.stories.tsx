@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Spinner } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Spinner",
+  title: "Primitives/Foundation/Spinner",
   component: Spinner,
   tags: ["autodocs"],
   argTypes: {

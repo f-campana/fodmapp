@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Kbd, KbdGroup } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Kbd",
+  title: "Primitives/Foundation/Kbd",
   component: Kbd,
   tags: ["autodocs"],
   argTypes: {

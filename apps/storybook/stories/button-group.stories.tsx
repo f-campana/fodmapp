@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Button, ButtonGroup } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/ButtonGroup",
+  title: "Primitives/Foundation/ButtonGroup",
   component: ButtonGroup,
   tags: ["autodocs"],
   argTypes: {

@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Label, Switch } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Switch",
+  title: "Primitives/Adapter/Switch",
   component: Switch,
   tags: ["autodocs"],
   argTypes: {

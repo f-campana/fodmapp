@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Textarea } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Textarea",
+  title: "Primitives/Foundation/Textarea",
   component: Textarea,
   tags: ["autodocs"],
   argTypes: {

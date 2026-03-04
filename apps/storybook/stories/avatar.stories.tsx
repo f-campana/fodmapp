@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Avatar, AvatarFallback, AvatarImage } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Avatar",
+  title: "Primitives/Adapter/Avatar",
   component: Avatar,
   tags: ["autodocs"],
   argTypes: {

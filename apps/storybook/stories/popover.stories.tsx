@@ -11,7 +11,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Popover",
+  title: "Primitives/Adapter/Popover",
   component: Popover,
   tags: ["autodocs"],
   argTypes: {

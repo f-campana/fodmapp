@@ -15,7 +15,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/NavigationMenu",
+  title: "Primitives/Adapter/NavigationMenu",
   component: NavigationMenu,
   tags: ["autodocs"],
   argTypes: {

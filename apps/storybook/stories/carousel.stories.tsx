@@ -14,7 +14,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Carousel",
+  title: "Composed/Carousel",
   component: Carousel,
   tags: ["autodocs"],
   argTypes: {

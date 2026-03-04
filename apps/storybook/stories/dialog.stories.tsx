@@ -15,7 +15,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Dialog",
+  title: "Primitives/Adapter/Dialog",
   component: Dialog,
   tags: ["autodocs"],
   argTypes: {

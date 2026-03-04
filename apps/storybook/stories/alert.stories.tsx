@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Alert, AlertDescription, AlertTitle } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Alert",
+  title: "Primitives/Foundation/Alert",
   component: Alert,
   tags: ["autodocs"],
   argTypes: {

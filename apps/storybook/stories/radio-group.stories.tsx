@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Label, RadioGroup, RadioGroupItem } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/RadioGroup",
+  title: "Primitives/Adapter/RadioGroup",
   component: RadioGroup,
   tags: ["autodocs"],
   argTypes: {

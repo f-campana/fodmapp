@@ -11,7 +11,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/InputGroup",
+  title: "Composed/InputGroup",
   component: InputGroup,
   tags: ["autodocs"],
   argTypes: {

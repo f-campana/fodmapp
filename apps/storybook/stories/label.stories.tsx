@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { Label } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Label",
+  title: "Primitives/Adapter/Label",
   component: Label,
   tags: ["autodocs"],
   argTypes: {

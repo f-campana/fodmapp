@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Tabs",
+  title: "Primitives/Adapter/Tabs",
   component: Tabs,
   tags: ["autodocs"],
   argTypes: {

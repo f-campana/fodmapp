@@ -15,7 +15,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Item",
+  title: "Primitives/Foundation/Item",
   component: Item,
   tags: ["autodocs"],
   argTypes: {

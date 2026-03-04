@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { NativeSelect } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/NativeSelect",
+  title: "Primitives/Foundation/NativeSelect",
   component: NativeSelect,
   tags: ["autodocs"],
   argTypes: {
