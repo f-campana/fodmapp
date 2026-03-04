@@ -87,7 +87,7 @@ Suggested recurring automation payload:
 ```text
 Name: Weekly Turbo Audit
 Schedule: every Monday at 09:00 local time
-Workspace: /Users/fabiencampana/Documents/Fodmap
+Workspace: /Users/fabiencampana/Documents/fodmapp
 Prompt:
 Run a findings-first Turborepo audit for this repo using $turborepo-fodmap-custom.
 If unavailable, fallback to $turborepo-scale-patterns.

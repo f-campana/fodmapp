@@ -5,7 +5,7 @@ Source of truth: team operational state (live, update as status changes)
 
 ## Rules
 
-- Keep `/Users/fabiencampana/Documents/Fodmap` clean.
+- Keep `/Users/fabiencampana/Documents/fodmapp` clean.
 - Do all feature work in dedicated worktrees.
 - Keep one initiative per worktree.
 - Track `status`, `scope`, and `blockers` here.
@@ -14,7 +14,8 @@ Source of truth: team operational state (live, update as status changes)
 
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                        | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `/Users/fabiencampana/Documents/Fodmap`                                             | `main`                                    | active (protected) | Main integration worktree only                               | Must remain clean.                                                  |
+| `/Users/fabiencampana/Documents/fodmapp`                                            | `main`                                    | active (protected) | Main integration worktree only                               | Must remain clean.                                                  |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-contract-fodmapp`       | `codex/local-path-contract-fodmapp`       | active             | PR-A local path contract canonicalization                    | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/public-cutover-decision-record`    | `codex/public-cutover-decision-record`    | merged             | PR-1 decision record for public cutover (`ADR-018`)          | Merged via PR #177.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/public-cutover-hardening`          | `codex/public-cutover-hardening`          | merged             | PR-2 workflow hardening and CI/env contract updates          | Merged via PR #178.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/public-cutover-evidence`           | `codex/public-cutover-evidence`           | merged             | PR-3 cutover evidence capture and status closure             | Merged via PR #179.                                                 |

@@ -58,7 +58,7 @@ Important unresolved architecture items:
 As of 2026-02-24:
 
 1. Worktrees:
-   - `/Users/fabiencampana/Documents/Fodmap` on `main`
+   - `/Users/fabiencampana/Documents/fodmapp` on `main`
    - `/Users/fabiencampana/Documents/Fodmap-barcode-v1` on `codex/barcode-feature-v1`
 2. `codex/barcode-feature-v1` is ahead by 7 commits and mixes concerns:
    - architecture/workspace/package additions (barcode packages, storybook story, CI/env updates)
@@ -149,13 +149,13 @@ Minimum validation references to include in sprint plan:
 
 ## References The Planning Agent Must Read First
 
-1. `/Users/fabiencampana/Documents/Fodmap/docs/architecture/boundaries-and-contracts.md`
-2. `/Users/fabiencampana/Documents/Fodmap/docs/architecture/decision-register.md`
-3. `/Users/fabiencampana/Documents/Fodmap/docs/transition/current-state-snapshot.md`
-4. `/Users/fabiencampana/Documents/Fodmap/docs/transition/pr-sequence-and-gates.md`
-5. `/Users/fabiencampana/Documents/Fodmap/docs/frontend/strategy.md`
-6. `/Users/fabiencampana/Documents/Fodmap/docs/frontend/tailwind-v4-token-architecture.md`
-7. `/Users/fabiencampana/Documents/Fodmap/docs/frontend/shadcn-bootstrap-plan.md`
+1. `/Users/fabiencampana/Documents/fodmapp/docs/architecture/boundaries-and-contracts.md`
+2. `/Users/fabiencampana/Documents/fodmapp/docs/architecture/decision-register.md`
+3. `/Users/fabiencampana/Documents/fodmapp/docs/transition/current-state-snapshot.md`
+4. `/Users/fabiencampana/Documents/fodmapp/docs/transition/pr-sequence-and-gates.md`
+5. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/strategy.md`
+6. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/tailwind-v4-token-architecture.md`
+7. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/shadcn-bootstrap-plan.md`
 
 ## Definition Of Done (For Sprint Planning Task)
 
