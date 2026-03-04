@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
-import { VisuallyHidden } from "./visually-hidden";
+import { cn } from "../../../lib/cn";
+import { VisuallyHidden } from "../utilities/visually-hidden";
 
 const spinnerVariants = cva(
   "inline-flex items-center justify-center text-muted-foreground",

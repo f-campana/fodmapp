@@ -7,7 +7,7 @@ export type {
   TableHeadProps,
   TableProps,
   TableRowProps,
-} from "./ui/table";
+} from "./ui/foundation/table";
 export {
   Table,
   TableBody,
@@ -17,4 +17,4 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
+} from "./ui/foundation/table";

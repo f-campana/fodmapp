@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cva } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 const scoreBarFillVariants = cva(
   "h-full rounded-full transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",

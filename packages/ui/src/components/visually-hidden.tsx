@@ -1,2 +1,2 @@
-export type { VisuallyHiddenProps } from "./ui/visually-hidden";
-export { VisuallyHidden } from "./ui/visually-hidden";
+export type { VisuallyHiddenProps } from "./ui/utilities/visually-hidden";
+export { VisuallyHidden } from "./ui/utilities/visually-hidden";

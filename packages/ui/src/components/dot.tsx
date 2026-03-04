@@ -1,2 +1,2 @@
-export type { DotProps } from "./ui/dot";
-export { Dot, dotVariants } from "./ui/dot";
+export type { DotProps } from "./ui/foundation/dot";
+export { Dot, dotVariants } from "./ui/foundation/dot";

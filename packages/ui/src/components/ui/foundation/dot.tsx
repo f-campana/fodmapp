@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
-import { VisuallyHidden } from "./visually-hidden";
+import { cn } from "../../../lib/cn";
+import { VisuallyHidden } from "../utilities/visually-hidden";
 
 const dotVariants = cva(
   "relative inline-flex size-2.5 shrink-0 rounded-full border border-transparent",

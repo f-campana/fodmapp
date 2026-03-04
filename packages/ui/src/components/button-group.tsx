@@ -1,2 +1,2 @@
-export type { ButtonGroupProps } from "./ui/button-group";
-export { ButtonGroup, buttonGroupVariants } from "./ui/button-group";
+export type { ButtonGroupProps } from "./ui/foundation/button-group";
+export { ButtonGroup, buttonGroupVariants } from "./ui/foundation/button-group";

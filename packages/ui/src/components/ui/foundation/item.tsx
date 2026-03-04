@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Slot } from "@radix-ui/react-slot";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export interface ItemProps extends React.ComponentProps<"div"> {
   asChild?: boolean;

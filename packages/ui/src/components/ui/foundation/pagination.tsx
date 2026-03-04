@@ -4,8 +4,8 @@ import { Slot } from "@radix-ui/react-slot";
 
 import { cva } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
-import { VisuallyHidden } from "./visually-hidden";
+import { cn } from "../../../lib/cn";
+import { VisuallyHidden } from "../utilities/visually-hidden";
 
 function Pagination({
   className,

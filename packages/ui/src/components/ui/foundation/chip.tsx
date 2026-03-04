@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 const chipVariants = cva(
   "inline-flex items-center gap-1 rounded-(--radius) border p-0.5",

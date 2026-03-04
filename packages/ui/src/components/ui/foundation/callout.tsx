@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 const calloutVariants = cva(
   "grid grid-cols-[auto_1fr] items-start gap-x-3 gap-y-1 rounded-xl border p-4 text-sm",

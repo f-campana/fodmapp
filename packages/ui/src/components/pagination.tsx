@@ -1,4 +1,4 @@
-export type { PaginationLinkProps } from "./ui/pagination";
+export type { PaginationLinkProps } from "./ui/foundation/pagination";
 export {
   Pagination,
   PaginationContent,
@@ -7,4 +7,4 @@ export {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "./ui/pagination";
+} from "./ui/foundation/pagination";

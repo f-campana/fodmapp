@@ -6,4 +6,4 @@ export {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./ui/card";
+} from "./ui/foundation/card";

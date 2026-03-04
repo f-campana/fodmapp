@@ -2,8 +2,8 @@ import * as React from "react";
 
 import { Slot } from "@radix-ui/react-slot";
 
-import { cn } from "../../lib/cn";
-import { VisuallyHidden } from "./visually-hidden";
+import { cn } from "../../../lib/cn";
+import { VisuallyHidden } from "../utilities/visually-hidden";
 
 function Breadcrumb({
   className,

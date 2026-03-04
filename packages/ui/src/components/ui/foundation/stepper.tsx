@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 const stepperVariants = cva("m-0 flex w-full list-none gap-3 p-0", {
   variants: {
