@@ -9,7 +9,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Collapsible",
+  title: "Primitives/Adapter/Collapsible",
   component: Collapsible,
   tags: ["autodocs"],
   argTypes: {

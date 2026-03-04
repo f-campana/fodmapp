@@ -15,7 +15,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/AlertDialog",
+  title: "Primitives/Adapter/AlertDialog",
   component: AlertDialog,
   tags: ["autodocs"],
   argTypes: {

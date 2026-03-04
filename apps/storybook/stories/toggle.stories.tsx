@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Toggle } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Toggle",
+  title: "Primitives/Adapter/Toggle",
   component: Toggle,
   tags: ["autodocs"],
   argTypes: {

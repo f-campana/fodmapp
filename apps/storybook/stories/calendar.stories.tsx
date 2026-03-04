@@ -7,7 +7,7 @@ import { expect, userEvent, within } from "storybook/test";
 import { Calendar } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Calendar",
+  title: "Composed/Calendar",
   component: Calendar,
   tags: ["autodocs"],
   argTypes: {

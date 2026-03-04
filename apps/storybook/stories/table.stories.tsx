@@ -13,7 +13,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Table",
+  title: "Primitives/Foundation/Table",
   component: Table,
   tags: ["autodocs"],
   argTypes: {

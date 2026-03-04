@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Chip } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Chip",
+  title: "Primitives/Foundation/Chip",
   component: Chip,
   tags: ["autodocs"],
   argTypes: {

@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { ScoreBar } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/ScoreBar",
+  title: "Primitives/Foundation/ScoreBar",
   component: ScoreBar,
   tags: ["autodocs"],
   argTypes: {

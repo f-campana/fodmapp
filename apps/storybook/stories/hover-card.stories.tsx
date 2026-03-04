@@ -10,7 +10,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/HoverCard",
+  title: "Primitives/Adapter/HoverCard",
   component: HoverCard,
   tags: ["autodocs"],
   argTypes: {

@@ -17,7 +17,7 @@ type OTPLayoutProps = Omit<
 >;
 
 const meta = {
-  title: "Primitives/InputOTP",
+  title: "Primitives/Adapter/InputOTP",
   component: InputOTP as ComponentType<OTPLayoutProps>,
   tags: ["autodocs"],
   argTypes: {

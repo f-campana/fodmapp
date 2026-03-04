@@ -5,7 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Checkbox, Label } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Checkbox",
+  title: "Primitives/Adapter/Checkbox",
   component: Checkbox,
   tags: ["autodocs"],
   argTypes: {

@@ -10,7 +10,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Accordion",
+  title: "Primitives/Adapter/Accordion",
   component: Accordion,
   tags: ["autodocs"],
   argTypes: {

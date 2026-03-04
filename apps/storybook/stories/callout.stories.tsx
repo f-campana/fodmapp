@@ -10,7 +10,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Callout",
+  title: "Primitives/Foundation/Callout",
   component: Callout,
   tags: ["autodocs"],
   argTypes: {

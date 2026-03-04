@@ -13,7 +13,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Pagination",
+  title: "Primitives/Foundation/Pagination",
   component: Pagination,
   tags: ["autodocs"],
   argTypes: {

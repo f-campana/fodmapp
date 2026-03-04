@@ -10,7 +10,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Tooltip",
+  title: "Primitives/Adapter/Tooltip",
   component: Tooltip,
   tags: ["autodocs"],
   argTypes: {

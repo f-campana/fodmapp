@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 import { Sonner, toast } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Sonner",
+  title: "Primitives/Adapter/Sonner",
   component: Sonner,
   tags: ["autodocs"],
   argTypes: {

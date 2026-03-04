@@ -23,7 +23,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Select",
+  title: "Primitives/Adapter/Select",
   component: Select,
   tags: ["autodocs"],
   argTypes: {

@@ -22,7 +22,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Menubar",
+  title: "Primitives/Adapter/Menubar",
   component: Menubar,
   tags: ["autodocs"],
   argTypes: {

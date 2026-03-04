@@ -1,0 +1,321 @@
+{
+  "version": 1,
+  "titlePrefixes": {
+    "adapter": "Primitives/Adapter",
+    "foundation": "Primitives/Foundation",
+    "composed": "Composed",
+    "utility": "Utilities"
+  },
+  "components": {
+    "accordion": {
+      "category": "adapter",
+      "storyFile": "accordion.stories.tsx",
+      "title": "Primitives/Adapter/Accordion"
+    },
+    "alert-dialog": {
+      "category": "adapter",
+      "storyFile": "alert-dialog.stories.tsx",
+      "title": "Primitives/Adapter/AlertDialog"
+    },
+    "alert": {
+      "category": "foundation",
+      "storyFile": "alert.stories.tsx",
+      "title": "Primitives/Foundation/Alert"
+    },
+    "aspect-ratio": {
+      "category": "adapter",
+      "storyFile": "aspect-ratio.stories.tsx",
+      "title": "Primitives/Adapter/AspectRatio"
+    },
+    "avatar": {
+      "category": "adapter",
+      "storyFile": "avatar.stories.tsx",
+      "title": "Primitives/Adapter/Avatar"
+    },
+    "badge": {
+      "category": "foundation",
+      "storyFile": "badge.stories.tsx",
+      "title": "Primitives/Foundation/Badge"
+    },
+    "breadcrumb": {
+      "category": "foundation",
+      "storyFile": "breadcrumb.stories.tsx",
+      "title": "Primitives/Foundation/Breadcrumb"
+    },
+    "button": {
+      "category": "foundation",
+      "storyFile": "button.stories.tsx",
+      "title": "Primitives/Foundation/Button"
+    },
+    "button-group": {
+      "category": "foundation",
+      "storyFile": "button-group.stories.tsx",
+      "title": "Primitives/Foundation/ButtonGroup"
+    },
+    "calendar": {
+      "category": "composed",
+      "storyFile": "calendar.stories.tsx",
+      "title": "Composed/Calendar"
+    },
+    "callout": {
+      "category": "foundation",
+      "storyFile": "callout.stories.tsx",
+      "title": "Primitives/Foundation/Callout"
+    },
+    "card": {
+      "category": "foundation",
+      "storyFile": "card.stories.tsx",
+      "title": "Primitives/Foundation/Card"
+    },
+    "carousel": {
+      "category": "composed",
+      "storyFile": "carousel.stories.tsx",
+      "title": "Composed/Carousel"
+    },
+    "checkbox": {
+      "category": "adapter",
+      "storyFile": "checkbox.stories.tsx",
+      "title": "Primitives/Adapter/Checkbox"
+    },
+    "chip": {
+      "category": "foundation",
+      "storyFile": "chip.stories.tsx",
+      "title": "Primitives/Foundation/Chip"
+    },
+    "collapsible": {
+      "category": "adapter",
+      "storyFile": "collapsible.stories.tsx",
+      "title": "Primitives/Adapter/Collapsible"
+    },
+    "combobox": {
+      "category": "composed",
+      "storyFile": "combobox.stories.tsx",
+      "title": "Composed/Combobox"
+    },
+    "command": {
+      "category": "composed",
+      "storyFile": "command.stories.tsx",
+      "title": "Composed/Command"
+    },
+    "context-menu": {
+      "category": "adapter",
+      "storyFile": "context-menu.stories.tsx",
+      "title": "Primitives/Adapter/ContextMenu"
+    },
+    "date-picker": {
+      "category": "composed",
+      "storyFile": "date-picker.stories.tsx",
+      "title": "Composed/DatePicker"
+    },
+    "dialog": {
+      "category": "adapter",
+      "storyFile": "dialog.stories.tsx",
+      "title": "Primitives/Adapter/Dialog"
+    },
+    "dot": {
+      "category": "foundation",
+      "storyFile": "dot.stories.tsx",
+      "title": "Primitives/Foundation/Dot"
+    },
+    "drawer": {
+      "category": "adapter",
+      "storyFile": "drawer.stories.tsx",
+      "title": "Primitives/Adapter/Drawer"
+    },
+    "dropdown-menu": {
+      "category": "adapter",
+      "storyFile": "dropdown-menu.stories.tsx",
+      "title": "Primitives/Adapter/DropdownMenu"
+    },
+    "empty": {
+      "category": "foundation",
+      "storyFile": "empty.stories.tsx",
+      "title": "Primitives/Foundation/Empty"
+    },
+    "field": {
+      "category": "composed",
+      "storyFile": "field.stories.tsx",
+      "title": "Composed/Field"
+    },
+    "hover-card": {
+      "category": "adapter",
+      "storyFile": "hover-card.stories.tsx",
+      "title": "Primitives/Adapter/HoverCard"
+    },
+    "input": {
+      "category": "foundation",
+      "storyFile": "input.stories.tsx",
+      "title": "Primitives/Foundation/Input"
+    },
+    "input-group": {
+      "category": "composed",
+      "storyFile": "input-group.stories.tsx",
+      "title": "Composed/InputGroup"
+    },
+    "input-otp": {
+      "category": "adapter",
+      "storyFile": "input-otp.stories.tsx",
+      "title": "Primitives/Adapter/InputOTP"
+    },
+    "item": {
+      "category": "foundation",
+      "storyFile": "item.stories.tsx",
+      "title": "Primitives/Foundation/Item"
+    },
+    "kbd": {
+      "category": "foundation",
+      "storyFile": "kbd.stories.tsx",
+      "title": "Primitives/Foundation/Kbd"
+    },
+    "label": {
+      "category": "adapter",
+      "storyFile": "label.stories.tsx",
+      "title": "Primitives/Adapter/Label"
+    },
+    "menubar": {
+      "category": "adapter",
+      "storyFile": "menubar.stories.tsx",
+      "title": "Primitives/Adapter/Menubar"
+    },
+    "native-select": {
+      "category": "foundation",
+      "storyFile": "native-select.stories.tsx",
+      "title": "Primitives/Foundation/NativeSelect"
+    },
+    "navigation-menu": {
+      "category": "adapter",
+      "storyFile": "navigation-menu.stories.tsx",
+      "title": "Primitives/Adapter/NavigationMenu"
+    },
+    "pagination": {
+      "category": "foundation",
+      "storyFile": "pagination.stories.tsx",
+      "title": "Primitives/Foundation/Pagination"
+    },
+    "popover": {
+      "category": "adapter",
+      "storyFile": "popover.stories.tsx",
+      "title": "Primitives/Adapter/Popover"
+    },
+    "portal": {
+      "category": "utility",
+      "storyFile": "portal.stories.tsx",
+      "title": "Utilities/Portal"
+    },
+    "progress": {
+      "category": "adapter",
+      "storyFile": "progress.stories.tsx",
+      "title": "Primitives/Adapter/Progress"
+    },
+    "radio-group": {
+      "category": "adapter",
+      "storyFile": "radio-group.stories.tsx",
+      "title": "Primitives/Adapter/RadioGroup"
+    },
+    "resizable": {
+      "category": "adapter",
+      "storyFile": "resizable.stories.tsx",
+      "title": "Primitives/Adapter/Resizable"
+    },
+    "score-bar": {
+      "category": "foundation",
+      "storyFile": "score-bar.stories.tsx",
+      "title": "Primitives/Foundation/ScoreBar"
+    },
+    "scroll-area": {
+      "category": "adapter",
+      "storyFile": "scroll-area.stories.tsx",
+      "title": "Primitives/Adapter/ScrollArea"
+    },
+    "select": {
+      "category": "adapter",
+      "storyFile": "select.stories.tsx",
+      "title": "Primitives/Adapter/Select"
+    },
+    "separator": {
+      "category": "adapter",
+      "storyFile": "separator.stories.tsx",
+      "title": "Primitives/Adapter/Separator"
+    },
+    "sheet": {
+      "category": "adapter",
+      "storyFile": "sheet.stories.tsx",
+      "title": "Primitives/Adapter/Sheet"
+    },
+    "skeleton": {
+      "category": "foundation",
+      "storyFile": "skeleton.stories.tsx",
+      "title": "Primitives/Foundation/Skeleton"
+    },
+    "slider": {
+      "category": "adapter",
+      "storyFile": "slider.stories.tsx",
+      "title": "Primitives/Adapter/Slider"
+    },
+    "sonner": {
+      "category": "adapter",
+      "storyFile": "sonner.stories.tsx",
+      "title": "Primitives/Adapter/Sonner"
+    },
+    "spinner": {
+      "category": "foundation",
+      "storyFile": "spinner.stories.tsx",
+      "title": "Primitives/Foundation/Spinner"
+    },
+    "stepper": {
+      "category": "foundation",
+      "storyFile": "stepper.stories.tsx",
+      "title": "Primitives/Foundation/Stepper"
+    },
+    "switch": {
+      "category": "adapter",
+      "storyFile": "switch.stories.tsx",
+      "title": "Primitives/Adapter/Switch"
+    },
+    "table": {
+      "category": "foundation",
+      "storyFile": "table.stories.tsx",
+      "title": "Primitives/Foundation/Table"
+    },
+    "tabs": {
+      "category": "adapter",
+      "storyFile": "tabs.stories.tsx",
+      "title": "Primitives/Adapter/Tabs"
+    },
+    "textarea": {
+      "category": "foundation",
+      "storyFile": "textarea.stories.tsx",
+      "title": "Primitives/Foundation/Textarea"
+    },
+    "toast": {
+      "category": "composed",
+      "storyFile": "toast.stories.tsx",
+      "title": "Composed/Toast"
+    },
+    "toggle": {
+      "category": "adapter",
+      "storyFile": "toggle.stories.tsx",
+      "title": "Primitives/Adapter/Toggle"
+    },
+    "toggle-group": {
+      "category": "adapter",
+      "storyFile": "toggle-group.stories.tsx",
+      "title": "Primitives/Adapter/ToggleGroup"
+    },
+    "tooltip": {
+      "category": "adapter",
+      "storyFile": "tooltip.stories.tsx",
+      "title": "Primitives/Adapter/Tooltip"
+    },
+    "typography": {
+      "category": "foundation",
+      "storyFile": "typography.stories.tsx",
+      "title": "Primitives/Foundation/Typography"
+    },
+    "visually-hidden": {
+      "category": "utility",
+      "storyFile": "visually-hidden.stories.tsx",
+      "title": "Utilities/VisuallyHidden"
+    }
+  }
+}

@@ -18,7 +18,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Combobox",
+  title: "Composed/Combobox",
   component: Combobox,
   tags: ["autodocs"],
   argTypes: {

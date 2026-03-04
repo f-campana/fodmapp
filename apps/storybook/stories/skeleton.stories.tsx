@@ -6,7 +6,7 @@ import { expect } from "storybook/test";
 import { Skeleton } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Skeleton",
+  title: "Primitives/Foundation/Skeleton",
   component: Skeleton,
   tags: ["autodocs"],
   argTypes: {

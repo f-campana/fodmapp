@@ -9,7 +9,7 @@ import {
 } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/Resizable",
+  title: "Primitives/Adapter/Resizable",
   component: ResizablePanelGroup,
   tags: ["autodocs"],
   argTypes: {

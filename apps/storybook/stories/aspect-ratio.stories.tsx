@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { AspectRatio } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/AspectRatio",
+  title: "Primitives/Adapter/AspectRatio",
   component: AspectRatio,
   tags: ["autodocs"],
   argTypes: {

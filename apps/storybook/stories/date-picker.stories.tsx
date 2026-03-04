@@ -7,7 +7,7 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import { DatePicker } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/DatePicker",
+  title: "Composed/DatePicker",
   component: DatePicker,
   tags: ["autodocs"],
   argTypes: {

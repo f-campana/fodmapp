@@ -5,7 +5,7 @@ import { expect, within } from "storybook/test";
 import { ScrollArea } from "@fodmap/ui";
 
 const meta = {
-  title: "Primitives/ScrollArea",
+  title: "Primitives/Adapter/ScrollArea",
   component: ScrollArea,
   tags: ["autodocs"],
   argTypes: {
