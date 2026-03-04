@@ -1,5 +1,11 @@
 # @fodmap/design-tokens
 
+## 0.3.0
+
+### Minor Changes
+
+- [#171](https://github.com/f-campana/Fodmap/pull/171) [`630b4ba`](https://github.com/f-campana/Fodmap/commit/630b4ba6e1854ae7f87d3b604f6f93e9776f6097) Thanks [@f-campana](https://github.com/f-campana)! - Add missing brand light color tokens and semantic light remaps, enforce base brand light/dark parity during token generation, and extend Storybook foundations coverage/documentation for semantic non-color tokens.
+
 ## 0.2.4
 
 ### Patch Changes

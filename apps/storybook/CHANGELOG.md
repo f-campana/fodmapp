@@ -1,5 +1,20 @@
 # @fodmap/storybook
 
+## 0.1.24
+
+### Patch Changes
+
+- [#171](https://github.com/f-campana/Fodmap/pull/171) [`630b4ba`](https://github.com/f-campana/Fodmap/commit/630b4ba6e1854ae7f87d3b604f6f93e9776f6097) Thanks [@f-campana](https://github.com/f-campana)! - Add missing brand light color tokens and semantic light remaps, enforce base brand light/dark parity during token generation, and extend Storybook foundations coverage/documentation for semantic non-color tokens.
+
+- [#173](https://github.com/f-campana/Fodmap/pull/173) [`0f508e8`](https://github.com/f-campana/Fodmap/commit/0f508e8a3bed6eece8bb9b7042c0159d8161d538) Thanks [@f-campana](https://github.com/f-campana)! - Refactor foundations stories into modular data/reference/showcase/play files, split token documentation styles into domain CSS partials, and remove dead foundations helper exports/selectors while preserving behavior.
+
+- [#172](https://github.com/f-campana/Fodmap/pull/172) [`2fd8c29`](https://github.com/f-campana/Fodmap/commit/2fd8c2913e03b56ec2ae3ec953e4c429843243eb) Thanks [@f-campana](https://github.com/f-campana)! - Refactor foundations color stories into separated data/reference/showcase/play modules and migrate color to shared row builders, shared class name utility, and shared accordion group state hook.
+
+- Updated dependencies [[`630b4ba`](https://github.com/f-campana/Fodmap/commit/630b4ba6e1854ae7f87d3b604f6f93e9776f6097)]:
+  - @fodmap/design-tokens@0.3.0
+  - @fodmap/reporting@0.1.8
+  - @fodmap/ui@3.13.1
+
 ## 0.1.23
 
 ### Patch Changes

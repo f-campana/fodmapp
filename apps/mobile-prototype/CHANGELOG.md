@@ -1,5 +1,12 @@
 # @fodmap/mobile-prototype
 
+## 0.3.4
+
+### Patch Changes
+
+- Updated dependencies [[`630b4ba`](https://github.com/f-campana/Fodmap/commit/630b4ba6e1854ae7f87d3b604f6f93e9776f6097)]:
+  - @fodmap/design-tokens@0.3.0
+
 ## 0.3.3
 
 ### Patch Changes
