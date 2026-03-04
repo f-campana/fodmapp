@@ -103,7 +103,10 @@ function main() {
   const storybookDir = path.resolve(scriptDir, "..");
   const repoRoot = path.resolve(storybookDir, "..", "..");
 
-  const implementationsDir = path.join(repoRoot, "packages/ui/src/components/ui");
+  const implementationsDir = path.join(
+    repoRoot,
+    "packages/ui/src/components/ui",
+  );
   const storiesDir = path.join(storybookDir, "stories");
   const taxonomyPath = path.join(storiesDir, "component-taxonomy.json");
 
