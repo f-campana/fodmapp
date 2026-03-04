@@ -54,6 +54,12 @@ feat(schema): add source confidence index
 6. CI scope note:
    - Heavy Turbo jobs are PR-scoped via `pr-scope` and may show as `skipped`; the `CI` gate treats scoped `skipped` jobs as acceptable.
 
+## Public Repository Intake Policy
+
+- Issues are open for public feedback and bug reports.
+- Pull request creation is restricted to approved collaborators.
+- Non-collaborators should open an issue first; maintainers can invite a collaborator when code contribution is approved.
+
 Tip: `pnpm install` (via `prepare`) configures local Git hooks, and pushes are blocked until `./.github/scripts/quality-gate.sh --full` passes (delete-only pushes are skipped).
 After branch/worktree sync, run `pnpm install` before pushing.
 The pre-push full quality gate runs monorepo-wide checks, not only changed-package scopes.
