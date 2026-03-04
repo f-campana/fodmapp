@@ -2,7 +2,7 @@ import * as React from "react";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export type AccordionProps = React.ComponentProps<
   typeof AccordionPrimitive.Root

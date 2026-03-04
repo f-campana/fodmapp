@@ -2,54 +2,89 @@ import * as React from "react";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
-import { cn } from "../../lib/cn";
+import { cva, type VariantProps } from "class-variance-authority";
 
-export type DialogProps = React.ComponentProps<typeof DialogPrimitive.Root>;
+import { cn } from "../../../lib/cn";
 
-function Dialog({ children, ...props }: DialogProps) {
+const sheetVariants = cva(
+  [
+    "fixed z-50 gap-4 border border-border bg-popover p-6 text-popover-foreground shadow-lg",
+    "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
+    "data-[state=open]:animate-in data-[state=closed]:animate-out",
+  ].join(" "),
+  {
+    variants: {
+      side: {
+        top: [
+          "inset-x-0 top-0 border-b",
+          "data-[state=open]:slide-in-from-top data-[state=closed]:slide-out-to-top",
+        ].join(" "),
+        bottom: [
+          "inset-x-0 bottom-0 border-t",
+          "data-[state=open]:slide-in-from-bottom data-[state=closed]:slide-out-to-bottom",
+        ].join(" "),
+        left: [
+          "inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+          "data-[state=open]:slide-in-from-left data-[state=closed]:slide-out-to-left",
+        ].join(" "),
+        right: [
+          "inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+          "data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right",
+        ].join(" "),
+      },
+    },
+    defaultVariants: {
+      side: "right",
+    },
+  },
+);
+
+export type SheetProps = React.ComponentProps<typeof DialogPrimitive.Root>;
+
+function Sheet({ children, ...props }: SheetProps) {
   return (
     <DialogPrimitive.Root {...props}>
-      <span data-slot="dialog" hidden />
+      <span data-slot="sheet" hidden />
       {children}
     </DialogPrimitive.Root>
   );
 }
 
-export type DialogTriggerProps = React.ComponentProps<
+export type SheetTriggerProps = React.ComponentProps<
   typeof DialogPrimitive.Trigger
 >;
 
-function DialogTrigger({ className, ...props }: DialogTriggerProps) {
+function SheetTrigger({ className, ...props }: SheetTriggerProps) {
   return (
     <DialogPrimitive.Trigger
-      data-slot="dialog-trigger"
+      data-slot="sheet-trigger"
       className={cn(className)}
       {...props}
     />
   );
 }
 
-export type DialogPortalProps = React.ComponentProps<
+export type SheetPortalProps = React.ComponentProps<
   typeof DialogPrimitive.Portal
 >;
 
-function DialogPortal({ children, ...props }: DialogPortalProps) {
+function SheetPortal({ children, ...props }: SheetPortalProps) {
   return (
     <DialogPrimitive.Portal {...props}>
-      <span data-slot="dialog-portal" hidden />
+      <span data-slot="sheet-portal" hidden />
       {children}
     </DialogPrimitive.Portal>
   );
 }
 
-export type DialogOverlayProps = React.ComponentProps<
+export type SheetOverlayProps = React.ComponentProps<
   typeof DialogPrimitive.Overlay
 >;
 
-function DialogOverlay({ className, ...props }: DialogOverlayProps) {
+function SheetOverlay({ className, ...props }: SheetOverlayProps) {
   return (
     <DialogPrimitive.Overlay
-      data-slot="dialog-overlay"
+      data-slot="sheet-overlay"
       className={cn(
         "fixed inset-0 z-50 bg-muted/80",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -61,37 +96,33 @@ function DialogOverlay({ className, ...props }: DialogOverlayProps) {
   );
 }
 
-export type DialogContentProps = React.ComponentProps<
-  typeof DialogPrimitive.Content
-> & {
+export interface SheetContentProps
+  extends
+    React.ComponentProps<typeof DialogPrimitive.Content>,
+    VariantProps<typeof sheetVariants> {
   closeLabel?: string;
-};
+}
 
-function DialogContent({
+function SheetContent({
   className,
   children,
+  side = "right",
   closeLabel = "Fermer",
   ...props
-}: DialogContentProps) {
+}: SheetContentProps) {
   return (
-    <DialogPortal>
-      <DialogOverlay />
+    <SheetPortal>
+      <SheetOverlay />
       <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          "fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-(--radius) border border-border bg-popover p-6 text-popover-foreground shadow-lg",
-          "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-          className,
-        )}
+        data-slot="sheet-content"
+        data-side={side}
+        className={cn(sheetVariants({ side }), className)}
         {...props}
       >
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          data-slot="dialog-close"
+          data-slot="sheet-close"
           className={cn(
             "absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-(--radius) border border-transparent",
             "text-muted-foreground transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
@@ -118,18 +149,18 @@ function DialogContent({
           </svg>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
-    </DialogPortal>
+    </SheetPortal>
   );
 }
 
-export type DialogCloseProps = React.ComponentProps<
+export type SheetCloseProps = React.ComponentProps<
   typeof DialogPrimitive.Close
 >;
 
-function DialogClose({ className, ...props }: DialogCloseProps) {
+function SheetClose({ className, ...props }: SheetCloseProps) {
   return (
     <DialogPrimitive.Close
-      data-slot="dialog-close"
+      data-slot="sheet-close"
       className={cn(
         "inline-flex items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
@@ -143,64 +174,52 @@ function DialogClose({ className, ...props }: DialogCloseProps) {
   );
 }
 
-export type DialogHeaderProps = React.ComponentProps<"div">;
+export type SheetHeaderProps = React.ComponentProps<"div">;
 
-function DialogHeader({ className, ...props }: DialogHeaderProps) {
+function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
-      data-slot="dialog-header"
+      data-slot="sheet-header"
       className={cn("flex flex-col gap-1.5 text-left", className)}
       {...props}
     />
   );
 }
 
-export type DialogBodyProps = React.ComponentProps<"div">;
+export type SheetFooterProps = React.ComponentProps<"div">;
 
-function DialogBody({ className, ...props }: DialogBodyProps) {
+function SheetFooter({ className, ...props }: SheetFooterProps) {
   return (
     <div
-      data-slot="dialog-body"
-      className={cn("grid gap-4", className)}
-      {...props}
-    />
-  );
-}
-
-export type DialogFooterProps = React.ComponentProps<"div">;
-
-function DialogFooter({ className, ...props }: DialogFooterProps) {
-  return (
-    <div
-      data-slot="dialog-footer"
+      data-slot="sheet-footer"
       className={cn("flex flex-wrap justify-end gap-2", className)}
       {...props}
     />
   );
 }
 
-export type DialogTitleProps = React.ComponentProps<
+export type SheetTitleProps = React.ComponentProps<
   typeof DialogPrimitive.Title
 >;
 
-function DialogTitle({ className, ...props }: DialogTitleProps) {
+function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
     <DialogPrimitive.Title
-      data-slot="dialog-title"
+      data-slot="sheet-title"
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />
   );
 }
 
-export type DialogDescriptionProps = React.ComponentProps<
+export type SheetDescriptionProps = React.ComponentProps<
   typeof DialogPrimitive.Description
 >;
 
-function DialogDescription({ className, ...props }: DialogDescriptionProps) {
+function SheetDescription({ className, ...props }: SheetDescriptionProps) {
   return (
     <DialogPrimitive.Description
-      data-slot="dialog-description"
+      data-slot="sheet-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
@@ -208,15 +227,15 @@ function DialogDescription({ className, ...props }: DialogDescriptionProps) {
 }
 
 export {
-  Dialog,
-  DialogBody,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+  sheetVariants,
 };

@@ -9,7 +9,7 @@ export type {
   SelectSeparatorProps,
   SelectTriggerProps,
   SelectValueProps,
-} from "./ui/select";
+} from "./ui/adapter/select";
 export {
   Select,
   SelectContent,
@@ -21,4 +21,4 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "./ui/adapter/select";

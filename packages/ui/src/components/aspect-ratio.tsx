@@ -1,2 +1,2 @@
-export type { AspectRatioProps } from "./ui/aspect-ratio";
-export { AspectRatio } from "./ui/aspect-ratio";
+export type { AspectRatioProps } from "./ui/adapter/aspect-ratio";
+export { AspectRatio } from "./ui/adapter/aspect-ratio";

@@ -3,10 +3,10 @@ export type {
   AccordionItemProps,
   AccordionProps,
   AccordionTriggerProps,
-} from "./ui/accordion";
+} from "./ui/adapter/accordion";
 export {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
+} from "./ui/adapter/accordion";

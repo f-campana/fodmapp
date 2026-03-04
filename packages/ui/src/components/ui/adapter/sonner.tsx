@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { toast, Toaster, type ToasterProps } from "sonner";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export type SonnerProps = ToasterProps;
 

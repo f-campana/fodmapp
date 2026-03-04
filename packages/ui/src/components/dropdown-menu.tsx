@@ -14,7 +14,7 @@ export type {
   DropdownMenuSubProps,
   DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
-} from "./ui/dropdown-menu";
+} from "./ui/adapter/dropdown-menu";
 export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,4 +31,4 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "./ui/adapter/dropdown-menu";

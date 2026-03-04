@@ -2,7 +2,7 @@ import * as React from "react";
 
 import * as AspectRatioPrimitive from "@radix-ui/react-aspect-ratio";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export type AspectRatioProps = React.ComponentProps<
   typeof AspectRatioPrimitive.Root

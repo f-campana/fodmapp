@@ -15,7 +15,7 @@ export type {
   MenubarSubProps,
   MenubarSubTriggerProps,
   MenubarTriggerProps,
-} from "./ui/menubar";
+} from "./ui/adapter/menubar";
 export {
   Menubar,
   MenubarCheckboxItem,
@@ -33,4 +33,4 @@ export {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "./ui/menubar";
+} from "./ui/adapter/menubar";

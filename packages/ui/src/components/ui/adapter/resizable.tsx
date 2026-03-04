@@ -4,7 +4,7 @@ import * as React from "react";
 
 import * as ResizablePrimitive from "react-resizable-panels";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export type ResizablePanelGroupProps = React.ComponentProps<
   typeof ResizablePrimitive.Group

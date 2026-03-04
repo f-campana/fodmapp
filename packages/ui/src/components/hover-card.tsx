@@ -4,11 +4,11 @@ export type {
   HoverCardPortalProps,
   HoverCardProps,
   HoverCardTriggerProps,
-} from "./ui/hover-card";
+} from "./ui/adapter/hover-card";
 export {
   HoverCard,
   HoverCardArrow,
   HoverCardContent,
   HoverCardPortal,
   HoverCardTrigger,
-} from "./ui/hover-card";
+} from "./ui/adapter/hover-card";

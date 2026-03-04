@@ -14,7 +14,7 @@ export type {
   ContextMenuSubProps,
   ContextMenuSubTriggerProps,
   ContextMenuTriggerProps,
-} from "./ui/context-menu";
+} from "./ui/adapter/context-menu";
 export {
   ContextMenu,
   ContextMenuCheckboxItem,
@@ -31,4 +31,4 @@ export {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "./ui/context-menu";
+} from "./ui/adapter/context-menu";

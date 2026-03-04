@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { OTPInput, OTPInputContext } from "input-otp";
 
-import { cn } from "../../lib/cn";
+import { cn } from "../../../lib/cn";
 
 export type InputOTPProps = React.ComponentProps<typeof OTPInput>;
 
