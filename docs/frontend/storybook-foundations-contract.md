@@ -5,6 +5,10 @@
 This document defines the maintenance contract for foundations token stories in
 `apps/storybook/stories/foundations`.
 
+Related contract:
+
+- `docs/frontend/storybook-component-taxonomy-contract.md`
+
 Covered stories:
 
 - `color.stories.tsx`
