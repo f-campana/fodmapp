@@ -36,6 +36,12 @@ case "$mode" in
     ;;
 esac
 
+# Avoid py_compile permission errors in sandboxed environments that cannot write
+# to the default user cache directory.
+if [[ -z "${PYTHONPYCACHEPREFIX:-}" ]]; then
+  export PYTHONPYCACHEPREFIX="${TMPDIR:-/tmp}/pycache"
+fi
+
 required_files=(
   ".editorconfig"
   ".gitattributes"
