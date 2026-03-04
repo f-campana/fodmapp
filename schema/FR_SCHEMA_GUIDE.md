@@ -1418,6 +1418,89 @@ Observed closeout outcomes (post PR #51 merge):
   - `0` single-review-eligible rows
 - blocker state remains external and is tracked in issue `#26` (second reviewer required for deferred activation).
 
+### 11.13 Composition-Zero Batch01 (Phase 3.6d)
+
+Composition-Zero Batch01 is research-first and constrained to current pilot-universe eligible cohort rows.
+
+Scope lock:
+
+- `3` `phase2-ail-infuse-huile` (`cohort_oil_fat`)
+
+Observed cohort availability in current `1..42` pilot universe:
+
+- `cohort_oil_fat`: eligible (`rank=3`)
+- `cohort_plain_protein`: no eligible rows in current scope
+
+Artifacts:
+
+- research matrix:
+  - `etl/phase3/research/phase3_composition_zero_batch01_matrix_v1.csv`
+- research report:
+  - `etl/phase3/research/phase3_composition_zero_batch01_report_v1.md`
+- evidence ledger:
+  - `etl/phase3/research/phase3_composition_zero_batch01_evidence_ledger_v1.csv`
+- measurements input:
+  - `etl/phase3/data/phase3_composition_zero_batch01_measurements_v1.csv`
+- SQL flow:
+  - `phase3_composition_zero_batch01_apply.sql`
+  - `phase3_rollups_compute.sql`
+  - `phase3_rollups_6subtype_checks.sql`
+  - `phase3_composition_zero_batch01_checks.sql`
+
+Locked source policy:
+
+- promotable rows must rely on official Monash sources
+- secondary sources are narrative-only and cannot be promotable measurement evidence
+
+Locked promotion contract (Batch01):
+
+1. rank scope: `3` only
+2. one approved food row expands to exactly six subtype rows:
+   - `fructan`, `fructose`, `gos`, `lactose`, `mannitol`, `sorbitol`
+3. per-row value policy:
+   - `amount_raw='0'`
+   - `comparator='eq'`
+   - `amount_g_per_100g=0`
+   - `amount_g_per_serving=0`
+4. method/source/evidence policy:
+   - `method='expert_estimate'`
+   - `source_slug='internal_rules_v1'`
+   - `evidence_tier='inferred'`
+   - `confidence_score=0.950`
+5. notes marker:
+   - `composition_zero_batch01_v1:cohort_oil_fat;gate:single_ingredient=1;gate:processing_risk=0`
+
+Blocked taxonomy (if blocked rows exist):
+
+- allowed:
+  - `not_single_ingredient_food`
+  - `processing_risk_additives`
+  - `missing_official_support`
+  - `evidence_conflict_not_promotable`
+  - `unknown_identity_or_prep`
+- forbidden:
+  - `insufficient_variant_specific_evidence`
+
+Batch01 checks contract:
+
+- matrix rows `= 6`
+- matrix found rows `= 6`
+- measurements CSV count parity with matrix found rows
+- duplicate `(priority_rank, subtype_code)` rows forbidden in matrix and CSV
+- row-policy enforcement:
+  - rank `2` absent
+  - source/method/evidence/confidence/value contract exact-match
+  - notes marker contract exact-match
+- post-apply:
+  - current DB rows tagged `composition_zero_batch01_v1:%` equal CSV row count
+  - all inserted rows resolve to `signal_source_kind='explicit_measurement'`
+
+Human checkpoint (mandatory):
+
+- review report + evidence ledger + matrix + measurements as one packet
+- confirm Batch01 intentionally carries no plain-protein cohort rows under current pilot scope
+- apply only after checkpoint approval
+
 ## 12) References
 
 - CIQUAL 2025 composition dataset (Etalab 2.0):
@@ -1434,3 +1517,15 @@ Observed closeout outcomes (post PR #51 merge):
   - https://www.monashfodmap.com/blog/app-how-to/
 - Monash lab testing process:
   - https://www.monashfodmap.com/blog/fodmap-testing-lab/
+- Monash FODMAP explainer:
+  - https://www.monashfodmap.com/blog/fodmap/
+- Monash proteins guidance:
+  - https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/
+- Monash high/low foods guidance:
+  - https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/
+- Monash not-listed-in-app caution:
+  - https://www.monashfodmap.com/blog/does-food-not-listed-in-app-mean-you-can-eat-it/
+- FODMAP Everyday lab-testing context (secondary narrative only):
+  - https://www.fodmapeveryday.com/monash-university-low-fodmap-lab-testing-explained/
+- Clinical review context (secondary narrative only):
+  - https://pmc.ncbi.nlm.nih.gov/articles/PMC7690730/
