@@ -17,23 +17,25 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
 
-## Public Cutover Status (ADR-018)
+## Post-Cutover Status (ADR-018)
 
 `ADR-018` implementation status at this revision:
 
-1. Completed in `PR-1`: decision record and documentation-first sequencing.
-2. Completed in `PR-2`:
-   - `Changesets release` preflight accepts default workflow permission `read` or `write`
-   - Storybook PR preview lane removed
-   - Storybook production lane gated by `vercel-production` environment
-3. Pending remote operations:
-   - set repository default workflow permission to `read`
-   - remove repository `TURBO_TEAM` / `TURBO_TOKEN`
-   - migrate and validate `VERCEL_*` in environment-only scope
-   - apply branch protection, rename to `f-campana/fodmapp`, set visibility to public
-4. Pending `PR-3`: execution evidence and status closure.
+1. Completed in `PR-1`: decision record and documentation-first sequencing (`#177`).
+2. Completed in `PR-2`: release preflight hardening + Storybook production-only workflow (`#178`).
+3. Completed in remote operations:
+   - repository renamed to `f-campana/fodmapp`
+   - repository visibility set to `public`
+   - default Actions workflow permission set to `read`
+   - `Allow GitHub Actions to create and approve pull requests` remains enabled
+   - branch protection applied on `main` with required checks (`CI`, `API`, `Changeset PR Gate`, `Semantic PR Title`)
+   - repository `TURBO_TEAM` / `TURBO_TOKEN` deleted
+   - `vercel-production` environment configured with required reviewer (`f-campana`) and protected-branch deployment policy
+   - secret scanning, push protection, Dependabot security updates, and code scanning default setup enabled
+4. Remaining manual cutover action:
+   - rotate `VERCEL_TOKEN`, set `VERCEL_*` values in `vercel-production` environment secrets, validate deploy, then delete repo-level `VERCEL_*` secrets.
 
-Sections below describe the post-`PR-2` workflow contract and required remote settings.
+Sections below describe the effective post-cutover workflow contract.
 
 ## Phase 2 Reporting Gate Mode
 
@@ -131,8 +133,8 @@ The main `CI` workflow now uses a `pr-scope` job to compute execution booleans f
 
 Turbo cache behavior for scoped jobs:
 
-- public cutover target removes repository `TURBO_TEAM` / `TURBO_TOKEN`
-- CI therefore defaults to local `.turbo` cache restore/save (`actions/cache/restore@v4` and `actions/cache/save@v4`)
+- repository `TURBO_TEAM` / `TURBO_TOKEN` are removed
+- CI defaults to local `.turbo` cache restore/save (`actions/cache/restore@v4` and `actions/cache/save@v4`)
 - if Turbo credentials are explicitly injected in the future, remote cache remains technically supported by the composite action
 
 The composite action (`.github/actions/setup-js-workspace`) centralizes this selection logic and
