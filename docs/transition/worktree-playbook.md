@@ -36,7 +36,7 @@ Add package-specific commands depending on PR scope (e.g., UI/Storybook checks).
 - If completed and merged:
 
 ```bash
-cd /Users/fabiencampana/Documents/Fodmap
+cd /Users/fabiencampana/Documents/fodmapp
 git worktree remove /Users/fabiencampana/Documents/Fodmap-<short-topic>
 git branch -d codex/<short-topic>
 ```
