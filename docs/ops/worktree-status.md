@@ -15,7 +15,8 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                                                | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`                                            | `main`                                    | active (protected) | Main integration worktree only                                                       | Must remain clean.                                                  |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-contract-fodmapp`       | `codex/local-path-contract-fodmapp`       | active             | PR-A local path contract canonicalization                                            | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-contract-fodmapp`       | `codex/local-path-contract-fodmapp`       | merged             | PR-A local path contract canonicalization                                            | Merged via PR #184.                                                 |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-migration-evidence`     | `codex/local-path-migration-evidence`     | active             | PR-B local main-path migration evidence and closure                                  | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-lane-structure-refactor`        | `codex/ui-lane-structure-refactor`        | active             | Lane-based UI implementation folder reorganization + taxonomy checker/docs alignment | In progress; validate full quality gate before merge.               |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/public-cutover-decision-record`    | `codex/public-cutover-decision-record`    | merged             | PR-1 decision record for public cutover (`ADR-018`)                                  | Merged via PR #177.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/public-cutover-hardening`          | `codex/public-cutover-hardening`          | merged             | PR-2 workflow hardening and CI/env contract updates                                  | Merged via PR #178.                                                 |
@@ -59,6 +60,25 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`           | active             | Revolut research reporting                                                           | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`  | active             | Deterministic changeset gate remediation                                             | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`           | active             | Turbo audit remediation                                                              | Cache correctness, CI cache, PR scope, scripts.                     |
+
+## Maintenance Log: Local Main Path Migration (2026-03-04)
+
+1. Precondition verified: prior main worktree directory was clean on `main...origin/main`.
+2. Target path check passed: `/Users/fabiencampana/Documents/fodmapp` did not exist.
+3. Migration executed from `/Users/fabiencampana/Documents`:
+   - `mv Fodmap Fodmap__rename_tmp__20260304`
+   - `mv Fodmap__rename_tmp__20260304 fodmapp`
+4. Worktree link repair executed from new main path:
+   - `git worktree repair`
+   - `git config worktree.useRelativePaths true`
+   - `git worktree repair --relative-paths`
+5. Post-migration verification completed at `2026-03-04T15:58:26Z`:
+   - `git worktree list --porcelain` resolves all linked worktrees with main at `/Users/fabiencampana/Documents/fodmapp`.
+   - Per-worktree `git rev-parse --is-inside-work-tree` and `git status --short --branch` succeeded for every linked worktree.
+   - Old main-gitdir pointer scan across sibling worktree `.git` files returned no matches.
+6. Evidence snapshots captured locally:
+   - preflight: `/tmp/fodmapp-rename-preflight.txt` (`2026-03-04T15:57:33Z`)
+   - postcheck: `/tmp/fodmapp-rename-postcheck.txt` (`2026-03-04T15:58:26Z`)
 
 ## Incident Timeline: Phase2 Reporting Full-Lane Drift (2026-03-01)
 
