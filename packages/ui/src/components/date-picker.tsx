@@ -1,2 +1,2 @@
-export type { DatePickerProps } from "./ui/date-picker";
-export { DatePicker } from "./ui/date-picker";
+export type { DatePickerProps } from "./ui/composed/date-picker";
+export { DatePicker } from "./ui/composed/date-picker";

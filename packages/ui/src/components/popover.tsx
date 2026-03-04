@@ -5,7 +5,7 @@ export type {
   PopoverPortalProps,
   PopoverProps,
   PopoverTriggerProps,
-} from "./ui/popover";
+} from "./ui/adapter/popover";
 export {
   Popover,
   PopoverAnchor,
@@ -13,4 +13,4 @@ export {
   PopoverContent,
   PopoverPortal,
   PopoverTrigger,
-} from "./ui/popover";
+} from "./ui/adapter/popover";

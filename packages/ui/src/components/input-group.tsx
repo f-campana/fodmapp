@@ -4,11 +4,11 @@ export type {
   InputGroupInputProps,
   InputGroupProps,
   InputGroupTextProps,
-} from "./ui/input-group";
+} from "./ui/composed/input-group";
 export {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
   InputGroupText,
-} from "./ui/input-group";
+} from "./ui/composed/input-group";

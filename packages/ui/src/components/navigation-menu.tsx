@@ -7,7 +7,7 @@ export type {
   NavigationMenuProps,
   NavigationMenuTriggerProps,
   NavigationMenuViewportProps,
-} from "./ui/navigation-menu";
+} from "./ui/adapter/navigation-menu";
 export {
   NavigationMenu,
   NavigationMenuContent,
@@ -18,4 +18,4 @@ export {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
   NavigationMenuViewport,
-} from "./ui/navigation-menu";
+} from "./ui/adapter/navigation-menu";

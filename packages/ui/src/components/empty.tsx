@@ -4,11 +4,11 @@ export type {
   EmptyIconProps,
   EmptyProps,
   EmptyTitleProps,
-} from "./ui/empty";
+} from "./ui/foundation/empty";
 export {
   Empty,
   EmptyActions,
   EmptyDescription,
   EmptyIcon,
   EmptyTitle,
-} from "./ui/empty";
+} from "./ui/foundation/empty";

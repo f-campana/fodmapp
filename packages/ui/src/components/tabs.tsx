@@ -3,5 +3,5 @@ export type {
   TabsListProps,
   TabsProps,
   TabsTriggerProps,
-} from "./ui/tabs";
-export { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+} from "./ui/adapter/tabs";
+export { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/adapter/tabs";

@@ -10,7 +10,7 @@ export type {
   AlertDialogProps,
   AlertDialogTitleProps,
   AlertDialogTriggerProps,
-} from "./ui/alert-dialog";
+} from "./ui/adapter/alert-dialog";
 export {
   AlertDialog,
   AlertDialogAction,
@@ -23,4 +23,4 @@ export {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
+} from "./ui/adapter/alert-dialog";

@@ -2,5 +2,5 @@ export type {
   ToastHelper,
   ToastOptions,
   ToastPromiseOptions,
-} from "./ui/toast";
-export { Toast } from "./ui/toast";
+} from "./ui/composed/toast";
+export { Toast } from "./ui/composed/toast";

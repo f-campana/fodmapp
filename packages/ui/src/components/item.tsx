@@ -8,7 +8,7 @@ export type {
   ItemProps,
   ItemSeparatorProps,
   ItemTitleProps,
-} from "./ui/item";
+} from "./ui/foundation/item";
 export {
   Item,
   ItemActions,
@@ -19,4 +19,4 @@ export {
   ItemMedia,
   ItemSeparator,
   ItemTitle,
-} from "./ui/item";
+} from "./ui/foundation/item";

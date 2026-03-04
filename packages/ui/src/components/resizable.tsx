@@ -2,9 +2,9 @@ export type {
   ResizableHandleProps,
   ResizablePanelGroupProps,
   ResizablePanelProps,
-} from "./ui/resizable";
+} from "./ui/adapter/resizable";
 export {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "./ui/resizable";
+} from "./ui/adapter/resizable";

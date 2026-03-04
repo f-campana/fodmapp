@@ -1,2 +1,5 @@
-export type { RadioGroupItemProps, RadioGroupProps } from "./ui/radio-group";
-export { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+export type {
+  RadioGroupItemProps,
+  RadioGroupProps,
+} from "./ui/adapter/radio-group";
+export { RadioGroup, RadioGroupItem } from "./ui/adapter/radio-group";

@@ -4,7 +4,7 @@ export type {
   StepperProps,
   StepperSeparatorProps,
   StepperStepProps,
-} from "./ui/stepper";
+} from "./ui/foundation/stepper";
 export {
   Stepper,
   StepperDescription,
@@ -12,4 +12,4 @@ export {
   StepperSeparator,
   StepperStep,
   stepperVariants,
-} from "./ui/stepper";
+} from "./ui/foundation/stepper";

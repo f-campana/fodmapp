@@ -5,7 +5,7 @@ export type {
   CarouselNextProps,
   CarouselPreviousProps,
   CarouselProps,
-} from "./ui/carousel";
+} from "./ui/composed/carousel";
 export {
   Carousel,
   CarouselContent,
@@ -13,4 +13,4 @@ export {
   CarouselNext,
   CarouselPrevious,
   useCarousel,
-} from "./ui/carousel";
+} from "./ui/composed/carousel";

@@ -1,2 +1,2 @@
-export type { BadgeProps } from "./ui/badge";
-export { Badge, badgeVariants } from "./ui/badge";
+export type { BadgeProps } from "./ui/foundation/badge";
+export { Badge, badgeVariants } from "./ui/foundation/badge";

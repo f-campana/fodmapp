@@ -10,6 +10,12 @@ const VALID_CATEGORIES = new Set([
   "composed",
   "utility",
 ]);
+const CATEGORY_TO_LANE_DIR = {
+  adapter: "adapter",
+  foundation: "foundation",
+  composed: "composed",
+  utility: "utilities",
+};
 
 function readJson(filePath) {
   return JSON.parse(readFileSync(filePath, "utf8"));
@@ -19,13 +25,62 @@ function sorted(values) {
   return [...values].sort((a, b) => a.localeCompare(b));
 }
 
-function listUiComponentSlugs(componentsDir) {
-  return sorted(
-    readdirSync(componentsDir)
-      .filter((file) => file.endsWith(".tsx"))
-      .filter((file) => !file.endsWith(".test.tsx"))
-      .map((file) => file.replace(/\.tsx$/, "")),
-  );
+function listUiComponentImplementations(implementationsDir) {
+  const slugsByLane = new Map();
+  const duplicateSlugs = [];
+  const rootFiles = [];
+  const unknownLaneFiles = [];
+  const laneDirs = new Set(Object.values(CATEGORY_TO_LANE_DIR));
+
+  for (const entry of readdirSync(implementationsDir)) {
+    const entryPath = path.join(implementationsDir, entry);
+    const stats = statSync(entryPath);
+
+    if (stats.isFile()) {
+      if (entry.endsWith(".tsx") && !entry.endsWith(".test.tsx")) {
+        rootFiles.push(entry);
+      }
+      continue;
+    }
+
+    if (!stats.isDirectory()) {
+      continue;
+    }
+
+    for (const file of readdirSync(entryPath)) {
+      const filePath = path.join(entryPath, file);
+      if (!statSync(filePath).isFile()) {
+        continue;
+      }
+
+      if (!file.endsWith(".tsx") || file.endsWith(".test.tsx")) {
+        continue;
+      }
+
+      const slug = file.replace(/\.tsx$/, "");
+      if (slugsByLane.has(slug)) {
+        duplicateSlugs.push(
+          `${slug} (in ${slugsByLane.get(slug).laneDir} and ${entry})`,
+        );
+      }
+
+      slugsByLane.set(slug, {
+        laneDir: entry,
+        file: `${entry}/${file}`,
+      });
+
+      if (!laneDirs.has(entry)) {
+        unknownLaneFiles.push(`${entry}/${file}`);
+      }
+    }
+  }
+
+  return {
+    slugsByLane,
+    duplicateSlugs: sorted(duplicateSlugs),
+    rootFiles: sorted(rootFiles),
+    unknownLaneFiles: sorted(unknownLaneFiles),
+  };
 }
 
 function listRootStoryFiles(storiesDir) {
@@ -48,7 +103,10 @@ function main() {
   const storybookDir = path.resolve(scriptDir, "..");
   const repoRoot = path.resolve(storybookDir, "..", "..");
 
-  const componentsDir = path.join(repoRoot, "packages/ui/src/components");
+  const implementationsDir = path.join(
+    repoRoot,
+    "packages/ui/src/components/ui",
+  );
   const storiesDir = path.join(storybookDir, "stories");
   const taxonomyPath = path.join(storiesDir, "component-taxonomy.json");
 
@@ -57,7 +115,8 @@ function main() {
   const titlePrefixes = taxonomy?.titlePrefixes ?? {};
   const componentsMap = taxonomy?.components ?? {};
 
-  const componentSlugs = listUiComponentSlugs(componentsDir);
+  const implementations = listUiComponentImplementations(implementationsDir);
+  const implementationSlugs = sorted(implementations.slugsByLane.keys());
   const taxonomySlugs = sorted(Object.keys(componentsMap));
   const storyFiles = listRootStoryFiles(storiesDir);
 
@@ -65,6 +124,24 @@ function main() {
 
   if (typeof taxonomy?.version !== "number") {
     errors.push("taxonomy.version must be a number.");
+  }
+
+  if (implementations.rootFiles.length > 0) {
+    errors.push(
+      `Unexpected implementation files at packages/ui/src/components/ui root: ${implementations.rootFiles.join(", ")}`,
+    );
+  }
+
+  if (implementations.unknownLaneFiles.length > 0) {
+    errors.push(
+      `Unexpected implementation files in unknown lanes: ${implementations.unknownLaneFiles.join(", ")}`,
+    );
+  }
+
+  if (implementations.duplicateSlugs.length > 0) {
+    errors.push(
+      `Duplicate implementation slugs across lanes: ${implementations.duplicateSlugs.join(", ")}`,
+    );
   }
 
   for (const [category, prefix] of Object.entries(titlePrefixes)) {
@@ -110,13 +187,21 @@ function main() {
         `components.${slug}.title must start with '${expectedPrefix}/' for category '${entry.category}'.`,
       );
     }
+
+    const expectedLaneDir = CATEGORY_TO_LANE_DIR[entry.category];
+    const implementation = implementations.slugsByLane.get(slug);
+    if (implementation && implementation.laneDir !== expectedLaneDir) {
+      errors.push(
+        `components.${slug} is categorized as '${entry.category}' but implementation is in ui/${implementation.laneDir} (${implementation.file}).`,
+      );
+    }
   }
 
-  const missingTaxonomyEntries = componentSlugs.filter(
+  const missingTaxonomyEntries = implementationSlugs.filter(
     (slug) => !taxonomySlugs.includes(slug),
   );
   const extraTaxonomyEntries = taxonomySlugs.filter(
-    (slug) => !componentSlugs.includes(slug),
+    (slug) => !implementationSlugs.includes(slug),
   );
 
   if (missingTaxonomyEntries.length > 0) {
@@ -187,7 +272,7 @@ function main() {
   }
 
   process.stdout.write(
-    `[storybook-taxonomy] OK: ${componentSlugs.length} components mapped, ${storyFiles.length} root stories validated.\n`,
+    `[storybook-taxonomy] OK: ${implementationSlugs.length} components mapped, ${storyFiles.length} root stories validated.\n`,
   );
 }
 

@@ -1,4 +1,4 @@
-export type { BreadcrumbLinkProps } from "./ui/breadcrumb";
+export type { BreadcrumbLinkProps } from "./ui/foundation/breadcrumb";
 export {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -7,4 +7,4 @@ export {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "./ui/breadcrumb";
+} from "./ui/foundation/breadcrumb";
