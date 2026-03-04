@@ -42,10 +42,15 @@ Apply these instructions to the whole repository root.
 
 For swap batches and activations, execute in this order:
 
-1. generation/rescore
+1. generation + draft materialization apply + rescore (Gate A review-packet prep)
 2. human review CSV update
-3. activation apply
+3. activation apply (Gate B only)
 4. post-activation checks
+
+Clarification:
+
+- in Phase 3 batch flows, `*_apply.sql` before review is draft materialization, not activation
+- only `*_activation_apply.sql` may change rule status (`draft`/`active`) from reviewed decisions
 
 ### 3.1b Scoring / Eligibility Semantics
 

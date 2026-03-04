@@ -127,6 +127,11 @@ Idempotency pass (same order, second run):
 7. `phase3_swap_activation_apply.sql`
 8. `phase3_swap_activation_checks.sql`
 
+Terminology (Phase 3 swaps):
+
+- `*_apply.sql` = materialize generated draft rules into DB scope (pre-review, no review decision application)
+- `*_activation_apply.sql` = apply reviewed CSV decisions and change rule status (`approve -> active`, otherwise `draft`)
+
 Batch01 execution (after MVP is stable):
 
 1. `phase3_rollups_compute.sql`
@@ -322,8 +327,10 @@ Audit columns exported for review and checks:
 
 Execution stop gate for Phase 3.4:
 
-- run generate -> apply -> rescore -> checks
-- stop before activation and hand off the review packet for human decisions
+- run generate -> draft apply -> rescore (Gate A review-packet prep)
+- hand off the review packet for human decision updates
+- run `*_activation_apply.sql` (Gate B) only after review updates are complete
+- run checks after activation (or skip post-activation checks when activation is intentionally deferred)
 
 ## 3.7 Batch03 Direct-Swap Expansion (Single-Review Activation Path)
 
