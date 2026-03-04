@@ -30,24 +30,16 @@ This document defines environment variables used across the current Python/SQL s
 | `CIQUAL_GRP_XML`  | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim_grp` XML override.                     |
 | `SEED_DB_URL`     | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml`                                                  | yes for non-arg usage         | `postgresql://.../fodmap_test`        | Phase3 seed DB connection string.                   |
 
-## CI Turborepo Cache Variables
+## CI Turborepo Cache Contract
 
-These keys are optional and used by `.github/workflows/ci.yml` Turbo-scoped jobs via the
-`.github/actions/setup-js-workspace` composite action.
+Repository-level Turbo secrets are no longer part of the default CI contract for public cutover.
 
-| Variable      | Used by                    | Required | Default/Example     | Notes                                                      |
-| ------------- | -------------------------- | -------- | ------------------- | ---------------------------------------------------------- |
-| `TURBO_TEAM`  | `.github/workflows/ci.yml` | no       | Vercel team slug    | Enables Turbo remote cache when paired with `TURBO_TOKEN`. |
-| `TURBO_TOKEN` | `.github/workflows/ci.yml` | no       | Vercel access token | Enables Turbo remote cache when paired with `TURBO_TEAM`.  |
+Current contract:
 
-When both keys are present, `.github/actions/setup-js-workspace` exports them into the job
-environment and remote cache is enabled for Turbo tasks in that job. When either key is missing,
-CI automatically falls back to local `.turbo` cache restore/save steps.
-
-Planned cutover target (`ADR-018`, not yet fully implemented):
-
-- repository-level `TURBO_TEAM` / `TURBO_TOKEN` will be removed
-- CI will operate in local-cache fallback mode by default unless a new explicit remote-cache policy is approved
+- `.github/workflows/ci.yml` runs in local-cache fallback mode by default (`.turbo` restore/save).
+- `.github/actions/setup-js-workspace` still supports remote cache if Turbo credentials are
+  explicitly provided by a future approved policy.
+- `TURBO_TEAM` / `TURBO_TOKEN` should not be required repository secrets.
 
 CI Turbo command policy:
 
@@ -68,25 +60,21 @@ These keys are optional and used by CI governance helper scripts.
 
 ## CI Storybook Deploy Variables
 
-These keys are required by `.github/workflows/storybook-deploy.yml`.
+These keys are required by `.github/workflows/storybook-deploy.yml` through the
+`vercel-production` environment.
 
-| Variable            | Used by                                  | Required | Default/Example   | Notes                                                                                          |
-| ------------------- | ---------------------------------------- | -------- | ----------------- | ---------------------------------------------------------------------------------------------- |
-| `VERCEL_TOKEN`      | `.github/workflows/storybook-deploy.yml` | yes      | Vercel CLI token  | Auth token for `vercel pull`, `vercel build`, and `vercel deploy` in preview/production lanes. |
-| `VERCEL_ORG_ID`     | `.github/workflows/storybook-deploy.yml` | yes      | `team_...` / user | Vercel scope identifier used by CLI with linked project metadata.                              |
-| `VERCEL_PROJECT_ID` | `.github/workflows/storybook-deploy.yml` | yes      | `prj_...`         | Vercel project identifier for Storybook deployment target.                                     |
+| Variable            | Used by                                  | Required | Default/Example   | Notes                                                                 |
+| ------------------- | ---------------------------------------- | -------- | ----------------- | --------------------------------------------------------------------- |
+| `VERCEL_TOKEN`      | `.github/workflows/storybook-deploy.yml` | yes      | Vercel CLI token  | Auth token for production `vercel pull` and `vercel deploy`.          |
+| `VERCEL_ORG_ID`     | `.github/workflows/storybook-deploy.yml` | yes      | `team_...` / user | Vercel scope identifier used by CLI with linked project metadata.     |
+| `VERCEL_PROJECT_ID` | `.github/workflows/storybook-deploy.yml` | yes      | `prj_...`         | Vercel project identifier for Storybook production deployment target. |
 
 Storybook deploy security notes:
 
-- Preview deployment is skipped for fork PRs to prevent secrets exposure.
+- Storybook deploy runs only on `push` to `main` (no PR preview lane).
+- Secret access is gated by GitHub environment approval (`vercel-production`).
 - Internal-only access enforcement is managed in Vercel project settings:
   - Vercel Authentication
-
-Planned cutover target (`ADR-018`, not yet fully implemented):
-
-- Storybook pull-request preview lane will be removed.
-- Storybook production deploy secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) will move from
-  repository secrets to `vercel-production` environment secrets with reviewer gating.
 
 ## App Runtime Integration Variables (`apps/app`)
 

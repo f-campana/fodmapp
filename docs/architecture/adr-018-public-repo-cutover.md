@@ -4,6 +4,7 @@
 
 - **Accepted** (2026-03-04)
 - Implementation tracked as a documentation-first three-PR sequence.
+- Progress update (PR-2): release permission preflight and Storybook production-only workflow hardening implemented.
 
 ## Context and Current Measured State
 
