@@ -86,9 +86,9 @@ function toThemedScaleRows(
 
   const lightByPath = new Map(lightRows.map((row) => [row.path, row.value]));
   const darkByPath = new Map(darkRows.map((row) => [row.path, row.value]));
-  const paths = [...new Set([...lightByPath.keys(), ...darkByPath.keys()])].sort(
-    (left, right) => naturalTokenPathCompare(left, right),
-  );
+  const paths = [
+    ...new Set([...lightByPath.keys(), ...darkByPath.keys()]),
+  ].sort((left, right) => naturalTokenPathCompare(left, right));
 
   return paths.map((path) => ({
     id: path,
@@ -137,10 +137,9 @@ const requiredSemanticSpacingPaths = [
   "semantic.space.controlY",
   "semantic.space.section",
 ] as const;
-const semanticSpacingByPath = new Map([
-  ...semanticRadiusRows,
-  ...semanticSpaceRows,
-].map((row) => [row.path, row]));
+const semanticSpacingByPath = new Map(
+  [...semanticRadiusRows, ...semanticSpaceRows].map((row) => [row.path, row]),
+);
 
 const maxBreakpointValue = Math.max(
   ...breakpointRows.map((row) => parseNumberish(row.value) ?? 0),
