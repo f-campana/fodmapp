@@ -1,5 +1,11 @@
 # @fodmap/storybook
 
+## 0.1.25
+
+### Patch Changes
+
+- [#180](https://github.com/f-campana/fodmapp/pull/180) [`8c80992`](https://github.com/f-campana/fodmapp/commit/8c8099252642b5e98eb89c3d7e7e11558996173e) Thanks [@f-campana](https://github.com/f-campana)! - Harden Storybook component taxonomy by introducing explicit adapter/foundation/composed/utility title lanes, adding missing utility stories, and enforcing title/component mapping consistency through a CI-checked taxonomy validator.
+
 ## 0.1.24
 
 ### Patch Changes
