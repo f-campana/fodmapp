@@ -68,8 +68,8 @@ jobs:
           const defaultPerm = payload.default_workflow_permissions;
           const canApprove = payload.can_approve_pull_request_reviews;
 
-          if (defaultPerm !== "write") {
-            console.error("::error::Changesets release requires workflow permissions set to 'Read and write'.");
+          if (defaultPerm !== "read" && defaultPerm !== "write") {
+            console.error("::error::Changesets release requires workflow permissions set to either 'Read repository contents' or 'Read and write'.");
             console.error("::error::GitHub UI: Settings > Actions > General > Workflow permissions.");
             process.exit(1);
           }
