@@ -1,5 +1,14 @@
 # @fodmap/storybook
 
+## 0.1.26
+
+### Patch Changes
+
+- [#185](https://github.com/f-campana/fodmapp/pull/185) [`d1014e3`](https://github.com/f-campana/fodmapp/commit/d1014e384c3c5237332af28c9a72564fd36febfc) Thanks [@f-campana](https://github.com/f-campana)! - Reorganize `@fodmap/ui` implementation files into lane folders (`adapter`, `foundation`, `composed`, `utilities`) while keeping public exports stable, and align Storybook taxonomy validation/docs with the new implementation layout contract.
+
+- Updated dependencies [[`d1014e3`](https://github.com/f-campana/fodmapp/commit/d1014e384c3c5237332af28c9a72564fd36febfc)]:
+  - @fodmap/ui@3.13.2
+
 ## 0.1.25
 
 ### Patch Changes
