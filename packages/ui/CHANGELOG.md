@@ -1,5 +1,12 @@
 # @fodmap/ui
 
+## 3.13.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @fodmap/tailwind-config@0.2.5
+
 ## 3.13.0
 
 ### Minor Changes
