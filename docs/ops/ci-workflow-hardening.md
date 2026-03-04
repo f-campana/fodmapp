@@ -15,26 +15,27 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - centralized workspace setup and cache orchestration through `.github/actions/setup-js-workspace`
 - explicit setup-node cache-mode control (`enable-node-cache`) for jobs that intentionally skip dependency installation
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
-- path-scoped Storybook deployment to Vercel with preview (PR) and production (main) lanes
+- path-scoped Storybook deployment to Vercel production lane on `main`
 
-## Planned Public Cutover (ADR-018)
+## Post-Cutover Status (ADR-018)
 
-This runbook now tracks an accepted (not yet fully implemented) public cutover sequence defined by
-`ADR-018`:
+`ADR-018` implementation status at this revision:
 
-1. Documentation-first sequencing (`PR-1` decision record, `PR-2` hardening, remote ops, `PR-3` evidence).
-2. Repository rename target: `f-campana/fodmapp`.
-3. Actions default workflow permission target: `read` (with release workflow compatibility updates).
-4. Storybook deploy target state:
-   - remove PR preview lane
-   - keep production deploy on `main`
-   - gate production deploy secret access through `vercel-production` environment approval.
-5. Secrets posture target state:
-   - remove repository `TURBO_TEAM` / `TURBO_TOKEN`
-   - migrate Vercel deployment secrets from repository scope to environment scope.
+1. Completed in `PR-1`: decision record and documentation-first sequencing (`#177`).
+2. Completed in `PR-2`: release preflight hardening + Storybook production-only workflow (`#178`).
+3. Completed in remote operations:
+   - repository renamed to `f-campana/fodmapp`
+   - repository visibility set to `public`
+   - default Actions workflow permission set to `read`
+   - `Allow GitHub Actions to create and approve pull requests` remains enabled
+   - branch protection applied on `main` with required checks (`CI`, `API`, `Changeset PR Gate`, `Semantic PR Title`)
+   - repository `TURBO_TEAM` / `TURBO_TOKEN` deleted
+   - `vercel-production` environment configured with required reviewer (`f-campana`) and protected-branch deployment policy
+   - secret scanning, push protection, Dependabot security updates, and code scanning default setup enabled
+4. Remaining manual cutover action:
+   - rotate `VERCEL_TOKEN`, set `VERCEL_*` values in `vercel-production` environment secrets, validate deploy, then delete repo-level `VERCEL_*` secrets.
 
-Until `PR-2` and remote cutover operations are complete, the sections below describe current
-implemented behavior on `main`.
+Sections below describe the effective post-cutover workflow contract.
 
 ## Phase 2 Reporting Gate Mode
 
@@ -53,10 +54,11 @@ implemented behavior on `main`.
 
 Required GitHub repository settings:
 
-1. `Settings > Actions > General > Workflow permissions`: set to **Read and write permissions**
+1. `Settings > Actions > General > Workflow permissions`: set to **Read repository contents** (recommended) or **Read and write permissions**
 2. `Settings > Actions > General > Workflow permissions`: enable **Allow GitHub Actions to create and approve pull requests**
 
-The workflow preflight step fails loudly with actionable errors if these settings are not enabled.
+The workflow preflight step now accepts either workflow default permission mode (`read` or `write`)
+and fails loudly only when the setting is invalid or when PR approval creation is disabled.
 
 ## Changeset PR Gate Determinism
 
@@ -131,8 +133,9 @@ The main `CI` workflow now uses a `pr-scope` job to compute execution booleans f
 
 Turbo cache behavior for scoped jobs:
 
-- if both `TURBO_TEAM` and `TURBO_TOKEN` are present, Turbo remote caching is used
-- otherwise, CI restores/saves local `.turbo` cache using `actions/cache/restore@v4` and `actions/cache/save@v4`
+- repository `TURBO_TEAM` / `TURBO_TOKEN` are removed
+- CI defaults to local `.turbo` cache restore/save (`actions/cache/restore@v4` and `actions/cache/save@v4`)
+- if Turbo credentials are explicitly injected in the future, remote cache remains technically supported by the composite action
 
 The composite action (`.github/actions/setup-js-workspace`) centralizes this selection logic and
 exports `TURBO_TEAM` / `TURBO_TOKEN` into the workspace step environment when both values are
@@ -153,7 +156,7 @@ to Vercel with deterministic trigger scope and explicit secret gating.
 
 Trigger policy:
 
-- `pull_request` (preview lane) and `push` to `main` (production lane)
+- `push` to `main` only (production lane)
 - path-scoped to:
   - `apps/storybook/**`
   - `packages/ui/**`
@@ -165,25 +168,19 @@ Trigger policy:
 
 Secrets contract:
 
-- required repository secrets:
+- required environment secrets in `vercel-production`:
   - `VERCEL_TOKEN`
   - `VERCEL_ORG_ID`
   - `VERCEL_PROJECT_ID`
-- workflow fails fast with explicit error if any required secret is missing
+- workflow fails fast with explicit error if any required environment secret is missing
 
 Security contract:
 
-- preview deploy lane runs only for non-fork PRs (secrets-safe)
-- fork PRs emit a dedicated skip job with reason
-- deployment access policy is enforced in Vercel project settings:
-  - Vercel Authentication
+- production deploy lane requires `vercel-production` environment approval before secret access
+- deployment access policy remains enforced in Vercel project settings (Vercel Authentication)
 
 UX contract:
 
-- preview lane upserts a single sticky PR comment (`<!-- storybook-preview-deploy -->`) with:
-  - preview URL
-  - commit SHA
-  - access mode note
 - production lane writes deployment URL + commit SHA to workflow summary
 
 ## Branch Protection Required Checks (`main`)
@@ -192,9 +189,8 @@ Configure `main` to require these checks:
 
 1. `CI`
 2. `API`
-3. `Phase 2 Reporting Gate`
-4. `Semantic PR Title`
-5. `Changeset PR Gate`
+3. `Semantic PR Title`
+4. `Changeset PR Gate`
 
 ## Manual Verification Checklist
 
@@ -215,6 +211,5 @@ Configure `main` to require these checks:
 11. Confirm the next eligible `Changesets release` run can create/update its PR using native token settings.
 12. Before merging any hotfix touching CI, reporting, release, or workflow logic, check for open mergeable changeset/release PRs and record disposition (merge, retarget, or intentionally defer).
 13. After merging to `main`, watch these workflows to completion before closing the incident: `Phase 2 Reporting`, `API`, `CI`, `Changesets release`.
-14. Open a PR touching `apps/storybook/**` and confirm `Storybook Deploy` preview job runs, publishes URL, and updates one sticky comment.
-15. Open a fork PR touching `apps/storybook/**` and confirm preview deploy is skipped with explicit reason.
-16. Merge a Storybook-impacting PR to `main` and confirm `Storybook Deploy` production job publishes and writes URL in job summary.
+14. Open a PR touching `apps/storybook/**` and confirm `Storybook Deploy` does not run (production-only trigger policy).
+15. Merge a Storybook-impacting PR to `main` and confirm `Storybook Deploy` requests `vercel-production` environment approval, then publishes and writes URL in job summary.

@@ -2,8 +2,12 @@
 
 ## Status
 
-- **Accepted** (2026-03-04)
-- Implementation tracked as a documentation-first three-PR sequence.
+- **Implemented** (2026-03-04)
+- Documentation-first sequence completed through:
+  - PR-1 decision record merge: #177 (`2026-03-04T14:01:42Z`)
+  - PR-2 hardening merge: #178 (`2026-03-04T14:13:31Z`)
+- Remote cutover operations executed between `2026-03-04T14:13Z` and `2026-03-04T14:16Z`.
+- Residual follow-up: rotate/migrate `VERCEL_*` secret values to `vercel-production` environment, then delete repository-level `VERCEL_*` secrets.
 
 ## Context and Current Measured State
 
@@ -98,6 +102,38 @@ Execution order is intentionally documentation-first:
 
 This sequence minimizes accidental drift between declared policy and implementation.
 
+## Execution Evidence (PR-3)
+
+### Remote state evidence (post-cutover)
+
+- Repository state (`gh api repos/f-campana/fodmapp`):
+  - `full_name=f-campana/fodmapp`
+  - `visibility=public` / `private=false`
+  - `default_branch=main`
+- Actions workflow defaults (`gh api repos/f-campana/fodmapp/actions/permissions/workflow`):
+  - `default_workflow_permissions=read`
+  - `can_approve_pull_request_reviews=true`
+- Branch protection (`gh api repos/f-campana/fodmapp/branches/main/protection`):
+  - strict status checks: `CI`, `API`, `Changeset PR Gate`, `Semantic PR Title`
+  - required approvals: `1`
+  - conversation resolution: enabled
+  - force push/deletion: disabled
+  - admin enforcement: disabled (admin bypass retained)
+- Environment protection (`gh api repos/f-campana/fodmapp/environments/vercel-production`):
+  - `required_reviewers` includes `f-campana`
+  - deployment policy: protected branches only
+- Security toggles:
+  - `secret_scanning=enabled`
+  - `secret_scanning_push_protection=enabled`
+  - `dependabot_security_updates=enabled`
+  - code scanning default setup `state=configured`
+- Repository secrets (`gh secret list -R f-campana/fodmapp`):
+  - `TURBO_TEAM` and `TURBO_TOKEN`: removed
+  - `VERCEL_*`: still present pending value migration to environment secrets
+- URL/remote verification:
+  - old URL redirects: `https://github.com/f-campana/Fodmap` -> `https://github.com/f-campana/fodmapp`
+  - local `origin`: `https://github.com/f-campana/fodmapp.git`
+
 ## Rollback Criteria and Contingencies
 
 ### Abort criteria during rollout
@@ -125,13 +161,13 @@ This sequence minimizes accidental drift between declared policy and implementat
 
 ## Verification Evidence Checklist (to complete in PR-3)
 
-- [ ] repository visibility is `public`
-- [ ] repository slug is `f-campana/fodmapp`
-- [ ] default Actions workflow permission is `read`
-- [ ] `main` branch protection is active with intended gates
-- [ ] repo-level `TURBO_*` secrets removed
-- [ ] repo-level `VERCEL_*` secrets removed
-- [ ] `vercel-production` environment exists with required secrets and approval gate
-- [ ] Storybook PR preview lane removed
-- [ ] Storybook production lane runs with environment approval
-- [ ] Changesets preflight passes under read-default token policy
+- [x] repository visibility is `public`
+- [x] repository slug is `f-campana/fodmapp`
+- [x] default Actions workflow permission is `read`
+- [x] `main` branch protection is active with intended gates
+- [x] repo-level `TURBO_*` secrets removed
+- [ ] repo-level `VERCEL_*` secrets removed (pending value migration)
+- [ ] `vercel-production` environment has required `VERCEL_*` secrets (pending value migration); approval gate is configured
+- [x] Storybook PR preview lane removed
+- [x] Storybook production lane uses `vercel-production` environment approval
+- [x] Changesets preflight supports read-default token policy (implemented in PR-2)
