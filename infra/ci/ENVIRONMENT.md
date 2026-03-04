@@ -44,6 +44,11 @@ When both keys are present, `.github/actions/setup-js-workspace` exports them in
 environment and remote cache is enabled for Turbo tasks in that job. When either key is missing,
 CI automatically falls back to local `.turbo` cache restore/save steps.
 
+Planned cutover target (`ADR-018`, not yet fully implemented):
+
+- repository-level `TURBO_TEAM` / `TURBO_TOKEN` will be removed
+- CI will operate in local-cache fallback mode by default unless a new explicit remote-cache policy is approved
+
 CI Turbo command policy:
 
 - Turbo-eligible CI commands should use `pnpm exec turbo run ...` so workflows always resolve the pinned local Turbo version.
@@ -76,6 +81,12 @@ Storybook deploy security notes:
 - Preview deployment is skipped for fork PRs to prevent secrets exposure.
 - Internal-only access enforcement is managed in Vercel project settings:
   - Vercel Authentication
+
+Planned cutover target (`ADR-018`, not yet fully implemented):
+
+- Storybook pull-request preview lane will be removed.
+- Storybook production deploy secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) will move from
+  repository secrets to `vercel-production` environment secrets with reviewer gating.
 
 ## App Runtime Integration Variables (`apps/app`)
 

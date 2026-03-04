@@ -1,6 +1,6 @@
 # CI Workflow Hardening Runbook
 
-Last updated: 2026-03-02
+Last updated: 2026-03-04
 
 ## Scope
 
@@ -16,6 +16,25 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit setup-node cache-mode control (`enable-node-cache`) for jobs that intentionally skip dependency installation
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel with preview (PR) and production (main) lanes
+
+## Planned Public Cutover (ADR-018)
+
+This runbook now tracks an accepted (not yet fully implemented) public cutover sequence defined by
+`ADR-018`:
+
+1. Documentation-first sequencing (`PR-1` decision record, `PR-2` hardening, remote ops, `PR-3` evidence).
+2. Repository rename target: `f-campana/fodmapp`.
+3. Actions default workflow permission target: `read` (with release workflow compatibility updates).
+4. Storybook deploy target state:
+   - remove PR preview lane
+   - keep production deploy on `main`
+   - gate production deploy secret access through `vercel-production` environment approval.
+5. Secrets posture target state:
+   - remove repository `TURBO_TEAM` / `TURBO_TOKEN`
+   - migrate Vercel deployment secrets from repository scope to environment scope.
+
+Until `PR-2` and remote cutover operations are complete, the sections below describe current
+implemented behavior on `main`.
 
 ## Phase 2 Reporting Gate Mode
 
