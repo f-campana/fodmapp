@@ -544,6 +544,77 @@ Batch C SQL checks enforce post-ingestion:
 - rank `3` has zero blocked missing subtype rows
 - low-coverage target rows across batch01+batch02+batch03 remain `<= 12`
 
+## 3.6d Composition-Zero Batch01 (Research-First, Strict Gates)
+
+Scope lock (current pilot-universe eligible cohort rows):
+
+- rank `3` `phase2-ail-infuse-huile` (`cohort_oil_fat`)
+
+Observed pilot-universe cohort availability:
+
+- `cohort_oil_fat`: in-scope (`rank=3`)
+- `cohort_plain_protein`: no eligible rows in current 42-food universe
+
+Artifacts:
+
+- research matrix:
+  - `etl/phase3/research/phase3_composition_zero_batch01_matrix_v1.csv`
+- research report:
+  - `etl/phase3/research/phase3_composition_zero_batch01_report_v1.md`
+- evidence ledger:
+  - `etl/phase3/research/phase3_composition_zero_batch01_evidence_ledger_v1.csv`
+- curated ingestion input:
+  - `etl/phase3/data/phase3_composition_zero_batch01_measurements_v1.csv`
+- SQL flow:
+  - `phase3_composition_zero_batch01_apply.sql`
+  - `phase3_rollups_compute.sql`
+  - `phase3_rollups_6subtype_checks.sql`
+  - `phase3_composition_zero_batch01_checks.sql`
+
+Locked Batch01 promotion contract:
+
+1. one approved food scope row (`rank=3`) expanded to all six subtype rows
+2. six required subtype rows:
+   - `fructan`, `fructose`, `gos`, `lactose`, `mannitol`, `sorbitol`
+3. per-row value contract:
+   - `amount_raw='0'`
+   - `comparator='eq'`
+   - `amount_g_per_100g=0`
+   - `amount_g_per_serving=0`
+4. method/source/evidence contract:
+   - `method='expert_estimate'`
+   - `source_slug='internal_rules_v1'`
+   - `evidence_tier='inferred'`
+   - `confidence_score=0.950` (oil cohort in Batch01)
+5. notes marker contract:
+   - `composition_zero_batch01_v1:cohort_oil_fat;gate:single_ingredient=1;gate:processing_risk=0`
+
+Blocked taxonomy contract (when blocked rows are present):
+
+- allowed:
+  - `not_single_ingredient_food`
+  - `processing_risk_additives`
+  - `missing_official_support`
+  - `evidence_conflict_not_promotable`
+  - `unknown_identity_or_prep`
+- forbidden:
+  - `insufficient_variant_specific_evidence`
+
+Execution notes:
+
+- only rows with `measurement_found=true` are ingested
+- additive-only scope: Batch01 deletes/replaces only prior rows tagged `composition_zero_batch01_v1:%`
+- rank `2` exclusion remains mandatory
+- explicit precedence remains mandatory (`signal_source_kind='explicit_measurement'`)
+
+Human stop gate (mandatory before apply):
+
+- review matrix/report/ledger/measurements draft as a single packet
+- confirm Batch01 intentionally includes only the oil cohort in current pilot scope
+- confirm source policy:
+  - official sources for promotable rows
+  - secondary sources narrative-only in report/ledger
+
 ## 3.2b.1 CI Seeded Integration Pipeline
 
 CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:

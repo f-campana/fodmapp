@@ -1,0 +1,11 @@
+priority_rank,food_slug,subtype_code,claim_id,source_url,source_tier,decision,decision_reason,notes
+3,phase2-ail-infuse-huile,fructan,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,gos,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,sorbitol,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,mannitol,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,fructose,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,lactose,C02,https://www.monashfodmap.com/blog/navigating-proteins-on-the-low-fodmap-diet/,official,promote,composition_zero_supported,"oil cohort composition inference"
+3,phase2-ail-infuse-huile,all,C03,https://www.monashfodmap.com/about-fodmap-and-ibs/high-and-low-fodmap-foods/,official,guardrail,processing_caveat_enforced,"token screen + ambiguity default block"
+3,phase2-ail-infuse-huile,all,C04,https://www.monashfodmap.com/blog/does-food-not-listed-in-app-mean-you-can-eat-it/,official,guardrail,unknown_food_not_auto_safe,"lane remains strict and explicit"
+3,phase2-ail-infuse-huile,all,C05,https://www.fodmapeveryday.com/monash-university-low-fodmap-lab-testing-explained/,secondary,context_only,secondary_narrative_only,"not promotable evidence"
+3,phase2-ail-infuse-huile,all,C06,https://pmc.ncbi.nlm.nih.gov/articles/PMC7690730/,secondary,context_only,clinical_background_only,"not promotable evidence"
