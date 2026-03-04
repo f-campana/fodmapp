@@ -39,7 +39,7 @@ Current contract:
 - `.github/workflows/ci.yml` runs in local-cache fallback mode by default (`.turbo` restore/save).
 - `.github/actions/setup-js-workspace` still supports remote cache if Turbo credentials are
   explicitly provided by a future approved policy.
-- `TURBO_TEAM` / `TURBO_TOKEN` should not be required repository secrets.
+- `TURBO_TEAM` / `TURBO_TOKEN` are removed from repository secrets as of `2026-03-04`.
 
 CI Turbo command policy:
 
@@ -75,6 +75,14 @@ Storybook deploy security notes:
 - Secret access is gated by GitHub environment approval (`vercel-production`).
 - Internal-only access enforcement is managed in Vercel project settings:
   - Vercel Authentication
+
+Cutover execution note (`2026-03-04`):
+
+- `vercel-production` environment and approval gate are configured.
+- Repository-level `VERCEL_*` secrets are still present during migration because secret values
+  cannot be exported via GitHub API for automatic transfer.
+- Finalization step: rotate `VERCEL_TOKEN`, set `VERCEL_*` as environment secrets, validate deploy,
+  then delete repo-level `VERCEL_*`.
 
 ## App Runtime Integration Variables (`apps/app`)
 

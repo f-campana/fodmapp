@@ -30,7 +30,7 @@ Status definitions:
 | ADR-016  | Data-engine pause after Batch C due second-review bottleneck                                          | Implemented | Batch04 probe shows 0 single-review candidates; issue #26 remains sole open blocker                                                                                           |
 | ADR-017  | Security & encryption architecture for mobile offline/online architecture                             | Implemented | Source-of-truth backend with encrypted local store concepts, signed offline queue contracts, and deletion/export workflow controls now implemented in production-facing paths |
 | ADR-017b | Security launch-blocking implementation spec for consent evidence, export/delete, and queue integrity | Implemented | Adds production-grade API + DB contracts for immutable consent ledger, deletion/export proofs, queue replay/tamper defenses, and P1 evidence gating                           |
-| ADR-018  | Documentation-first hardening and public cutover (`Fodmap` -> `fodmapp`)                              | Accepted    | Cutover staged as PR-1 decision record, PR-2 hardening, remote ops, PR-3 evidence closure                                                                                     |
+| ADR-018  | Documentation-first hardening and public cutover (`Fodmap` -> `fodmapp`)                              | Implemented | PR-1 merged (#177), PR-2 merged (#178), remote cutover executed; residual manual step: migrate `VERCEL_*` values to environment scope and delete repo-level copies.           |
 
 ## Open Timing Decisions
 
