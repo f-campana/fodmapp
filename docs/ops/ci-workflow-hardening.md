@@ -1,5 +1,11 @@
 # CI Workflow Hardening Runbook
 
+Status: Implemented
+Audience: Maintainer or operator; Reviewer or auditor
+Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.
+Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
+Last reviewed: 2026-03-08
+
 Last updated: 2026-03-04
 
 ## Scope
@@ -17,6 +23,14 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
 - API workflow job timeouts to fail fast on stalled runner container initialization
+
+## Preconditions
+
+- Work from a dedicated worktree branched from the intended base branch.
+- Sync repository dependencies before validation with `pnpm install`.
+- When CI semantics or environment contracts change, update `infra/ci/ENVIRONMENT.md` in the same
+  PR when applicable.
+- Run `./.github/scripts/quality-gate.sh --full` before requesting merge.
 
 ## Post-Cutover Status (ADR-018)
 
@@ -207,7 +221,7 @@ Configure `main` to require these checks:
 3. `Semantic PR Title`
 4. `Changeset PR Gate`
 
-## Manual Verification Checklist
+## Validation
 
 1. Open a docs-only PR.
 2. Confirm scoped Turbo jobs are skipped and `CI` still passes.
