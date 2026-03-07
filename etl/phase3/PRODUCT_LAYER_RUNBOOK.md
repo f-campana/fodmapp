@@ -1,5 +1,11 @@
 # Phase 3 Product Layer Runbook (SQL MVP)
 
+Status: Implemented
+Audience: Data or workflow operator; Maintainer or operator; Reviewer or auditor
+Scope: SQL-first execution, activation gates, API read-layer dependencies, and validation contracts for the Phase 3 product layer.
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)
+Last reviewed: 2026-03-08
+
 This runbook defines the SQL-first product-layer execution on top of completed Phase 2 data.
 
 ## Scope
@@ -20,6 +26,15 @@ Out of scope:
 
 - CI/bootstrap hosting
 - rank 2 (garlic powder) rule activation before re-verification
+
+## Preconditions
+
+- Run against `fodmap_test` or an equivalent seeded database with completed Phase 2 prerequisites.
+- Keep rank 2 excluded from generation, apply, activation, and API-facing swap flows.
+- Treat review CSVs as gate inputs: Gate B cannot run until the relevant review file is updated by
+  a human reviewer.
+- Recompute rollups before any activation or API validation step that depends on refreshed
+  measurements or thresholds.
 
 ## Current Canonical State (Post Batch C Closeout)
 
@@ -144,6 +159,15 @@ Batch01 execution (after MVP is stable):
 8. `phase3_swap_rules_batch01_activation_apply.sql`
 9. `phase3_swap_rules_batch01_checks.sql`
 10. rerun 8 and 9 for idempotency
+
+## Validation
+
+- Every execution lane must pass its paired checks after materialization and again after
+  idempotency reruns where defined.
+- Gate B activation steps must fail fast on snapshot-lock mismatches rather than mutating rule
+  status.
+- API freshness validation requires rerunning `phase3_rollups_compute.sql` and
+  `phase3_rollups_6subtype_checks.sql` before serving updated rollup-dependent responses.
 
 ## MVP Locks
 

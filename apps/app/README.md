@@ -1,8 +1,14 @@
 # @fodmap/app
 
+Status: Implemented
+Audience: Contributor or engineer; Product or design collaborator
+Scope: Current app scaffold scope, runtime integrations, and zero-credential behavior contract.
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/README.md](../../docs/README.md)
+Last reviewed: 2026-03-08
+
 Architecture-first Next.js scaffold for the product app.
 
-## Scope In This PR
+## Current Scope
 
 1. Minimal public route (`/`) and gated-area placeholder route (`/espace`).
 2. FR-first copy with EN-ready dictionary structure.
@@ -15,7 +21,7 @@ Architecture-first Next.js scaffold for the product app.
    - consent (`Axeptio`) deferred no-op adapter
 6. Route smoke tests for `/` and `/espace`.
 
-## Out Of Scope In This PR
+## Out Of Scope
 
 1. Business logic and data-fetch flows.
 2. Full production auth flows and consent policy orchestration.

@@ -1,5 +1,11 @@
 # FODMAP API (v0)
 
+Status: Implemented
+Audience: Contributor or engineer; Data or workflow operator
+Scope: Setup, local execution, test flow, and OpenAPI contract entry point for the read-only API.
+Related docs: [docs/foundation/project-definition.md](../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../docs/foundation/documentation-personas.md), [docs/README.md](../docs/README.md)
+Last reviewed: 2026-03-08
+
 Read-only FastAPI service exposing Phase 3 product-layer data:
 
 - food metadata by `food_slug`
