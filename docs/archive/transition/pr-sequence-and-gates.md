@@ -1,3 +1,9 @@
+# Historical Record
+
+This file is archived for traceability only.
+Former active path: `docs/transition/pr-sequence-and-gates.md`.
+Link to this archive path directly when historical context is required.
+
 # PR Sequence And Gates
 
 This document tracks what is already landed and what remains as the next gated options.

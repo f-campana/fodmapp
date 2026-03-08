@@ -1,7 +1,8 @@
-# Historical / Superseded Artifact
+# Historical Record
 
 This file is archived for traceability only.
-Canonical active source: [`docs/transition/pr4-runtime-integrations-plan.md`](../../transition/pr4-runtime-integrations-plan.md).
+Former active path: `docs/transition/pr4-runtime-integrations-plan.md`.
+Link to this archive path directly when historical context is required.
 
 # PR-4 Runtime Integrations Plan (`apps/app`)
 

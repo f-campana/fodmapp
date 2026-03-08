@@ -1,5 +1,13 @@
 # Phase2 Reporting Review Checkpoint
 
+Status: In progress
+
+Role in reporting docs set:
+
+- This file is the subordinate gate and evidence record for the active reporting track.
+- `docs/plans/phase2-reporting-implementation-plan.md` remains the canonical active plan.
+- `docs/plans/phase2-reporting-task-breakdown.md` remains the subordinate execution checklist.
+
 ## Scope
 
 - Branch: `codex/phase2-reporting-phase4-delivery`

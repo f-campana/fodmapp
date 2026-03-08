@@ -55,7 +55,7 @@ Reference files:
 3. `apps/app/lib/i18n.ts`
 4. `apps/app/lib/consent.ts`
 5. `apps/app/lib/analytics.ts`
-6. `docs/transition/current-state-snapshot.md`
+6. `docs/transition/current-state.md`
 
 ## 5. Onboarding Flow (V1)
 

@@ -1,5 +1,13 @@
 # Phase 2 Reporting Task Breakdown
 
+Status: In progress
+
+Role in reporting docs set:
+
+- This file is the subordinate execution checklist for the active reporting track.
+- `docs/plans/phase2-reporting-implementation-plan.md` remains the canonical active plan.
+- `docs/plans/phase2-reporting-review-checkpoint.md` records gate outcomes and evidence.
+
 ## Execution mode
 
 - now: release-critical

@@ -1,7 +1,8 @@
-# Historical / Superseded Artifact
+# Historical Record
 
 This file is archived for traceability only.
-Canonical active source: [`docs/transition/sprint-planning-handoff.md`](../../transition/sprint-planning-handoff.md).
+Former active path: `docs/transition/sprint-planning-handoff.md`.
+Link to this archive path directly when historical context is required.
 
 # Sprint Planning Handoff (Architecture And Scaffolding)
 
@@ -151,8 +152,8 @@ Minimum validation references to include in sprint plan:
 
 1. `/Users/fabiencampana/Documents/fodmapp/docs/architecture/boundaries-and-contracts.md`
 2. `/Users/fabiencampana/Documents/fodmapp/docs/architecture/decision-register.md`
-3. `/Users/fabiencampana/Documents/fodmapp/docs/transition/current-state-snapshot.md`
-4. `/Users/fabiencampana/Documents/fodmapp/docs/transition/pr-sequence-and-gates.md`
+3. `/Users/fabiencampana/Documents/fodmapp/docs/archive/transition/current-state-snapshot.md`
+4. `/Users/fabiencampana/Documents/fodmapp/docs/archive/transition/pr-sequence-and-gates.md`
 5. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/strategy.md`
 6. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/tailwind-v4-token-architecture.md`
 7. `/Users/fabiencampana/Documents/fodmapp/docs/frontend/shadcn-bootstrap-plan.md`
