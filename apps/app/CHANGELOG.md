@@ -1,5 +1,11 @@
 # @fodmap/app
 
+## 0.1.26
+
+### Patch Changes
+
+- [#194](https://github.com/f-campana/fodmapp/pull/194) [`be2d2a4`](https://github.com/f-campana/fodmapp/commit/be2d2a4762a51a01ac4841677d60eecfb9bbab32) Thanks [@f-campana](https://github.com/f-campana)! - Align the app README with the repository documentation metadata contract and canonical routing model.
+
 ## 0.1.25
 
 ### Patch Changes
