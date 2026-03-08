@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-04
+Last reviewed: 2026-03-08
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -59,9 +59,9 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-prototype-alt-prototype-v3` | `codex/mobile-prototype-alt-prototype-v3` | active             | Mobile prototype alt iteration v3                                                    | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-research-realignment`       | `codex/mobile-research-realignment`       | active (to split)  | Mobile research + ADR + implementation                                               | Planned split into dedicated worktrees by scope.                    |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-research-docs-extract`      | `codex/mobile-research-docs-extract`      | active             | Mobile docs extract (ADR-017/017b + alignment/control plan)                          | Split from `codex/mobile-research-realignment` for focused docs PR. |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-foundation-canon`             | `codex/docs-foundation-canon`             | active             | Canonical project definition and documentation persona baseline                      | In progress.                                                        |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-frontdoor-routing`            | `codex/docs-frontdoor-routing`            | active             | Root README and docs index routing aligned to foundation canon                       | In progress.                                                        |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-entrypoint-alignment`         | `codex/docs-entrypoint-alignment`         | active             | Metadata and authority alignment for high-traffic active docs                        | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-foundation-canon`             | `codex/docs-foundation-canon`             | merged             | Canonical project definition and documentation persona baseline                      | Merged via PR #192; worktree removed.                               |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-frontdoor-routing`            | `codex/docs-frontdoor-routing`            | merged             | Root README and docs index routing aligned to foundation canon                       | Merged via PR #193; worktree removed.                               |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-entrypoint-alignment`         | `codex/docs-entrypoint-alignment`         | merged             | Metadata and authority alignment for high-traffic active docs                        | Merged via PR #194 and release PR #195; worktree removed.           |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`           | active             | Revolut research reporting                                                           | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`  | active             | Deterministic changeset gate remediation                                             | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`           | active             | Turbo audit remediation                                                              | Cache correctness, CI cache, PR scope, scripts.                     |
