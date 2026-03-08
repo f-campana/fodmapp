@@ -7,6 +7,10 @@ Status: Planned (deferred)
 
 The current pass focuses on targeted public-readiness cleanup to avoid coupling a broad information-architecture rewrite to immediate repository hardening and contributor intake controls.
 
+Foundation canon now lives in `docs/foundation/`; future IA work should build routing and
+placement rules on top of that canon rather than redefining project identity or documentation
+personas.
+
 ## Rewrite Goals (Future Pass)
 
 1. Redesign `/docs` information architecture with clear owner boundaries.

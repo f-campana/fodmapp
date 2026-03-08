@@ -1,6 +1,6 @@
 # FODMAP Documentation Index
 
-Last updated: 2026-03-04
+Last updated: 2026-03-08
 
 This `/docs` tree is the operational and architectural source of truth for this repository.
 It includes active guidance, accepted/implemented decisions, and archived historical material.
@@ -15,6 +15,8 @@ It includes active guidance, accepted/implemented decisions, and archived histor
 
 ## Structure
 
+- `foundation/`
+  - Project definition and documentation-system governance canon.
 - `architecture/`
   - ADRs, decision register, and cross-layer contracts.
 - `ops/`
@@ -39,6 +41,8 @@ Archived copies in `docs/archive/transition/*` are explicitly marked as historic
 
 ## Public Repository Notes
 
+- Project identity and documentation-governance canon live in:
+  - `docs/foundation/README.md`
 - Public-facing repository policy and intake guidance live in:
   - `README.md`
   - `CONTRIBUTING.md`
