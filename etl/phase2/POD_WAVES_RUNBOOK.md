@@ -1,6 +1,19 @@
 # Phase 2 Pod Waves Runbook
 
+Status: Implemented
+Audience: Data or workflow operator; Maintainer or operator
+Scope: Wave-by-wave execution contract for Phase 2 priority-food resolution after rank2 quarantine.
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)
+Last reviewed: 2026-03-08
+
 This runbook defines pod-wave execution after rank2 garlic powder quarantine.
+
+## Preconditions
+
+- Run against the intended replay or working database with the canonical schema loaded.
+- Complete human review for the wave decision and data artifacts before any mutating apply step.
+- Preserve the rank2 quarantine contract throughout all wave and replay operations.
+- Capture apply and checks outputs for PR evidence before moving to the next wave.
 
 ## Pod model
 
@@ -117,6 +130,15 @@ Note: rank `34` is intentionally excluded because it is already resolved and ing
 4. Re-run `phase2_<wave_key>_apply.sql` to validate idempotency.
 5. Re-run `phase2_<wave_key>_checks.sql`.
 6. Capture outputs in PR and proceed to next wave (or replay-gap remediation once all waves are complete).
+
+## Validation
+
+- Every executed wave must pass its paired `phase2_<wave_key>_checks.sql` script twice: once after
+  first apply and once after idempotency re-apply.
+- Expected rank locks, resolved or unresolved counts, and quarantine checks must match the active
+  wave contract in this document.
+- Replay remediation is complete only when `phase2_replay_final_checks.sql` passes against a
+  from-zero rebuild.
 
 ## Replay-gap remediation workflow (from-zero deterministic replay)
 
