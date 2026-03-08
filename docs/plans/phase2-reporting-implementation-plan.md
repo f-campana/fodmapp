@@ -1,5 +1,13 @@
 # Phase 2 Reporting Implementation Plan v4
 
+Status: In progress
+
+Role in reporting docs set:
+
+- This file is the canonical active plan for the reporting delivery track.
+- `docs/plans/phase2-reporting-task-breakdown.md` is the subordinate execution checklist.
+- `docs/plans/phase2-reporting-review-checkpoint.md` is the subordinate gate and evidence record.
+
 ## Scope and intent
 
 - Objective: implement deterministic reporting for the finalized now-set and establish the execution skeleton for next/backlog items.

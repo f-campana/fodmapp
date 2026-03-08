@@ -1,7 +1,8 @@
-# Historical / Superseded Artifact
+# Historical Record
 
 This file is archived for traceability only.
-Canonical active source: [`docs/transition/architecture-scaffolding-sprint-plan.md`](../../transition/architecture-scaffolding-sprint-plan.md).
+Former active path: `docs/transition/architecture-scaffolding-sprint-plan.md`.
+Link to this archive path directly when historical context is required.
 
 # Architecture Scaffolding Sprint Plan
 
