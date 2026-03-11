@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-08
+Last reviewed: 2026-03-11
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -63,7 +63,7 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-frontdoor-routing`            | `codex/docs-frontdoor-routing`            | merged             | Root README and docs index routing aligned to foundation canon                       | Merged via PR #193; worktree removed.                               |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-entrypoint-alignment`         | `codex/docs-entrypoint-alignment`         | merged             | Metadata and authority alignment for high-traffic active docs                        | Merged via PR #194 and release PR #195; worktree removed.           |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-lifecycle-classification`     | `codex/docs-lifecycle-classification`     | merged             | Transition, plans, research, and archive lifecycle classification                    | Merged via PR #197; worktree removed.                               |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-pr-governance`                | `codex/docs-pr-governance`                | active             | PR template and contributing rules for canonical-doc governance reporting            | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/docs-pr-governance`                | `codex/docs-pr-governance`                | merged             | PR template and contributing rules for canonical-doc governance reporting            | Merged via PR #199; worktree removed.                               |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`           | active             | Revolut research reporting                                                           | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`  | active             | Deterministic changeset gate remediation                                             | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`           | active             | Turbo audit remediation                                                              | Cache correctness, CI cache, PR scope, scripts.                     |
