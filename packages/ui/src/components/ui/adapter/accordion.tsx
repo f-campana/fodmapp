@@ -25,7 +25,7 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
-      className={cn("border-b border-border", className)}
+      className={cn("border-b border-border last:border-b-0", className)}
       {...props}
     />
   );
@@ -45,9 +45,11 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group inline-flex flex-1 items-center justify-between gap-2 rounded-[calc(var(--radius)-0.25rem)] py-4 text-left text-sm font-medium",
+          "group inline-flex flex-1 items-center justify-between gap-2 rounded-[calc(var(--radius)-0.25rem)] p-2 text-left text-sm font-medium",
           "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-          "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
+          "hover:bg-accent hover:text-foreground",
+          "data-[state=open]:bg-accent data-[state=open]:font-semibold data-[state=open]:text-foreground",
+          "outline-hidden focus-visible:ring-2 focus-visible:ring-ring-soft",
           "disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
@@ -56,7 +58,7 @@ function AccordionTrigger({
         {children}
         <svg
           aria-hidden="true"
-          className="size-4 shrink-0 text-muted-foreground transition-transform duration-(--transition-duration-interactive) ease-(--transition-timing-interactive) group-data-[state=open]:rotate-180"
+          className="size-4 shrink-0 text-muted-foreground transition-transform duration-(--transition-duration-interactive) ease-(--transition-timing-interactive) group-hover:text-foreground group-data-[state=open]:rotate-180 group-data-[state=open]:text-foreground"
           fill="none"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +97,7 @@ function AccordionContent({
     >
       <div
         data-slot="accordion-content-inner"
-        className="pt-0 pb-4 text-muted-foreground"
+        className="p-2 text-muted-foreground"
       >
         {children}
       </div>
