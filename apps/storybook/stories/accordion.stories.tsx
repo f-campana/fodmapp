@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import type { ReactNode } from "react";
 import { expect, userEvent, within } from "storybook/test";
 
 import {
@@ -9,12 +10,22 @@ import {
   AccordionTrigger,
 } from "@fodmap/ui";
 
-import { StoryFrame } from "./story-frame";
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function AccordionAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-accordion-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
 
 const meta = {
   title: "Primitives/Adapter/Accordion",
   component: Accordion,
-  tags: ["autodocs"],
   argTypes: {
     type: {
       description: "Accordion mode: one item or many items opened at a time.",
@@ -53,6 +64,12 @@ const meta = {
   parameters: {
     controls: { expanded: true },
     layout: "padded",
+    a11y: {
+      test: "error",
+      context: {
+        include: ["[data-accordion-audit-root]"],
+      },
+    },
   },
 } satisfies Meta<typeof Accordion>;
 
@@ -141,12 +158,96 @@ function CollapsibleAccordion() {
   );
 }
 
+function ResponsiveStressAccordion(args: Story["args"]) {
+  const disabled = args?.disabled ?? false;
+  const dir = args?.dir ?? "ltr";
+
+  return (
+    <Accordion
+      collapsible
+      defaultValue="item-1"
+      disabled={disabled}
+      dir={dir}
+      type="single"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>
+          Quels aliments à faible teneur en FODMAP pouvez-vous préparer à
+          l&apos;avance pour un déjeuner transportable pendant une semaine très
+          chargée ?
+        </AccordionTrigger>
+        <AccordionContent>
+          Préparez une base simple la veille, répartissez-la en portions
+          individuelles et ajoutez au dernier moment les éléments fragiles pour
+          conserver une texture agréable et limiter les écarts de tolérance.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>
+          Comment réintroduire progressivement plusieurs légumes cuits sans
+          perdre en lisibilité lorsque l&apos;intitulé de la section devient plus
+          long sur mobile ?
+        </AccordionTrigger>
+        <AccordionContent>
+          Commencez par une portion modeste, gardez une seule variable nouvelle
+          par repas et notez la tolérance sur plusieurs jours avant d&apos;augmenter
+          la variété ou le volume.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+}
+
 export const Default: Story = {
   render: (args) => (
-    <StoryFrame maxWidth="xl">
+    <AccordionAuditFrame maxWidth="xl">
       <DefaultAccordion {...args} />
-    </StoryFrame>
+    </AccordionAuditFrame>
   ),
+};
+
+export const OnSurface: Story = {
+  render: (args) => (
+    <AccordionAuditFrame maxWidth="xl" surface>
+      <DefaultAccordion {...args} />
+    </AccordionAuditFrame>
+  ),
+};
+
+export const Multiple: Story = {
+  render: () => (
+    <AccordionAuditFrame maxWidth="xl">
+      <MultipleAccordion />
+    </AccordionAuditFrame>
+  ),
+};
+
+export const Collapsible: Story = {
+  render: () => (
+    <AccordionAuditFrame maxWidth="xl">
+      <CollapsibleAccordion />
+    </AccordionAuditFrame>
+  ),
+};
+
+export const DarkMode: Story = {
+  ...Default,
+  globals: {
+    theme: "dark",
+  },
+};
+
+export const InteractionChecks: Story = {
+  render: (args) => (
+    <AccordionAuditFrame maxWidth="xl">
+      <DefaultAccordion {...args} />
+    </AccordionAuditFrame>
+  ),
+  parameters: {
+    docs: {
+      disable: true,
+    },
+  },
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='accordion']");
@@ -156,8 +257,13 @@ export const Default: Story = {
 
     await expect(root).toHaveAttribute("data-slot", "accordion");
     await expect(trigger).toHaveAttribute("data-slot", "accordion-trigger");
+    await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("min-h-11");
     await expect(trigger.className).toContain("focus-visible:ring-ring-soft");
     await expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
+    await expect(trigger.className).not.toContain(
+      "rounded-[calc(var(--radius)-0.25rem)]",
+    );
 
     await userEvent.click(trigger);
 
@@ -188,33 +294,10 @@ export const Default: Story = {
   },
 };
 
-export const OnSurface: Story = {
+export const ResponsiveStress: Story = {
   render: (args) => (
-    <StoryFrame maxWidth="xl" surface>
-      <DefaultAccordion {...args} />
-    </StoryFrame>
+    <AccordionAuditFrame maxWidth="sm">
+      <ResponsiveStressAccordion {...args} />
+    </AccordionAuditFrame>
   ),
-};
-
-export const Multiple: Story = {
-  render: () => (
-    <StoryFrame maxWidth="xl">
-      <MultipleAccordion />
-    </StoryFrame>
-  ),
-};
-
-export const Collapsible: Story = {
-  render: () => (
-    <StoryFrame maxWidth="xl">
-      <CollapsibleAccordion />
-    </StoryFrame>
-  ),
-};
-
-export const DarkMode: Story = {
-  ...Default,
-  globals: {
-    theme: "dark",
-  },
 };

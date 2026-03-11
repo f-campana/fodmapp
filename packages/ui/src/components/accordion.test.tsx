@@ -90,17 +90,30 @@ describe("Accordion", () => {
       "[data-slot='accordion-content-inner']",
     );
 
+    expect(item?.className ?? "").toContain("overflow-hidden");
+    expect(item?.className ?? "").toContain("border-b");
     expect(item?.className ?? "").toContain("border-border");
+    expect(item?.className ?? "").toContain("first-of-type:rounded-t-(--radius)");
+    expect(item?.className ?? "").toContain("last:rounded-b-(--radius)");
     expect(item?.className ?? "").toContain("last:border-b-0");
+    expect(trigger.className).toContain("cursor-pointer");
+    expect(trigger.className).toContain("min-h-11");
     expect(trigger.className).toContain("p-2");
+    expect(trigger.className).toContain("text-base");
+    expect(trigger.className).toContain("leading-6");
     expect(trigger.className).toContain("hover:bg-accent");
     expect(trigger.className).toContain("hover:text-foreground");
     expect(trigger.className).toContain("data-[state=open]:bg-accent");
     expect(trigger.className).toContain("data-[state=open]:text-foreground");
     expect(trigger.className).toContain("data-[state=open]:font-semibold");
     expect(trigger.className).toContain("focus-visible:ring-ring-soft");
+    expect(trigger.className).not.toContain(
+      "rounded-[calc(var(--radius)-0.25rem)]",
+    );
     expect(trigger.className).not.toContain("focus-visible:border-ring");
     expect(contentInner?.className ?? "").toContain("p-2");
+    expect(contentInner?.className ?? "").toContain("text-base");
+    expect(contentInner?.className ?? "").toContain("leading-7");
     expect(content?.className ?? "").toContain(
       "data-[state=open]:animate-accordion-down",
     );

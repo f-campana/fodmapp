@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@storybook/addon-a11y": "10.2.14",
+    "@storybook/addon-docs": "10.2.14",
     "@storybook/react-vite": "10.2.14",
     "@storybook/test-runner": "0.24.2",
     "@types/react": "19.2.14",

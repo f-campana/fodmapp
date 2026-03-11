@@ -1,0 +1,62 @@
+import { Canvas, Meta, Subtitle, Title } from "@storybook/addon-docs/blocks";
+
+import * as AccordionStories from "./accordion.stories";
+
+<Meta of={AccordionStories} />
+
+<Title />
+<Subtitle>
+  Use accordion to progressively reveal related content without hiding
+  information users need to compare at once.
+</Subtitle>
+
+## When to use
+
+Use accordion when a page contains related sections that benefit from
+progressive disclosure, such as preparation tips, substitution guidance, or
+short operational checklists.
+
+Avoid accordion when users need to compare most sections at the same time, scan
+every answer quickly, or keep multiple chunks of content open while making a
+decision.
+
+<Canvas of={AccordionStories.Default} />
+
+## Behavior Modes
+
+`single` keeps one item open at a time. `multiple` supports side-by-side
+comparison. `collapsible` allows a single accordion to return to a fully closed
+state.
+
+<Canvas of={AccordionStories.Multiple} />
+<Canvas of={AccordionStories.Collapsible} />
+
+## Composition Patterns
+
+Use the bare block pattern when accordion is part of the page flow. Use the
+surface composition when the content belongs inside a card, panel, or inset
+container.
+
+<Canvas of={AccordionStories.OnSurface} />
+
+## Accessibility Contract
+
+This accordion follows the standard accordion pattern:
+
+- each trigger is a button inside a heading
+- keyboard users can move between triggers with arrow keys
+- expanded state is exposed with `aria-expanded`
+- each trigger controls a labelled region
+- focus remains visible in light and dark themes
+- trigger targets are sized to a `44px` minimum height baseline
+
+## Responsive Notes
+
+Long labels are allowed to wrap. The chevron should stay visible, spacing should
+remain readable at narrow widths, and no horizontal overflow should appear in
+light, dark, or surfaced contexts.
+
+The example below is an engineering reference used to pressure-test long copy on
+small widths. It is not the primary product showcase.
+
+<Canvas of={AccordionStories.ResponsiveStress} />
