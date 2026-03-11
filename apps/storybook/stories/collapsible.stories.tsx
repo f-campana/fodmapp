@@ -8,6 +8,8 @@ import {
   CollapsibleTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame } from "./story-frame";
+
 const meta = {
   title: "Primitives/Adapter/Collapsible",
   component: Collapsible,
@@ -40,6 +42,7 @@ const meta = {
   },
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
   },
 } satisfies Meta<typeof Collapsible>;
 
@@ -49,13 +52,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
-    <Collapsible {...args} className="w-full max-w-md">
-      <CollapsibleTrigger>Voir les substitutions possibles</CollapsibleTrigger>
-      <CollapsibleContent>
-        Remplacez l&apos;ail par de l&apos;huile infusée pour limiter les
-        FODMAP.
-      </CollapsibleContent>
-    </Collapsible>
+    <StoryFrame maxWidth="md">
+      <Collapsible {...args}>
+        <CollapsibleTrigger>
+          Voir les substitutions possibles
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          Remplacez l&apos;ail par de l&apos;huile infusée pour limiter les
+          FODMAP.
+        </CollapsibleContent>
+      </Collapsible>
+    </StoryFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -89,12 +96,14 @@ export const InitiallyOpen: Story = {
     defaultOpen: true,
   },
   render: (args) => (
-    <Collapsible {...args} className="w-full max-w-md">
-      <CollapsibleTrigger>Conseils de préparation</CollapsibleTrigger>
-      <CollapsibleContent>
-        Faites tremper les légumineuses puis rincez-les abondamment.
-      </CollapsibleContent>
-    </Collapsible>
+    <StoryFrame maxWidth="md">
+      <Collapsible {...args}>
+        <CollapsibleTrigger>Conseils de préparation</CollapsibleTrigger>
+        <CollapsibleContent>
+          Faites tremper les légumineuses puis rincez-les abondamment.
+        </CollapsibleContent>
+      </Collapsible>
+    </StoryFrame>
   ),
 };
 
@@ -103,9 +112,11 @@ export const Disabled: Story = {
     disabled: true,
   },
   render: (args) => (
-    <Collapsible {...args} className="w-full max-w-md">
-      <CollapsibleTrigger>Section indisponible</CollapsibleTrigger>
-      <CollapsibleContent>Contenu masqué</CollapsibleContent>
-    </Collapsible>
+    <StoryFrame maxWidth="md">
+      <Collapsible {...args}>
+        <CollapsibleTrigger>Section indisponible</CollapsibleTrigger>
+        <CollapsibleContent>Contenu masqué</CollapsibleContent>
+      </Collapsible>
+    </StoryFrame>
   ),
 };

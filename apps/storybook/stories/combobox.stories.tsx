@@ -17,6 +17,8 @@ import {
   ComboboxTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame } from "./story-frame";
+
 const meta = {
   title: "Composed/Combobox",
   component: Combobox,
@@ -68,6 +70,7 @@ const meta = {
   },
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
   },
 } satisfies Meta<typeof Combobox>;
 
@@ -77,29 +80,27 @@ type Story = StoryObj<typeof meta>;
 
 function SingleFixture(args: Story["args"]) {
   return (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-        <Combobox {...args}>
-          <ComboboxTrigger aria-label="Choix de l option" />
-          <ComboboxContent>
-            <ComboboxInput placeholder="Rechercher un aliment" />
-            <ComboboxList>
-              <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
-              <ComboboxGroup heading="Fruits">
-                <ComboboxItem value="pomme">Pomme</ComboboxItem>
-                <ComboboxItem value="banane">Banane</ComboboxItem>
-                <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-              </ComboboxGroup>
-              <ComboboxSeparator />
-              <ComboboxGroup heading="Legumes">
-                <ComboboxItem value="carotte">Carotte</ComboboxItem>
-                <ComboboxItem value="courgette">Courgette</ComboboxItem>
-              </ComboboxGroup>
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
+      <Combobox {...args}>
+        <ComboboxTrigger aria-label="Choix de l option" />
+        <ComboboxContent>
+          <ComboboxInput placeholder="Rechercher un aliment" />
+          <ComboboxList>
+            <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
+            <ComboboxGroup heading="Fruits">
+              <ComboboxItem value="pomme">Pomme</ComboboxItem>
+              <ComboboxItem value="banane">Banane</ComboboxItem>
+              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
+            </ComboboxGroup>
+            <ComboboxSeparator />
+            <ComboboxGroup heading="Legumes">
+              <ComboboxItem value="carotte">Carotte</ComboboxItem>
+              <ComboboxItem value="courgette">Courgette</ComboboxItem>
+            </ComboboxGroup>
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </StoryFrame>
   );
 }
 
@@ -160,8 +161,8 @@ function SingleControlledFixture(args: Story["args"]) {
   const [value, setValue] = useState("pomme");
 
   return (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-xl space-y-3 rounded-(--radius) border border-border bg-card p-4">
+    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
+      <div className="space-y-3">
         <Combobox
           {...args}
           onValueChange={(nextValue) => {
@@ -182,7 +183,7 @@ function SingleControlledFixture(args: Story["args"]) {
         </Combobox>
         <p className="text-sm text-muted-foreground">Valeur: {value}</p>
       </div>
-    </div>
+    </StoryFrame>
   );
 }
 
@@ -192,24 +193,22 @@ export const SingleControlled: Story = {
 
 function MultiFixture() {
   return (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-        <ComboboxMulti>
-          <ComboboxTrigger aria-label="Choix multiple" />
-          <ComboboxContent>
-            <ComboboxInput placeholder="Rechercher un aliment" />
-            <ComboboxList>
-              <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
-              <ComboboxGroup heading="Fruits">
-                <ComboboxItem value="pomme">Pomme</ComboboxItem>
-                <ComboboxItem value="banane">Banane</ComboboxItem>
-                <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-              </ComboboxGroup>
-            </ComboboxList>
-          </ComboboxContent>
-        </ComboboxMulti>
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
+      <ComboboxMulti>
+        <ComboboxTrigger aria-label="Choix multiple" />
+        <ComboboxContent>
+          <ComboboxInput placeholder="Rechercher un aliment" />
+          <ComboboxList>
+            <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
+            <ComboboxGroup heading="Fruits">
+              <ComboboxItem value="pomme">Pomme</ComboboxItem>
+              <ComboboxItem value="banane">Banane</ComboboxItem>
+              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
+            </ComboboxGroup>
+          </ComboboxList>
+        </ComboboxContent>
+      </ComboboxMulti>
+    </StoryFrame>
   );
 }
 
@@ -265,8 +264,8 @@ function MultiControlledFixture() {
   const [value, setValue] = useState<string[]>(["pomme"]);
 
   return (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-xl space-y-3 rounded-(--radius) border border-border bg-card p-4">
+    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
+      <div className="space-y-3">
         <ComboboxMulti onValueChange={setValue} value={value}>
           <ComboboxTrigger aria-label="Choix multiple controle" />
           <ComboboxContent>
@@ -282,7 +281,7 @@ function MultiControlledFixture() {
           Valeurs: {value.join(", ")}
         </p>
       </div>
-    </div>
+    </StoryFrame>
   );
 }
 
@@ -292,24 +291,22 @@ export const MultiControlled: Story = {
 
 export const WithDisabledItems: Story = {
   render: () => (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-        <Combobox>
-          <ComboboxTrigger aria-label="Etat des options" />
-          <ComboboxContent>
-            <ComboboxInput placeholder="Rechercher" />
-            <ComboboxList>
-              <ComboboxGroup heading="Actions">
-                <ComboboxItem disabled value="support-premium">
-                  Support premium indisponible
-                </ComboboxItem>
-                <ComboboxItem value="profil">Profil</ComboboxItem>
-              </ComboboxGroup>
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
+      <Combobox>
+        <ComboboxTrigger aria-label="Etat des options" />
+        <ComboboxContent>
+          <ComboboxInput placeholder="Rechercher" />
+          <ComboboxList>
+            <ComboboxGroup heading="Actions">
+              <ComboboxItem disabled value="support-premium">
+                Support premium indisponible
+              </ComboboxItem>
+              <ComboboxItem value="profil">Profil</ComboboxItem>
+            </ComboboxGroup>
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </StoryFrame>
   ),
 };
 

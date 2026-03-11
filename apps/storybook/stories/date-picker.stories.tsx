@@ -6,6 +6,8 @@ import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import { DatePicker } from "@fodmap/ui";
 
+import { StoryFrame } from "./story-frame";
+
 const meta = {
   title: "Composed/DatePicker",
   component: DatePicker,
@@ -92,6 +94,7 @@ const meta = {
   },
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
   },
 } satisfies Meta<typeof DatePicker>;
 
@@ -101,11 +104,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-sm rounded-(--radius) border border-border bg-card p-4">
-        <DatePicker {...args} />
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="sm" surface>
+      <DatePicker {...args} />
+    </StoryFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -166,8 +167,8 @@ function ControlledExample(args: Story["args"]) {
   const [value, setValue] = useState<Date | undefined>(new Date(2026, 2, 14));
 
   return (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-sm space-y-3 rounded-(--radius) border border-border bg-card p-4">
+    <StoryFrame centeredMinHeight={72} maxWidth="sm" surface>
+      <div className="space-y-3">
         <DatePicker
           {...args}
           onValueChange={(nextValue) => {
@@ -180,7 +181,7 @@ function ControlledExample(args: Story["args"]) {
           Valeur: {value ? value.toISOString().slice(0, 10) : "aucune"}
         </p>
       </div>
-    </div>
+    </StoryFrame>
   );
 }
 
@@ -197,11 +198,9 @@ export const WithBounds: Story = {
     },
   },
   render: (args) => (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-sm rounded-(--radius) border border-border bg-card p-4">
-        <DatePicker {...args} />
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="sm" surface>
+      <DatePicker {...args} />
+    </StoryFrame>
   ),
 };
 
@@ -210,11 +209,9 @@ export const Disabled: Story = {
     disabled: true,
   },
   render: (args) => (
-    <div className="flex min-h-72 items-center justify-center">
-      <div className="w-full max-w-sm rounded-(--radius) border border-border bg-card p-4">
-        <DatePicker {...args} />
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={72} maxWidth="sm" surface>
+      <DatePicker {...args} />
+    </StoryFrame>
   ),
 };
 

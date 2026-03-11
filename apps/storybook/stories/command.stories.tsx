@@ -16,6 +16,8 @@ import {
   CommandShortcut,
 } from "@fodmap/ui";
 
+import { StoryFrame } from "./story-frame";
+
 const meta = {
   title: "Composed/Command",
   component: Command,
@@ -74,6 +76,7 @@ const meta = {
   },
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
   },
 } satisfies Meta<typeof Command>;
 
@@ -83,31 +86,29 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
-    <div className="flex min-h-80 items-center justify-center">
-      <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-        <Command {...args}>
-          <CommandInput placeholder="Rechercher une action" />
-          <CommandList>
-            <CommandEmpty>Aucun resultat</CommandEmpty>
-            <CommandGroup heading="Actions rapides">
-              <CommandItem value="profil">
-                Ouvrir le profil
-                <CommandShortcut>⌘P</CommandShortcut>
-              </CommandItem>
-              <CommandItem value="parametres">
-                Modifier les parametres
-              </CommandItem>
-            </CommandGroup>
-            <CommandSeparator hidden />
-            <CommandGroup heading="Navigation">
-              <CommandItem value="dashboard">
-                Aller au tableau de bord
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={80} maxWidth="xl" surface>
+      <Command {...args}>
+        <CommandInput placeholder="Rechercher une action" />
+        <CommandList>
+          <CommandEmpty>Aucun resultat</CommandEmpty>
+          <CommandGroup heading="Actions rapides">
+            <CommandItem value="profil">
+              Ouvrir le profil
+              <CommandShortcut>⌘P</CommandShortcut>
+            </CommandItem>
+            <CommandItem value="parametres">
+              Modifier les parametres
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator hidden />
+          <CommandGroup heading="Navigation">
+            <CommandItem value="dashboard">
+              Aller au tableau de bord
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </StoryFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -217,8 +218,8 @@ function ControlledExample(args: Story["args"]) {
   const [value, setValue] = useState("profil");
 
   return (
-    <div className="flex min-h-80 items-center justify-center">
-      <div className="w-full max-w-xl space-y-3 rounded-(--radius) border border-border bg-card p-4">
+    <StoryFrame centeredMinHeight={80} maxWidth="xl" surface>
+      <div className="space-y-3">
         <Command
           {...args}
           onValueChange={(next) => {
@@ -235,7 +236,7 @@ function ControlledExample(args: Story["args"]) {
         </Command>
         <p className="text-sm text-muted-foreground">Valeur: {value}</p>
       </div>
-    </div>
+    </StoryFrame>
   );
 }
 
@@ -245,21 +246,19 @@ export const Controlled: Story = {
 
 export const WithDisabledItems: Story = {
   render: (args) => (
-    <div className="flex min-h-80 items-center justify-center">
-      <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-        <Command {...args}>
-          <CommandInput placeholder="Rechercher une action" />
-          <CommandList>
-            <CommandGroup heading="Etat du compte">
-              <CommandItem disabled value="support">
-                Support prioritaire indisponible
-              </CommandItem>
-              <CommandItem value="profil">Profil</CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </div>
-    </div>
+    <StoryFrame centeredMinHeight={80} maxWidth="xl" surface>
+      <Command {...args}>
+        <CommandInput placeholder="Rechercher une action" />
+        <CommandList>
+          <CommandGroup heading="Etat du compte">
+            <CommandItem disabled value="support">
+              Support prioritaire indisponible
+            </CommandItem>
+            <CommandItem value="profil">Profil</CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </StoryFrame>
   ),
 };
 
