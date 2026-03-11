@@ -62,6 +62,8 @@ required_files=(
   ".github/scripts/detect-changeset-pr-scope.test.mjs"
   ".github/scripts/detect-ci-scope.mjs"
   ".github/scripts/detect-ci-scope.test.mjs"
+  ".github/scripts/docs-hygiene-audit.mjs"
+  ".github/scripts/docs-hygiene-audit.test.mjs"
 )
 
 run_cmd() {
@@ -93,6 +95,8 @@ run_cmd "changeset scope detector syntax" node --check .github/scripts/detect-ch
 run_cmd "changeset scope detector tests syntax" node --check .github/scripts/detect-changeset-pr-scope.test.mjs
 run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mjs
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
+run_cmd "docs hygiene audit syntax" node --check .github/scripts/docs-hygiene-audit.mjs
+run_cmd "docs hygiene audit tests syntax" node --check .github/scripts/docs-hygiene-audit.test.mjs
 run_cmd "reporting python script syntax" python3 -m py_compile \
   etl/phase2/reporting/scripts/collect_reporting.py \
   etl/phase2/reporting/scripts/compare_baselines.py \
@@ -121,6 +125,7 @@ if [[ "$run_full" == "true" ]]; then
   run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
   run_cmd "CI scope tests" pnpm ci:scope:test
   run_cmd "changeset scope detector tests" node --test .github/scripts/detect-changeset-pr-scope.test.mjs
+  run_cmd "docs hygiene audit unit tests" node --test .github/scripts/docs-hygiene-audit.test.mjs
   run_cmd "openapi check" pnpm --filter @fodmap/types openapi:check
   run_cmd "design token check" pnpm tokens:check
   run_cmd "tailwind style check" pnpm tailwind:styles:check
