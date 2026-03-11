@@ -204,16 +204,38 @@ export function resolveLocalTarget(repoPath, sourceFile, linkPath) {
 }
 
 function cleanHeadingText(text) {
-  return text
-    .replace(/\s+#+\s*$/, "")
-    .replace(/<[^>]+>/g, "")
+  const withoutTrailingHashes = text.replace(/\s+#+\s*$/, "");
+  let withoutHtml = "";
+  let insideTag = false;
+
+  for (const character of withoutTrailingHashes) {
+    if (character === "<") {
+      insideTag = true;
+      continue;
+    }
+
+    if (character === ">") {
+      insideTag = false;
+      continue;
+    }
+
+    if (!insideTag) {
+      withoutHtml += character;
+    }
+  }
+
+  return withoutHtml;
+}
+
+function normalizeHeadingText(text) {
+  return cleanHeadingText(text)
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
     .replace(/[*_~`]/g, "")
     .trim();
 }
 
 export function slugifyHeading(text) {
-  const cleaned = cleanHeadingText(text)
+  const cleaned = normalizeHeadingText(text)
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()

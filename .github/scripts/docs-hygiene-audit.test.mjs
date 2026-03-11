@@ -59,11 +59,20 @@ test("collectMarkdownLinks ignores fenced and inline code links", () => {
 
 test("slugifyHeading and collectGitHubAnchors follow GitHub-style duplicate slugs", () => {
   const anchors = collectGitHubAnchors(
-    ["# Overview", "## Overview", "## Quick start"].join("\n"),
+    [
+      "# Overview",
+      "## Overview",
+      "## Quick start",
+      "## Quick <em>start</em>",
+    ].join("\n"),
   );
 
   assert.equal(slugifyHeading("Quick start"), "quick-start");
-  assert.deepEqual([...anchors], ["overview", "overview-1", "quick-start"]);
+  assert.equal(slugifyHeading("Quick <em>start</em>"), "quick-start");
+  assert.deepEqual(
+    [...anchors],
+    ["overview", "overview-1", "quick-start", "quick-start-1"],
+  );
 });
 
 test("broken relative markdown links are reported", () => {
