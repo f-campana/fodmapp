@@ -1,0 +1,42 @@
+name: Docs Hygiene Audit
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs-hygiene-audit:
+    name: docs-hygiene-audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Run docs hygiene audit
+        run: |
+          mkdir -p "${RUNNER_TEMP}/docs-hygiene-audit"
+          node .github/scripts/docs-hygiene-audit.mjs \
+            --repo . \
+            --out-dir "${RUNNER_TEMP}/docs-hygiene-audit"
+
+      - name: Publish audit summary
+        run: |
+          cat "${RUNNER_TEMP}/docs-hygiene-audit/docs-hygiene-report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-hygiene-audit-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/docs-hygiene-audit/docs-hygiene-report.md
+            ${{ runner.temp }}/docs-hygiene-audit/docs-hygiene-report.json
+          if-no-files-found: error
