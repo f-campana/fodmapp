@@ -1,8 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap");
-@import "@fodmap/tailwind-config/shared-styles.css";
-@import "../../node_modules/tw-animate-css/dist/tw-animate.css";
-@source "../components/ui/**/*.{ts,tsx}";
-@source "../components/field.tsx";
+@import "tailwindcss" source(none);
+@import "../../../packages/tailwind-config/shared-styles.css";
+@import "../../../packages/ui/node_modules/tw-animate-css/dist/tw-animate.css";
+
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+@source "../stories/**/*.{ts,tsx}";
+@source "./**/*.{ts,tsx}";
 
 @layer base {
   * {
@@ -12,7 +15,7 @@
   body {
     margin: 0;
     font-family: var(--font-body);
-    background-color: var(--color-bg);
+    background-color: var(--storybook-preview-background, var(--color-bg)) !important;
     color: var(--color-text);
   }
 
