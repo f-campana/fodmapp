@@ -163,7 +163,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
   return (
     <SelectPrimitive.Item
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
+        "relative flex w-full cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -224,7 +224,7 @@ function SelectScrollUpButton({
   return (
     <SelectPrimitive.ScrollUpButton
       className={cn(
-        "flex cursor-default items-center justify-center py-1 text-muted-foreground",
+        "flex cursor-pointer items-center justify-center py-1 text-muted-foreground",
         className,
       )}
       data-slot="select-scroll-up-button"
@@ -260,7 +260,7 @@ function SelectScrollDownButton({
   return (
     <SelectPrimitive.ScrollDownButton
       className={cn(
-        "flex cursor-default items-center justify-center py-1 text-muted-foreground",
+        "flex cursor-pointer items-center justify-center py-1 text-muted-foreground",
         className,
       )}
       data-slot="select-scroll-down-button"

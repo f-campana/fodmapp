@@ -374,6 +374,7 @@ describe("Menubar", () => {
 
     expect(item?.className ?? "").toContain("focus:bg-accent");
     expect(item?.className ?? "").toContain("focus:text-accent-foreground");
+    expect(item?.className ?? "").toContain("cursor-pointer");
 
     expect(subTrigger?.className ?? "").toContain(
       "data-[state=open]:bg-accent",
@@ -381,10 +382,13 @@ describe("Menubar", () => {
     expect(subTrigger?.className ?? "").toContain(
       "data-[state=open]:text-accent-foreground",
     );
+    expect(subTrigger?.className ?? "").toContain("cursor-pointer");
 
+    expect(checkboxItem?.className ?? "").toContain("cursor-pointer");
     expect(checkboxItem?.className ?? "").toContain(
       "data-[disabled]:pointer-events-none",
     );
+    expect(trigger.className).toContain("cursor-pointer");
     expect(trigger.className).toContain("focus-visible:ring-ring-soft");
     expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
     expect(

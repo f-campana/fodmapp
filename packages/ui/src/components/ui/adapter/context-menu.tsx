@@ -104,7 +104,7 @@ function ContextMenuSubTrigger({
       data-slot="context-menu-sub-trigger"
       data-inset={inset || undefined}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
@@ -206,7 +206,7 @@ function ContextMenuItem({
       data-slot="context-menu-item"
       data-inset={inset || undefined}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -232,7 +232,7 @@ function ContextMenuCheckboxItem({
     <ContextMenuPrimitive.CheckboxItem
       data-slot="context-menu-checkbox-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -280,7 +280,7 @@ function ContextMenuRadioItem({
     <ContextMenuPrimitive.RadioItem
       data-slot="context-menu-radio-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",

@@ -411,6 +411,7 @@ describe("Combobox", () => {
     expect(content?.className ?? "").toContain("bg-popover");
     expect(content?.className ?? "").toContain("text-popover-foreground");
 
+    expect(item?.className ?? "").toContain("cursor-pointer");
     expect(item?.className ?? "").toContain("data-[selected=true]:bg-accent");
     expect(item?.className ?? "").toContain(
       "data-[disabled=true]:pointer-events-none",

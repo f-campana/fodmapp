@@ -348,6 +348,7 @@ describe("Select", () => {
 
     expect(item?.className ?? "").toContain("focus:bg-accent");
     expect(item?.className ?? "").toContain("focus:text-accent-foreground");
+    expect(item?.className ?? "").toContain("cursor-pointer");
   });
 
   it("merges className on trigger, content, item, label, and separator", async () => {

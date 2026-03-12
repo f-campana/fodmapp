@@ -208,6 +208,7 @@ describe("Command", () => {
     );
 
     expect(item?.className ?? "").toContain("data-[selected=true]:bg-accent");
+    expect(item?.className ?? "").toContain("cursor-pointer");
     expect(item?.className ?? "").toContain(
       "data-[selected=true]:text-accent-foreground",
     );

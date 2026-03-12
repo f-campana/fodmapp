@@ -544,7 +544,7 @@ function ComboboxItem({
   return (
     <CommandPrimitive.Item
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex w-full cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",

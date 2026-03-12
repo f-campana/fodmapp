@@ -41,7 +41,7 @@ function MenubarTrigger({ className, ...props }: MenubarTriggerProps) {
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
       className={cn(
-        "inline-flex items-center justify-center rounded-(--radius) border border-transparent px-3 py-1.5 text-sm font-medium outline-hidden select-none",
+        "inline-flex cursor-pointer items-center justify-center rounded-(--radius) border border-transparent px-3 py-1.5 text-sm font-medium outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "focus:bg-accent focus:text-accent-foreground",
@@ -122,7 +122,7 @@ function MenubarSubTrigger({
       data-slot="menubar-sub-trigger"
       data-inset={inset || undefined}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground",
@@ -227,7 +227,7 @@ function MenubarItem({ className, inset = false, ...props }: MenubarItemProps) {
       data-slot="menubar-item"
       data-inset={inset || undefined}
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) px-2 py-1.5 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -253,7 +253,7 @@ function MenubarCheckboxItem({
     <MenubarPrimitive.CheckboxItem
       data-slot="menubar-checkbox-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -301,7 +301,7 @@ function MenubarRadioItem({
     <MenubarPrimitive.RadioItem
       data-slot="menubar-radio-item"
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
