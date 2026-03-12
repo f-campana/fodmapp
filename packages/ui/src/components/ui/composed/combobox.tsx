@@ -360,6 +360,7 @@ function ComboboxContent({
   className,
   children,
   commandClassName,
+  "aria-label": ariaLabel,
   sideOffset = 4,
   ...props
 }: ComboboxContentProps) {
@@ -367,34 +368,41 @@ function ComboboxContent({
 
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        className={cn(
-          "z-50 w-(--radix-popover-trigger-width) min-w-[12rem] overflow-hidden rounded-(--radius) border border-border bg-popover p-0 text-popover-foreground shadow-md",
-          "origin-(--radix-popover-content-transform-origin)",
-          "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-          "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
-        )}
-        data-slot="combobox-content"
-        id={context.contentId}
-        sideOffset={sideOffset}
-        {...props}
+      <div
+        aria-label="Suggestions de recherche"
+        data-slot="combobox-portal"
+        role="region"
       >
-        <CommandPrimitive
+        <PopoverPrimitive.Content
+          aria-label={ariaLabel ?? "Suggestions de recherche"}
           className={cn(
-            "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
-            "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
-            commandClassName,
+            "z-50 w-(--radix-popover-trigger-width) min-w-[12rem] overflow-hidden rounded-(--radius) border border-border bg-popover p-0 text-popover-foreground shadow-md",
+            "origin-(--radix-popover-content-transform-origin)",
+            "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out",
+            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+            "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+            className,
           )}
-          shouldFilter
+          data-slot="combobox-content"
+          id={context.contentId}
+          sideOffset={sideOffset}
+          {...props}
         >
-          {children}
-        </CommandPrimitive>
-      </PopoverPrimitive.Content>
+          <CommandPrimitive
+            className={cn(
+              "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
+              "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+              commandClassName,
+            )}
+            shouldFilter
+          >
+            {children}
+          </CommandPrimitive>
+        </PopoverPrimitive.Content>
+      </div>
     </PopoverPrimitive.Portal>
   );
 }
@@ -582,10 +590,10 @@ export type ComboboxSeparatorProps = React.ComponentProps<
 
 function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
   return (
-    <CommandPrimitive.Separator
+    <div
+      aria-hidden="true"
       className={cn("-mx-1 h-px bg-border", className)}
       data-slot="combobox-separator"
-      role="presentation"
       {...props}
     />
   );

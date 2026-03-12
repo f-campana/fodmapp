@@ -100,7 +100,11 @@ function SelectContent({
 }: SelectContentProps) {
   return (
     <SelectPrimitive.Portal>
-      <div data-slot="select-portal">
+      <div
+        aria-label="Options du sélecteur"
+        data-slot="select-portal"
+        role="region"
+      >
         <SelectPrimitive.Content
           className={cn(
             "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] overflow-hidden rounded-(--radius) border border-border bg-popover text-popover-foreground shadow-md",
@@ -128,6 +132,7 @@ function SelectContent({
                 "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)",
             )}
             data-slot="select-viewport"
+            tabIndex={0}
           >
             {children}
           </SelectPrimitive.Viewport>

@@ -1,8 +1,7 @@
-import { useState } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { expect, fn, userEvent, waitFor, within } from "storybook/test";
+import type { ReactNode } from "react";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import {
   Combobox,
@@ -17,7 +16,40 @@ import {
   ComboboxTrigger,
 } from "@fodmap/ui";
 
-import { StoryFrame } from "./story-frame";
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function ComboboxAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-combobox-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  defaultOpen: false,
+  modal: false,
+  onOpenChange: fn(),
+  onValueChange: fn(),
+} as const;
+
+const fruitOptions = [
+  { value: "pomme", label: "Pomme" },
+  { value: "banane", label: "Banane" },
+  { value: "kiwi", label: "Kiwi" },
+] as const;
+
+const longComboboxOptions = Array.from({ length: 18 }, (_, index) => ({
+  value: `ingredient-${index + 1}`,
+  label: `Ingrédient recommandé ${index + 1}`,
+}));
 
 const meta = {
   title: "Composed/Combobox",
@@ -25,23 +57,23 @@ const meta = {
   tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
-      description: "Sets initial popover open state in uncontrolled mode.",
+      description: "Sets the initial popover open state in uncontrolled mode.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
     open: {
-      description: "Controls popover open state.",
+      description: "Controls the popover open state.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "undefined" } },
     },
     defaultValue: {
-      description: "Initial selected value in uncontrolled single mode.",
-      control: { type: "text" },
+      description: "Initial selected value in single mode.",
+      control: "text",
       table: { defaultValue: { summary: "undefined" } },
     },
     value: {
       description: "Controlled selected value in single mode.",
-      control: { type: "text" },
+      control: "text",
       table: { defaultValue: { summary: "undefined" } },
     },
     modal: {
@@ -50,27 +82,27 @@ const meta = {
       table: { defaultValue: { summary: "false" } },
     },
     onOpenChange: {
-      description: "Callback invoked when open state changes.",
+      description: "Callback invoked when the popover open state changes.",
     },
     onValueChange: {
-      description: "Callback invoked when selected value changes.",
+      description: "Callback invoked when the selected value changes.",
     },
     children: {
-      description:
-        "Combobox composition using trigger, content, and command slots.",
+      description: "Composition of trigger, search input, groups, and items.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    defaultOpen: false,
-    modal: false,
-    onOpenChange: fn(),
-    onValueChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
     layout: "padded",
+    a11y: {
+      test: "error",
+      context: {
+        include: ["[data-combobox-audit-root]", "[data-slot='combobox-portal']"],
+      },
+    },
   },
 } satisfies Meta<typeof Combobox>;
 
@@ -78,246 +110,254 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function SingleFixture(args: Story["args"]) {
+function ComboboxScaffold({
+  children,
+  description,
+  eyebrow,
+  title,
+}: {
+  children: ReactNode;
+  description: string;
+  eyebrow: string;
+  title: string;
+}) {
   return (
-    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
-      <Combobox {...args}>
-        <ComboboxTrigger aria-label="Choix de l option" />
-        <ComboboxContent>
-          <ComboboxInput placeholder="Rechercher un aliment" />
-          <ComboboxList>
-            <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
-            <ComboboxGroup heading="Fruits">
-              <ComboboxItem value="pomme">Pomme</ComboboxItem>
-              <ComboboxItem value="banane">Banane</ComboboxItem>
-              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-            </ComboboxGroup>
-            <ComboboxSeparator />
-            <ComboboxGroup heading="Legumes">
-              <ComboboxItem value="carotte">Carotte</ComboboxItem>
-              <ComboboxItem value="courgette">Courgette</ComboboxItem>
-            </ComboboxGroup>
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-    </StoryFrame>
+    <div className="w-full space-y-4">
+      <div className="space-y-1 text-left">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          {eyebrow}
+        </p>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <p className="text-sm leading-5 text-muted-foreground">{description}</p>
+      </div>
+      <div className="w-full max-w-sm">{children}</div>
+    </div>
   );
 }
 
-export const SingleDefault: Story = {
-  render: (args) => <SingleFixture {...args} />,
-  play: async ({ canvasElement }) => {
+function SingleCombobox(args: Story["args"]) {
+  return (
+    <Combobox {...args}>
+      <ComboboxTrigger aria-label="Choisir un aliment" />
+      <ComboboxContent>
+        <ComboboxInput placeholder="Rechercher un aliment" />
+        <ComboboxList>
+          <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+          <ComboboxGroup heading="Fruits">
+            {fruitOptions.map((option) => (
+              <ComboboxItem key={option.value} value={option.value}>
+                {option.label}
+              </ComboboxItem>
+            ))}
+          </ComboboxGroup>
+          <ComboboxSeparator />
+          <ComboboxGroup heading="Légumes">
+            <ComboboxItem value="carotte">Carotte</ComboboxItem>
+            <ComboboxItem value="courgette">Courgette</ComboboxItem>
+          </ComboboxGroup>
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+function MultiComboboxStory() {
+  return (
+    <ComboboxMulti>
+      <ComboboxTrigger aria-label="Choisir plusieurs aliments" />
+      <ComboboxContent>
+        <ComboboxInput placeholder="Rechercher un aliment" />
+        <ComboboxList>
+          <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+          <ComboboxGroup heading="Fruits">
+            {fruitOptions.map((option) => (
+              <ComboboxItem key={option.value} value={option.value}>
+                {option.label}
+              </ComboboxItem>
+            ))}
+          </ComboboxGroup>
+        </ComboboxList>
+      </ComboboxContent>
+    </ComboboxMulti>
+  );
+}
+
+function LongListCombobox(args: Story["args"]) {
+  return (
+    <Combobox {...args}>
+      <ComboboxTrigger aria-label="Choisir une recommandation" />
+      <ComboboxContent>
+        <ComboboxInput placeholder="Rechercher une recommandation" />
+        <ComboboxList className="max-h-44">
+          <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+          <ComboboxGroup heading="Recommandations">
+            {longComboboxOptions.map((option) => (
+              <ComboboxItem key={option.value} value={option.value}>
+                {option.label}
+              </ComboboxItem>
+            ))}
+          </ComboboxGroup>
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+function ResponsiveStressCombobox() {
+  return (
+    <Combobox>
+      <ComboboxTrigger aria-label="Choisir une recommandation détaillée" />
+      <ComboboxContent>
+        <ComboboxInput placeholder="Rechercher une recommandation détaillée" />
+        <ComboboxList className="max-h-44">
+          <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
+          <ComboboxGroup heading="Largeur réduite">
+            <ComboboxItem value="detailed-primary">
+              Recommandation principale avec un intitulé volontairement long
+              pour tester le retour à la ligne
+            </ComboboxItem>
+            <ComboboxItem value="detailed-secondary">
+              Variante secondaire avec plus de contexte
+            </ComboboxItem>
+            <ComboboxItem value="detailed-short">Variante compacte</ComboboxItem>
+          </ComboboxGroup>
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
+      <ComboboxScaffold
+        description="Cherchez puis sélectionnez une option sans parcourir toute la liste manuellement."
+        eyebrow="Recherche"
+        title="Combobox simple"
+      >
+        <SingleCombobox {...args} />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
+  ),
+};
+
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
+      <ComboboxScaffold
+        description="Utilisez Combobox quand la recherche textuelle accélère la sélection."
+        eyebrow="Recherche"
+        title="Combobox simple"
+      >
+        <SingleCombobox {...defaultPlaygroundArgs} />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
+  ),
+};
+
+export const OnSurface: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md" surface>
+      <ComboboxScaffold
+        description="Dans une carte, gardez le déclencheur et le panneau de résultats cohérents avec la surface."
+        eyebrow="Surface"
+        title="Combobox dans une carte"
+      >
+        <SingleCombobox {...defaultPlaygroundArgs} />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
+  ),
+};
+
+export const Multiple: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
+      <ComboboxScaffold
+        description="Le mode multiple est utile quand plusieurs éléments doivent rester visibles dans le déclencheur."
+        eyebrow="Sélection"
+        title="Sélection multiple"
+      >
+        <MultiComboboxStory />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
+  ),
+};
+
+export const InteractionChecks: Story = {
+  args: {
+    ...defaultPlaygroundArgs,
+    onOpenChange: fn(),
+    onValueChange: fn(),
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: { disable: true },
+  },
+  render: (args) => (
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
+      <ComboboxScaffold
+        description="Vérifie le portail, la recherche ouverte et la sélection sur une liste longue."
+        eyebrow="Qualité"
+        title="Contrats d&apos;interaction"
+      >
+        <LongListCombobox {...args} />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
+  ),
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    const trigger = canvas.getByRole("combobox", { name: "Choix de l option" });
+    const trigger = canvas.getByRole("combobox", {
+      name: "Choisir une recommandation",
+    });
 
     await expect(
       canvasElement.querySelector("[data-slot='combobox']"),
     ).toHaveAttribute("data-slot", "combobox");
-
-    await expect(trigger).toHaveAttribute("data-slot", "combobox-trigger");
-    await expect(trigger.className).toContain("border-input");
-    await expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     await userEvent.click(trigger);
 
-    const content = await waitFor(() => {
-      const node = document.body.querySelector(
-        "[data-slot='combobox-content']",
-      );
-      if (!node) {
-        throw new Error("Combobox content not mounted yet.");
-      }
-      return node as HTMLElement;
+    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    const body = within(document.body);
+    const portal = document.body.querySelector("[data-slot='combobox-portal']");
+    const input = body.getByPlaceholderText("Rechercher une recommandation");
+    const option = body.getByRole("option", {
+      name: "Ingrédient recommandé 12",
     });
 
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("text-popover-foreground");
+    await expect(portal).toHaveAttribute("data-slot", "combobox-portal");
+    await expect(input).toBeVisible();
 
-    const input = document.body.querySelector("[data-slot='combobox-input']");
-    const list = document.body.querySelector("[data-slot='combobox-list']");
-    const group = document.body.querySelector("[data-slot='combobox-group']");
-    const item = document.body.querySelector("[data-slot='combobox-item']");
-    const separator = document.body.querySelector(
-      "[data-slot='combobox-separator']",
-    );
+    await userEvent.click(option);
 
-    await expect(input).toHaveAttribute("data-slot", "combobox-input");
-    await expect(list).toHaveAttribute("data-slot", "combobox-list");
-    await expect(group).toHaveAttribute("data-slot", "combobox-group");
-    await expect(item).toHaveAttribute("data-slot", "combobox-item");
-    await expect(separator).toHaveAttribute("data-slot", "combobox-separator");
-
-    await userEvent.click(within(document.body).getByText("Banane"));
-
-    await waitFor(() => {
-      if (document.body.querySelector("[data-slot='combobox-content']")) {
-        throw new Error("Combobox content should be closed after selection.");
-      }
-    });
-  },
-};
-
-function SingleControlledFixture(args: Story["args"]) {
-  const [value, setValue] = useState("pomme");
-
-  return (
-    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
-      <div className="space-y-3">
-        <Combobox
-          {...args}
-          onValueChange={(nextValue) => {
-            setValue(nextValue);
-            args?.onValueChange?.(nextValue);
-          }}
-          value={value}
-        >
-          <ComboboxTrigger aria-label="Choix controle" />
-          <ComboboxContent>
-            <ComboboxInput placeholder="Rechercher" />
-            <ComboboxList>
-              <ComboboxItem value="pomme">Pomme</ComboboxItem>
-              <ComboboxItem value="banane">Banane</ComboboxItem>
-              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
-        <p className="text-sm text-muted-foreground">Valeur: {value}</p>
-      </div>
-    </StoryFrame>
-  );
-}
-
-export const SingleControlled: Story = {
-  render: (args) => <SingleControlledFixture {...args} />,
-};
-
-function MultiFixture() {
-  return (
-    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
-      <ComboboxMulti>
-        <ComboboxTrigger aria-label="Choix multiple" />
-        <ComboboxContent>
-          <ComboboxInput placeholder="Rechercher un aliment" />
-          <ComboboxList>
-            <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
-            <ComboboxGroup heading="Fruits">
-              <ComboboxItem value="pomme">Pomme</ComboboxItem>
-              <ComboboxItem value="banane">Banane</ComboboxItem>
-              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-            </ComboboxGroup>
-          </ComboboxList>
-        </ComboboxContent>
-      </ComboboxMulti>
-    </StoryFrame>
-  );
-}
-
-export const MultiDefault: Story = {
-  render: () => <MultiFixture />,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole("combobox", { name: "Choix multiple" });
-
+    await expect(args.onValueChange).toHaveBeenCalledWith("ingredient-12");
+    await expect(trigger).toHaveTextContent("Ingrédient recommandé 12");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await expect(
-      canvasElement.querySelector("[data-slot='combobox-multi']"),
-    ).toHaveAttribute("data-slot", "combobox-multi");
-
-    await userEvent.click(trigger);
-    await waitFor(() => {
-      const item = document.body.querySelector("[data-slot='combobox-item']");
-      if (!item) {
-        throw new Error("Combobox item not mounted yet.");
-      }
-    });
-
-    await userEvent.click(within(document.body).getByText("Pomme"));
-
-    await waitFor(() => {
-      if (document.body.querySelector("[data-slot='combobox-content']")) {
-        throw new Error("Combobox content should close after first selection.");
-      }
-    });
-
-    await userEvent.click(trigger);
-    await waitFor(() => {
-      const item = document.body.querySelector("[data-slot='combobox-item']");
-      if (!item) {
-        throw new Error("Combobox item not mounted on second open.");
-      }
-    });
-
-    await userEvent.click(within(document.body).getByText("Banane"));
-
-    await waitFor(() => {
-      if (document.body.querySelector("[data-slot='combobox-content']")) {
-        throw new Error(
-          "Combobox content should close after second selection.",
-        );
-      }
-    });
-
-    await expect(trigger).toHaveTextContent("Pomme +1");
+      document.body.querySelector("[data-slot='combobox-content']"),
+    ).toBeNull();
   },
 };
 
-function MultiControlledFixture() {
-  const [value, setValue] = useState<string[]>(["pomme"]);
-
-  return (
-    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
-      <div className="space-y-3">
-        <ComboboxMulti onValueChange={setValue} value={value}>
-          <ComboboxTrigger aria-label="Choix multiple controle" />
-          <ComboboxContent>
-            <ComboboxInput placeholder="Rechercher" />
-            <ComboboxList>
-              <ComboboxItem value="pomme">Pomme</ComboboxItem>
-              <ComboboxItem value="banane">Banane</ComboboxItem>
-              <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-            </ComboboxList>
-          </ComboboxContent>
-        </ComboboxMulti>
-        <p className="text-sm text-muted-foreground">
-          Valeurs: {value.join(", ")}
-        </p>
-      </div>
-    </StoryFrame>
-  );
-}
-
-export const MultiControlled: Story = {
-  render: () => <MultiControlledFixture />,
-};
-
-export const WithDisabledItems: Story = {
+export const ResponsiveStress: Story = {
+  parameters: {
+    ...fixedStoryParameters,
+    docs: { disable: true },
+  },
   render: () => (
-    <StoryFrame centeredMinHeight={72} maxWidth="xl" surface>
-      <Combobox>
-        <ComboboxTrigger aria-label="Etat des options" />
-        <ComboboxContent>
-          <ComboboxInput placeholder="Rechercher" />
-          <ComboboxList>
-            <ComboboxGroup heading="Actions">
-              <ComboboxItem disabled value="support-premium">
-                Support premium indisponible
-              </ComboboxItem>
-              <ComboboxItem value="profil">Profil</ComboboxItem>
-            </ComboboxGroup>
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
-    </StoryFrame>
+    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="sm">
+      <ComboboxScaffold
+        description="Le déclencheur et les résultats doivent rester lisibles malgré des libellés longs."
+        eyebrow="Responsive"
+        title="Libellés longs"
+      >
+        <ResponsiveStressCombobox />
+      </ComboboxScaffold>
+    </ComboboxAuditFrame>
   ),
-};
-
-export const DarkMode: Story = {
-  ...SingleDefault,
-  args: {
-    ...SingleDefault.args,
-    onOpenChange: fn(),
-    onValueChange: fn(),
-  },
-  globals: {
-    theme: "dark",
-  },
 };

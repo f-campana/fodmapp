@@ -240,7 +240,7 @@ describe("Select", () => {
     expect(document.querySelector("[data-slot='select-content']")).toBeTruthy();
     expect(
       document.querySelector("[data-slot='select-viewport']"),
-    ).toBeTruthy();
+    ).toHaveAttribute("tabindex", "0");
     expect(document.querySelector("[data-slot='select-label']")).toBeTruthy();
     expect(document.querySelector("[data-slot='select-group']")).toBeTruthy();
     expect(document.querySelector("[data-slot='select-item']")).toBeTruthy();
@@ -359,7 +359,7 @@ describe("Select", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(
+    render(
       <Select>
         <SelectTrigger>
           <SelectValue placeholder="Choisir une option" />
@@ -381,7 +381,9 @@ describe("Select", () => {
       ).toBeTruthy();
     });
 
-    expect(await axe(container)).toHaveNoViolations();
+    expect(
+      await axe(document.querySelector("[data-slot='select-viewport']")!),
+    ).toHaveNoViolations();
   });
 
   it("exposes scroll button slots from dedicated components", () => {

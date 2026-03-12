@@ -1,15 +1,7 @@
-import { useState } from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import {
-  expect,
-  fireEvent,
-  fn,
-  userEvent,
-  waitFor,
-  within,
-} from "storybook/test";
+import type { ReactNode } from "react";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import {
   Select,
@@ -22,29 +14,83 @@ import {
   SelectValue,
 } from "@fodmap/ui";
 
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function SelectAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-select-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  defaultOpen: false,
+  dir: "ltr",
+  disabled: false,
+  required: false,
+  onOpenChange: fn(),
+  onValueChange: fn(),
+} as const;
+
+const frequentOptions = [
+  { value: "profil", label: "Profil" },
+  { value: "parametres", label: "Paramètres" },
+  { value: "mode-expert", label: "Mode expert" },
+] as const;
+
+const groupedSections = [
+  {
+    label: "Suivi",
+    items: [
+      { value: "journal", label: "Journal alimentaire" },
+      { value: "scores", label: "Scores personnels" },
+    ],
+  },
+  {
+    label: "Analyse",
+    items: [
+      { value: "substitutions", label: "Substitutions" },
+      { value: "rapport", label: "Rapport expert" },
+    ],
+  },
+] as const;
+
+const longListOptions = Array.from({ length: 18 }, (_, index) => ({
+  value: `follow-up-${index + 1}`,
+  label: `Option de suivi ${index + 1}`,
+}));
+
 const meta = {
   title: "Primitives/Adapter/Select",
   component: Select,
   tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
-      description: "Sets initial open state for uncontrolled mode.",
+      description: "Sets the initial open state in uncontrolled mode.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
     open: {
-      description: "Controls open state in controlled mode.",
+      description: "Controls the open state when the select is externally managed.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "undefined" } },
     },
     defaultValue: {
-      description: "Sets initial selected value for uncontrolled mode.",
-      control: { type: "text" },
+      description: "Sets the initial selected value in uncontrolled mode.",
+      control: "text",
       table: { defaultValue: { summary: "undefined" } },
     },
     value: {
-      description: "Controls selected value in controlled mode.",
-      control: { type: "text" },
+      description: "Controls the selected value in controlled mode.",
+      control: "text",
       table: { defaultValue: { summary: "undefined" } },
     },
     dir: {
@@ -54,7 +100,7 @@ const meta = {
       table: { defaultValue: { summary: "ltr" } },
     },
     disabled: {
-      description: "Disables all user interactions.",
+      description: "Disables the trigger and prevents interactions.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
@@ -65,34 +111,29 @@ const meta = {
     },
     name: {
       description: "Form field name used during submission.",
-      control: { type: "text" },
+      control: "text",
       table: { defaultValue: { summary: "undefined" } },
     },
     onOpenChange: {
-      description: "Callback invoked when open state changes.",
+      description: "Callback invoked whenever the open state changes.",
     },
     onValueChange: {
-      description: "Callback invoked when selected value changes.",
+      description: "Callback invoked whenever the selected value changes.",
     },
     children: {
-      description: "SelectTrigger and SelectContent composition.",
+      description: "Composition of trigger, content, groups, labels, and items.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    defaultOpen: false,
-    dir: "ltr",
-    disabled: false,
-    required: false,
-    onOpenChange: fn(),
-    onValueChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
     a11y: {
-      config: {
-        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      test: "error",
+      context: {
+        include: ["[data-select-audit-root]", "[data-slot='select-viewport']"],
       },
     },
   },
@@ -102,224 +143,253 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-center justify-center">
-      <div className="w-72">
-        <Select {...args}>
-          <SelectTrigger aria-label="Choix de l option">
-            <SelectValue placeholder="Choisir une option" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Mon compte</SelectLabel>
-              <SelectSeparator />
-              <SelectItem value="profil">Profil</SelectItem>
-              <SelectItem value="parametres">Parametres</SelectItem>
-              <SelectItem value="mode-expert">Mode expert</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const root = canvasElement.querySelector("[data-slot='select']");
-    const trigger = canvas.getByRole("combobox", { name: "Choix de l option" });
-
-    await expect(root).toHaveAttribute("data-slot", "select");
-    await expect(trigger).toHaveAttribute("data-slot", "select-trigger");
-
-    await userEvent.click(trigger);
-
-    const content = await waitFor(() => {
-      const node = document.body.querySelector("[data-slot='select-content']");
-      if (!node) {
-        throw new Error("Select content is not mounted yet.");
-      }
-      return node as HTMLElement;
-    });
-
-    const portal = document.body.querySelector("[data-slot='select-portal']");
-    const viewport = document.body.querySelector(
-      "[data-slot='select-viewport']",
-    );
-    const label = document.body.querySelector("[data-slot='select-label']");
-    const separator = document.body.querySelector(
-      "[data-slot='select-separator']",
-    );
-    const item = document.body.querySelector(
-      "[data-slot='select-item']",
-    ) as HTMLElement | null;
-
-    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-    await expect(portal).toHaveAttribute("data-slot", "select-portal");
-    await expect(viewport).toHaveAttribute("data-slot", "select-viewport");
-    await expect(label).toHaveAttribute("data-slot", "select-label");
-    await expect(separator).toHaveAttribute("data-slot", "select-separator");
-
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("text-popover-foreground");
-    await expect(content.className).toContain("data-[state=open]:animate-in");
-    await expect(content.className).toContain(
-      "data-[side=right]:slide-in-from-left-2",
-    );
-
-    await expect(trigger.className).toContain(
-      "data-[placeholder]:text-muted-foreground",
-    );
-    await expect(trigger.className).toContain("focus-visible:ring-ring-soft");
-    await expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
-    await expect(item?.className ?? "").toContain("focus:bg-accent");
-  },
-};
-
-export const Grouped: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-center justify-center">
-      <div className="w-72">
-        <Select {...args}>
-          <SelectTrigger aria-label="Choix de la categorie">
-            <SelectValue placeholder="Selectionner une categorie" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Suivi</SelectLabel>
-              <SelectItem value="journal">Journal alimentaire</SelectItem>
-              <SelectItem value="scores">Scores personnels</SelectItem>
-            </SelectGroup>
-            <SelectSeparator />
-            <SelectGroup>
-              <SelectLabel>Analyse</SelectLabel>
-              <SelectItem value="substitutions">Substitutions</SelectItem>
-              <SelectItem value="rapport">Rapport expert</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  ),
-};
-
-export const LongList: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-center justify-center">
-      <div className="w-72">
-        <Select {...args}>
-          <SelectTrigger aria-label="Choix de l ingredient">
-            <SelectValue placeholder="Choisir un ingredient" />
-          </SelectTrigger>
-          <SelectContent className="max-h-44">
-            <SelectGroup>
-              <SelectLabel>Ingredients frequents</SelectLabel>
-              <SelectSeparator />
-              {Array.from({ length: 20 }, (_, index) => {
-                const value = `ingredient-${index + 1}`;
-                return (
-                  <SelectItem key={value} value={value}>
-                    Ingredient {index + 1}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole("combobox", {
-      name: "Choix de l ingredient",
-    });
-
-    await userEvent.click(trigger);
-
-    const content = await waitFor(() => {
-      const node = document.body.querySelector("[data-slot='select-content']");
-      if (!node) {
-        throw new Error("Select content is not mounted yet.");
-      }
-      return node as HTMLElement;
-    });
-
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("max-h-44");
-
-    const viewport = document.body.querySelector(
-      "[data-slot='select-viewport']",
-    ) as HTMLElement | null;
-
-    if (viewport) {
-      viewport.scrollTop = 10_000;
-      await fireEvent.scroll(viewport);
-    }
-
-    const scrollDown = document.body.querySelector(
-      "[data-slot='select-scroll-down-button']",
-    );
-    const scrollUp = document.body.querySelector(
-      "[data-slot='select-scroll-up-button']",
-    );
-
-    if (scrollDown) {
-      await expect(scrollDown).toHaveAttribute(
-        "data-slot",
-        "select-scroll-down-button",
-      );
-    }
-
-    if (scrollUp) {
-      await expect(scrollUp).toHaveAttribute(
-        "data-slot",
-        "select-scroll-up-button",
-      );
-    }
-  },
-};
-
-function ControlledSelect(args: Story["args"]) {
-  const [value, setValue] = useState("parametres");
-
+function SelectScaffold({
+  children,
+  description,
+  eyebrow,
+  title,
+}: {
+  children: ReactNode;
+  description: string;
+  eyebrow: string;
+  title: string;
+}) {
   return (
-    <div className="flex min-h-56 items-center justify-center">
-      <div className="w-72 space-y-3">
-        <Select
-          {...args}
-          onValueChange={(next) => {
-            setValue(next);
-            args?.onValueChange?.(next);
-          }}
-          value={value}
-        >
-          <SelectTrigger aria-label="Choix controle">
-            <SelectValue placeholder="Choisir une option" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="profil">Profil</SelectItem>
-            <SelectItem value="parametres">Parametres</SelectItem>
-            <SelectItem value="mode-expert">Mode expert</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-sm text-muted-foreground">Valeur: {value}</p>
+    <div className="w-full space-y-4">
+      <div className="space-y-1 text-left">
+        <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          {eyebrow}
+        </p>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <p className="text-sm leading-5 text-muted-foreground">{description}</p>
       </div>
+      <div className="w-full max-w-sm">{children}</div>
     </div>
   );
 }
 
-export const Controlled: Story = {
-  render: (args) => <ControlledSelect {...args} />,
+function BasicSelect(args: Story["args"]) {
+  return (
+    <Select {...args}>
+      <SelectTrigger aria-label="Choisir une vue">
+        <SelectValue placeholder="Choisir une vue" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Mon compte</SelectLabel>
+          <SelectSeparator />
+          {frequentOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+function GroupedSelect(args: Story["args"]) {
+  return (
+    <Select {...args}>
+      <SelectTrigger aria-label="Choisir une catégorie">
+        <SelectValue placeholder="Choisir une catégorie" />
+      </SelectTrigger>
+      <SelectContent>
+        {groupedSections.map((section, index) => (
+          <div key={section.label}>
+            {index > 0 ? <SelectSeparator /> : null}
+            <SelectGroup>
+              <SelectLabel>{section.label}</SelectLabel>
+              {section.items.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </div>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function LongListSelect(args: Story["args"]) {
+  return (
+    <Select {...args}>
+      <SelectTrigger aria-label="Choisir un suivi">
+        <SelectValue placeholder="Choisir un suivi" />
+      </SelectTrigger>
+      <SelectContent className="max-h-44">
+        <SelectGroup>
+          <SelectLabel>Suivis disponibles</SelectLabel>
+          <SelectSeparator />
+          {longListOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+function ResponsiveStressSelect() {
+  return (
+    <Select>
+      <SelectTrigger aria-label="Choisir une configuration détaillée">
+        <SelectValue placeholder="Choisir une configuration détaillée" />
+      </SelectTrigger>
+      <SelectContent className="max-h-44">
+        <SelectGroup>
+          <SelectLabel>Largeur réduite</SelectLabel>
+          <SelectSeparator />
+          <SelectItem value="mobile-primary">
+            Configuration principale avec un intitulé volontairement long pour
+            vérifier le retour à la ligne
+          </SelectItem>
+          <SelectItem value="mobile-secondary">
+            Variante secondaire avec précision complémentaire
+          </SelectItem>
+          <SelectItem value="mobile-compact">Variante compacte</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
+      <SelectScaffold
+        description="Choisissez la vue active sans exposer toute la liste en permanence."
+        eyebrow="Navigation"
+        title="Sélecteur standard"
+      >
+        <BasicSelect {...args} />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
 };
 
-export const DarkMode: Story = {
-  ...Default,
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
+      <SelectScaffold
+        description="Utilisez un Select quand une seule option doit être choisie parmi un ensemble compact."
+        eyebrow="Navigation"
+        title="Sélecteur standard"
+      >
+        <BasicSelect {...defaultPlaygroundArgs} />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
+};
+
+export const OnSurface: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="md" surface>
+      <SelectScaffold
+        description="Dans une carte ou un panneau, gardez le déclencheur aligné avec le contenu principal."
+        eyebrow="Surface"
+        title="Select dans une carte"
+      >
+        <BasicSelect {...defaultPlaygroundArgs} />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
+};
+
+export const Grouped: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
+      <SelectScaffold
+        description="Regroupez les options lorsqu&apos;elles appartiennent à des sections distinctes du produit."
+        eyebrow="Organisation"
+        title="Options groupées"
+      >
+        <GroupedSelect {...defaultPlaygroundArgs} />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
+};
+
+export const InteractionChecks: Story = {
   args: {
-    ...Default.args,
+    ...defaultPlaygroundArgs,
     onOpenChange: fn(),
     onValueChange: fn(),
   },
-  globals: {
-    theme: "dark",
+  parameters: {
+    controls: { disable: true },
+    docs: { disable: true },
   },
+  render: (args) => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
+      <SelectScaffold
+        description="Vérifie l&apos;ouverture, le portail, la sélection et le comportement de liste longue."
+        eyebrow="Qualité"
+        title="Contrats d&apos;interaction"
+      >
+        <LongListSelect {...args} />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole("combobox", { name: "Choisir un suivi" });
+
+    await expect(
+      canvasElement.querySelector("[data-slot='select']"),
+    ).toHaveAttribute("data-slot", "select");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.click(trigger);
+
+    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    const body = within(document.body);
+    const portal = document.body.querySelector("[data-slot='select-portal']");
+    const viewport = document.body.querySelector(
+      "[data-slot='select-viewport']",
+    );
+    const listbox = body.getByRole("listbox");
+    const option = body.getByRole("option", { name: "Option de suivi 12" });
+
+    await expect(portal).toHaveAttribute("data-slot", "select-portal");
+    await expect(viewport).toHaveAttribute("tabindex", "0");
+    await expect(listbox).toBeVisible();
+
+    await userEvent.click(option);
+
+    await expect(args.onValueChange).toHaveBeenCalledWith("follow-up-12");
+    await expect(trigger).toHaveTextContent("Option de suivi 12");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(
+      document.body.querySelector("[data-slot='select-content']"),
+    ).toBeNull();
+  },
+};
+
+export const ResponsiveStress: Story = {
+  parameters: {
+    ...fixedStoryParameters,
+    docs: { disable: true },
+  },
+  render: () => (
+    <SelectAuditFrame centeredMinHeight={72} maxWidth="sm">
+      <SelectScaffold
+        description="Le déclencheur doit rester lisible et sans débordement sur une largeur mobile serrée."
+        eyebrow="Responsive"
+        title="Libellés longs"
+      >
+        <ResponsiveStressSelect />
+      </SelectScaffold>
+    </SelectAuditFrame>
+  ),
 };

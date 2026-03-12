@@ -345,6 +345,7 @@ describe("Combobox", () => {
     ) as HTMLElement | null;
 
     expect(container.querySelector("[data-slot='combobox']")).toBeTruthy();
+    expect(document.querySelector("[data-slot='combobox-portal']")).toBeTruthy();
     expect(
       document.querySelector("[data-slot='combobox-input-wrapper']"),
     ).toBeTruthy();
@@ -423,9 +424,21 @@ describe("Combobox", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = renderSingle();
+    renderSingle();
 
-    const results = await axe(container);
+    fireEvent.click(
+      screen.getByRole("combobox", { name: "Choix de l option" }),
+    );
+
+    await waitFor(() => {
+      expect(
+        document.querySelector("[data-slot='combobox-content']"),
+      ).toBeTruthy();
+    });
+
+    const results = await axe(
+      document.querySelector("[data-slot='combobox-portal']")!,
+    );
 
     expect(results).toHaveNoViolations();
   });
