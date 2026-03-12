@@ -56,7 +56,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[placeholder]:text-muted-foreground",
+        "data-placeholder:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-muted-foreground",
         className,
       )}
@@ -166,7 +166,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
         "relative flex w-full cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-disabled:pointer-events-none data-disabled:opacity-50",
         className,
       )}
       data-slot="select-item"

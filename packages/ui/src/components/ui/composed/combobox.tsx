@@ -392,7 +392,7 @@ function ComboboxContent({
           <CommandPrimitive
             className={cn(
               "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
-              "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+              "**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground",
               commandClassName,
             )}
             shouldFilter
@@ -491,7 +491,7 @@ function ComboboxGroup({ className, heading, ...props }: ComboboxGroupProps) {
     <CommandPrimitive.Group
       className={cn(
         "overflow-hidden p-1 text-foreground",
-        "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+        "**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground",
         className,
       )}
       data-slot="combobox-group"
