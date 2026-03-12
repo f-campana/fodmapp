@@ -11,9 +11,9 @@ export type RadioGroupProps = React.ComponentProps<
 function RadioGroup({ className, ...props }: RadioGroupProps) {
   return (
     <RadioGroupPrimitive.Root
+      {...props}
       data-slot="radio-group"
       className={cn("grid gap-2", className)}
-      {...props}
     />
   );
 }
@@ -25,6 +25,7 @@ export type RadioGroupItemProps = React.ComponentProps<
 function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
   return (
     <RadioGroupPrimitive.Item
+      {...props}
       data-slot="radio-group-item"
       className={cn(
         "peer aspect-square size-4 shrink-0 cursor-pointer rounded-full border border-input bg-background text-primary shadow-sm",
@@ -35,7 +36,6 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
-      {...props}
     >
       <RadioGroupPrimitive.Indicator
         data-slot="radio-group-indicator"

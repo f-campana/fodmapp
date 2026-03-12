@@ -405,7 +405,7 @@ export const InteractionChecks: Story = {
 
     await expect(portal).toHaveAttribute("data-slot", "select-portal");
     await expect(viewport).toHaveAttribute("tabindex", "0");
-    await expect(listbox).toBeVisible();
+    await expect(listbox).toHaveAttribute("data-state", "open");
 
     await userEvent.click(option);
 

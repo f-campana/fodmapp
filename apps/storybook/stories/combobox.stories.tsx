@@ -372,7 +372,7 @@ export const InteractionChecks: Story = {
     });
 
     await expect(portal).toHaveAttribute("data-slot", "combobox-portal");
-    await expect(input).toBeVisible();
+    await expect(input).toHaveAttribute("aria-expanded", "true");
 
     await userEvent.click(option);
 

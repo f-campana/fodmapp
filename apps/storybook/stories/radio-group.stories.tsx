@@ -248,6 +248,9 @@ export const InteractionChecks: Story = {
     const balanced = canvas.getByRole("radio", {
       name: "Tolérance intermédiaire",
     });
+    const exploratory = canvas.getByRole("radio", {
+      name: "Tolérance exploratoire",
+    });
 
     await expect(group).toHaveAttribute("data-slot", "radio-group");
     await expect(gentle).toBeChecked();
@@ -258,6 +261,12 @@ export const InteractionChecks: Story = {
     await expect(args.onValueChange).toHaveBeenCalledWith("balanced");
     await expect(balanced).toBeChecked();
     await expect(gentle).not.toBeChecked();
+
+    await userEvent.click(exploratory);
+
+    await expect(args.onValueChange).toHaveBeenCalledWith("exploratory");
+    await expect(exploratory).toBeChecked();
+    await expect(balanced).not.toBeChecked();
   },
 };
 

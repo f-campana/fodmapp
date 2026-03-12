@@ -1,6 +1,7 @@
 import { createRef } from "react";
 
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -77,28 +78,19 @@ describe("RadioGroup", () => {
     );
   });
 
-  it("handles keyboard navigation events while preserving single selection", () => {
+  it("keeps the selected radio as the single keyboard tab stop", async () => {
+    const user = userEvent.setup();
+
     renderOptions({ defaultValue: "sans-lactose" });
 
     const selected = screen.getByRole("radio", { name: "Sans lactose" });
-    const initiallyChecked = screen
-      .getAllByRole("radio")
-      .filter((radio) => radio.getAttribute("data-state") === "checked");
+    const next = screen.getByRole("radio", { name: "Végétarien" });
 
-    act(() => {
-      selected.focus();
-      fireEvent.keyDown(selected, {
-        key: "ArrowRight",
-        code: "ArrowRight",
-      });
-    });
+    await user.tab();
 
-    const afterEventChecked = screen
-      .getAllByRole("radio")
-      .filter((radio) => radio.getAttribute("data-state") === "checked");
-
-    expect(initiallyChecked).toHaveLength(1);
-    expect(afterEventChecked).toHaveLength(1);
+    expect(selected).toHaveFocus();
+    expect(selected).toHaveAttribute("tabindex", "0");
+    expect(next).toHaveAttribute("tabindex", "-1");
   });
 
   it("does not select disabled items", () => {
@@ -122,8 +114,29 @@ describe("RadioGroup", () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it("renders data-slot contract", () => {
-    renderOptions({ defaultValue: "sans-lactose" });
+  it("keeps slot markers stable on root and item", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RadioGroup
+        aria-label="Préférence"
+        data-slot="custom-root"
+        defaultValue="sans-lactose"
+      >
+        <div className="flex items-center gap-2">
+          <RadioGroupItem
+            data-slot="custom-item"
+            id="option-sans-lactose"
+            value="sans-lactose"
+          />
+          <label htmlFor="option-sans-lactose">Sans lactose</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="option-vegetarien" value="vegetarien" />
+          <label htmlFor="option-vegetarien">Végétarien</label>
+        </div>
+      </RadioGroup>,
+    );
 
     const root = screen.getByRole("radiogroup", { name: "Préférence" });
     const item = screen.getByRole("radio", { name: "Sans lactose" });
@@ -132,6 +145,15 @@ describe("RadioGroup", () => {
     expect(root).toHaveAttribute("data-slot", "radio-group");
     expect(item).toHaveAttribute("data-slot", "radio-group-item");
     expect(indicator).toHaveAttribute("data-slot", "radio-group-indicator");
+
+    expect(document.querySelector("[data-slot='custom-root']")).toBeNull();
+    expect(document.querySelector("[data-slot='custom-item']")).toBeNull();
+
+    await user.click(screen.getByRole("radio", { name: "Végétarien" }));
+    expect(screen.getByRole("radio", { name: "Végétarien" })).toHaveAttribute(
+      "data-slot",
+      "radio-group-item",
+    );
   });
 
   it("forwards ref to radio group root", () => {

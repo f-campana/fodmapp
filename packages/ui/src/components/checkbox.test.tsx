@@ -60,6 +60,25 @@ describe("Checkbox", () => {
     );
   });
 
+  it("keeps slot markers stable on the real checkbox element", () => {
+    const { container } = render(
+      <Checkbox
+        aria-label="Stable"
+        data-slot="custom-checkbox"
+        defaultChecked
+      />,
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: "Stable" });
+    const indicator = checkbox.querySelector("[data-slot='checkbox-indicator']");
+
+    expect(checkbox).toBe(container.firstElementChild);
+    expect(checkbox).toHaveAttribute("data-slot", "checkbox");
+    expect(indicator).toHaveAttribute("data-slot", "checkbox-indicator");
+
+    expect(container.querySelector("[data-slot='custom-checkbox']")).toBeNull();
+  });
+
   it("renders indicator slot when checked", () => {
     render(<Checkbox aria-label="Option" defaultChecked />);
 
