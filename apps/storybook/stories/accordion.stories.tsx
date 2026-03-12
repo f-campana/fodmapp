@@ -133,69 +133,6 @@ function DefaultAccordion(args: Story["args"]) {
   );
 }
 
-function MultipleAccordion() {
-  return (
-    <Accordion defaultValue={["item-1"]} type="multiple">
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Petit déjeuner</AccordionTrigger>
-        <AccordionContent>
-          Favorisez les portions mesurées en début de journée.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-2">
-        <AccordionTrigger>Déjeuner</AccordionTrigger>
-        <AccordionContent>
-          Privilégiez une base simple et ajoutez les fibres progressivement.
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-}
-
-function CollapsibleAccordion() {
-  return (
-    <Accordion collapsible defaultValue="item-1" type="single">
-      <AccordionItem value="item-1">
-        <AccordionTrigger>Plan de la semaine</AccordionTrigger>
-        <AccordionContent>
-          Organisez vos repas en avance pour éviter les choix impulsifs.
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-}
-
-function ResponsiveStressAccordion() {
-  return (
-    <Accordion collapsible defaultValue="item-1" type="single">
-      <AccordionItem value="item-1">
-        <AccordionTrigger>
-          Quels aliments à faible teneur en FODMAP pouvez-vous préparer à
-          l&apos;avance pour un déjeuner transportable pendant une semaine très
-          chargée ?
-        </AccordionTrigger>
-        <AccordionContent>
-          Préparez une base simple la veille, répartissez-la en portions
-          individuelles et ajoutez au dernier moment les éléments fragiles pour
-          conserver une texture agréable et limiter les écarts de tolérance.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="item-2">
-        <AccordionTrigger>
-          Comment réintroduire progressivement plusieurs légumes cuits sans
-          perdre en lisibilité lorsque l&apos;intitulé de la section devient
-          plus long sur mobile ?
-        </AccordionTrigger>
-        <AccordionContent>
-          Commencez par une portion modeste, gardez une seule variable nouvelle
-          par repas et notez la tolérance sur plusieurs jours avant
-          d&apos;augmenter la variété ou le volume.
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-}
-
 export const Playground: Story = {
   render: (args) => (
     <AccordionAuditFrame maxWidth="xl">
@@ -226,7 +163,20 @@ export const Multiple: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <AccordionAuditFrame maxWidth="xl">
-      <MultipleAccordion />
+      <Accordion defaultValue={["item-1"]} type="multiple">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Petit déjeuner</AccordionTrigger>
+          <AccordionContent>
+            Favorisez les portions mesurées en début de journée.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>Déjeuner</AccordionTrigger>
+          <AccordionContent>
+            Privilégiez une base simple et ajoutez les fibres progressivement.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </AccordionAuditFrame>
   ),
 };
@@ -235,7 +185,14 @@ export const Collapsible: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <AccordionAuditFrame maxWidth="xl">
-      <CollapsibleAccordion />
+      <Accordion collapsible defaultValue="item-1" type="single">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Plan de la semaine</AccordionTrigger>
+          <AccordionContent>
+            Organisez vos repas en avance pour éviter les choix impulsifs.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </AccordionAuditFrame>
   ),
 };
@@ -309,7 +266,33 @@ export const ResponsiveStress: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <AccordionAuditFrame maxWidth="sm">
-      <ResponsiveStressAccordion />
+      <Accordion collapsible defaultValue="item-1" type="single">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>
+            Quels aliments à faible teneur en FODMAP pouvez-vous préparer à
+            l&apos;avance pour un déjeuner transportable pendant une semaine
+            très chargée ?
+          </AccordionTrigger>
+          <AccordionContent>
+            Préparez une base simple la veille, répartissez-la en portions
+            individuelles et ajoutez au dernier moment les éléments fragiles
+            pour conserver une texture agréable et limiter les écarts de
+            tolérance.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>
+            Comment réintroduire progressivement plusieurs légumes cuits sans
+            perdre en lisibilité lorsque l&apos;intitulé de la section devient
+            plus long sur mobile ?
+          </AccordionTrigger>
+          <AccordionContent>
+            Commencez par une portion modeste, gardez une seule variable
+            nouvelle par repas et notez la tolérance sur plusieurs jours avant
+            d&apos;augmenter la variété ou le volume.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </AccordionAuditFrame>
   ),
 };
