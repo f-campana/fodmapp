@@ -49,7 +49,9 @@ describe("Resizable", () => {
       </ResizablePanelGroup>,
     );
 
-    const group = container.querySelector("[data-slot='resizable-panel-group']");
+    const group = container.querySelector(
+      "[data-slot='resizable-panel-group']",
+    );
     const panels = container.querySelectorAll("[data-slot='resizable-panel']");
     const handle = container.querySelector("[data-slot='resizable-handle']");
     const grip = container.querySelector("[data-slot='resizable-handle-grip']");
@@ -90,11 +92,15 @@ describe("Resizable", () => {
     expect(handle).toHaveAttribute("tabindex", "0");
     expect(handle).toHaveAttribute("aria-orientation", "vertical");
     expect(handle.className).toContain("group");
-    expect(handle.className).toContain("aria-[orientation=vertical]:cursor-col-resize");
+    expect(handle.className).toContain(
+      "aria-[orientation=vertical]:cursor-col-resize",
+    );
     expect(handle.className).toContain("aria-[orientation=horizontal]:h-px");
     expect(handle.className).toContain("aria-[orientation=vertical]:w-px");
     expect(handle.className).toContain("focus-visible:ring-ring-soft");
-    expect(grip.className).toContain("group-aria-[orientation=horizontal]:w-12");
+    expect(grip.className).toContain(
+      "group-aria-[orientation=horizontal]:w-12",
+    );
     expect(grip.className).toContain("group-aria-[orientation=vertical]:h-12");
   });
 
@@ -142,7 +148,9 @@ describe("Resizable", () => {
       </ResizablePanelGroup>,
     );
 
-    const group = container.querySelector("[data-slot='resizable-panel-group']");
+    const group = container.querySelector(
+      "[data-slot='resizable-panel-group']",
+    );
 
     expect(group?.className ?? "").toContain("groupe-personnalise");
     expect(group?.className ?? "").toContain("flex-col");

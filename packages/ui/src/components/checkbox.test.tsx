@@ -70,7 +70,9 @@ describe("Checkbox", () => {
     );
 
     const checkbox = screen.getByRole("checkbox", { name: "Stable" });
-    const indicator = checkbox.querySelector("[data-slot='checkbox-indicator']");
+    const indicator = checkbox.querySelector(
+      "[data-slot='checkbox-indicator']",
+    );
 
     expect(checkbox).toBe(container.firstElementChild);
     expect(checkbox).toHaveAttribute("data-slot", "checkbox");

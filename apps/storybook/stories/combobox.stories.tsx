@@ -252,7 +252,9 @@ function ResponsiveStressCombobox(portalContainer: HTMLDivElement | null) {
             <ComboboxItem value="detailed-secondary">
               Variante secondaire avec plus de contexte
             </ComboboxItem>
-            <ComboboxItem value="detailed-short">Variante compacte</ComboboxItem>
+            <ComboboxItem value="detailed-short">
+              Variante compacte
+            </ComboboxItem>
           </ComboboxGroup>
         </ComboboxList>
       </ComboboxContent>
@@ -343,7 +345,7 @@ export const InteractionChecks: Story = {
         <ComboboxScaffold
           description="Vérifie le portail, la recherche ouverte et la sélection sur une liste longue."
           eyebrow="Qualité"
-          title="Contrats d&apos;interaction"
+          title="Contrats d'interaction"
         >
           {LongListCombobox(args, portalContainer)}
         </ComboboxScaffold>

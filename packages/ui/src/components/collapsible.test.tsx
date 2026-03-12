@@ -36,7 +36,9 @@ describe("Collapsible", () => {
 
     const root = container.querySelector("[data-slot='collapsible']");
     const trigger = screen.getByRole("button", { name: "Voir les détails" });
-    const content = container.querySelector("[data-slot='collapsible-content']");
+    const content = container.querySelector(
+      "[data-slot='collapsible-content']",
+    );
 
     expect(root).toBe(container.firstElementChild);
     expect(trigger).toHaveAttribute("data-slot", "collapsible-trigger");
@@ -60,7 +62,9 @@ describe("Collapsible", () => {
     const trigger = screen.getByRole("button", { name: "Voir les détails" });
 
     expect(trigger).toHaveAttribute("data-slot", "custom-trigger");
-    expect(container.querySelector("[data-slot='collapsible-content']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='collapsible-content']"),
+    ).toBeTruthy();
   });
 
   it("toggles state on trigger click in uncontrolled mode", async () => {
@@ -135,8 +139,12 @@ describe("Collapsible", () => {
     );
 
     const root = container.querySelector("[data-slot='collapsible']");
-    const trigger = container.querySelector("[data-slot='collapsible-trigger']");
-    const content = container.querySelector("[data-slot='collapsible-content']");
+    const trigger = container.querySelector(
+      "[data-slot='collapsible-trigger']",
+    );
+    const content = container.querySelector(
+      "[data-slot='collapsible-content']",
+    );
 
     expect(root?.className ?? "").toContain("mon-collapsible");
     expect(trigger?.className ?? "").toContain("mon-trigger");

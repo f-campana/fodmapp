@@ -15,7 +15,10 @@
   body {
     margin: 0;
     font-family: var(--font-body);
-    background-color: var(--storybook-preview-background, var(--color-bg)) !important;
+    background-color: var(
+      --storybook-preview-background,
+      var(--color-bg)
+    ) !important;
     color: var(--color-text);
   }
 

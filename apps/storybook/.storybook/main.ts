@@ -32,8 +32,8 @@ const config: StorybookConfig = {
   },
 
   core: {
-    disableWhatsNewNotifications: true
-  }
+    disableWhatsNewNotifications: true,
+  },
 };
 
 export default config;

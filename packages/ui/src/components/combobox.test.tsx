@@ -393,7 +393,9 @@ describe("Combobox", () => {
     ).toBeTruthy();
     expect(getComboboxInput(container)).toBeTruthy();
     expect(container.querySelector("[data-slot='combobox-list']")).toBeTruthy();
-    expect(container.querySelector("[data-slot='combobox-group']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='combobox-group']"),
+    ).toBeTruthy();
     expect(
       container.querySelector("[data-slot='combobox-separator']"),
     ).toBeTruthy();

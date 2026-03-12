@@ -53,7 +53,9 @@ describe("Select", () => {
     renderChildren: (portalContainer: HTMLDivElement | null) => ReactNode,
   ) {
     return render(
-      <SelectTestHarness>{(portalContainer) => renderChildren(portalContainer)}</SelectTestHarness>,
+      <SelectTestHarness>
+        {(portalContainer) => renderChildren(portalContainer)}
+      </SelectTestHarness>,
     );
   }
 
@@ -102,9 +104,7 @@ describe("Select", () => {
     return within(container).queryByRole("option", { name });
   }
 
-  function renderDisabledItemSelect(
-    onValueChange: ReturnType<typeof vi.fn>,
-  ) {
+  function renderDisabledItemSelect(onValueChange: ReturnType<typeof vi.fn>) {
     return renderSelectWithPortal((portalContainer) => (
       <Select onValueChange={onValueChange}>
         <SelectTrigger>

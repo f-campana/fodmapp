@@ -11,11 +11,7 @@
   "tailwindCSS.suggestions": true,
   "tailwindCSS.codeActions": true,
   "tailwindCSS.experimental.configFile": {
-    "packages/ui/src/styles/index.css": [
-      "packages/ui/**/*"
-    ],
-    "apps/storybook/.storybook/preview.css": [
-      "apps/storybook/**/*"
-    ]
+    "packages/ui/src/styles/index.css": ["packages/ui/**/*"],
+    "apps/storybook/.storybook/preview.css": ["apps/storybook/**/*"]
   }
 }

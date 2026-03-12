@@ -75,13 +75,7 @@ if (isAgentationEnabled) {
   // Keep generated design-token artifacts hot while Storybook is running locally.
   upstreamWatchProcess = runProcess(
     pnpmCmd,
-    [
-      "exec",
-      "turbo",
-      "watch",
-      "build",
-      "--filter=@fodmap/design-tokens",
-    ],
+    ["exec", "turbo", "watch", "build", "--filter=@fodmap/design-tokens"],
     repoRootCwd,
   );
 }
@@ -101,7 +95,9 @@ previewStylesWatchProcess.on("exit", (code, signal) => {
     return;
   }
 
-  process.stderr.write("[storybook-dev] preview styles watch exited unexpectedly. Stopping Storybook.\n");
+  process.stderr.write(
+    "[storybook-dev] preview styles watch exited unexpectedly. Stopping Storybook.\n",
+  );
   shutdownAll();
   process.exit(code ?? 1);
 });
@@ -116,7 +112,9 @@ if (upstreamWatchProcess) {
       return;
     }
 
-    process.stderr.write("[storybook-dev] upstream watch exited unexpectedly. Stopping Storybook.\n");
+    process.stderr.write(
+      "[storybook-dev] upstream watch exited unexpectedly. Stopping Storybook.\n",
+    );
     shutdownAll();
     process.exit(code ?? 1);
   });

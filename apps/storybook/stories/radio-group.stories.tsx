@@ -151,11 +151,7 @@ function RadioGroupField(args: Story["args"]) {
 
 function DisabledRadioGroupField() {
   return (
-    <RadioGroupField
-      {...defaultPlaygroundArgs}
-      disabled
-      onValueChange={fn()}
-    />
+    <RadioGroupField {...defaultPlaygroundArgs} disabled onValueChange={fn()} />
   );
 }
 

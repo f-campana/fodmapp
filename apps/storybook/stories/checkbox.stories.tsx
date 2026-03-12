@@ -77,7 +77,11 @@ type Story = StoryObj<typeof meta>;
 function CheckboxField(args: Story["args"]) {
   return (
     <div className="flex items-start gap-3">
-      <Checkbox {...args} id="meal-plan" aria-label="Enregistrer dans mon plan" />
+      <Checkbox
+        {...args}
+        id="meal-plan"
+        aria-label="Enregistrer dans mon plan"
+      />
       <div className="space-y-1">
         <Label htmlFor="meal-plan">Enregistrer dans mon plan</Label>
         <p className="text-sm leading-5 text-muted-foreground">

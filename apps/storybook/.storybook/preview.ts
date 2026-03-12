@@ -17,10 +17,10 @@ type SemanticColorTokens = {
 };
 
 const PREVIEW_BACKGROUND_CSS_VAR = "--storybook-preview-background";
-const LIGHT_SEMANTIC_COLORS =
-  tokens.themes.light.semantic.color as SemanticColorTokens;
-const DARK_SEMANTIC_COLORS =
-  tokens.themes.dark.semantic.color as SemanticColorTokens;
+const LIGHT_SEMANTIC_COLORS = tokens.themes.light.semantic
+  .color as SemanticColorTokens;
+const DARK_SEMANTIC_COLORS = tokens.themes.dark.semantic
+  .color as SemanticColorTokens;
 const SEMANTIC_COLORS_BY_THEME: Record<PreviewTheme, SemanticColorTokens> = {
   light: LIGHT_SEMANTIC_COLORS,
   dark: DARK_SEMANTIC_COLORS,
@@ -111,8 +111,9 @@ const preview: Preview = {
         document.documentElement.removeAttribute("data-theme");
       }
 
-      const selectedBackground = context.globals.backgrounds
-        ?.value as PreviewBackground | undefined;
+      const selectedBackground = context.globals.backgrounds?.value as
+        | PreviewBackground
+        | undefined;
       const previewBackground = resolvePreviewBackground(
         selectedBackground,
         resolvedTheme,

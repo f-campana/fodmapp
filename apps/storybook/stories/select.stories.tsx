@@ -79,7 +79,8 @@ const meta = {
       table: { defaultValue: { summary: "false" } },
     },
     open: {
-      description: "Controls the open state when the select is externally managed.",
+      description:
+        "Controls the open state when the select is externally managed.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "undefined" } },
     },
@@ -121,7 +122,8 @@ const meta = {
       description: "Callback invoked whenever the selected value changes.",
     },
     children: {
-      description: "Composition of trigger, content, groups, labels, and items.",
+      description:
+        "Composition of trigger, content, groups, labels, and items.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
@@ -351,7 +353,7 @@ export const Grouped: Story = {
     <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
       {(portalContainer) => (
         <SelectScaffold
-          description="Regroupez les options lorsqu&apos;elles appartiennent à des sections distinctes du produit."
+          description="Regroupez les options lorsqu'elles appartiennent à des sections distinctes du produit."
           eyebrow="Organisation"
           title="Options groupées"
         >
@@ -376,9 +378,9 @@ export const InteractionChecks: Story = {
     <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
       {(portalContainer) => (
         <SelectScaffold
-          description="Vérifie l&apos;ouverture, le portail, la sélection et le comportement de liste longue."
+          description="Vérifie l'ouverture, le portail, la sélection et le comportement de liste longue."
           eyebrow="Qualité"
-          title="Contrats d&apos;interaction"
+          title="Contrats d'interaction"
         >
           {LongListSelect(args, portalContainer)}
         </SelectScaffold>
@@ -400,7 +402,9 @@ export const InteractionChecks: Story = {
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
     const portal = canvasElement.querySelector("[data-slot='select-portal']");
-    const viewport = canvasElement.querySelector("[data-slot='select-viewport']");
+    const viewport = canvasElement.querySelector(
+      "[data-slot='select-viewport']",
+    );
     const listbox = canvas.getByRole("listbox");
     const option = canvas.getByRole("option", { name: "Option de suivi 12" });
 

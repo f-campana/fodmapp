@@ -11,7 +11,10 @@ const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
 const isWatch = process.argv.includes("--watch");
 const inputPath = path.resolve(storybookCwd, ".storybook/preview.css");
-const outputPath = path.resolve(storybookCwd, ".storybook/preview.generated.css");
+const outputPath = path.resolve(
+  storybookCwd,
+  ".storybook/preview.generated.css",
+);
 
 const args = [
   "--filter",
