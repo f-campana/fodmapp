@@ -10,8 +10,7 @@ export type AccordionProps = React.ComponentProps<
 
 function Accordion({ children, ...props }: AccordionProps) {
   return (
-    <AccordionPrimitive.Root {...props}>
-      <span data-slot="accordion" hidden />
+    <AccordionPrimitive.Root {...props} data-slot="accordion">
       {children}
     </AccordionPrimitive.Root>
   );
@@ -24,12 +23,12 @@ export type AccordionItemProps = React.ComponentProps<
 function AccordionItem({ className, ...props }: AccordionItemProps) {
   return (
     <AccordionPrimitive.Item
+      {...props}
       data-slot="accordion-item"
       className={cn(
-        "overflow-hidden border-b border-border first-of-type:rounded-t-(--radius) last:rounded-b-(--radius) last:border-b-0",
+        "overflow-hidden border-b border-border last:rounded-b-(--radius) last:border-b-0 first-of-type:rounded-t-(--radius)",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -46,6 +45,7 @@ function AccordionTrigger({
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
+        {...props}
         data-slot="accordion-trigger"
         className={cn(
           "group inline-flex min-h-11 flex-1 cursor-pointer items-center justify-between gap-2 p-2 text-left text-base leading-6 font-medium",
@@ -56,7 +56,6 @@ function AccordionTrigger({
           "disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
-        {...props}
       >
         {children}
         <svg
@@ -90,13 +89,13 @@ function AccordionContent({
 }: AccordionContentProps) {
   return (
     <AccordionPrimitive.Content
+      {...props}
       data-slot="accordion-content"
       className={cn(
         "overflow-hidden",
         "data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up",
         className,
       )}
-      {...props}
     >
       <div
         data-slot="accordion-content-inner"

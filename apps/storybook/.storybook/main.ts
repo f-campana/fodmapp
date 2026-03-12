@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { StorybookConfig } from "@storybook/react-vite";
+
 import { mergeConfig } from "vite";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,10 +12,12 @@ const repoRoot = path.resolve(__dirname, "../../..");
 const config: StorybookConfig = {
   stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(ts|tsx)"],
   addons: ["@storybook/addon-a11y", "@storybook/addon-docs"],
+
   framework: {
     name: "@storybook/react-vite",
     options: {},
   },
+
   async viteFinal(baseConfig) {
     return mergeConfig(baseConfig, {
       resolve: {
@@ -27,6 +30,10 @@ const config: StorybookConfig = {
       },
     });
   },
+
+  core: {
+    disableWhatsNewNotifications: true
+  }
 };
 
 export default config;
