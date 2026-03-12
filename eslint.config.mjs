@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 
 import baseConfig from "@fodmap/eslint-config";
+import markdownConfig from "@fodmap/eslint-config/markdown";
 import nextConfig from "@fodmap/eslint-config/next";
 
 export default defineConfig([
@@ -20,5 +21,9 @@ export default defineConfig([
     "packages/design-tokens/src/generated/tokens.native.d.ts",
   ]),
   ...baseConfig,
+  ...markdownConfig.map((config) => ({
+    ...config,
+    files: ["apps/storybook/stories/**/*.{md,mdx}"],
+  })),
   ...nextConfig,
 ]);
