@@ -23,6 +23,7 @@ function ResizablePanelGroup({
       className={cn(
         "flex h-full w-full",
         orientation === "vertical" ? "flex-col" : "flex-row",
+        "data-[orientation=vertical]:flex-col",
         className,
       )}
     />
@@ -66,6 +67,7 @@ function ResizableHandle({
         "aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full",
         "aria-[orientation=vertical]:cursor-col-resize",
         "aria-[orientation=vertical]:h-full aria-[orientation=vertical]:w-px",
+        "data-[panel-group-direction=horizontal]:h-px data-[panel-group-direction=vertical]:w-px",
         className,
       )}
     >

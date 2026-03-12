@@ -142,20 +142,27 @@ function DatePicker({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className={cn("w-auto p-0", contentClassName)}
-          data-slot="date-picker-content"
+          className="w-auto p-0"
           id={contentId}
           sideOffset={4}
         >
-          <Calendar
-            data-slot="date-picker-calendar"
-            initialFocus
-            mode="single"
-            onSelect={handleSelect}
-            selected={selectedDate}
-            className={cn(calendarPropsClassName, calendarClassName)}
-            {...restCalendarProps}
-          />
+          <div
+            className={cn(
+              "bg-popover text-popover-foreground",
+              contentClassName,
+            )}
+            data-slot="date-picker-content"
+          >
+            <Calendar
+              data-slot="date-picker-calendar"
+              initialFocus
+              mode="single"
+              onSelect={handleSelect}
+              selected={selectedDate}
+              className={cn(calendarPropsClassName, calendarClassName)}
+              {...restCalendarProps}
+            />
+          </div>
         </PopoverContent>
       </div>
     </Popover>

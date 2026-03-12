@@ -1,4 +1,9 @@
-import { createRef, type ReactNode, useState } from "react";
+import {
+  type ComponentProps,
+  createRef,
+  type ReactNode,
+  useState,
+} from "react";
 
 import {
   fireEvent,
@@ -42,6 +47,10 @@ function SelectTestHarness({
 }
 
 describe("Select", () => {
+  type SelectValueChangeHandler = NonNullable<
+    ComponentProps<typeof Select>["onValueChange"]
+  >;
+
   function openSelect() {
     const trigger = screen.getByRole("combobox");
     trigger.focus();
@@ -104,7 +113,7 @@ describe("Select", () => {
     return within(container).queryByRole("option", { name });
   }
 
-  function renderDisabledItemSelect(onValueChange: ReturnType<typeof vi.fn>) {
+  function renderDisabledItemSelect(onValueChange: SelectValueChangeHandler) {
     return renderSelectWithPortal((portalContainer) => (
       <Select onValueChange={onValueChange}>
         <SelectTrigger>
@@ -256,7 +265,8 @@ describe("Select", () => {
       querySelectOption(container, "Support prioritaire"),
     );
 
-    fireEvent.click(disabledItem);
+    expect(disabledItem).toBeTruthy();
+    fireEvent.click(disabledItem!);
 
     expect(onValueChange).not.toHaveBeenCalledWith("support");
   });
@@ -336,7 +346,7 @@ describe("Select", () => {
     expect(trigger?.className ?? "").toContain("cursor-pointer");
     expect(trigger?.className ?? "").toContain("focus-visible:ring-ring-soft");
     expect(trigger?.className ?? "").toContain(
-      "data-[placeholder]:text-muted-foreground",
+      "data-placeholder:text-muted-foreground",
     );
 
     expect(content?.className ?? "").toContain("bg-popover");

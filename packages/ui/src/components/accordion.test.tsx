@@ -219,7 +219,7 @@ describe("Accordion", () => {
               <AccordionContent>Reponse 2</AccordionContent>
             </AccordionItem>
           </Accordion>
-          <output data-testid="current-value">{value || "none"}</output>
+          <output aria-label="Valeur courante">{value || "none"}</output>
         </>
       );
     }
@@ -230,12 +230,14 @@ describe("Accordion", () => {
 
     await user.click(triggerTwo);
     expect(onValueChange).toHaveBeenCalledWith("item-2");
-    expect(screen.getByTestId("current-value")).toHaveTextContent("item-2");
+    expect(screen.getByLabelText("Valeur courante")).toHaveTextContent(
+      "item-2",
+    );
     expect(triggerTwo).toHaveAttribute("aria-expanded", "true");
 
     await user.click(triggerTwo);
     expect(onValueChange).toHaveBeenLastCalledWith("");
-    expect(screen.getByTestId("current-value")).toHaveTextContent("none");
+    expect(screen.getByLabelText("Valeur courante")).toHaveTextContent("none");
     expect(triggerTwo).toHaveAttribute("aria-expanded", "false");
   });
 

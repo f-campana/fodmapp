@@ -21,6 +21,7 @@ describe("ScrollArea", () => {
 
     expect(root).toHaveAttribute("data-slot", "scroll-area");
     expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
+    expect(viewport).toHaveAttribute("tabindex", "0");
   });
 
   it("renders both scrollbar orientations and thumb slots", () => {
