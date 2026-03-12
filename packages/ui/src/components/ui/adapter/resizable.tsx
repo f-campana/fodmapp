@@ -12,16 +12,19 @@ export type ResizablePanelGroupProps = React.ComponentProps<
 
 function ResizablePanelGroup({
   className,
+  orientation = "horizontal",
   ...props
 }: ResizablePanelGroupProps) {
   return (
     <ResizablePrimitive.Group
+      {...props}
       data-slot="resizable-panel-group"
+      orientation={orientation}
       className={cn(
-        "flex h-full w-full data-[orientation=vertical]:flex-col",
+        "flex h-full w-full",
+        orientation === "vertical" ? "flex-col" : "flex-row",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -33,9 +36,9 @@ export type ResizablePanelProps = React.ComponentProps<
 function ResizablePanel({ className, ...props }: ResizablePanelProps) {
   return (
     <ResizablePrimitive.Panel
+      {...props}
       data-slot="resizable-panel"
       className={cn(className)}
-      {...props}
     />
   );
 }
@@ -53,24 +56,26 @@ function ResizableHandle({
 }: ResizableHandleProps) {
   return (
     <ResizablePrimitive.Separator
+      {...props}
       data-slot="resizable-handle"
       className={cn(
-        "relative shrink-0 touch-none bg-border outline-hidden select-none",
+        "group relative shrink-0 touch-none bg-border outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-        "data-[panel-group-direction=horizontal]:h-px data-[panel-group-direction=horizontal]:w-full",
-        "data-[panel-group-direction=vertical]:h-full data-[panel-group-direction=vertical]:w-px",
+        "aria-[orientation=horizontal]:cursor-row-resize",
+        "aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full",
+        "aria-[orientation=vertical]:cursor-col-resize",
+        "aria-[orientation=vertical]:h-full aria-[orientation=vertical]:w-px",
         className,
       )}
-      {...props}
     >
       {withHandle ? (
         <div
           data-slot="resizable-handle-grip"
           className={cn(
             "absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-sm border border-border bg-background text-muted-foreground",
-            "data-[panel-group-direction=horizontal]:h-4 data-[panel-group-direction=horizontal]:w-12",
-            "data-[panel-group-direction=vertical]:h-12 data-[panel-group-direction=vertical]:w-4",
+            "group-aria-[orientation=horizontal]:h-4 group-aria-[orientation=horizontal]:w-12",
+            "group-aria-[orientation=vertical]:h-12 group-aria-[orientation=vertical]:w-4",
           )}
         >
           <svg

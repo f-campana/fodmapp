@@ -1,12 +1,7 @@
 import { createRef } from "react";
 
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -27,64 +22,122 @@ describe("Tabs", () => {
     );
   }
 
-  it("renders tab semantics", () => {
-    renderTabs();
+  it("keeps slot markers stable on real elements in default composition", () => {
+    const { container } = render(
+      <Tabs data-slot="custom-root" defaultValue="resume">
+        <TabsList data-slot="custom-list">
+          <TabsTrigger data-slot="custom-trigger" value="resume">
+            Résumé
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent data-slot="custom-content" value="resume">
+          Contenu résumé
+        </TabsContent>
+      </Tabs>,
+    );
 
-    expect(screen.getByRole("tablist")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Résumé" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Détails" })).toBeInTheDocument();
-    expect(screen.getByRole("tabpanel")).toBeInTheDocument();
+    const root = container.querySelector("[data-slot='tabs']");
+    const list = container.querySelector("[data-slot='tabs-list']");
+    const trigger = screen.getByRole("tab", { name: "Résumé" });
+    const content = container.querySelector("[data-slot='tabs-content']");
+
+    expect(root).toBe(container.firstElementChild);
+    expect(list).toBeTruthy();
+    expect(trigger).toHaveAttribute("data-slot", "tabs-trigger");
+    expect(content).toBeTruthy();
+
+    expect(container.querySelector("[data-slot='custom-root']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-list']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-content']")).toBeNull();
   });
 
-  it("switches active tab in uncontrolled mode", () => {
+  it("allows trigger slot override when using asChild", () => {
+    const { container } = render(
+      <Tabs defaultValue="resume">
+        <TabsList>
+          <TabsTrigger asChild value="resume">
+            <button data-slot="custom-trigger">Résumé</button>
+          </TabsTrigger>
+          <TabsTrigger value="details">Détails</TabsTrigger>
+        </TabsList>
+        <TabsContent value="resume">Contenu résumé</TabsContent>
+        <TabsContent value="details">Contenu détaillé</TabsContent>
+      </Tabs>,
+    );
+
+    const customTrigger = screen.getByRole("tab", { name: "Résumé" });
+
+    expect(customTrigger).toHaveAttribute("data-slot", "custom-trigger");
+    expect(container.querySelector("[data-slot='tabs-trigger']")).toBeTruthy();
+  });
+
+  it("switches active tabs in uncontrolled mode and keeps semantic linkage", async () => {
+    const user = userEvent.setup();
     renderTabs();
 
     const resume = screen.getByRole("tab", { name: "Résumé" });
     const details = screen.getByRole("tab", { name: "Détails" });
 
-    expect(resume).toHaveAttribute("data-state", "active");
-    expect(details).toHaveAttribute("data-state", "inactive");
+    expect(resume).toHaveAttribute("aria-selected", "true");
+    expect(details).toHaveAttribute("aria-selected", "false");
 
-    act(() => {
-      fireEvent.mouseDown(details);
-      fireEvent.click(details);
+    await user.click(details);
+
+    await waitFor(() => {
+      expect(details).toHaveAttribute("aria-selected", "true");
+      expect(resume).toHaveAttribute("aria-selected", "false");
     });
 
-    return waitFor(() => {
-      expect(details).toHaveAttribute("data-state", "active");
-      expect(resume).toHaveAttribute("data-state", "inactive");
-    });
+    const detailsPanelId = details.getAttribute("aria-controls");
+    const detailsPanel = detailsPanelId
+      ? document.getElementById(detailsPanelId)
+      : null;
+
+    expect(detailsPanel).toHaveAttribute("data-slot", "tabs-content");
+    expect(detailsPanel).toHaveAttribute(
+      "aria-labelledby",
+      details.getAttribute("id") ?? "",
+    );
+    expect(detailsPanel).toHaveTextContent("Contenu détaillé");
   });
 
-  it("supports keyboard navigation", () => {
+  it("supports keyboard navigation and activates the next tab", async () => {
+    const user = userEvent.setup();
     renderTabs();
 
     const resume = screen.getByRole("tab", { name: "Résumé" });
-    const initiallyChecked = screen
-      .getAllByRole("tab")
-      .filter((tab) => tab.getAttribute("data-state") === "active");
+    const details = screen.getByRole("tab", { name: "Détails" });
 
-    act(() => {
-      resume.focus();
-      fireEvent.keyDown(resume, { key: "ArrowRight", code: "ArrowRight" });
+    await user.click(resume);
+    await user.keyboard("{ArrowRight}");
+
+    await waitFor(() => {
+      expect(details).toHaveFocus();
+      expect(details).toHaveAttribute("aria-selected", "true");
     });
 
-    const afterEventChecked = screen
-      .getAllByRole("tab")
-      .filter((tab) => tab.getAttribute("data-state") === "active");
+    const detailsPanelId = details.getAttribute("aria-controls");
+    const detailsPanel = detailsPanelId
+      ? document.getElementById(detailsPanelId)
+      : null;
 
-    expect(initiallyChecked).toHaveLength(1);
-    expect(afterEventChecked).toHaveLength(1);
+    expect(detailsPanel).toHaveTextContent("Contenu détaillé");
+    expect(detailsPanel).toHaveAttribute(
+      "aria-labelledby",
+      details.getAttribute("id") ?? "",
+    );
   });
 
-  it("does not activate disabled trigger", () => {
+  it("does not activate a disabled trigger", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
 
     render(
       <Tabs defaultValue="resume" onValueChange={onValueChange}>
         <TabsList>
           <TabsTrigger value="resume">Résumé</TabsTrigger>
-          <TabsTrigger value="details" disabled>
+          <TabsTrigger disabled value="details">
             Détails
           </TabsTrigger>
         </TabsList>
@@ -93,35 +146,58 @@ describe("Tabs", () => {
       </Tabs>,
     );
 
-    screen.getByRole("tab", { name: "Détails" }).click();
+    const details = screen.getByRole("tab", { name: "Détails" });
 
-    expect(onValueChange).not.toHaveBeenCalledWith("details");
+    expect(details).toBeDisabled();
+
+    await user.click(details);
+
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(details).toHaveAttribute("aria-selected", "false");
   });
 
-  it("renders data-slot and state class contracts", () => {
+  it("keeps minimal class contracts on trigger and content", () => {
     renderTabs();
 
-    const root = screen.getByRole("tablist").closest("[data-slot='tabs']");
-    const list = screen.getByRole("tablist");
     const trigger = screen.getByRole("tab", { name: "Résumé" });
     const panel = screen
       .getByText("Contenu résumé")
       .closest("[data-slot='tabs-content']");
 
-    expect(root).toHaveAttribute("data-slot", "tabs");
-    expect(list).toHaveAttribute("data-slot", "tabs-list");
-    expect(trigger).toHaveAttribute("data-slot", "tabs-trigger");
-    expect(panel).toHaveAttribute("data-slot", "tabs-content");
     expect(trigger.className).toContain("data-[state=active]:bg-background");
     expect(trigger.className).toContain("data-[state=active]:text-foreground");
-    expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
+    expect(trigger.className).toContain("cursor-pointer");
+    expect(trigger.className).toContain("focus-visible:ring-ring-soft");
+    expect(trigger.className).toContain(
+      "data-[orientation=vertical]:whitespace-normal",
+    );
+    expect(panel?.className ?? "").toContain("border-border");
+    expect(panel?.className ?? "").toContain("focus-visible:ring-ring-soft");
   });
 
-  it("merges className on root", () => {
-    renderTabs({ className: "mes-onglets" });
+  it("merges className on root, list, trigger, and content", () => {
+    const { container } = render(
+      <Tabs className="mes-onglets" defaultValue="resume">
+        <TabsList className="ma-liste">
+          <TabsTrigger className="mon-trigger" value="resume">
+            Résumé
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent className="mon-contenu" value="resume">
+          Contenu résumé
+        </TabsContent>
+      </Tabs>,
+    );
 
-    const root = screen.getByRole("tablist").closest("[data-slot='tabs']");
+    const root = container.querySelector("[data-slot='tabs']");
+    const list = container.querySelector("[data-slot='tabs-list']");
+    const trigger = container.querySelector("[data-slot='tabs-trigger']");
+    const content = container.querySelector("[data-slot='tabs-content']");
+
     expect(root?.className ?? "").toContain("mes-onglets");
+    expect(list?.className ?? "").toContain("ma-liste");
+    expect(trigger?.className ?? "").toContain("mon-trigger");
+    expect(content?.className ?? "").toContain("mon-contenu");
   });
 
   it("forwards ref to tabs root", () => {

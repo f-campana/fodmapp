@@ -11,9 +11,9 @@ export type CollapsibleProps = React.ComponentProps<
 function Collapsible({ className, ...props }: CollapsibleProps) {
   return (
     <CollapsiblePrimitive.Root
+      {...props}
       data-slot="collapsible"
       className={cn("flex flex-col gap-2", className)}
-      {...props}
     />
   );
 }
@@ -25,6 +25,7 @@ export type CollapsibleTriggerProps = React.ComponentProps<
 function CollapsibleTrigger({ className, ...props }: CollapsibleTriggerProps) {
   return (
     <CollapsiblePrimitive.Trigger
+      {...props}
       data-slot="collapsible-trigger"
       className={cn(
         "inline-flex items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm font-medium",
@@ -33,7 +34,6 @@ function CollapsibleTrigger({ className, ...props }: CollapsibleTriggerProps) {
         "disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -45,13 +45,13 @@ export type CollapsibleContentProps = React.ComponentProps<
 function CollapsibleContent({ className, ...props }: CollapsibleContentProps) {
   return (
     <CollapsiblePrimitive.Content
+      {...props}
       data-slot="collapsible-content"
       className={cn(
         "overflow-hidden text-sm text-muted-foreground",
         "data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up",
         className,
       )}
-      {...props}
     />
   );
 }
