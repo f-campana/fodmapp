@@ -1,12 +1,14 @@
 import { createRef } from "react";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
 
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -29,153 +31,298 @@ window.matchMedia = vi.fn().mockImplementation((query: string) => ({
   removeListener: vi.fn(),
 }));
 
-function DrawerFixture() {
-  return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <button type="button">Ouvrir le tiroir</button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Titre</DrawerTitle>
-          <DrawerDescription>Description</DrawerDescription>
-        </DrawerHeader>
-        <DrawerFooter>
-          <button type="button">Action</button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  );
-}
-
-function getDrawerTrigger() {
-  const trigger = document.querySelector("[data-slot='drawer-trigger']");
-
-  if (!trigger) {
-    throw new Error("Drawer trigger not found");
+describe("Drawer", () => {
+  function renderDrawer(props?: React.ComponentProps<typeof Drawer>) {
+    return render(
+      <Drawer {...props}>
+        <DrawerTrigger>Ouvrir le tiroir</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Titre</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <DrawerClose>Annuler</DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>,
+    );
   }
 
-  return trigger as HTMLElement;
-}
+  async function waitForDrawerContent() {
+    return waitFor(() => {
+      const node = document.querySelector("[data-slot='drawer-content']");
+      if (!node) {
+        throw new Error("drawer content not mounted yet");
+      }
 
-describe("Drawer", () => {
-  it("opens and closes from trigger and Escape", async () => {
-    render(<DrawerFixture />);
-
-    const trigger = document.querySelector(
-      "[data-slot='drawer-trigger']",
-    ) as HTMLElement | null;
-
-    fireEvent.click(trigger as HTMLElement);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toBeTruthy();
+      return node as HTMLElement;
     });
+  }
 
-    const content = document.querySelector("[data-slot='drawer-content']");
-
-    fireEvent.keyDown(content ?? document.body, {
-      key: "Escape",
-      code: "Escape",
-    });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toHaveAttribute("data-state", "closed");
-    });
-  });
-
-  it("closes on overlay click and built-in close button", async () => {
-    render(<DrawerFixture />);
-
-    fireEvent.click(getDrawerTrigger());
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toBeTruthy();
-    });
-
-    const closeButton = screen.getByLabelText("Fermer");
-
-    fireEvent.click(closeButton);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toHaveAttribute("data-state", "closed");
-    });
-
-    fireEvent.click(getDrawerTrigger());
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-overlay']"),
-      ).toBeTruthy();
-    });
-
-    fireEvent.pointerDown(
-      document.querySelector("[data-slot='drawer-overlay']") as Element,
-    );
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toHaveAttribute("data-state", "closed");
-    });
-  });
-
-  it("renders slots and semantic class contracts", async () => {
-    const { container } = render(<DrawerFixture />);
-
-    fireEvent.click(getDrawerTrigger());
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='drawer-content']"),
-      ).toBeTruthy();
-    });
-
-    const root = container.querySelector("[data-slot='drawer']");
-    const portal = document.querySelector("[data-slot='drawer-portal']");
-    const overlay = document.querySelector(
-      "[data-slot='drawer-overlay']",
-    ) as HTMLElement;
-    const content = document.querySelector(
-      "[data-slot='drawer-content']",
-    ) as HTMLElement;
-
-    expect(root).toBeTruthy();
-    expect(portal).toBeTruthy();
-    expect(overlay.className).toContain("bg-muted/80");
-    expect(content.className).toContain("bg-popover");
-    expect(content.className).toContain("text-popover-foreground");
-    expect(content.className).toContain(
-      "data-[vaul-drawer-direction=bottom]:inset-x-0",
-    );
-    expect(content.className).toContain(
-      "data-[vaul-drawer-direction=bottom]:bottom-0",
-    );
-  });
-
-  it("merges className and supports refs", async () => {
-    const triggerRef = createRef<HTMLButtonElement>();
-    const contentRef = createRef<HTMLDivElement>();
+  it("keeps slot markers stable on exposed compounds", async () => {
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
 
     const { container } = render(
       <Drawer defaultOpen>
-        <DrawerTrigger asChild ref={triggerRef}>
-          <button className="declencheur-personnalise" type="button">
-            Ouvrir
+        <DrawerTrigger data-slot="custom-trigger">Ouvrir</DrawerTrigger>
+        <DrawerContent container={portalContainer} data-slot="custom-content">
+          <DrawerHeader data-slot="custom-header">
+            <DrawerTitle data-slot="custom-title">Titre</DrawerTitle>
+            <DrawerDescription data-slot="custom-description">
+              Description
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter data-slot="custom-footer">
+            <DrawerClose data-slot="custom-close">Fermer</DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    await waitForDrawerContent();
+
+    expect(container.querySelector("[data-slot='drawer']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='drawer-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-portal']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-overlay']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-header']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-title']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-description']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-footer']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='drawer-handle']"),
+    ).toBeTruthy();
+
+    const closeButtons = portalContainer.querySelectorAll(
+      "[data-slot='drawer-close']",
+    );
+    expect(closeButtons).toHaveLength(2);
+
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-header']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-title']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-description']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-footer']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-close']"),
+    ).toBeNull();
+  });
+
+  it("opens from keyboard, moves focus into the drawer, and closes on Escape", async () => {
+    const user = userEvent.setup();
+    const requestAnimationFrameSpy = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback: FrameRequestCallback) => {
+        callback(0);
+        return 0;
+      });
+
+    renderDrawer();
+
+    const trigger = screen.getByRole("button", { name: "Ouvrir le tiroir" });
+    const triggerFocusSpy = vi.spyOn(trigger, "focus");
+
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await user.keyboard("{Enter}");
+
+    const content = await waitForDrawerContent();
+
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "open");
+    });
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    await waitFor(() => {
+      expect(content.contains(document.activeElement)).toBe(true);
+    });
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "closed");
+    });
+    const overlay = document.querySelector(
+      "[data-slot='drawer-overlay']",
+    ) as HTMLElement | null;
+
+    if (overlay) {
+      fireEvent.animationEnd(overlay);
+    }
+
+    fireEvent.animationEnd(content);
+
+    await waitFor(() => {
+      expect(triggerFocusSpy).toHaveBeenCalled();
+    });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    triggerFocusSpy.mockRestore();
+    requestAnimationFrameSpy.mockRestore();
+  });
+
+  it("closes from the built-in close button", async () => {
+    renderDrawer();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ouvrir le tiroir" }));
+
+    const content = await waitForDrawerContent();
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "open");
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Fermer" }));
+
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "closed");
+    });
+  });
+
+  it("closes on overlay interaction", async () => {
+    renderDrawer();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ouvrir le tiroir" }));
+
+    await waitFor(() => {
+      expect(
+        document.querySelector("[data-slot='drawer-content']"),
+      ).toHaveAttribute("data-state", "open");
+    });
+
+    const overlay = await waitFor(() => {
+      const node = document.querySelector("[data-slot='drawer-overlay']");
+      if (!node) {
+        throw new Error("drawer overlay not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+
+    fireEvent.pointerDown(overlay);
+
+    await waitFor(() => {
+      expect(
+        document.querySelector("[data-slot='drawer-content']"),
+      ).toHaveAttribute("data-state", "closed");
+    });
+  });
+
+  it("applies semantic class contracts", async () => {
+    renderDrawer();
+
+    const trigger = screen.getByRole("button", { name: "Ouvrir le tiroir" });
+
+    await userEvent.click(trigger);
+
+    const overlay = await waitFor(() => {
+      const node = document.querySelector("[data-slot='drawer-overlay']");
+      if (!node) {
+        throw new Error("drawer overlay not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+    const content = document.querySelector(
+      "[data-slot='drawer-content']",
+    ) as HTMLElement | null;
+    const builtInClose = screen.getByRole("button", { name: "Fermer" });
+    const actionClose = screen.getByRole("button", { name: "Annuler" });
+
+    expect(overlay.className).toContain("bg-muted/80");
+    expect(overlay.className).toContain("data-[state=open]:animate-in");
+    expect(content?.className ?? "").toContain("bg-popover");
+    expect(content?.className ?? "").toContain("text-popover-foreground");
+    expect(content?.className ?? "").toContain(
+      "data-[vaul-drawer-direction=bottom]:inset-x-0",
+    );
+    expect(content?.className ?? "").toContain(
+      "data-[vaul-drawer-direction=bottom]:bottom-0",
+    );
+    expect(trigger.className).toContain("cursor-pointer");
+    expect(builtInClose.className).toContain("cursor-pointer");
+    expect(actionClose.className).toContain("cursor-pointer");
+    expect(builtInClose.className).toContain("focus-visible:border-ring");
+    expect(builtInClose.className).toContain("focus-visible:ring-ring-soft");
+    expect(builtInClose.className).not.toContain("focus-visible:ring-ring/50");
+    expect(actionClose.className).toContain("focus-visible:border-ring");
+    expect(actionClose.className).toContain("focus-visible:ring-ring-soft");
+    expect(actionClose.className).not.toContain("focus-visible:ring-ring/50");
+  });
+
+  it("allows trigger slot override when using asChild", async () => {
+    render(
+      <Drawer defaultOpen>
+        <DrawerTrigger asChild>
+          <button data-slot="custom-trigger" type="button">
+            Ouvrir via enfant
           </button>
         </DrawerTrigger>
+        <DrawerContent>
+          <DrawerTitle>Titre</DrawerTitle>
+          <DrawerDescription>Description</DrawerDescription>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    await waitForDrawerContent();
+
+    const trigger = screen.getByRole("button", {
+      hidden: true,
+      name: "Ouvrir via enfant",
+    });
+
+    expect(trigger).toHaveAttribute("data-slot", "custom-trigger");
+    expect(document.querySelector("[data-slot='drawer-content']")).toBeTruthy();
+    expect(document.querySelector("[data-slot='drawer-close']")).toBeTruthy();
+  });
+
+  it("merges className and forwards refs", async () => {
+    const triggerRef = createRef<HTMLButtonElement>();
+    const contentRef = createRef<HTMLDivElement>();
+
+    render(
+      <Drawer defaultOpen>
+        <DrawerTrigger ref={triggerRef}>Ouvrir</DrawerTrigger>
         <DrawerContent className="contenu-personnalise" ref={contentRef}>
           <DrawerHeader className="entete-personnalisee">
             <DrawerTitle>Titre</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
+          <DrawerFooter className="pied-personnalise">
+            <DrawerClose>Fermer</DrawerClose>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>,
     );
@@ -186,9 +333,15 @@ describe("Drawer", () => {
       ).toBeTruthy();
     });
 
-    expect(container.querySelector(".declencheur-personnalise")).toBeTruthy();
-    expect(document.querySelector(".contenu-personnalise")).toBeTruthy();
-    expect(document.querySelector(".entete-personnalisee")).toBeTruthy();
+    expect(
+      document.querySelector("[data-slot='drawer-content']")?.className ?? "",
+    ).toContain("contenu-personnalise");
+    expect(
+      document.querySelector("[data-slot='drawer-header']")?.className ?? "",
+    ).toContain("entete-personnalisee");
+    expect(
+      document.querySelector("[data-slot='drawer-footer']")?.className ?? "",
+    ).toContain("pied-personnalise");
 
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
     expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
@@ -206,8 +359,6 @@ describe("Drawer", () => {
       </Drawer>,
     );
 
-    const results = await axe(container);
-
-    expect(results).toHaveNoViolations();
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

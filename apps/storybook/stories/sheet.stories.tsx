@@ -1,8 +1,11 @@
+import { type ReactNode, useState } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import {
+  Button,
   Sheet,
   SheetClose,
   SheetContent,
@@ -13,42 +16,86 @@ import {
   SheetTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function SheetAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-sheet-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+function SheetStoryCanvas({
+  children,
+  ...props
+}: Omit<StoryFrameProps, "children"> & {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return (
+    <SheetAuditFrame {...props}>
+      <div className="w-full" ref={setPortalContainer}>
+        {children(portalContainer)}
+      </div>
+    </SheetAuditFrame>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  defaultOpen: false,
+  modal: true,
+  onOpenChange: fn(),
+} as const;
+
 const meta = {
   title: "Primitives/Adapter/Sheet",
   component: Sheet,
-  tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
-      description: "Sets initial open state for uncontrolled mode.",
+      description: "Sets the initial open state in uncontrolled mode.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
     open: {
-      description: "Controls open state in controlled mode.",
+      description: "Controls the open state when managed externally.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "undefined" } },
     },
     modal: {
-      description: "Whether the sheet is rendered as a modal layer.",
+      description: "Keeps interaction inside the sheet when true.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "true" } },
     },
     onOpenChange: {
-      description: "Callback invoked whenever open state changes.",
+      description: "Callback fired whenever the open state changes.",
     },
     children: {
-      description: "SheetTrigger and SheetContent composition.",
+      description: "Trigger and content composition.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    defaultOpen: false,
-    modal: true,
-    onOpenChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
+    a11y: {
+      test: "error",
+      context: {
+        include: ["[data-sheet-audit-root]"],
+      },
+    },
   },
 } satisfies Meta<typeof Sheet>;
 
@@ -56,46 +103,148 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex min-h-36 items-center justify-center">
-      <Sheet {...args}>
+function FilterSheet(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+  options?: {
+    closeSlot?: string;
+    triggerSlot?: string;
+    useLocalPortal?: boolean;
+  },
+) {
+  const contentProps =
+    options?.useLocalPortal && portalContainer
+      ? { container: portalContainer }
+      : {};
+  const triggerProps = options?.triggerSlot
+    ? { "data-slot": options.triggerSlot }
+    : {};
+  const closeProps = options?.closeSlot
+    ? { "data-slot": options.closeSlot }
+    : {};
+
+  return (
+    <Sheet {...args}>
+      {options?.triggerSlot ? (
         <SheetTrigger asChild>
           <button
             className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
+            {...triggerProps}
             type="button"
           >
             Ouvrir le panneau de filtres
           </button>
         </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Filtres rapides</SheetTitle>
-            <SheetDescription>
-              Ajustez les preferences de recherche en un clic.
-            </SheetDescription>
-          </SheetHeader>
-          <SheetFooter>
+      ) : (
+        <SheetTrigger asChild>
+          <Button variant="outline">Ouvrir le panneau de filtres</Button>
+        </SheetTrigger>
+      )}
+      <SheetContent {...contentProps}>
+        <SheetHeader>
+          <SheetTitle>Filtres rapides</SheetTitle>
+          <SheetDescription>
+            Ajustez les preferences de recherche en un clic.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="rounded-(--radius) border border-border bg-card p-4 text-sm text-muted-foreground">
+          Affinez les resultats par profil de repas, niveau de tolerance et
+          substitutions deja validees.
+        </div>
+        <SheetFooter className="border-t border-border pt-4">
+          {options?.closeSlot ? (
             <SheetClose asChild>
               <button
                 className="rounded-(--radius) border border-border px-3 py-2 text-sm"
+                {...closeProps}
                 type="button"
               >
                 Annuler
               </button>
             </SheetClose>
-            <button
-              className="rounded-(--radius) border border-primary bg-primary px-3 py-2 text-sm text-primary-foreground"
-              type="button"
-            >
-              Appliquer
-            </button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </div>
+          ) : (
+            <SheetClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </SheetClose>
+          )}
+          <Button>Appliquer</Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <SheetStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => FilterSheet(args, portalContainer)}
+    </SheetStoryCanvas>
   ),
-  play: async ({ canvasElement, args }) => {
+};
+
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <SheetStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => FilterSheet(defaultPlaygroundArgs, portalContainer)}
+    </SheetStoryCanvas>
+  ),
+};
+
+export const LeftSide: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <SheetStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {() => {
+        return (
+          <Sheet {...defaultPlaygroundArgs} onOpenChange={fn()}>
+            <SheetTrigger asChild>
+              <Button variant="outline">Ouvrir a gauche</Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+              <SheetHeader>
+                <SheetTitle>Panneau gauche</SheetTitle>
+                <SheetDescription>Navigation secondaire.</SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        );
+      }}
+    </SheetStoryCanvas>
+  ),
+};
+
+export const DarkMode: Story = {
+  ...Default,
+  parameters: fixedStoryParameters,
+  globals: {
+    theme: "dark",
+  },
+};
+
+export const InteractionChecks: Story = {
+  args: {
+    ...defaultPlaygroundArgs,
+    onOpenChange: fn(),
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      disable: true,
+    },
+  },
+  render: (args) => (
+    <SheetStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        FilterSheet(args, portalContainer, {
+          closeSlot: "custom-sheet-close",
+          triggerSlot: "custom-sheet-trigger",
+          useLocalPortal: true,
+        })
+      }
+    </SheetStoryCanvas>
+  ),
+  play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='sheet']");
     const trigger = canvas.getByRole("button", {
@@ -103,110 +252,66 @@ export const Default: Story = {
     });
 
     await expect(root).toHaveAttribute("data-slot", "sheet");
-    await expect(trigger).toHaveAttribute("data-slot", "sheet-trigger");
+    await expect(trigger).toHaveAttribute("data-slot", "custom-sheet-trigger");
+    await expect(
+      canvasElement.querySelector("[data-slot='sheet-trigger']"),
+    ).toBeNull();
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-    await userEvent.click(trigger);
+    await userEvent.tab();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
 
     const content = await waitFor(() => {
-      const node = document.body.querySelector("[data-slot='sheet-content']");
+      const node = canvasElement.querySelector("[data-slot='sheet-content']");
       if (!node) {
         throw new Error("Sheet content is not mounted yet.");
       }
+
       return node as HTMLElement;
     });
 
-    const portal = document.body.querySelector("[data-slot='sheet-portal']");
-    const overlay = document.body.querySelector(
-      "[data-slot='sheet-overlay']",
-    ) as HTMLElement | null;
-    const close = document.body.querySelector(
-      "[data-slot='sheet-close'][aria-label='Fermer']",
-    ) as HTMLElement | null;
-
-    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-    await expect(portal).toHaveAttribute("data-slot", "sheet-portal");
-    await expect(overlay).toHaveAttribute("data-slot", "sheet-overlay");
+    await expect(
+      canvasElement.querySelector("[data-slot='sheet-portal']"),
+    ).toBeTruthy();
+    await expect(
+      canvasElement.querySelector("[data-slot='sheet-overlay']"),
+    ).toBeTruthy();
+    await expect(canvasElement.contains(content)).toBe(true);
     await expect(content).toHaveAttribute("data-slot", "sheet-content");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(content).toHaveAttribute("data-side", "right");
 
-    await expect(overlay?.className ?? "").toContain("bg-muted/80");
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("text-popover-foreground");
-    await expect(content.className).toContain("w-3/4");
-    await expect(content.className).toContain("sm:max-w-sm");
-    await expect(content.className).toContain(
-      "data-[state=open]:slide-in-from-right",
+    const closeButton = within(content).getByRole("button", {
+      name: "Annuler",
+    });
+    await expect(closeButton).toHaveAttribute(
+      "data-slot",
+      "custom-sheet-close",
     );
+    await expect(
+      content.querySelectorAll("[data-slot='sheet-close']"),
+    ).toHaveLength(1);
 
-    await expect(close).toHaveAttribute("data-slot", "sheet-close");
-    await expect(close?.className ?? "").toContain("focus-visible:border-ring");
-    await expect(close?.className ?? "").toContain(
-      "focus-visible:ring-ring-soft",
-    );
-    await expect(close?.className ?? "").not.toContain(
-      "focus-visible:ring-ring/50",
-    );
-  },
-};
+    await waitFor(() => {
+      if (!content.contains(document.activeElement)) {
+        throw new Error("Sheet focus has not moved inside the content yet.");
+      }
+    });
 
-export const Left: Story = {
-  args: {
-    onOpenChange: fn(),
-  },
-  render: (args) => (
-    <div className="flex min-h-36 items-center justify-center">
-      <Sheet {...args}>
-        <SheetTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
-            type="button"
-          >
-            Ouvrir a gauche
-          </button>
-        </SheetTrigger>
-        <SheetContent side="left">
-          <SheetHeader>
-            <SheetTitle>Panneau gauche</SheetTitle>
-            <SheetDescription>Navigation secondaire.</SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-    </div>
-  ),
-};
+    await userEvent.keyboard("{Escape}");
 
-export const Top: Story = {
-  args: {
-    onOpenChange: fn(),
-  },
-  render: (args) => (
-    <div className="flex min-h-36 items-center justify-center">
-      <Sheet {...args}>
-        <SheetTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
-            type="button"
-          >
-            Ouvrir en haut
-          </button>
-        </SheetTrigger>
-        <SheetContent side="top">
-          <SheetHeader>
-            <SheetTitle>Panneau superieur</SheetTitle>
-            <SheetDescription>Informations contextuelles.</SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-    </div>
-  ),
-};
+    await waitFor(() => {
+      if (canvasElement.querySelector("[data-slot='sheet-content']")) {
+        throw new Error("Sheet content is still mounted after Escape.");
+      }
+    });
+    await waitFor(() => {
+      if (document.activeElement !== trigger) {
+        throw new Error("Sheet trigger has not regained focus yet.");
+      }
+    });
 
-export const DarkMode: Story = {
-  ...Default,
-  args: {
-    ...Default.args,
-    onOpenChange: fn(),
-  },
-  globals: {
-    theme: "dark",
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
 };

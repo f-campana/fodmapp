@@ -1,0 +1,78 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SheetStories from "./sheet.stories";
+import { sheetRecommendedUsageCode } from "./sheet.docs-source";
+
+<Meta of={SheetStories} />
+
+<Title />
+<Subtitle>
+  Use Sheet for modal side panels that preserve page context while exposing a
+  focused block of controls.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={sheetRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Sheet for filters, secondary navigation, or short panel tasks that should
+slide from a chosen side.
+
+Avoid Sheet for simple confirmations better served by Dialog or for transient
+tips that do not need a modal layer.
+
+<Canvas of={SheetStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled open state, plus the
+modal toggle.
+
+<Controls of={SheetStories.Playground} />
+
+## Side variants
+
+Right-side sheets are the default inspector pattern. Left-side sheets work when
+secondary navigation needs the same interaction contract.
+
+<Canvas of={SheetStories.LeftSide} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes `aria-expanded` and opens a labelled dialog panel
+- Escape closes the panel and returns focus to the trigger
+- portal content stays keyboard reachable even when mounted into a local container
+- close controls keep visible focus styling in both themes
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, content, header, title, description, footer, and close controls
+- when using `SheetTrigger` or `SheetClose` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local sheet audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, default side metadata, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, container-based portal mounting, overlay dismissal, side variants, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for trigger and close cursor affordance plus edge alignment and motion from right and left variants
+- screen reader smoke pass for title and description announcement on an open panel
+
+## Responsive notes
+
+The default sheet keeps a capped narrow width for small screens and larger
+viewports. Long content should scroll vertically inside the panel rather than
+overflow horizontally.

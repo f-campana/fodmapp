@@ -1,0 +1,78 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as PopoverStories from "./popover.stories";
+import { popoverRecommendedUsageCode } from "./popover.docs-source";
+
+<Meta of={PopoverStories} />
+
+<Title />
+<Subtitle>
+  Use Popover for lightweight contextual details that should stay visually tied
+  to a trigger.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={popoverRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Popover for short contextual help, compact detail summaries, or lightweight
+actions anchored to an existing control.
+
+Avoid Popover for blocking flows, long forms, or content that must remain open
+while users navigate away from the trigger.
+
+<Canvas of={PopoverStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test uncontrolled and controlled open state, plus the
+modal toggle.
+
+<Controls of={PopoverStories.Playground} />
+
+## Anchoring
+
+Anchors help position the layer relative to nearby context without changing the
+trigger contract.
+
+<Canvas of={PopoverStories.Anchored} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes `aria-expanded` and opens a named popover surface
+- Escape closes the layer and returns focus to the trigger
+- the anchor, trigger, content, and arrow keep their documented slot hooks in default composition
+- portal content can mount into a local container for isolated interaction checks
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, anchor, trigger, content, and arrow
+- when using `PopoverTrigger` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local popover audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, container-based portal mounting, outside dismissal, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for trigger cursor affordance plus arrow alignment and spacing on representative trigger positions
+- keyboard smoke pass for trigger focus and close behavior in light and dark themes
+
+## Responsive notes
+
+Popover content keeps a compact width and stays anchored to the trigger. Long
+copy may wrap, but the layer should avoid horizontal overflow and preserve clear
+trigger association.

@@ -8,7 +8,7 @@ import { cn } from "../../../lib/cn";
 
 const sheetVariants = cva(
   [
-    "fixed z-50 gap-4 border border-border bg-popover p-6 text-popover-foreground shadow-lg",
+    "fixed z-50 grid auto-rows-max content-start gap-4 border border-border bg-popover p-6 text-popover-foreground shadow-lg",
     "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
     "data-[state=open]:animate-in data-[state=closed]:animate-out",
   ].join(" "),
@@ -57,9 +57,9 @@ export type SheetTriggerProps = React.ComponentProps<
 function SheetTrigger({ className, ...props }: SheetTriggerProps) {
   return (
     <DialogPrimitive.Trigger
-      data-slot="sheet-trigger"
-      className={cn(className)}
       {...props}
+      data-slot="sheet-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
@@ -101,9 +101,11 @@ export interface SheetContentProps
     React.ComponentProps<typeof DialogPrimitive.Content>,
     VariantProps<typeof sheetVariants> {
   closeLabel?: string;
+  container?: SheetPortalProps["container"];
 }
 
 function SheetContent({
+  container,
   className,
   children,
   side = "right",
@@ -111,26 +113,26 @@ function SheetContent({
   ...props
 }: SheetContentProps) {
   return (
-    <SheetPortal>
+    <SheetPortal container={container}>
       <SheetOverlay />
       <DialogPrimitive.Content
-        data-slot="sheet-content"
         data-side={side}
         className={cn(sheetVariants({ side }), className)}
         {...props}
+        data-slot="sheet-content"
       >
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          data-slot="sheet-close"
           className={cn(
-            "absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-(--radius) border border-transparent",
+            "absolute top-4 right-4 inline-flex size-8 cursor-pointer items-center justify-center rounded-(--radius) border border-transparent",
             "text-muted-foreground transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
             "hover:bg-accent hover:text-accent-foreground",
             "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
             "disabled:pointer-events-none disabled:opacity-50",
           )}
           type="button"
+          data-slot="sheet-close"
         >
           <svg
             aria-hidden="true"
@@ -160,16 +162,16 @@ export type SheetCloseProps = React.ComponentProps<
 function SheetClose({ className, ...props }: SheetCloseProps) {
   return (
     <DialogPrimitive.Close
+      {...props}
       data-slot="sheet-close"
       className={cn(
-        "inline-flex items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
+        "inline-flex cursor-pointer items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "hover:bg-accent hover:text-accent-foreground",
         "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -179,9 +181,9 @@ export type SheetHeaderProps = React.ComponentProps<"div">;
 function SheetHeader({ className, ...props }: SheetHeaderProps) {
   return (
     <div
-      data-slot="sheet-header"
       className={cn("flex flex-col gap-1.5 text-left", className)}
       {...props}
+      data-slot="sheet-header"
     />
   );
 }
@@ -191,9 +193,9 @@ export type SheetFooterProps = React.ComponentProps<"div">;
 function SheetFooter({ className, ...props }: SheetFooterProps) {
   return (
     <div
-      data-slot="sheet-footer"
       className={cn("flex flex-wrap justify-end gap-2", className)}
       {...props}
+      data-slot="sheet-footer"
     />
   );
 }
@@ -205,9 +207,9 @@ export type SheetTitleProps = React.ComponentProps<
 function SheetTitle({ className, ...props }: SheetTitleProps) {
   return (
     <DialogPrimitive.Title
-      data-slot="sheet-title"
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
+      data-slot="sheet-title"
     />
   );
 }
@@ -219,9 +221,9 @@ export type SheetDescriptionProps = React.ComponentProps<
 function SheetDescription({ className, ...props }: SheetDescriptionProps) {
   return (
     <DialogPrimitive.Description
-      data-slot="sheet-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
+      data-slot="sheet-description"
     />
   );
 }

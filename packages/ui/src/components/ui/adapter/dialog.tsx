@@ -22,9 +22,9 @@ export type DialogTriggerProps = React.ComponentProps<
 function DialogTrigger({ className, ...props }: DialogTriggerProps) {
   return (
     <DialogPrimitive.Trigger
-      data-slot="dialog-trigger"
-      className={cn(className)}
       {...props}
+      data-slot="dialog-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
@@ -65,19 +65,20 @@ export type DialogContentProps = React.ComponentProps<
   typeof DialogPrimitive.Content
 > & {
   closeLabel?: string;
+  container?: DialogPortalProps["container"];
 };
 
 function DialogContent({
+  container,
   className,
   children,
   closeLabel = "Fermer",
   ...props
 }: DialogContentProps) {
   return (
-    <DialogPortal>
+    <DialogPortal container={container}>
       <DialogOverlay />
       <DialogPrimitive.Content
-        data-slot="dialog-content"
         className={cn(
           "fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-(--radius) border border-border bg-popover p-6 text-popover-foreground shadow-lg",
           "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
@@ -87,19 +88,20 @@ function DialogContent({
           className,
         )}
         {...props}
+        data-slot="dialog-content"
       >
         {children}
         <DialogPrimitive.Close
           aria-label={closeLabel}
-          data-slot="dialog-close"
           className={cn(
-            "absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-(--radius) border border-transparent",
+            "absolute top-4 right-4 inline-flex size-8 cursor-pointer items-center justify-center rounded-(--radius) border border-transparent",
             "text-muted-foreground transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
             "hover:bg-accent hover:text-accent-foreground",
             "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
             "disabled:pointer-events-none disabled:opacity-50",
           )}
           type="button"
+          data-slot="dialog-close"
         >
           <svg
             aria-hidden="true"
@@ -129,16 +131,16 @@ export type DialogCloseProps = React.ComponentProps<
 function DialogClose({ className, ...props }: DialogCloseProps) {
   return (
     <DialogPrimitive.Close
+      {...props}
       data-slot="dialog-close"
       className={cn(
-        "inline-flex items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
+        "inline-flex cursor-pointer items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "hover:bg-accent hover:text-accent-foreground",
         "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -148,9 +150,9 @@ export type DialogHeaderProps = React.ComponentProps<"div">;
 function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
     <div
-      data-slot="dialog-header"
       className={cn("flex flex-col gap-1.5 text-left", className)}
       {...props}
+      data-slot="dialog-header"
     />
   );
 }
@@ -160,9 +162,9 @@ export type DialogBodyProps = React.ComponentProps<"div">;
 function DialogBody({ className, ...props }: DialogBodyProps) {
   return (
     <div
-      data-slot="dialog-body"
       className={cn("grid gap-4", className)}
       {...props}
+      data-slot="dialog-body"
     />
   );
 }
@@ -172,9 +174,9 @@ export type DialogFooterProps = React.ComponentProps<"div">;
 function DialogFooter({ className, ...props }: DialogFooterProps) {
   return (
     <div
-      data-slot="dialog-footer"
       className={cn("flex flex-wrap justify-end gap-2", className)}
       {...props}
+      data-slot="dialog-footer"
     />
   );
 }
@@ -186,9 +188,9 @@ export type DialogTitleProps = React.ComponentProps<
 function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
     <DialogPrimitive.Title
-      data-slot="dialog-title"
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
+      data-slot="dialog-title"
     />
   );
 }
@@ -200,9 +202,9 @@ export type DialogDescriptionProps = React.ComponentProps<
 function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogPrimitive.Description
-      data-slot="dialog-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
+      data-slot="dialog-description"
     />
   );
 }
