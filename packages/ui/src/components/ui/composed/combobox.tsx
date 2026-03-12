@@ -312,7 +312,7 @@ function ComboboxTrigger({
       aria-controls={context.contentId}
       aria-expanded={context.open}
       className={cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
+        "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft",
@@ -354,9 +354,11 @@ export interface ComboboxContentProps extends React.ComponentProps<
   typeof PopoverPrimitive.Content
 > {
   commandClassName?: string;
+  container?: React.ComponentProps<typeof PopoverPrimitive.Portal>["container"];
 }
 
 function ComboboxContent({
+  container,
   className,
   children,
   commandClassName,
@@ -367,12 +369,8 @@ function ComboboxContent({
   const context = useComboboxContext("ComboboxContent");
 
   return (
-    <PopoverPrimitive.Portal>
-      <div
-        aria-label="Suggestions de recherche"
-        data-slot="combobox-portal"
-        role="region"
-      >
+    <PopoverPrimitive.Portal container={container}>
+      <div data-slot="combobox-portal">
         <PopoverPrimitive.Content
           aria-label={ariaLabel ?? "Suggestions de recherche"}
           className={cn(

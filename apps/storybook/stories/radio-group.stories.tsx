@@ -31,7 +31,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Adapter/RadioGroup",
   component: RadioGroup,
-  tags: ["autodocs"],
   argTypes: {
     defaultValue: {
       description: "Sets the initial selected value in uncontrolled mode.",

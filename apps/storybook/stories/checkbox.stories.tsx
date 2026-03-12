@@ -32,7 +32,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Adapter/Checkbox",
   component: Checkbox,
-  tags: ["autodocs"],
   argTypes: {
     defaultChecked: {
       description: "Sets the initial checked state in uncontrolled usage.",

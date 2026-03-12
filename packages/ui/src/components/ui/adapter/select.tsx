@@ -51,7 +51,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
+        "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft",
@@ -89,9 +89,12 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
 
 export type SelectContentProps = React.ComponentProps<
   typeof SelectPrimitive.Content
->;
+> & {
+  container?: React.ComponentProps<typeof SelectPrimitive.Portal>["container"];
+};
 
 function SelectContent({
+  container,
   className,
   children,
   position = "popper",
@@ -99,12 +102,8 @@ function SelectContent({
   ...props
 }: SelectContentProps) {
   return (
-    <SelectPrimitive.Portal>
-      <div
-        aria-label="Options du sélecteur"
-        data-slot="select-portal"
-        role="region"
-      >
+    <SelectPrimitive.Portal container={container}>
+      <div data-slot="select-portal">
         <SelectPrimitive.Content
           className={cn(
             "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] overflow-hidden rounded-(--radius) border border-border bg-popover text-popover-foreground shadow-md",
@@ -132,6 +131,7 @@ function SelectContent({
                 "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)",
             )}
             data-slot="select-viewport"
+            role="group"
             tabIndex={0}
           >
             {children}

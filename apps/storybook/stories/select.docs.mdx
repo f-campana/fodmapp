@@ -1,0 +1,82 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SelectStories from "./select.stories";
+import { selectRecommendedUsageCode } from "./select.docs-source";
+
+<Meta of={SelectStories} />
+
+<Title />
+<Subtitle>
+  Use Select when one option must be chosen from a compact list that does not
+  need free-text search.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={selectRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Select when the list is short to medium, the current choice should stay
+collapsed by default, and users do not need to compare every option at once.
+
+Avoid Select when users need search, multi-select, or rich side-by-side option
+comparison.
+
+<Canvas of={SelectStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test default value, controlled open state, direction, and
+required or disabled behavior.
+
+<Controls of={SelectStories.Playground} />
+
+## Behavior variants
+
+Grouped options are appropriate when the list spans distinct product sections.
+Keep the grouping shallow and obvious.
+
+<Canvas of={SelectStories.Grouped} sourceState="none" />
+
+## Composition patterns
+
+Use the plain trigger for page flow. Use the surfaced composition when the
+control sits inside a card, panel, or configuration block.
+
+<Canvas of={SelectStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes the collapsed/expanded combobox pattern
+- the open layer exposes a listbox with named options and group labels
+- keyboard users can open the menu, move through options, and commit selection
+- the scrollable open-state viewport remains keyboard reachable
+- focus styling remains visible on both trigger and open content
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Select example area, including the open portal content
+- Storybook interaction checks verify portal mounting, semantic open state, long-list selection, and close behavior
+- UI tests cover open/close behavior, controlled and uncontrolled selection, disabled items, slot hooks, ref forwarding, class contracts, and a11y
+
+What is checked manually:
+
+- keyboard smoke pass for trigger focus, option navigation, and close behavior
+- visual pass for trigger cursor, option wrapping, and surfaced presentation
+
+## Responsive notes
+
+Long option labels may wrap. The trigger should stay readable on first paint and
+the open list should remain scrollable without clipping or horizontal overflow.
+
+<Canvas of={SelectStories.ResponsiveStress} sourceState="none" />

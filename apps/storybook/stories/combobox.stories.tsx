@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
 import {
@@ -54,7 +54,6 @@ const longComboboxOptions = Array.from({ length: 18 }, (_, index) => ({
 const meta = {
   title: "Composed/Combobox",
   component: Combobox,
-  tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
       description: "Sets the initial popover open state in uncontrolled mode.",
@@ -100,7 +99,7 @@ const meta = {
     a11y: {
       test: "error",
       context: {
-        include: ["[data-combobox-audit-root]", "[data-slot='combobox-portal']"],
+        include: ["[data-combobox-audit-root]"],
       },
     },
   },
@@ -135,11 +134,35 @@ function ComboboxScaffold({
   );
 }
 
-function SingleCombobox(args: Story["args"]) {
+function ComboboxStoryCanvas({
+  children,
+  ...props
+}: Omit<StoryFrameProps, "children"> & {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return (
+    <ComboboxAuditFrame {...props}>
+      <div className="w-full" ref={setPortalContainer}>
+        {children(portalContainer)}
+      </div>
+    </ComboboxAuditFrame>
+  );
+}
+
+function SingleCombobox(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Combobox {...args}>
       <ComboboxTrigger aria-label="Choisir un aliment" />
-      <ComboboxContent>
+      <ComboboxContent {...contentProps}>
         <ComboboxInput placeholder="Rechercher un aliment" />
         <ComboboxList>
           <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
@@ -161,11 +184,13 @@ function SingleCombobox(args: Story["args"]) {
   );
 }
 
-function MultiComboboxStory() {
+function MultiComboboxStory(portalContainer: HTMLDivElement | null) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <ComboboxMulti>
       <ComboboxTrigger aria-label="Choisir plusieurs aliments" />
-      <ComboboxContent>
+      <ComboboxContent {...contentProps}>
         <ComboboxInput placeholder="Rechercher un aliment" />
         <ComboboxList>
           <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
@@ -182,11 +207,16 @@ function MultiComboboxStory() {
   );
 }
 
-function LongListCombobox(args: Story["args"]) {
+function LongListCombobox(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Combobox {...args}>
       <ComboboxTrigger aria-label="Choisir une recommandation" />
-      <ComboboxContent>
+      <ComboboxContent {...contentProps}>
         <ComboboxInput placeholder="Rechercher une recommandation" />
         <ComboboxList className="max-h-44">
           <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
@@ -203,11 +233,13 @@ function LongListCombobox(args: Story["args"]) {
   );
 }
 
-function ResponsiveStressCombobox() {
+function ResponsiveStressCombobox(portalContainer: HTMLDivElement | null) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Combobox>
       <ComboboxTrigger aria-label="Choisir une recommandation détaillée" />
-      <ComboboxContent>
+      <ComboboxContent {...contentProps}>
         <ComboboxInput placeholder="Rechercher une recommandation détaillée" />
         <ComboboxList className="max-h-44">
           <ComboboxEmpty>Aucun résultat</ComboboxEmpty>
@@ -229,60 +261,68 @@ function ResponsiveStressCombobox() {
 
 export const Playground: Story = {
   render: (args) => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
-      <ComboboxScaffold
-        description="Cherchez puis sélectionnez une option sans parcourir toute la liste manuellement."
-        eyebrow="Recherche"
-        title="Combobox simple"
-      >
-        <SingleCombobox {...args} />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Cherchez puis sélectionnez une option sans parcourir toute la liste manuellement."
+          eyebrow="Recherche"
+          title="Combobox simple"
+        >
+          {SingleCombobox(args, portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
 };
 
 export const Default: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
-      <ComboboxScaffold
-        description="Utilisez Combobox quand la recherche textuelle accélère la sélection."
-        eyebrow="Recherche"
-        title="Combobox simple"
-      >
-        <SingleCombobox {...defaultPlaygroundArgs} />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Utilisez Combobox quand la recherche textuelle accélère la sélection."
+          eyebrow="Recherche"
+          title="Combobox simple"
+        >
+          {SingleCombobox(defaultPlaygroundArgs, portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
 };
 
 export const OnSurface: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md" surface>
-      <ComboboxScaffold
-        description="Dans une carte, gardez le déclencheur et le panneau de résultats cohérents avec la surface."
-        eyebrow="Surface"
-        title="Combobox dans une carte"
-      >
-        <SingleCombobox {...defaultPlaygroundArgs} />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Dans une carte, gardez le déclencheur et le panneau de résultats cohérents avec la surface."
+          eyebrow="Surface"
+          title="Combobox dans une carte"
+        >
+          {SingleCombobox(defaultPlaygroundArgs, portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
 };
 
 export const Multiple: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
-      <ComboboxScaffold
-        description="Le mode multiple est utile quand plusieurs éléments doivent rester visibles dans le déclencheur."
-        eyebrow="Sélection"
-        title="Sélection multiple"
-      >
-        <MultiComboboxStory />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Le mode multiple est utile quand plusieurs éléments doivent rester visibles dans le déclencheur."
+          eyebrow="Sélection"
+          title="Sélection multiple"
+        >
+          {MultiComboboxStory(portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
 };
 
@@ -297,15 +337,17 @@ export const InteractionChecks: Story = {
     docs: { disable: true },
   },
   render: (args) => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="md">
-      <ComboboxScaffold
-        description="Vérifie le portail, la recherche ouverte et la sélection sur une liste longue."
-        eyebrow="Qualité"
-        title="Contrats d&apos;interaction"
-      >
-        <LongListCombobox {...args} />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Vérifie le portail, la recherche ouverte et la sélection sur une liste longue."
+          eyebrow="Qualité"
+          title="Contrats d&apos;interaction"
+        >
+          {LongListCombobox(args, portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -323,10 +365,9 @@ export const InteractionChecks: Story = {
     await expect(args.onOpenChange).toHaveBeenCalledWith(true);
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
-    const body = within(document.body);
-    const portal = document.body.querySelector("[data-slot='combobox-portal']");
-    const input = body.getByPlaceholderText("Rechercher une recommandation");
-    const option = body.getByRole("option", {
+    const portal = canvasElement.querySelector("[data-slot='combobox-portal']");
+    const input = canvas.getByPlaceholderText("Rechercher une recommandation");
+    const option = canvas.getByRole("option", {
       name: "Ingrédient recommandé 12",
     });
 
@@ -339,7 +380,7 @@ export const InteractionChecks: Story = {
     await expect(trigger).toHaveTextContent("Ingrédient recommandé 12");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await expect(
-      document.body.querySelector("[data-slot='combobox-content']"),
+      canvasElement.querySelector("[data-slot='combobox-content']"),
     ).toBeNull();
   },
 };
@@ -350,14 +391,16 @@ export const ResponsiveStress: Story = {
     docs: { disable: true },
   },
   render: () => (
-    <ComboboxAuditFrame centeredMinHeight={72} maxWidth="sm">
-      <ComboboxScaffold
-        description="Le déclencheur et les résultats doivent rester lisibles malgré des libellés longs."
-        eyebrow="Responsive"
-        title="Libellés longs"
-      >
-        <ResponsiveStressCombobox />
-      </ComboboxScaffold>
-    </ComboboxAuditFrame>
+    <ComboboxStoryCanvas centeredMinHeight={72} maxWidth="sm">
+      {(portalContainer) => (
+        <ComboboxScaffold
+          description="Le déclencheur et les résultats doivent rester lisibles malgré des libellés longs."
+          eyebrow="Responsive"
+          title="Libellés longs"
+        >
+          {ResponsiveStressCombobox(portalContainer)}
+        </ComboboxScaffold>
+      )}
+    </ComboboxStoryCanvas>
   ),
 };

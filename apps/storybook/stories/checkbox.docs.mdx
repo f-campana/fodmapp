@@ -1,0 +1,82 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CheckboxStories from "./checkbox.stories";
+import { checkboxRecommendedUsageCode } from "./checkbox.docs-source";
+
+<Meta of={CheckboxStories} />
+
+<Title />
+<Subtitle>
+  Use Checkbox for a single independent choice that can be turned on or off
+  without affecting sibling options.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={checkboxRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Checkbox for consent, saved preferences, or optional follow-up actions that
+users can enable independently.
+
+Avoid Checkbox when choices are mutually exclusive or when users must pick
+exactly one option from a set.
+
+<Canvas of={CheckboxStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test checked state, invalid state, and disabled behavior
+quickly.
+
+<Controls of={CheckboxStories.Playground} />
+
+## Behavior variants
+
+Keep the default field for normal preference capture. Use the invalid state only
+when the surrounding form has a real validation requirement.
+
+<Canvas of={CheckboxStories.Invalid} sourceState="none" />
+
+## Composition patterns
+
+Pair the control with a real label and supporting text. When the choice belongs
+inside a card or panel, keep the spacing and alignment tied to that surface.
+
+<Canvas of={CheckboxStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the control exposes the native checkbox pattern with `aria-checked`
+- the label remains discoverable through the linked `htmlFor` relationship
+- invalid state is exposed through `aria-invalid`
+- focus treatment stays visible on the active surface
+- the hit target stays touch-friendly while the label can wrap naturally
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Checkbox example area
+- Storybook interaction checks verify checked-state changes and slot presence
+- UI tests cover click behavior, disabled behavior, stable slot hooks, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for label alignment, cursor behavior, and focus visibility
+- mobile smoke pass for long-label wrapping without horizontal overflow
+
+## Responsive notes
+
+Long labels should wrap next to the control without collapsing the vertical
+alignment or pushing the control off the first line.
+
+<Canvas of={CheckboxStories.ResponsiveStress} sourceState="none" />

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
 import {
@@ -71,7 +71,6 @@ const longListOptions = Array.from({ length: 18 }, (_, index) => ({
 const meta = {
   title: "Primitives/Adapter/Select",
   component: Select,
-  tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
       description: "Sets the initial open state in uncontrolled mode.",
@@ -133,7 +132,7 @@ const meta = {
     a11y: {
       test: "error",
       context: {
-        include: ["[data-select-audit-root]", "[data-slot='select-viewport']"],
+        include: ["[data-select-audit-root]"],
       },
     },
   },
@@ -168,13 +167,37 @@ function SelectScaffold({
   );
 }
 
-function BasicSelect(args: Story["args"]) {
+function SelectStoryCanvas({
+  children,
+  ...props
+}: Omit<StoryFrameProps, "children"> & {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return (
+    <SelectAuditFrame {...props}>
+      <div className="w-full" ref={setPortalContainer}>
+        {children(portalContainer)}
+      </div>
+    </SelectAuditFrame>
+  );
+}
+
+function BasicSelect(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Select {...args}>
       <SelectTrigger aria-label="Choisir une vue">
         <SelectValue placeholder="Choisir une vue" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent {...contentProps}>
         <SelectGroup>
           <SelectLabel>Mon compte</SelectLabel>
           <SelectSeparator />
@@ -189,13 +212,18 @@ function BasicSelect(args: Story["args"]) {
   );
 }
 
-function GroupedSelect(args: Story["args"]) {
+function GroupedSelect(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Select {...args}>
       <SelectTrigger aria-label="Choisir une catégorie">
         <SelectValue placeholder="Choisir une catégorie" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent {...contentProps}>
         {groupedSections.map((section, index) => (
           <div key={section.label}>
             {index > 0 ? <SelectSeparator /> : null}
@@ -214,13 +242,18 @@ function GroupedSelect(args: Story["args"]) {
   );
 }
 
-function LongListSelect(args: Story["args"]) {
+function LongListSelect(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Select {...args}>
       <SelectTrigger aria-label="Choisir un suivi">
         <SelectValue placeholder="Choisir un suivi" />
       </SelectTrigger>
-      <SelectContent className="max-h-44">
+      <SelectContent className="max-h-44" {...contentProps}>
         <SelectGroup>
           <SelectLabel>Suivis disponibles</SelectLabel>
           <SelectSeparator />
@@ -235,13 +268,15 @@ function LongListSelect(args: Story["args"]) {
   );
 }
 
-function ResponsiveStressSelect() {
+function ResponsiveStressSelect(portalContainer: HTMLDivElement | null) {
+  const contentProps = portalContainer ? { container: portalContainer } : {};
+
   return (
     <Select>
       <SelectTrigger aria-label="Choisir une configuration détaillée">
         <SelectValue placeholder="Choisir une configuration détaillée" />
       </SelectTrigger>
-      <SelectContent className="max-h-44">
+      <SelectContent className="max-h-44" {...contentProps}>
         <SelectGroup>
           <SelectLabel>Largeur réduite</SelectLabel>
           <SelectSeparator />
@@ -261,60 +296,68 @@ function ResponsiveStressSelect() {
 
 export const Playground: Story = {
   render: (args) => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SelectScaffold
-        description="Choisissez la vue active sans exposer toute la liste en permanence."
-        eyebrow="Navigation"
-        title="Sélecteur standard"
-      >
-        <BasicSelect {...args} />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Choisissez la vue active sans exposer toute la liste en permanence."
+          eyebrow="Navigation"
+          title="Sélecteur standard"
+        >
+          {BasicSelect(args, portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
 };
 
 export const Default: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SelectScaffold
-        description="Utilisez un Select quand une seule option doit être choisie parmi un ensemble compact."
-        eyebrow="Navigation"
-        title="Sélecteur standard"
-      >
-        <BasicSelect {...defaultPlaygroundArgs} />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Utilisez un Select quand une seule option doit être choisie parmi un ensemble compact."
+          eyebrow="Navigation"
+          title="Sélecteur standard"
+        >
+          {BasicSelect(defaultPlaygroundArgs, portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
 };
 
 export const OnSurface: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="md" surface>
-      <SelectScaffold
-        description="Dans une carte ou un panneau, gardez le déclencheur aligné avec le contenu principal."
-        eyebrow="Surface"
-        title="Select dans une carte"
-      >
-        <BasicSelect {...defaultPlaygroundArgs} />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Dans une carte ou un panneau, gardez le déclencheur aligné avec le contenu principal."
+          eyebrow="Surface"
+          title="Select dans une carte"
+        >
+          {BasicSelect(defaultPlaygroundArgs, portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
 };
 
 export const Grouped: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SelectScaffold
-        description="Regroupez les options lorsqu&apos;elles appartiennent à des sections distinctes du produit."
-        eyebrow="Organisation"
-        title="Options groupées"
-      >
-        <GroupedSelect {...defaultPlaygroundArgs} />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Regroupez les options lorsqu&apos;elles appartiennent à des sections distinctes du produit."
+          eyebrow="Organisation"
+          title="Options groupées"
+        >
+          {GroupedSelect(defaultPlaygroundArgs, portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
 };
 
@@ -329,15 +372,17 @@ export const InteractionChecks: Story = {
     docs: { disable: true },
   },
   render: (args) => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SelectScaffold
-        description="Vérifie l&apos;ouverture, le portail, la sélection et le comportement de liste longue."
-        eyebrow="Qualité"
-        title="Contrats d&apos;interaction"
-      >
-        <LongListSelect {...args} />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Vérifie l&apos;ouverture, le portail, la sélection et le comportement de liste longue."
+          eyebrow="Qualité"
+          title="Contrats d&apos;interaction"
+        >
+          {LongListSelect(args, portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
@@ -353,13 +398,10 @@ export const InteractionChecks: Story = {
     await expect(args.onOpenChange).toHaveBeenCalledWith(true);
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
-    const body = within(document.body);
-    const portal = document.body.querySelector("[data-slot='select-portal']");
-    const viewport = document.body.querySelector(
-      "[data-slot='select-viewport']",
-    );
-    const listbox = body.getByRole("listbox");
-    const option = body.getByRole("option", { name: "Option de suivi 12" });
+    const portal = canvasElement.querySelector("[data-slot='select-portal']");
+    const viewport = canvasElement.querySelector("[data-slot='select-viewport']");
+    const listbox = canvas.getByRole("listbox");
+    const option = canvas.getByRole("option", { name: "Option de suivi 12" });
 
     await expect(portal).toHaveAttribute("data-slot", "select-portal");
     await expect(viewport).toHaveAttribute("tabindex", "0");
@@ -371,7 +413,7 @@ export const InteractionChecks: Story = {
     await expect(trigger).toHaveTextContent("Option de suivi 12");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
     await expect(
-      document.body.querySelector("[data-slot='select-content']"),
+      canvasElement.querySelector("[data-slot='select-content']"),
     ).toBeNull();
   },
 };
@@ -382,14 +424,16 @@ export const ResponsiveStress: Story = {
     docs: { disable: true },
   },
   render: () => (
-    <SelectAuditFrame centeredMinHeight={72} maxWidth="sm">
-      <SelectScaffold
-        description="Le déclencheur doit rester lisible et sans débordement sur une largeur mobile serrée."
-        eyebrow="Responsive"
-        title="Libellés longs"
-      >
-        <ResponsiveStressSelect />
-      </SelectScaffold>
-    </SelectAuditFrame>
+    <SelectStoryCanvas centeredMinHeight={72} maxWidth="sm">
+      {(portalContainer) => (
+        <SelectScaffold
+          description="Le déclencheur doit rester lisible et sans débordement sur une largeur mobile serrée."
+          eyebrow="Responsive"
+          title="Libellés longs"
+        >
+          {ResponsiveStressSelect(portalContainer)}
+        </SelectScaffold>
+      )}
+    </SelectStoryCanvas>
   ),
 };
