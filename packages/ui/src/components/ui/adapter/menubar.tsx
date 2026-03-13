@@ -6,11 +6,12 @@ import { cn } from "../../../lib/cn";
 
 export type MenubarProps = React.ComponentProps<typeof MenubarPrimitive.Root>;
 
-function Menubar({ className, ...props }: MenubarProps) {
+function Menubar({ className, tabIndex = 0, ...props }: MenubarProps) {
   return (
     <MenubarPrimitive.Root
       {...props}
       data-slot="menubar"
+      tabIndex={tabIndex}
       className={cn(
         "flex h-10 max-w-full items-center gap-1 overflow-x-auto rounded-(--radius) border border-border bg-background p-1",
         className,

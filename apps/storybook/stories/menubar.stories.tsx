@@ -139,7 +139,7 @@ function MenubarResponsiveShell({ children }: { children: ReactNode }) {
           La barre reste lisible et defile horizontalement si necessaire.
         </p>
       </div>
-      <div className="mt-3 overflow-x-auto pb-2">{children}</div>
+      <div className="mt-3 pb-2">{children}</div>
     </div>
   );
 }
