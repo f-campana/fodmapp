@@ -85,12 +85,7 @@ CREATE TEMP TABLE stg_safe_harbor_candidates (
   notes TEXT NOT NULL
 ) ON COMMIT DROP;
 
-WITH rule_source AS (
-  SELECT source_id
-  FROM sources
-  WHERE source_slug = 'internal_rules_v1'
-),
-rank2_blocked AS (
+WITH rank2_blocked AS (
   SELECT resolved_food_id AS food_id
   FROM phase2_priority_foods
   WHERE priority_rank = 2
@@ -103,6 +98,35 @@ ciqual_refs AS (
   WHERE fer.ref_system = 'CIQUAL'
   GROUP BY fer.food_id
 ),
+ciqual_nutrient_candidates AS (
+  SELECT
+    fno.food_id,
+    nd.nutrient_code,
+    fno.comparator,
+    fno.amount_value,
+    COALESCE(fno.observed_at, fno.effective_from) AS observed_on,
+    ROW_NUMBER() OVER (
+      PARTITION BY fno.food_id, nd.nutrient_code
+      ORDER BY COALESCE(fno.observed_at, fno.effective_from) DESC, fno.created_at DESC, fno.observation_id DESC
+    ) AS rn
+  FROM food_nutrient_observations fno
+  JOIN nutrient_definitions nd ON nd.nutrient_id = fno.nutrient_id
+  JOIN sources s ON s.source_id = fno.source_id
+  WHERE s.source_slug = 'ciqual_2025'
+    AND nd.nutrient_code IN ('CIQUAL_32000', 'CIQUAL_32210', 'CIQUAL_32250', 'CIQUAL_32410', 'CIQUAL_34000')
+    AND fno.basis = 'per_100g'
+    AND fno.amount_value IS NOT NULL
+),
+ciqual_nutrient_latest AS (
+  SELECT
+    food_id,
+    nutrient_code,
+    comparator,
+    amount_value,
+    observed_on
+  FROM ciqual_nutrient_candidates
+  WHERE rn = 1
+),
 ciqual_zero_pack_basis AS (
   SELECT
     f.food_id,
@@ -111,36 +135,33 @@ ciqual_zero_pack_basis AS (
     cr.ciqual_ref
   FROM foods f
   JOIN ciqual_refs cr ON cr.food_id = f.food_id
-  LEFT JOIN food_nutrient_observations fno ON fno.food_id = f.food_id
-  LEFT JOIN nutrient_definitions nd
-    ON nd.nutrient_id = fno.nutrient_id
-   AND nd.nutrient_code IN ('CIQUAL_32000', 'CIQUAL_32210', 'CIQUAL_32250', 'CIQUAL_32410', 'CIQUAL_34000')
+  LEFT JOIN ciqual_nutrient_latest nl ON nl.food_id = f.food_id
   GROUP BY f.food_id, f.food_slug, f.canonical_name_fr, cr.ciqual_ref
   HAVING COUNT(*) FILTER (
-    WHERE nd.nutrient_code = 'CIQUAL_32000'
-      AND fno.comparator = 'eq'
-      AND fno.amount_value = 0
-  ) > 0
+    WHERE nl.nutrient_code = 'CIQUAL_32000'
+      AND nl.comparator = 'eq'
+      AND nl.amount_value = 0
+  ) = 1
      AND COUNT(*) FILTER (
-       WHERE nd.nutrient_code = 'CIQUAL_32210'
-         AND fno.comparator = 'eq'
-         AND fno.amount_value = 0
-     ) > 0
+       WHERE nl.nutrient_code = 'CIQUAL_32210'
+         AND nl.comparator = 'eq'
+         AND nl.amount_value = 0
+     ) = 1
      AND COUNT(*) FILTER (
-       WHERE nd.nutrient_code = 'CIQUAL_32250'
-         AND fno.comparator = 'eq'
-         AND fno.amount_value = 0
-     ) > 0
+       WHERE nl.nutrient_code = 'CIQUAL_32250'
+         AND nl.comparator = 'eq'
+         AND nl.amount_value = 0
+     ) = 1
      AND COUNT(*) FILTER (
-       WHERE nd.nutrient_code = 'CIQUAL_32410'
-         AND fno.comparator = 'eq'
-         AND fno.amount_value = 0
-     ) > 0
+       WHERE nl.nutrient_code = 'CIQUAL_32410'
+         AND nl.comparator = 'eq'
+         AND nl.amount_value = 0
+     ) = 1
      AND COUNT(*) FILTER (
-       WHERE nd.nutrient_code = 'CIQUAL_34000'
-         AND fno.comparator = 'eq'
-         AND fno.amount_value = 0
-     ) > 0
+       WHERE nl.nutrient_code = 'CIQUAL_34000'
+         AND nl.comparator = 'eq'
+         AND nl.amount_value = 0
+     ) = 1
 ),
 oil_candidates AS (
   SELECT DISTINCT

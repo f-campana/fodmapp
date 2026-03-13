@@ -144,46 +144,70 @@ DECLARE
 BEGIN
   SELECT COUNT(*) INTO bad_count
   FROM (
+    WITH ciqual_nutrient_candidates AS (
+      SELECT
+        fno.food_id,
+        nd.nutrient_code,
+        fno.comparator,
+        fno.amount_value,
+        ROW_NUMBER() OVER (
+          PARTITION BY fno.food_id, nd.nutrient_code
+          ORDER BY COALESCE(fno.observed_at, fno.effective_from) DESC, fno.created_at DESC, fno.observation_id DESC
+        ) AS rn
+      FROM food_nutrient_observations fno
+      JOIN nutrient_definitions nd ON nd.nutrient_id = fno.nutrient_id
+      JOIN sources s ON s.source_id = fno.source_id
+      WHERE s.source_slug = 'ciqual_2025'
+        AND nd.nutrient_code IN ('CIQUAL_32000', 'CIQUAL_32210', 'CIQUAL_32250', 'CIQUAL_32410', 'CIQUAL_34000')
+        AND fno.basis = 'per_100g'
+        AND fno.amount_value IS NOT NULL
+    ),
+    ciqual_nutrient_latest AS (
+      SELECT
+        food_id,
+        nutrient_code,
+        comparator,
+        amount_value
+      FROM ciqual_nutrient_candidates
+      WHERE rn = 1
+    )
     SELECT
       a.food_id,
       COUNT(*) FILTER (
-        WHERE nd.nutrient_code = 'CIQUAL_32000'
-          AND fno.comparator = 'eq'
-          AND fno.amount_value = 0
+        WHERE nl.nutrient_code = 'CIQUAL_32000'
+          AND nl.comparator = 'eq'
+          AND nl.amount_value = 0
       ) AS sugar_zero_count,
       COUNT(*) FILTER (
-        WHERE nd.nutrient_code = 'CIQUAL_32210'
-          AND fno.comparator = 'eq'
-          AND fno.amount_value = 0
+        WHERE nl.nutrient_code = 'CIQUAL_32210'
+          AND nl.comparator = 'eq'
+          AND nl.amount_value = 0
       ) AS fructose_zero_count,
       COUNT(*) FILTER (
-        WHERE nd.nutrient_code = 'CIQUAL_32250'
-          AND fno.comparator = 'eq'
-          AND fno.amount_value = 0
+        WHERE nl.nutrient_code = 'CIQUAL_32250'
+          AND nl.comparator = 'eq'
+          AND nl.amount_value = 0
       ) AS glucose_zero_count,
       COUNT(*) FILTER (
-        WHERE nd.nutrient_code = 'CIQUAL_32410'
-          AND fno.comparator = 'eq'
-          AND fno.amount_value = 0
+        WHERE nl.nutrient_code = 'CIQUAL_32410'
+          AND nl.comparator = 'eq'
+          AND nl.amount_value = 0
       ) AS lactose_zero_count,
       COUNT(*) FILTER (
-        WHERE nd.nutrient_code = 'CIQUAL_34000'
-          AND fno.comparator = 'eq'
-          AND fno.amount_value = 0
+        WHERE nl.nutrient_code = 'CIQUAL_34000'
+          AND nl.comparator = 'eq'
+          AND nl.amount_value = 0
       ) AS polyols_zero_count
     FROM food_safe_harbor_assignments a
-    LEFT JOIN food_nutrient_observations fno ON fno.food_id = a.food_id
-    LEFT JOIN nutrient_definitions nd
-      ON nd.nutrient_id = fno.nutrient_id
-     AND nd.nutrient_code IN ('CIQUAL_32000', 'CIQUAL_32210', 'CIQUAL_32250', 'CIQUAL_32410', 'CIQUAL_34000')
+    LEFT JOIN ciqual_nutrient_latest nl ON nl.food_id = a.food_id
     WHERE a.assignment_version = 'safe_harbor_v1'
     GROUP BY a.food_id
   ) nutrient_basis
-  WHERE sugar_zero_count = 0
-     OR fructose_zero_count = 0
-     OR glucose_zero_count = 0
-     OR lactose_zero_count = 0
-     OR polyols_zero_count = 0;
+  WHERE sugar_zero_count <> 1
+     OR fructose_zero_count <> 1
+     OR glucose_zero_count <> 1
+     OR lactose_zero_count <> 1
+     OR polyols_zero_count <> 1;
 
   IF bad_count <> 0 THEN
     RAISE EXCEPTION 'safe_harbor_v1 contains assignments without full CIQUAL zero-nutrient basis (% rows)', bad_count;
