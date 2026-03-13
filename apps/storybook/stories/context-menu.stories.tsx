@@ -71,6 +71,11 @@ const defaultPlaygroundArgs = {
   onOpenChange: fn(),
 } as const;
 
+const defaultShowcaseArgs = {
+  modal: true,
+  dir: "ltr",
+} as const;
+
 const triggerClassName =
   "flex w-full max-w-sm cursor-pointer flex-col items-start gap-1 rounded-(--radius) border border-border bg-card px-4 py-4 text-left text-sm shadow-sm transition-colors hover:bg-accent/40";
 
@@ -206,7 +211,10 @@ function PreferencesContextMenu(args: Story["args"]) {
   );
 }
 
-function SubmenuContextMenu(args: Story["args"]) {
+function SubmenuContextMenu(
+  args: Story["args"],
+  portalContainer?: HTMLDivElement | null,
+) {
   return (
     <ContextMenu {...args}>
       <ContextMenuTrigger asChild>
@@ -214,11 +222,11 @@ function SubmenuContextMenu(args: Story["args"]) {
           <ContextMenuTarget title="Outils avances" />
         </button>
       </ContextMenuTrigger>
-      <ContextMenuContent>
+      <ContextMenuContent container={portalContainer}>
         <ContextMenuItem>Tableau principal</ContextMenuItem>
         <ContextMenuSub>
           <ContextMenuSubTrigger>Parametres avances</ContextMenuSubTrigger>
-          <ContextMenuPortal>
+          <ContextMenuPortal container={portalContainer}>
             <ContextMenuSubContent>
               <ContextMenuItem>Regles de substitution</ContextMenuItem>
               <ContextMenuItem>Options de score</ContextMenuItem>
@@ -243,7 +251,7 @@ export const Default: Story = {
   render: () => (
     <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
       {(portalContainer) =>
-        WorkspaceContextMenu(defaultPlaygroundArgs, portalContainer)
+        WorkspaceContextMenu(defaultShowcaseArgs, portalContainer)
       }
     </ContextMenuStoryCanvas>
   ),
@@ -254,7 +262,7 @@ export const OnSurface: Story = {
   render: () => (
     <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
       {(portalContainer) =>
-        WorkspaceContextMenu(defaultPlaygroundArgs, portalContainer)
+        WorkspaceContextMenu(defaultShowcaseArgs, portalContainer)
       }
     </ContextMenuStoryCanvas>
   ),
@@ -264,7 +272,7 @@ export const CheckboxAndRadio: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <ContextMenuAuditFrame centeredMinHeight={72} maxWidth="md">
-      <PreferencesContextMenu {...defaultPlaygroundArgs} />
+      <PreferencesContextMenu {...defaultShowcaseArgs} />
     </ContextMenuAuditFrame>
   ),
 };
@@ -272,9 +280,11 @@ export const CheckboxAndRadio: Story = {
 export const Submenu: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <ContextMenuAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SubmenuContextMenu {...defaultPlaygroundArgs} />
-    </ContextMenuAuditFrame>
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        SubmenuContextMenu(defaultShowcaseArgs, portalContainer)
+      }
+    </ContextMenuStoryCanvas>
   ),
 };
 

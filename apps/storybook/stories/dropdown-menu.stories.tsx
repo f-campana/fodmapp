@@ -65,20 +65,33 @@ const defaultPlaygroundArgs = {
   onOpenChange: fn(),
 } as const;
 
+const defaultShowcaseArgs = {
+  modal: true,
+  dir: "ltr",
+} as const;
+
 const triggerClassName =
   "inline-flex cursor-pointer items-center rounded-(--radius) border border-border bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/40";
 
-function DropdownMenuActionRow({ children }: { children: ReactNode }) {
+function DropdownMenuActionRow({
+  children,
+  eyebrow = "Actions rapides",
+  title = "Mon espace",
+  description = "Gardez les raccourcis du compte actif a portee de main.",
+}: {
+  children: ReactNode;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+}) {
   return (
     <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-(--radius) border border-border bg-card px-4 py-4 shadow-sm">
       <div className="min-w-0 space-y-1">
         <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          Actions rapides
+          {eyebrow}
         </p>
-        <h3 className="text-sm font-semibold text-foreground">Mon espace</h3>
-        <p className="text-sm text-muted-foreground">
-          Gardez les raccourcis du compte actif a portee de main.
-        </p>
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <div className="shrink-0">{children}</div>
     </div>
@@ -222,17 +235,26 @@ function PreferencesDropdownMenu(args: Story["args"]) {
   );
 }
 
-function SubmenuDropdownMenu(args: Story["args"]) {
+function SubmenuDropdownMenu(
+  args: Story["args"],
+  portalContainer?: HTMLDivElement | null,
+) {
   return (
     <DropdownMenu {...args}>
-      <DropdownMenuTrigger className={triggerClassName}>
-        Outils avances
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuActionRow
+        description="Ouvrez les reglages avances sans quitter les actions principales."
+        eyebrow="Navigation secondaire"
+        title="Outils de configuration"
+      >
+        <DropdownMenuTrigger className={triggerClassName}>
+          Outils avances
+        </DropdownMenuTrigger>
+      </DropdownMenuActionRow>
+      <DropdownMenuContent container={portalContainer}>
         <DropdownMenuItem>Tableau principal</DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Parametres avances</DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
+          <DropdownMenuPortal container={portalContainer}>
             <DropdownMenuSubContent>
               <DropdownMenuItem>Regles de substitution</DropdownMenuItem>
               <DropdownMenuItem>Options de score</DropdownMenuItem>
@@ -257,7 +279,7 @@ export const Default: Story = {
   render: () => (
     <DropdownMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
       {(portalContainer) =>
-        AccountDropdownMenu(defaultPlaygroundArgs, portalContainer)
+        AccountDropdownMenu(defaultShowcaseArgs, portalContainer)
       }
     </DropdownMenuStoryCanvas>
   ),
@@ -268,7 +290,7 @@ export const OnSurface: Story = {
   render: () => (
     <DropdownMenuStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
       {(portalContainer) =>
-        AccountDropdownMenu(defaultPlaygroundArgs, portalContainer)
+        AccountDropdownMenu(defaultShowcaseArgs, portalContainer)
       }
     </DropdownMenuStoryCanvas>
   ),
@@ -278,7 +300,7 @@ export const CheckboxAndRadio: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <DropdownMenuAuditFrame centeredMinHeight={72} maxWidth="md">
-      <PreferencesDropdownMenu {...defaultPlaygroundArgs} />
+      <PreferencesDropdownMenu {...defaultShowcaseArgs} />
     </DropdownMenuAuditFrame>
   ),
 };
@@ -286,9 +308,11 @@ export const CheckboxAndRadio: Story = {
 export const Submenu: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <DropdownMenuAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SubmenuDropdownMenu {...defaultPlaygroundArgs} />
-    </DropdownMenuAuditFrame>
+    <DropdownMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        SubmenuDropdownMenu(defaultShowcaseArgs, portalContainer)
+      }
+    </DropdownMenuStoryCanvas>
   ),
 };
 

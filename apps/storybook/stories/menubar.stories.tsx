@@ -128,6 +128,22 @@ function MenubarWorkspaceShell({ children }: { children: ReactNode }) {
   );
 }
 
+function MenubarResponsiveShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-full max-w-[19rem] rounded-(--radius) border border-border bg-card p-3 shadow-sm">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Largeur contrainte
+        </p>
+        <p className="text-sm text-muted-foreground">
+          La barre reste lisible et defile horizontalement si necessaire.
+        </p>
+      </div>
+      <div className="mt-3 overflow-x-auto pb-2">{children}</div>
+    </div>
+  );
+}
+
 function WorkspaceMenubar(
   args: Story["args"],
   portalContainer: HTMLDivElement | null,
@@ -156,23 +172,23 @@ function WorkspaceMenubar(
             <MenubarTrigger>Fichier</MenubarTrigger>
           )}
           <MenubarContent {...contentProps}>
-            <MenubarLabel>Mon compte</MenubarLabel>
+            <MenubarLabel>Plan actuel</MenubarLabel>
             <MenubarSeparator />
             <MenubarGroup>
               <MenubarItem>
-                Profil
-                <MenubarShortcut>P</MenubarShortcut>
+                Dupliquer le plan
+                <MenubarShortcut>D</MenubarShortcut>
               </MenubarItem>
               {options?.itemSlot ? (
                 <MenubarItem asChild>
                   <a data-slot={options.itemSlot} href="#profil">
-                    Ouvrir le profil
+                    Ouvrir le plan
                   </a>
                 </MenubarItem>
               ) : (
                 <MenubarItem>
-                  Parametres
-                  <MenubarShortcut>,</MenubarShortcut>
+                  Exporter
+                  <MenubarShortcut>E</MenubarShortcut>
                 </MenubarItem>
               )}
             </MenubarGroup>
@@ -181,15 +197,15 @@ function WorkspaceMenubar(
         <MenubarMenu>
           <MenubarTrigger>Edition</MenubarTrigger>
           <MenubarContent {...contentProps}>
-            <MenubarItem>Dupliquer</MenubarItem>
-            <MenubarItem>Renommer</MenubarItem>
+            <MenubarItem>Annuler</MenubarItem>
+            <MenubarItem>Renommer la semaine</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
           <MenubarTrigger>Affichage</MenubarTrigger>
           <MenubarContent {...contentProps}>
             <MenubarItem>Afficher les alertes</MenubarItem>
-            <MenubarItem>Mode detaille</MenubarItem>
+            <MenubarItem>Vue ingredients</MenubarItem>
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
@@ -219,43 +235,54 @@ function PreferencesMenubar(args: Story["args"]) {
   );
 }
 
-function SubmenuMenubar(args: Story["args"]) {
+function SubmenuMenubar(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+) {
   return (
-    <Menubar {...args}>
-      <MenubarMenu>
-        <MenubarTrigger>Outils</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem>Tableau principal</MenubarItem>
-          <MenubarSub>
-            <MenubarSubTrigger>Parametres avances</MenubarSubTrigger>
-            <MenubarPortal>
-              <MenubarSubContent>
-                <MenubarItem>Regles de substitution</MenubarItem>
-                <MenubarItem>Options de score</MenubarItem>
-              </MenubarSubContent>
-            </MenubarPortal>
-          </MenubarSub>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
+    <MenubarWorkspaceShell>
+      <Menubar {...args} className="w-full">
+        <MenubarMenu>
+          <MenubarTrigger>Outils</MenubarTrigger>
+          <MenubarContent container={portalContainer}>
+            <MenubarItem>Tableau principal</MenubarItem>
+            <MenubarSub>
+              <MenubarSubTrigger>Parametres avances</MenubarSubTrigger>
+              <MenubarPortal container={portalContainer}>
+                <MenubarSubContent>
+                  <MenubarItem>Regles de substitution</MenubarItem>
+                  <MenubarItem>Options de score</MenubarItem>
+                </MenubarSubContent>
+              </MenubarPortal>
+            </MenubarSub>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p className="text-sm text-muted-foreground">
+        Les sous-menus restent ancres a la barre principale au lieu de flotter
+        dans un canevas vide.
+      </p>
+    </MenubarWorkspaceShell>
   );
 }
 
 function ResponsiveStressMenubar() {
   return (
-    <Menubar className="w-full">
-      <MenubarMenu>
-        <MenubarTrigger>Tableau de bord hebdomadaire detaille</MenubarTrigger>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>
-          Ajustements de substitution a reverifier
-        </MenubarTrigger>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>Preparation en plusieurs etapes</MenubarTrigger>
-      </MenubarMenu>
-    </Menubar>
+    <MenubarResponsiveShell>
+      <Menubar className="min-w-max">
+        <MenubarMenu>
+          <MenubarTrigger>Tableau de bord hebdomadaire detaille</MenubarTrigger>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>
+            Ajustements de substitution a reverifier
+          </MenubarTrigger>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Preparation en plusieurs etapes</MenubarTrigger>
+        </MenubarMenu>
+      </Menubar>
+    </MenubarResponsiveShell>
   );
 }
 
@@ -301,9 +328,11 @@ export const CheckboxAndRadio: Story = {
 export const Submenu: Story = {
   parameters: fixedStoryParameters,
   render: () => (
-    <MenubarAuditFrame centeredMinHeight={72} maxWidth="md">
-      <SubmenuMenubar {...defaultPlaygroundArgs} />
-    </MenubarAuditFrame>
+    <MenubarStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        SubmenuMenubar(defaultPlaygroundArgs, portalContainer)
+      }
+    </MenubarStoryCanvas>
   ),
 };
 
@@ -370,10 +399,10 @@ export const InteractionChecks: Story = {
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
     const defaultItem = within(content).getByRole("menuitem", {
-      name: /^Profil/,
+      name: /^Dupliquer le plan/,
     });
     const customItem = within(content).getByRole("menuitem", {
-      name: "Ouvrir le profil",
+      name: "Ouvrir le plan",
     });
 
     await expect(defaultItem).toHaveAttribute("data-slot", "menubar-item");
@@ -413,7 +442,7 @@ export const ResponsiveStress: Story = {
     },
   },
   render: () => (
-    <MenubarAuditFrame maxWidth="sm">
+    <MenubarAuditFrame centeredMinHeight={72} maxWidth="md">
       <ResponsiveStressMenubar />
     </MenubarAuditFrame>
   ),

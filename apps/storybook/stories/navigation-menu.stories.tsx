@@ -36,6 +36,11 @@ const defaultPlaygroundArgs = {
   onValueChange: fn(),
 } as const;
 
+const defaultShowcaseArgs = {
+  dir: "ltr",
+  orientation: "horizontal",
+} as const;
+
 const triggerCardClassName =
   "block rounded-(--radius) border border-border bg-background px-3 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent/40";
 
@@ -57,6 +62,22 @@ function NavigationPreviewShell({ children }: { children: ReactNode }) {
         </div>
         <div className="w-full lg:w-auto">{children}</div>
       </div>
+    </div>
+  );
+}
+
+function NavigationResponsiveShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-full max-w-[19rem] rounded-(--radius) border border-border bg-card p-3 shadow-sm">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Navigation compacte
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Les destinations longues restent lisibles dans une colonne etroite.
+        </p>
+      </div>
+      <div className="mt-3">{children}</div>
     </div>
   );
 }
@@ -169,35 +190,27 @@ function PrimaryNavigation(
 
 function ResponsiveStressNavigation() {
   return (
-    <NavigationMenu
-      className="w-full max-w-sm items-start justify-start"
-      orientation="vertical"
-    >
-      <NavigationMenuList className="w-full flex-col items-stretch justify-start">
-        <NavigationMenuItem className="w-full" value="planning">
-          <NavigationMenuTrigger className="w-full justify-between whitespace-normal">
-            Planning hebdomadaire detaille
-          </NavigationMenuTrigger>
-          <NavigationMenuContent className="md:static">
-            <div className="rounded-(--radius) border border-border bg-card p-4 text-sm">
-              Repartissez les decisions importantes sur plusieurs repas pour
-              garder une lecture simple sur mobile.
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem className="w-full" value="substitutions">
-          <NavigationMenuTrigger className="w-full justify-between whitespace-normal">
-            Substitutions a reverifier avant service
-          </NavigationMenuTrigger>
-          <NavigationMenuContent className="md:static">
-            <div className="rounded-(--radius) border border-border bg-card p-4 text-sm">
-              Gardez les points les plus sensibles visibles sans imposer une
-              largeur fixe.
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+    <NavigationResponsiveShell>
+      <NavigationMenu
+        className="w-full max-w-[19rem] items-start justify-start [&>[data-slot='navigation-menu-viewport-position']]:hidden"
+        orientation="vertical"
+      >
+        <NavigationMenuList className="w-full flex-col items-stretch justify-start">
+          <NavigationMenuItem className="w-full" value="planning">
+            <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
+              Planning hebdomadaire detaille
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="hidden" />
+          </NavigationMenuItem>
+          <NavigationMenuItem className="w-full" value="substitutions">
+            <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
+              Substitutions a reverifier avant service
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="hidden" />
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </NavigationResponsiveShell>
   );
 }
 
@@ -213,7 +226,7 @@ export const Default: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <NavigationMenuAuditFrame maxWidth="3xl">
-      {PrimaryNavigation(defaultPlaygroundArgs)}
+      {PrimaryNavigation(defaultShowcaseArgs)}
     </NavigationMenuAuditFrame>
   ),
 };
@@ -222,7 +235,7 @@ export const OnSurface: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <NavigationMenuAuditFrame maxWidth="3xl" surface>
-      {PrimaryNavigation(defaultPlaygroundArgs)}
+      {PrimaryNavigation(defaultShowcaseArgs)}
     </NavigationMenuAuditFrame>
   ),
 };
@@ -231,7 +244,7 @@ export const WithIndicator: Story = {
   parameters: fixedStoryParameters,
   render: () => (
     <NavigationMenuAuditFrame maxWidth="3xl">
-      {PrimaryNavigation(defaultPlaygroundArgs, { includeIndicator: true })}
+      {PrimaryNavigation(defaultShowcaseArgs, { includeIndicator: true })}
     </NavigationMenuAuditFrame>
   ),
 };
@@ -343,7 +356,7 @@ export const ResponsiveStress: Story = {
     },
   },
   render: () => (
-    <NavigationMenuAuditFrame maxWidth="sm">
+    <NavigationMenuAuditFrame centeredMinHeight={72} maxWidth="md">
       <ResponsiveStressNavigation />
     </NavigationMenuAuditFrame>
   ),
