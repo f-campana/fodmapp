@@ -24,12 +24,12 @@
     },
     "aspect-ratio": {
       "category": "adapter",
-      "storyFile": "aspect-ratio.stories.tsx",
+      "storyFile": "primitives/adapter/aspect-ratio/aspect-ratio.stories.tsx",
       "title": "Primitives/Adapter/AspectRatio"
     },
     "avatar": {
       "category": "adapter",
-      "storyFile": "avatar.stories.tsx",
+      "storyFile": "primitives/adapter/avatar/avatar.stories.tsx",
       "title": "Primitives/Adapter/Avatar"
     },
     "badge": {
@@ -169,7 +169,7 @@
     },
     "label": {
       "category": "adapter",
-      "storyFile": "label.stories.tsx",
+      "storyFile": "primitives/adapter/label/label.stories.tsx",
       "title": "Primitives/Adapter/Label"
     },
     "menubar": {
@@ -199,7 +199,7 @@
     },
     "portal": {
       "category": "utility",
-      "storyFile": "portal.stories.tsx",
+      "storyFile": "utilities/portal/portal.stories.tsx",
       "title": "Utilities/Portal"
     },
     "progress": {
@@ -234,7 +234,7 @@
     },
     "separator": {
       "category": "adapter",
-      "storyFile": "separator.stories.tsx",
+      "storyFile": "primitives/adapter/separator/separator.stories.tsx",
       "title": "Primitives/Adapter/Separator"
     },
     "sheet": {
@@ -314,7 +314,7 @@
     },
     "visually-hidden": {
       "category": "utility",
-      "storyFile": "visually-hidden.stories.tsx",
+      "storyFile": "utilities/visually-hidden/visually-hidden.stories.tsx",
       "title": "Utilities/VisuallyHidden"
     }
   }
