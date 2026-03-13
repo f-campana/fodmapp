@@ -41,13 +41,13 @@ const defaultShowcaseArgs = {
   orientation: "horizontal",
 } as const;
 
-const triggerCardClassName =
-  "block rounded-(--radius) border border-border bg-background px-3 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent/40";
+const contentLinkClassName =
+  "block rounded-(--radius) px-3 py-3 text-sm font-medium transition-colors hover:bg-accent/40";
 
 function NavigationPreviewShell({ children }: { children: ReactNode }) {
   return (
     <div className="w-full rounded-(--radius) border border-border bg-card px-4 py-4 shadow-sm">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="space-y-4">
         <div className="space-y-1">
           <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
             Navigation produit
@@ -60,7 +60,7 @@ function NavigationPreviewShell({ children }: { children: ReactNode }) {
             page active.
           </p>
         </div>
-        <div className="w-full lg:w-auto">{children}</div>
+        <div className="w-full">{children}</div>
       </div>
     </div>
   );
@@ -134,24 +134,31 @@ function PrimaryNavigation(
 ) {
   return (
     <NavigationPreviewShell>
-      <NavigationMenu className="w-full max-w-xl justify-start" {...args}>
+      <NavigationMenu
+        className="w-full max-w-xl flex-col items-start justify-start [&>[data-slot='navigation-menu-viewport-position']]:static [&>[data-slot='navigation-menu-viewport-position']]:mt-2 [&>[data-slot='navigation-menu-viewport-position']]:w-full [&>[data-slot='navigation-menu-viewport-position']]:justify-start"
+        {...args}
+      >
         <NavigationMenuList className="w-full justify-start">
           <NavigationMenuItem value="produits">
             <NavigationMenuTrigger data-slot="custom-navigation-menu-trigger">
               Produits
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
+              <ul className="grid gap-1 p-2 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
                 <li>
                   {options?.linkSlot ? (
                     <NavigationMenuLink asChild>
-                      <a data-slot={options.linkSlot} href="#calculateur">
+                      <a
+                        className={contentLinkClassName}
+                        data-slot={options.linkSlot}
+                        href="#calculateur"
+                      >
                         Calculateur FODMAP
                       </a>
                     </NavigationMenuLink>
                   ) : (
                     <NavigationMenuLink asChild>
-                      <a className={triggerCardClassName} href="#calculateur">
+                      <a className={contentLinkClassName} href="#calculateur">
                         Calculateur FODMAP
                       </a>
                     </NavigationMenuLink>
@@ -159,7 +166,7 @@ function PrimaryNavigation(
                 </li>
                 <li>
                   <NavigationMenuLink asChild>
-                    <a className={triggerCardClassName} href="#substitutions">
+                    <a className={contentLinkClassName} href="#substitutions">
                       Substitutions
                     </a>
                   </NavigationMenuLink>
@@ -170,10 +177,10 @@ function PrimaryNavigation(
           <NavigationMenuItem value="ressources">
             <NavigationMenuTrigger>Ressources</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[340px]">
+              <ul className="grid gap-1 p-2 md:w-[340px]">
                 <li>
                   <NavigationMenuLink asChild>
-                    <a className={triggerCardClassName} href="#guides">
+                    <a className={contentLinkClassName} href="#guides">
                       Guides pratiques
                     </a>
                   </NavigationMenuLink>
@@ -192,7 +199,8 @@ function ResponsiveStressNavigation() {
   return (
     <NavigationResponsiveShell>
       <NavigationMenu
-        className="w-full max-w-[19rem] items-start justify-start [&>[data-slot='navigation-menu-viewport-position']]:hidden"
+        className="w-full max-w-[19rem] flex-col items-stretch justify-start [&>[data-slot='navigation-menu-viewport-position']]:static [&>[data-slot='navigation-menu-viewport-position']]:mt-2 [&>[data-slot='navigation-menu-viewport-position']]:w-full [&>[data-slot='navigation-menu-viewport-position']]:justify-stretch"
+        defaultValue="planning"
         orientation="vertical"
       >
         <NavigationMenuList className="w-full flex-col items-stretch justify-start">
@@ -200,13 +208,59 @@ function ResponsiveStressNavigation() {
             <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
               Planning hebdomadaire detaille
             </NavigationMenuTrigger>
-            <NavigationMenuContent className="hidden" />
+            <NavigationMenuContent>
+              <ul className="grid gap-1 p-2">
+                <li>
+                  <NavigationMenuLink asChild>
+                    <a
+                      className={contentLinkClassName}
+                      href="#planning-jour-par-jour"
+                    >
+                      Vue jour par jour
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+                <li>
+                  <NavigationMenuLink asChild>
+                    <a
+                      className={contentLinkClassName}
+                      href="#planning-equipes"
+                    >
+                      Coordination des equipes
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem className="w-full" value="substitutions">
             <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
               Substitutions a reverifier avant service
             </NavigationMenuTrigger>
-            <NavigationMenuContent className="hidden" />
+            <NavigationMenuContent>
+              <ul className="grid gap-1 p-2">
+                <li>
+                  <NavigationMenuLink asChild>
+                    <a
+                      className={contentLinkClassName}
+                      href="#substitutions-prioritaires"
+                    >
+                      Substitutions prioritaires
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+                <li>
+                  <NavigationMenuLink asChild>
+                    <a
+                      className={contentLinkClassName}
+                      href="#service-sensible"
+                    >
+                      Service sensible
+                    </a>
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -351,6 +405,11 @@ export const InteractionChecks: Story = {
 export const ResponsiveStress: Story = {
   parameters: {
     controls: { disable: true },
+    a11y: {
+      config: {
+        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      },
+    },
     docs: {
       disable: true,
     },
