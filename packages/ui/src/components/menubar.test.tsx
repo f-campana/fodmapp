@@ -389,11 +389,13 @@ describe("Menubar", () => {
       document.querySelector("[data-slot='menubar']")?.className ?? "",
     ).toContain("overflow-x-auto");
     expect(trigger.className).toContain("trigger-personnalise");
+    expect(trigger.className).toContain("cursor-pointer");
     expect(trigger.className).toContain("focus-visible:ring-ring-soft");
     expect(content.className).toContain("bg-popover");
     expect(content.className).toContain("text-popover-foreground");
     expect(content.className).toContain("data-[state=open]:animate-in");
     expect(content.className).toContain("contenu-personnalise");
+    expect(item.className).toContain("cursor-pointer");
     expect(item.className).toContain("focus:bg-accent");
     expect(item.className).toContain("focus:text-accent-foreground");
     expect(item.className).toContain("item-personnalise");

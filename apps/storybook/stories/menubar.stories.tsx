@@ -308,6 +308,7 @@ export const InteractionChecks: Story = {
     await expect(
       canvasElement.querySelector("[data-slot='menubar-trigger']"),
     ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     trigger.focus();
@@ -337,6 +338,7 @@ export const InteractionChecks: Story = {
     });
 
     await expect(defaultItem).toHaveAttribute("data-slot", "menubar-item");
+    await expect(defaultItem.className).toContain("cursor-pointer");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-menubar-item",

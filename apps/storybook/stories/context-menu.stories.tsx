@@ -307,6 +307,7 @@ export const InteractionChecks: Story = {
     await expect(
       canvasElement.querySelector("[data-slot='context-menu-trigger']"),
     ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
 
     trigger.focus();
     await expect(trigger).toHaveFocus();
@@ -338,6 +339,7 @@ export const InteractionChecks: Story = {
     });
 
     await expect(defaultItem).toHaveAttribute("data-slot", "context-menu-item");
+    await expect(defaultItem.className).toContain("cursor-pointer");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-context-menu-item",

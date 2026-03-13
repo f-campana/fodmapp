@@ -312,6 +312,7 @@ export const InteractionChecks: Story = {
     await expect(
       canvasElement.querySelector("[data-slot='dropdown-menu-trigger']"),
     ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     await userEvent.tab();
@@ -347,6 +348,7 @@ export const InteractionChecks: Story = {
       "data-slot",
       "dropdown-menu-item",
     );
+    await expect(defaultItem.className).toContain("cursor-pointer");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-dropdown-menu-item",

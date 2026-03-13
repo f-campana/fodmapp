@@ -258,6 +258,7 @@ export const InteractionChecks: Story = {
         "[data-slot='custom-navigation-menu-trigger']",
       ),
     ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     await userEvent.tab();

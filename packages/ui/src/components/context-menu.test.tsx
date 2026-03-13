@@ -377,6 +377,7 @@ describe("ContextMenu", () => {
     expect(content.className).toContain("text-popover-foreground");
     expect(content.className).toContain("data-[state=open]:animate-in");
     expect(content.className).toContain("contenu-personnalise");
+    expect(item.className).toContain("cursor-pointer");
     expect(item.className).toContain("focus:bg-accent");
     expect(item.className).toContain("focus:text-accent-foreground");
     expect(item.className).toContain("item-personnalise");
