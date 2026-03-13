@@ -88,6 +88,8 @@ Use this index when you know you need documentation, but do not yet know which s
   high-signal product PRD for France-first mobile onboarding.
 - [`docs/plans/safe-harbor-food-categories-prd-fr-v1.md`](./plans/safe-harbor-food-categories-prd-fr-v1.md):
   Safe-Harbor V1 PRD aligned to the implemented composition-zero contract.
+- [`docs/plans/symptoms-tracking-v1-prd.md`](./plans/symptoms-tracking-v1-prd.md): product scope for
+  the first tracking lane across web and mobile.
 - [`docs/research/safe-harbor-evidence-pack-v1.md`](./research/safe-harbor-evidence-pack-v1.md):
   rights-first evidence pack + copy guardrails for Safe-Harbor V1.
 
@@ -118,6 +120,8 @@ Use this index when you know you need documentation, but do not yet know which s
   baseline for controlled mobile execution.
 - [`docs/research/safe-harbor-mode-framing-2026-03-13.md`](./research/safe-harbor-mode-framing-2026-03-13.md):
   discussion note on strict vs guided safe-harbor product framing.
+- [`docs/plans/symptoms-tracking-v1-prd.md`](./plans/symptoms-tracking-v1-prd.md): draft PRD for the
+  tracking lane (manual-first, account-backed, basic summaries only).
 - [`docs/plans/mobile-onboarding-prd-fr-v1.md`](./plans/mobile-onboarding-prd-fr-v1.md): active
   France-first mobile onboarding PRD.
 - [`docs/plans/safe-harbor-food-categories-prd-fr-v1.md`](./plans/safe-harbor-food-categories-prd-fr-v1.md):
