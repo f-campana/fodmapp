@@ -75,4 +75,6 @@ Canonical v0 review contract is committed at:
 
 v0 is slug-based, returns both FR/EN fields, and has no locale negotiation.
 Safe-Harbor V1 uses a dedicated endpoint (`GET /v0/safe-harbors`) so browse
-discovery does not weaken the required `/v0/foods?q=...` search contract.
+discovery does not weaken the required `/v0/foods?q=...` search contract. The
+endpoint only returns foods backed by explicit Safe-Harbor V1 `6/6` zero packs
+materialized from CIQUAL-linked foods and internal rules.

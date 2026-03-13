@@ -119,8 +119,9 @@ export interface paths {
     };
     /**
      * Discover Safe-Harbor V1 foods grouped by cohort
-     * @description Returns Safe-Harbor V1 cohort groupings derived from CIQUAL-linked foods
-     *     and internal rules. This endpoint is additive to `/v0/foods` search and
+     * @description Returns Safe-Harbor V1 cohort groupings derived only from explicit 6/6
+     *     zero-measurement packs materialized from CIQUAL-linked foods and
+     *     internal rules. This endpoint is additive to `/v0/foods` search and
      *     does not imply full Phase 3 rollup coverage for the returned foods.
      *
      *     Public copy and metadata are project-authored. Cohort assignment is

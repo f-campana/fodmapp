@@ -1092,7 +1092,7 @@ Safe-Harbor V1 contract (`/v0/safe-harbors`):
   - `cohort_oil_fat`
   - `cohort_plain_protein`
   - `cohort_egg`
-- runtime/public cohort assignment derives from `CIQUAL`-linked foods plus `internal_rules_v1`
+- runtime/public cohort assignment derives only from explicit `6/6` zero-measurement packs materialized from `CIQUAL`-linked foods plus `internal_rules_v1`
 - public rationale/caveat copy is project-authored and cautious
 - response metadata must expose CIQUAL attribution/version fields and a non-endorsement notice
 - endpoint does not imply full Phase 3 rollup coverage for returned foods

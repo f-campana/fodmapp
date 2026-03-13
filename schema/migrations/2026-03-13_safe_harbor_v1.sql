@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS food_safe_harbor_assignments (
   rule_source_id UUID NOT NULL REFERENCES sources (source_id),
   data_source_id UUID NOT NULL REFERENCES sources (source_id),
   assignment_version TEXT NOT NULL,
-  assignment_method TEXT NOT NULL CHECK (assignment_method IN ('ciqual_category_gate_v1')),
+  assignment_method TEXT NOT NULL CHECK (assignment_method IN ('explicit_measurement_pack_v1')),
   notes TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),

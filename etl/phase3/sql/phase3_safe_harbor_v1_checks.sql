@@ -28,13 +28,15 @@ BEGIN
   WHERE a.assignment_version = 'safe_harbor_v1'
     AND (
       c.cohort_code IS NULL
-      OR a.assignment_method <> 'ciqual_category_gate_v1'
+      OR a.assignment_method <> 'explicit_measurement_pack_v1'
       OR a.rule_source_id <> (SELECT source_id FROM sources WHERE source_slug = 'internal_rules_v1')
       OR a.data_source_id <> (SELECT source_id FROM sources WHERE source_slug = 'ciqual_2025')
+      OR a.notes NOT LIKE 'safe_harbor_v1:composition_zero;%'
+      OR a.notes NOT LIKE '%assignment_basis=6x_zero_measurement_pack%'
     );
 
   IF bad_count <> 0 THEN
-    RAISE EXCEPTION 'safe_harbor_v1 source or cohort contract violated (% rows)', bad_count;
+    RAISE EXCEPTION 'safe_harbor_v1 source, cohort, or assignment-method contract violated (% rows)', bad_count;
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -62,28 +64,164 @@ END $$;
 
 DO $$
 DECLARE
-  oil_count INTEGER;
-  protein_count INTEGER;
-  egg_count INTEGER;
+  assignment_count INTEGER;
+  pack_food_count INTEGER;
   bad_count INTEGER;
 BEGIN
-  SELECT COUNT(*) INTO oil_count
+  SELECT COUNT(*) INTO assignment_count
   FROM food_safe_harbor_assignments
-  WHERE assignment_version = 'safe_harbor_v1'
-    AND cohort_code = 'cohort_oil_fat';
+  WHERE assignment_version = 'safe_harbor_v1';
 
-  SELECT COUNT(*) INTO protein_count
-  FROM food_safe_harbor_assignments
-  WHERE assignment_version = 'safe_harbor_v1'
-    AND cohort_code = 'cohort_plain_protein';
+  SELECT COUNT(*) INTO pack_food_count
+  FROM (
+    SELECT m.food_id
+    FROM food_fodmap_measurements m
+    JOIN sources src ON src.source_id = m.source_id
+    JOIN fodmap_subtypes fs ON fs.fodmap_subtype_id = m.fodmap_subtype_id
+    WHERE src.source_slug = 'internal_rules_v1'
+      AND m.is_current = TRUE
+      AND m.notes LIKE 'safe_harbor_v1:composition_zero;%'
+      AND m.comparator = 'eq'
+      AND m.amount_g_per_100g = 0
+      AND m.amount_g_per_serving = 0
+    GROUP BY m.food_id
+    HAVING COUNT(DISTINCT fs.code) = 6
+  ) packs;
 
-  SELECT COUNT(*) INTO egg_count
-  FROM food_safe_harbor_assignments
-  WHERE assignment_version = 'safe_harbor_v1'
-    AND cohort_code = 'cohort_egg';
+  IF assignment_count <> pack_food_count THEN
+    RAISE EXCEPTION 'safe_harbor_v1 assignment count (%) must equal explicit zero-pack count (%)', assignment_count, pack_food_count;
+  END IF;
 
-  IF oil_count = 0 OR protein_count = 0 OR egg_count = 0 THEN
-    RAISE EXCEPTION 'safe_harbor_v1 requires non-empty oil/protein/egg cohorts, got oil=% protein=% egg=%', oil_count, protein_count, egg_count;
+  SELECT COUNT(*) INTO bad_count
+  FROM (
+    SELECT
+      a.food_id,
+      COUNT(DISTINCT fs.code) FILTER (
+        WHERE m.is_current = TRUE
+          AND m.comparator = 'eq'
+          AND m.amount_g_per_100g = 0
+          AND m.amount_g_per_serving = 0
+          AND m.notes LIKE 'safe_harbor_v1:composition_zero;%'
+      ) AS subtype_count
+    FROM food_safe_harbor_assignments a
+    LEFT JOIN food_fodmap_measurements m ON m.food_id = a.food_id
+    LEFT JOIN fodmap_subtypes fs ON fs.fodmap_subtype_id = m.fodmap_subtype_id
+    LEFT JOIN sources src ON src.source_id = m.source_id
+    WHERE a.assignment_version = 'safe_harbor_v1'
+      AND src.source_slug = 'internal_rules_v1'
+    GROUP BY a.food_id
+  ) pack_counts
+  WHERE subtype_count <> 6;
+
+  IF bad_count <> 0 THEN
+    RAISE EXCEPTION 'safe_harbor_v1 assignments missing full 6-subtype zero packs (% rows)', bad_count;
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM food_safe_harbor_assignments a
+  JOIN food_fodmap_measurements m ON m.food_id = a.food_id
+  JOIN fodmap_subtypes fs ON fs.fodmap_subtype_id = m.fodmap_subtype_id
+  JOIN sources src ON src.source_id = m.source_id
+  WHERE a.assignment_version = 'safe_harbor_v1'
+    AND src.source_slug = 'internal_rules_v1'
+    AND m.notes LIKE 'safe_harbor_v1:composition_zero;%'
+    AND (
+      (fs.code IN ('fructan', 'gos') AND m.method <> 'expert_estimate')
+      OR (fs.code IN ('fructose', 'lactose', 'sorbitol', 'mannitol') AND m.method <> 'derived_from_nutrient')
+      OR m.comparator <> 'eq'
+      OR m.amount_g_per_100g <> 0
+      OR m.amount_g_per_serving <> 0
+    );
+
+  IF bad_count <> 0 THEN
+    RAISE EXCEPTION 'safe_harbor_v1 measurement-pack subtype method or zero-value contract violated (% rows)', bad_count;
+  END IF;
+END $$;
+
+DO $$
+DECLARE
+  bad_count INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO bad_count
+  FROM (
+    SELECT
+      a.food_id,
+      COUNT(*) FILTER (
+        WHERE nd.nutrient_code = 'CIQUAL_32000'
+          AND fno.comparator = 'eq'
+          AND fno.amount_value = 0
+      ) AS sugar_zero_count,
+      COUNT(*) FILTER (
+        WHERE nd.nutrient_code = 'CIQUAL_32210'
+          AND fno.comparator = 'eq'
+          AND fno.amount_value = 0
+      ) AS fructose_zero_count,
+      COUNT(*) FILTER (
+        WHERE nd.nutrient_code = 'CIQUAL_32250'
+          AND fno.comparator = 'eq'
+          AND fno.amount_value = 0
+      ) AS glucose_zero_count,
+      COUNT(*) FILTER (
+        WHERE nd.nutrient_code = 'CIQUAL_32410'
+          AND fno.comparator = 'eq'
+          AND fno.amount_value = 0
+      ) AS lactose_zero_count,
+      COUNT(*) FILTER (
+        WHERE nd.nutrient_code = 'CIQUAL_34000'
+          AND fno.comparator = 'eq'
+          AND fno.amount_value = 0
+      ) AS polyols_zero_count
+    FROM food_safe_harbor_assignments a
+    LEFT JOIN food_nutrient_observations fno ON fno.food_id = a.food_id
+    LEFT JOIN nutrient_definitions nd
+      ON nd.nutrient_id = fno.nutrient_id
+     AND nd.nutrient_code IN ('CIQUAL_32000', 'CIQUAL_32210', 'CIQUAL_32250', 'CIQUAL_32410', 'CIQUAL_34000')
+    WHERE a.assignment_version = 'safe_harbor_v1'
+    GROUP BY a.food_id
+  ) nutrient_basis
+  WHERE sugar_zero_count = 0
+     OR fructose_zero_count = 0
+     OR glucose_zero_count = 0
+     OR lactose_zero_count = 0
+     OR polyols_zero_count = 0;
+
+  IF bad_count <> 0 THEN
+    RAISE EXCEPTION 'safe_harbor_v1 contains assignments without full CIQUAL zero-nutrient basis (% rows)', bad_count;
+  END IF;
+
+  SELECT COUNT(*) INTO bad_count
+  FROM food_safe_harbor_assignments a
+  JOIN foods f ON f.food_id = a.food_id
+  WHERE a.assignment_version = 'safe_harbor_v1'
+    AND a.cohort_code = 'cohort_oil_fat'
+    AND (
+      COALESCE(lower(f.canonical_name_fr), '') LIKE ANY (
+        ARRAY[
+          '%margarine%',
+          '%allégé%',
+          '%allege%',
+          '%léger%',
+          '%leger%',
+          '%à tartiner%',
+          '%a tartiner%',
+          '%sans précision%',
+          '%sans precision%',
+          '%aliment moyen%',
+          '%mélange%',
+          '%melange%',
+          '%combinée%',
+          '%combinee%',
+          '%pour friture%',
+          '%à frire%',
+          '%a frire%'
+        ]
+      )
+      OR COALESCE(lower(f.canonical_name_fr), '') ~ '^huile ou '
+      OR COALESCE(lower(f.canonical_name_fr), '') ~ '^mati[èe]re grasse ou '
+    );
+
+  IF bad_count <> 0 THEN
+    RAISE EXCEPTION 'safe_harbor_v1 oil identity screen failed (% rows)', bad_count;
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -120,33 +258,17 @@ BEGIN
         '%etouffee%',
         '%semi-conserve%',
         '%conserve%',
-        '%panure%'
+        '%panure%',
+        '%sans précision%',
+        '%sans precision%',
+        '%aliment moyen%',
+        '%mélange%',
+        '%melange%'
       ]
     );
 
   IF bad_count <> 0 THEN
     RAISE EXCEPTION 'safe_harbor_v1 protein processing screen failed (% rows)', bad_count;
-  END IF;
-
-  SELECT COUNT(*) INTO bad_count
-  FROM food_safe_harbor_assignments a
-  JOIN foods f ON f.food_id = a.food_id
-  WHERE a.assignment_version = 'safe_harbor_v1'
-    AND a.cohort_code = 'cohort_oil_fat'
-    AND COALESCE(lower(f.canonical_name_fr), '') LIKE ANY (
-      ARRAY[
-        '%margarine%',
-        '%allégé%',
-        '%allege%',
-        '%léger%',
-        '%leger%',
-        '%à tartiner%',
-        '%a tartiner%'
-      ]
-    );
-
-  IF bad_count <> 0 THEN
-    RAISE EXCEPTION 'safe_harbor_v1 oil processing screen failed (% rows)', bad_count;
   END IF;
 
   SELECT COUNT(*) INTO bad_count
@@ -165,7 +287,14 @@ BEGIN
         '%champignon%',
         '%oignon%',
         '%sauce%',
-        '%garniture%'
+        '%garniture%',
+        '%avec matière grasse%',
+        '%avec matiere grasse%',
+        '%sans précision%',
+        '%sans precision%',
+        '%aliment moyen%',
+        '%mélange%',
+        '%melange%'
       ]
     );
 

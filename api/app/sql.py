@@ -118,6 +118,7 @@ SELECT
 FROM food_safe_harbor_assignments a
 JOIN safe_harbor_cohorts c ON c.cohort_code = a.cohort_code
 JOIN foods f ON f.food_id = a.food_id
+WHERE a.assignment_version = 'safe_harbor_v1'
 ORDER BY c.sort_order ASC, f.food_slug ASC
 """
 
