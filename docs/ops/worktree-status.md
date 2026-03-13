@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-11
+Last reviewed: 2026-03-13
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,8 +15,6 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                                                | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`                                            | `main`                                    | active (protected) | Main integration worktree only                                                       | Must remain clean.                                                  |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-agentation-storybook-plan`      | `codex/ui-agentation-storybook-plan`      | active             | Agentation research + Storybook integration implementation plan                      | Internal-use assumption accepted; implementation in progress.       |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-accordion-finish-touches`       | `codex/ui-accordion-finish-touches`       | active             | Accordion finishing-touches remediation (story contract + adapter polish + tests)    | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/phase3-composition-zero-batch01`   | `codex/phase3-composition-zero-batch01`   | merged             | Phase 3 composition-zero Batch01 research/docs/sql artifacts                         | Merged via PR #188; worktree removed.                               |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-contract-fodmapp`       | `codex/local-path-contract-fodmapp`       | merged             | PR-A local path contract canonicalization                                            | Merged via PR #184.                                                 |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/local-path-migration-evidence`     | `codex/local-path-migration-evidence`     | merged             | PR-B local main-path migration evidence and closure                                  | Merged via PR #187.                                                 |
