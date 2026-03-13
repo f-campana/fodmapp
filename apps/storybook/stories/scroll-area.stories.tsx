@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import type { ReactNode } from "react";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { ScrollArea } from "@fodmap/ui";
 
@@ -94,7 +94,7 @@ function WeeklyPlanList({ stress = false }: { stress?: boolean }) {
     <div className={stress ? "space-y-3 pr-2" : "space-y-2 pr-2"}>
       {items.map((item) => (
         <div
-          className="rounded-(--radius-sm) border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
+          className="rounded-sm border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
           key={item}
         >
           <div className="font-medium text-foreground">{item}</div>
@@ -181,22 +181,30 @@ export const InteractionChecks: Story = {
     const firstItem = canvas.getByText("Breakfast prep notes");
     const root = firstItem.closest("[data-slot='scroll-area']");
     const viewport = firstItem.closest("[data-slot='scroll-area-viewport']");
-    const scrollbars = canvasElement.querySelectorAll(
-      "[data-slot='scroll-area-scrollbar']",
+    const verticalScrollbar = canvasElement.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
     );
-    const thumbs = canvasElement.querySelectorAll(
-      "[data-slot='scroll-area-thumb']",
+    const horizontalScrollbar = canvasElement.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
     );
-    const corners = canvasElement.querySelectorAll(
-      "[data-slot='scroll-area-corner']",
+    const visibleCorner = canvasElement.querySelector(
+      "[data-slot='scroll-area-corner']:not([hidden])",
     );
 
     await expect(root).toHaveAttribute("data-slot", "scroll-area");
     await expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
     await expect(viewport).toHaveAttribute("tabindex", "0");
-    await expect(scrollbars).toHaveLength(2);
-    await expect(thumbs).toHaveLength(2);
-    await expect(corners.length).toBeGreaterThan(0);
+    await expect(verticalScrollbar).not.toBeNull();
+    await expect(horizontalScrollbar).not.toBeNull();
+    await expect(visibleCorner).not.toBeNull();
+    await waitFor(async () => {
+      await expect(
+        canvasElement.querySelectorAll("[data-slot='scroll-area-thumb']"),
+      ).toHaveLength(1);
+      await expect(
+        horizontalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
+      ).toBeNull();
+    });
     await expect(viewport?.scrollWidth ?? 0).toBeLessThanOrEqual(
       viewport?.clientWidth ?? 0,
     );

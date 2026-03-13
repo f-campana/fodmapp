@@ -31,9 +31,6 @@ describe("ScrollArea", () => {
     const scrollbars = container.querySelectorAll(
       "[data-slot='scroll-area-scrollbar']",
     );
-    const thumbs = container.querySelectorAll(
-      "[data-slot='scroll-area-thumb']",
-    );
     const corners = container.querySelectorAll(
       "[data-slot='scroll-area-corner']",
     );
@@ -42,7 +39,6 @@ describe("ScrollArea", () => {
     expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
     expect(viewport).toHaveAttribute("tabindex", "0");
     expect(scrollbars).toHaveLength(2);
-    expect(thumbs).toHaveLength(2);
     expect(corners.length).toBeGreaterThan(0);
     expect(
       container.querySelector("[data-slot='custom-scroll-area']"),
@@ -62,8 +58,8 @@ describe("ScrollArea", () => {
     ).toHaveFocus();
   });
 
-  it("merges className on the root and keeps thumb token classes", () => {
-    const { container } = renderScrollArea({
+  it("merges className on the root", () => {
+    renderScrollArea({
       className: "custom-scroll-area",
     });
 
@@ -72,10 +68,6 @@ describe("ScrollArea", () => {
         .getByText("Scrollable ingredients")
         .closest("[data-slot='scroll-area']")?.className ?? "",
     ).toContain("custom-scroll-area");
-    expect(
-      container.querySelector("[data-slot='scroll-area-thumb']")?.className ??
-        "",
-    ).toContain("bg-border");
   });
 
   it("forwards refs to the root element", () => {

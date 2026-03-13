@@ -28,11 +28,11 @@ function ScrollArea({
       >
         {children}
       </ScrollAreaPrimitive.Viewport>
-      <ScrollBar orientation="vertical" forceMount />
-      <ScrollBar orientation="horizontal" forceMount />
+      <ScrollBar orientation="vertical" />
+      <ScrollBar orientation="horizontal" />
       <ScrollAreaPrimitive.Corner
         data-slot="scroll-area-corner"
-        className="bg-muted"
+        className="bg-transparent"
       />
       <span data-slot="scroll-area-corner" hidden />
     </ScrollAreaPrimitive.Root>
@@ -46,25 +46,36 @@ export type ScrollBarProps = React.ComponentProps<
 function ScrollBar({
   className,
   orientation = "vertical",
-  forceMount = true,
+  forceMount,
+  style,
   ...props
 }: ScrollBarProps) {
+  const railInset = "12px";
+
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       {...props}
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
       forceMount={forceMount}
+      style={
+        orientation === "vertical"
+          ? {
+              ...style,
+              top: railInset,
+              bottom: `calc(${railInset} + var(--radix-scroll-area-corner-height, 0px) - 16px)`,
+            }
+          : style
+      }
       className={cn(
         "flex touch-none select-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0",
         orientation === "vertical"
-          ? "h-full w-3 border-l border-l-transparent"
-          : "h-3 flex-col border-t border-t-transparent",
+          ? "w-4 border-l border-l-transparent"
+          : "h-4 flex-col border-t border-t-transparent",
         className,
       )}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
-        forceMount
         data-slot="scroll-area-thumb"
         className="relative flex-1 rounded-full bg-border/80"
       />

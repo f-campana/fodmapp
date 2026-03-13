@@ -51,7 +51,7 @@ visual review.
 
 - the viewport stays keyboard reachable through its tab stop
 - root, viewport, scrollbar, thumb, and corner slot hooks stay stable in default composition
-- both scrollbar orientations remain mounted so visual regression checks can inspect the full surface
+- unnecessary scrollbar chrome stays mounted without a thumb when an axis does not overflow
 
 ## Slot hooks
 
@@ -63,8 +63,8 @@ visual review.
 What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the ScrollArea example area
-- Storybook interaction checks verify the viewport tab stop plus the mounted scrollbar, thumb, and corner hooks
-- UI tests cover slot stability, keyboard reachability, ref forwarding, thumb token classes, and a11y
+- Storybook interaction checks verify the viewport tab stop, the mounted vertical scrollbar/thumb, and that the unused horizontal rail keeps its slot without rendering a second thumb while the corner marker remains stable
+- UI tests cover slot stability, keyboard reachability, ref forwarding, root class merging, and a11y
 
 What is checked manually:
 
