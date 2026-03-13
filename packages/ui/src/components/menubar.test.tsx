@@ -388,6 +388,10 @@ describe("Menubar", () => {
     expect(
       document.querySelector("[data-slot='menubar']")?.className ?? "",
     ).toContain("overflow-x-auto");
+    expect(document.querySelector("[data-slot='menubar']")).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
     expect(trigger.className).toContain("trigger-personnalise");
     expect(trigger.className).toContain("cursor-pointer");
     expect(trigger.className).toContain("text-sm");
@@ -461,5 +465,20 @@ describe("Menubar", () => {
     await waitForMenubarContent(portalContainer);
 
     expect(await axe(auditRoot)).toHaveNoViolations();
+  });
+
+  it("keeps the root keyboard reachable when horizontal overflow is enabled", () => {
+    render(
+      <Menubar>
+        <MenubarMenu>
+          <MenubarTrigger>Menu scrollable</MenubarTrigger>
+        </MenubarMenu>
+      </Menubar>,
+    );
+
+    expect(document.querySelector("[data-slot='menubar']")).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
   });
 });
