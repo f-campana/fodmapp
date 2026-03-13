@@ -45,6 +45,20 @@ describe("ScrollArea", () => {
     ).toBeNull();
   });
 
+  it("insets the rails away from the viewport edges", () => {
+    const { container } = renderScrollArea();
+
+    const verticalScrollbar = container.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
+    );
+    const horizontalScrollbar = container.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    );
+
+    expect(verticalScrollbar).toHaveStyle({ top: "12px" });
+    expect(horizontalScrollbar).toHaveStyle({ left: "12px" });
+  });
+
   it("keeps the viewport keyboard reachable", async () => {
     const user = userEvent.setup();
     renderScrollArea();

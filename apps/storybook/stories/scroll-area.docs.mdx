@@ -43,15 +43,20 @@ classes.
 
 The base composition works in normal page flow. Use the surfaced pattern when
 the scroll region belongs inside a card or inset panel and border spacing needs
-visual review.
+visual review. Add the horizontal and two-axis variants when content can widen
+past the viewport or when the corner junction between both rails needs review.
 
 <Canvas of={ScrollAreaStories.OnSurface} sourceState="none" />
+
+<Canvas of={ScrollAreaStories.Horizontal} sourceState="none" />
+
+<Canvas of={ScrollAreaStories.BothAxes} sourceState="none" />
 
 ## Accessibility contract
 
 - the viewport stays keyboard reachable through its tab stop
 - root, viewport, scrollbar, thumb, and corner slot hooks stay stable in default composition
-- unnecessary scrollbar chrome stays mounted without a thumb when an axis does not overflow
+- only the overflowing axis renders a thumb, while the non-overflowing rail keeps its slot for layout stability
 
 ## Slot hooks
 
@@ -63,7 +68,7 @@ visual review.
 What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the ScrollArea example area
-- Storybook interaction checks verify the viewport tab stop, the mounted vertical scrollbar/thumb, and that the unused horizontal rail keeps its slot without rendering a second thumb while the corner marker remains stable
+- Storybook interaction checks verify vertical-only, horizontal-only, and two-axis overflow states, including the viewport tab stop and the expected thumb count for each axis configuration
 - UI tests cover slot stability, keyboard reachability, ref forwarding, root class merging, and a11y
 
 What is checked manually:
@@ -74,6 +79,7 @@ What is checked manually:
 ## Responsive notes
 
 Long cards may wrap, and dual-axis overflow should stay readable without
-clipping the viewport or scrollbar chrome.
+clipping the viewport or scrollbar chrome. Use the responsive stress story to
+review the two-axis case at narrow widths.
 
 <Canvas of={ScrollAreaStories.ResponsiveStress} sourceState="none" />

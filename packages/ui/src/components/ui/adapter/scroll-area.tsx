@@ -51,6 +51,18 @@ function ScrollBar({
   ...props
 }: ScrollBarProps) {
   const railInset = "12px";
+  const scrollbarStyle =
+    orientation === "vertical"
+      ? {
+          ...style,
+          top: railInset,
+          bottom: `calc(${railInset} + var(--radix-scroll-area-corner-height, 0px) - 16px)`,
+        }
+      : {
+          ...style,
+          left: railInset,
+          right: `calc(${railInset} + var(--radix-scroll-area-corner-width, 0px))`,
+        };
 
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
@@ -58,17 +70,9 @@ function ScrollBar({
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
       forceMount={forceMount}
-      style={
-        orientation === "vertical"
-          ? {
-              ...style,
-              top: railInset,
-              bottom: `calc(${railInset} + var(--radix-scroll-area-corner-height, 0px) - 16px)`,
-            }
-          : style
-      }
+      style={scrollbarStyle}
       className={cn(
-        "flex touch-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 select-none data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0",
+        "flex touch-none select-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 has-[>[data-slot='scroll-area-thumb']]:bg-background/55 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:bg-background/35 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:backdrop-blur-sm data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0",
         orientation === "vertical"
           ? "w-4 border-l border-l-transparent"
           : "h-4 flex-col border-t border-t-transparent",

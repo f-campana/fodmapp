@@ -108,12 +108,77 @@ function WeeklyPlanList({ stress = false }: { stress?: boolean }) {
   );
 }
 
+function PrepRailRow() {
+  const items = [
+    "Breakfast prep lane",
+    "Lunch swap lane",
+    "Dinner note lane",
+    "Freezer label lane",
+    "Travel-safe lane",
+    "Fallback pantry lane",
+  ];
+
+  return (
+    <div className="flex w-max gap-3 pb-2 pr-3">
+      {items.map((item) => (
+        <div
+          className="w-64 shrink-0 rounded-sm border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
+          key={item}
+        >
+          <div className="font-medium text-foreground">{item}</div>
+          <div className="mt-1 text-muted-foreground">
+            Keep the note short so the row can scan quickly while you compare
+            adjacent plans.
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PantryGrid() {
+  const items = [
+    "Breakfast prep",
+    "Lunch swaps",
+    "Dinner notes",
+    "Freezer labels",
+    "Travel-safe kit",
+    "Fallback pantry",
+    "Reheat timings",
+    "Portion check-ins",
+    "Snack backups",
+    "Weekend batch",
+    "Shopping holds",
+    "Serving notes matrix",
+  ];
+
+  return (
+    <div className="grid w-max grid-cols-4 gap-3 pb-3 pr-3">
+      {items.map((item) => (
+        <div
+          className="min-h-28 w-60 rounded-sm border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
+          key={item}
+        >
+          <div className="font-medium text-foreground">{item}</div>
+          <div className="mt-1 text-muted-foreground">
+            Keep each block compact so both axes stay readable inside the same
+            bounded review panel.
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ScrollAreaExample(
   args: Story["args"],
   options?: {
     stress?: boolean;
+    variant?: "vertical" | "horizontal" | "both";
   },
 ) {
+  const variant = options?.variant ?? "vertical";
+
   return (
     <ScrollArea
       className={[
@@ -124,7 +189,13 @@ function ScrollAreaExample(
       type={args?.type ?? "always"}
     >
       <div className="p-3">
-        <WeeklyPlanList stress={options?.stress} />
+        {variant === "horizontal" ? (
+          <PrepRailRow />
+        ) : variant === "both" ? (
+          <PantryGrid />
+        ) : (
+          <WeeklyPlanList stress={options?.stress} />
+        )}
       </div>
     </ScrollArea>
   );
@@ -156,6 +227,24 @@ export const OnSurface: Story = {
   ),
 };
 
+export const Horizontal: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ScrollAreaAuditFrame maxWidth="xl">
+      {ScrollAreaExample(defaultPlaygroundArgs, { variant: "horizontal" })}
+    </ScrollAreaAuditFrame>
+  ),
+};
+
+export const BothAxes: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ScrollAreaAuditFrame maxWidth="xl">
+      {ScrollAreaExample(defaultPlaygroundArgs, { variant: "both" })}
+    </ScrollAreaAuditFrame>
+  ),
+};
+
 export const DarkMode: Story = {
   ...Default,
   parameters: fixedStoryParameters,
@@ -173,44 +262,102 @@ export const InteractionChecks: Story = {
   },
   render: () => (
     <ScrollAreaAuditFrame maxWidth="xl">
-      {ScrollAreaExample(defaultPlaygroundArgs)}
+      <div className="space-y-8">
+        {ScrollAreaExample(defaultPlaygroundArgs)}
+        {ScrollAreaExample(defaultPlaygroundArgs, { variant: "horizontal" })}
+        {ScrollAreaExample(defaultPlaygroundArgs, { variant: "both" })}
+      </div>
     </ScrollAreaAuditFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const firstItem = canvas.getByText("Breakfast prep notes");
-    const root = firstItem.closest("[data-slot='scroll-area']");
-    const viewport = firstItem.closest("[data-slot='scroll-area-viewport']");
-    const verticalScrollbar = canvasElement.querySelector(
-      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
+    const verticalItem = canvas.getByText("Breakfast prep notes");
+    const horizontalItem = canvas.getByText("Breakfast prep lane");
+    const bothAxesItem = canvas.getByText("Serving notes matrix");
+    const verticalRoot = verticalItem.closest("[data-slot='scroll-area']");
+    const horizontalRoot = horizontalItem.closest("[data-slot='scroll-area']");
+    const bothAxesRoot = bothAxesItem.closest("[data-slot='scroll-area']");
+    const verticalViewport = verticalItem.closest(
+      "[data-slot='scroll-area-viewport']",
     );
-    const horizontalScrollbar = canvasElement.querySelector(
-      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    const horizontalViewport = horizontalItem.closest(
+      "[data-slot='scroll-area-viewport']",
     );
-    const corners = canvasElement.querySelectorAll(
-      "[data-slot='scroll-area-corner']",
+    const bothAxesViewport = bothAxesItem.closest(
+      "[data-slot='scroll-area-viewport']",
     );
 
-    await expect(root).toHaveAttribute("data-slot", "scroll-area");
-    await expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
-    await expect(viewport).toHaveAttribute("tabindex", "0");
+    await expect(verticalRoot).toHaveAttribute("data-slot", "scroll-area");
+    await expect(verticalViewport).toHaveAttribute(
+      "data-slot",
+      "scroll-area-viewport",
+    );
+    await expect(verticalViewport).toHaveAttribute("tabindex", "0");
+    await expect(horizontalRoot).toHaveAttribute("data-slot", "scroll-area");
+    await expect(bothAxesRoot).toHaveAttribute("data-slot", "scroll-area");
+
+    const verticalScrollbar = verticalRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
+    );
+    const verticalHorizontalScrollbar = verticalRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    );
+    const horizontalScrollbar = horizontalRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    );
+    const horizontalVerticalScrollbar = horizontalRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
+    );
+    const bothAxesVerticalScrollbar = bothAxesRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
+    );
+    const bothAxesHorizontalScrollbar = bothAxesRoot?.querySelector(
+      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    );
+
     await expect(verticalScrollbar).not.toBeNull();
+    await expect(verticalHorizontalScrollbar).not.toBeNull();
     await expect(horizontalScrollbar).not.toBeNull();
-    await expect(corners.length).toBeGreaterThan(0);
+    await expect(horizontalVerticalScrollbar).not.toBeNull();
+    await expect(bothAxesVerticalScrollbar).not.toBeNull();
+    await expect(bothAxesHorizontalScrollbar).not.toBeNull();
+
     await waitFor(async () => {
       await expect(
-        canvasElement.querySelectorAll("[data-slot='scroll-area-thumb']"),
+        verticalRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],
       ).toHaveLength(1);
       await expect(
-        horizontalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
+        verticalHorizontalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
       ).toBeNull();
+      await expect(
+        horizontalRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],
+      ).toHaveLength(1);
+      await expect(
+        horizontalVerticalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
+      ).toBeNull();
+      await expect(
+        bothAxesRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],
+      ).toHaveLength(2);
     });
-    await expect(viewport?.scrollWidth ?? 0).toBeLessThanOrEqual(
-      viewport?.clientWidth ?? 0,
+
+    await expect(verticalViewport?.scrollWidth ?? 0).toBeLessThanOrEqual(
+      verticalViewport?.clientWidth ?? 0,
+    );
+    await expect(horizontalViewport?.scrollWidth ?? 0).toBeGreaterThan(
+      horizontalViewport?.clientWidth ?? 0,
+    );
+    await expect(horizontalViewport?.scrollHeight ?? 0).toBeLessThanOrEqual(
+      horizontalViewport?.clientHeight ?? 0,
+    );
+    await expect(bothAxesViewport?.scrollWidth ?? 0).toBeGreaterThan(
+      bothAxesViewport?.clientWidth ?? 0,
+    );
+    await expect(bothAxesViewport?.scrollHeight ?? 0).toBeGreaterThan(
+      bothAxesViewport?.clientHeight ?? 0,
     );
 
     await userEvent.tab();
-    await expect(viewport).toHaveFocus();
+    await expect(verticalViewport).toHaveFocus();
   },
 };
 
@@ -223,7 +370,7 @@ export const ResponsiveStress: Story = {
   },
   render: () => (
     <ScrollAreaAuditFrame maxWidth="sm" surface>
-      {ScrollAreaExample(defaultPlaygroundArgs, { stress: true })}
+      {ScrollAreaExample(defaultPlaygroundArgs, { variant: "both" })}
     </ScrollAreaAuditFrame>
   ),
 };
