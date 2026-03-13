@@ -14,6 +14,15 @@ from app.main import create_app
 SECURITY_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-02-25_security_consent_export_delete.sql"
 )
+SAFE_HARBOR_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-03-13_safe_harbor_v1.sql"
+)
+SAFE_HARBOR_APPLY_PATH = (
+    Path(__file__).resolve().parents[2] / "etl" / "phase3" / "sql" / "phase3_safe_harbor_v1_apply.sql"
+)
+SAFE_HARBOR_CHECKS_PATH = (
+    Path(__file__).resolve().parents[2] / "etl" / "phase3" / "sql" / "phase3_safe_harbor_v1_checks.sql"
+)
 
 
 def _default_db_url() -> str:
@@ -65,11 +74,35 @@ def _ensure_me_security_schema(db_url: str) -> None:
         conn.execute(migration_sql)
 
 
+def _ensure_safe_harbor_schema(db_url: str) -> None:
+    with psycopg.connect(db_url, row_factory=dict_row) as conn:
+        table_state = conn.execute("SELECT to_regclass('public.safe_harbor_cohorts') AS cohort_table").fetchone()
+        cohort_table_exists = bool(table_state and table_state["cohort_table"])
+
+    if not cohort_table_exists:
+        migration_sql = SAFE_HARBOR_MIGRATION_PATH.read_text(encoding="utf-8")
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            conn.execute(migration_sql)
+
+    apply_sql = SAFE_HARBOR_APPLY_PATH.read_text(encoding="utf-8")
+    checks_sql = SAFE_HARBOR_CHECKS_PATH.read_text(encoding="utf-8")
+    with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+        conn.execute(apply_sql)
+        conn.execute(checks_sql)
+
+
 @pytest.fixture(scope="session")
 def me_security_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
         pytest.skip("integration DB is not ready or schema is missing")
     _ensure_me_security_schema(db_url)
+
+
+@pytest.fixture(scope="session")
+def safe_harbor_schema(db_url: str, integration_db_ready: bool) -> None:
+    if not integration_db_ready:
+        pytest.skip("integration DB is not ready or schema is missing")
+    _ensure_safe_harbor_schema(db_url)
 
 
 @pytest.fixture()

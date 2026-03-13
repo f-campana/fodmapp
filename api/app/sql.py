@@ -101,6 +101,49 @@ ORDER BY
 LIMIT %(limit)s
 """
 
+SQL_LIST_SAFE_HARBORS = """
+SELECT
+  c.cohort_code,
+  c.label_fr,
+  c.label_en,
+  c.rationale_fr,
+  c.rationale_en,
+  c.caveat_fr,
+  c.caveat_en,
+  c.sort_order,
+  f.food_slug,
+  f.canonical_name_fr,
+  f.canonical_name_en,
+  f.preparation_state::text AS preparation_state
+FROM food_safe_harbor_assignments a
+JOIN safe_harbor_cohorts c ON c.cohort_code = a.cohort_code
+JOIN foods f ON f.food_id = a.food_id
+WHERE a.assignment_version = 'safe_harbor_v1'
+ORDER BY c.sort_order ASC, f.food_slug ASC
+"""
+
+SQL_GET_SAFE_HARBOR_META = """
+SELECT
+  rule.source_slug AS cohort_rule_source_slug,
+  COALESCE(MAX(a.assignment_version), 'safe_harbor_v1') AS cohort_rule_version,
+  data.source_slug AS data_source_slug,
+  data.source_name AS data_source_name,
+  data.dataset_version AS data_source_version,
+  data.published_at AS data_source_published_at
+FROM sources rule
+JOIN sources data ON data.source_slug = 'ciqual_2025'
+LEFT JOIN food_safe_harbor_assignments a
+  ON a.rule_source_id = rule.source_id
+ AND a.data_source_id = data.source_id
+WHERE rule.source_slug = 'internal_rules_v1'
+GROUP BY
+  rule.source_slug,
+  data.source_slug,
+  data.source_name,
+  data.dataset_version,
+  data.published_at
+"""
+
 SQL_GET_FOOD_SUBTYPES = """
 SELECT
   v.subtype_code,
