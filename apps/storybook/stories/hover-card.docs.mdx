@@ -1,0 +1,80 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as HoverCardStories from "./hover-card.stories";
+import { hoverCardRecommendedUsageCode } from "./hover-card.docs-source";
+
+<Meta of={HoverCardStories} />
+
+<Title />
+<Subtitle>
+  Use HoverCard for richer contextual summaries that stay anchored to a trigger
+  without escalating to a modal layer.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={hoverCardRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use HoverCard for compact previews, richer food summaries, or context blocks
+that benefit from a title, body copy, and secondary detail.
+
+Avoid HoverCard for mandatory tasks, full editing flows, or content that must
+remain open while users navigate elsewhere.
+
+<Canvas of={HoverCardStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled open state, plus the
+open and close delays.
+
+<Controls of={HoverCardStories.Playground} />
+
+## Composition patterns
+
+The default composition keeps the card lightweight. Use the surfaced example
+when the trigger lives inside another card and the open panel needs a clean gap
+from nearby borders.
+
+<Canvas of={HoverCardStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- keyboard focus can open the hover card without relying on hover alone
+- moving focus away closes the open surface cleanly
+- portal content can mount into a local container for isolated checks
+- the arrow, content, and trigger keep their documented slots in default composition
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, portal, content, and arrow
+- when using `HoverCardTrigger` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local hover-card audit area
+- Storybook interaction checks verify focus open, local container mounting, the `asChild` slot exception, arrow rendering, and blur close
+- UI tests cover default-composition slot stability, the `asChild` slot exception, local container mounting, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for trigger-to-panel spacing and non-touching borders
+- narrow-width review to confirm the open card remains visible and readable
+
+## Responsive notes
+
+Hover card content keeps a capped width and collision padding so longer
+descriptions can wrap without clipping the panel on smaller screens.
+
+<Canvas of={HoverCardStories.ResponsiveStress} sourceState="none" />

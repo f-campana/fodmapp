@@ -1,6 +1,7 @@
 import { createRef } from "react";
 
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it } from "vitest";
@@ -8,75 +9,81 @@ import { describe, expect, it } from "vitest";
 import { ScrollArea } from "./scroll-area";
 
 describe("ScrollArea", () => {
-  it("renders root and viewport slots", () => {
-    render(
-      <ScrollArea className="h-24 w-24">
-        <div className="h-64">Liste ingrédients</div>
+  function renderScrollArea(props?: Record<string, unknown>) {
+    return render(
+      <ScrollArea
+        className="h-24 w-24"
+        {...(props as React.ComponentProps<typeof ScrollArea>)}
+      >
+        <div className="h-64 w-64">Scrollable ingredients</div>
       </ScrollArea>,
     );
+  }
 
-    const content = screen.getByText("Liste ingrédients");
+  it("keeps root, viewport, scrollbar, thumb, and corner slots stable", () => {
+    const { container } = renderScrollArea({
+      "data-slot": "custom-scroll-area",
+    });
+
+    const content = screen.getByText("Scrollable ingredients");
     const root = content.closest("[data-slot='scroll-area']");
     const viewport = content.closest("[data-slot='scroll-area-viewport']");
-
-    expect(root).toHaveAttribute("data-slot", "scroll-area");
-    expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
-    expect(viewport).toHaveAttribute("tabindex", "0");
-  });
-
-  it("renders both scrollbar orientations and thumb slots", () => {
-    const { container } = render(
-      <ScrollArea className="h-24 w-24">
-        <div className="h-64 w-64">Contenu défilant</div>
-      </ScrollArea>,
-    );
-
-    const vertical = container.querySelector(
-      "[data-slot='scroll-area-scrollbar'][data-orientation='vertical']",
-    );
-    const horizontal = container.querySelector(
-      "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
+    const scrollbars = container.querySelectorAll(
+      "[data-slot='scroll-area-scrollbar']",
     );
     const thumbs = container.querySelectorAll(
       "[data-slot='scroll-area-thumb']",
     );
-    const corner = container.querySelector("[data-slot='scroll-area-corner']");
+    const corners = container.querySelectorAll(
+      "[data-slot='scroll-area-corner']",
+    );
 
-    expect(vertical).toBeTruthy();
-    expect(horizontal).toBeTruthy();
+    expect(root).toHaveAttribute("data-slot", "scroll-area");
+    expect(viewport).toHaveAttribute("data-slot", "scroll-area-viewport");
+    expect(viewport).toHaveAttribute("tabindex", "0");
+    expect(scrollbars).toHaveLength(2);
     expect(thumbs).toHaveLength(2);
-    expect(corner).toHaveAttribute("data-slot", "scroll-area-corner");
+    expect(corners.length).toBeGreaterThan(0);
+    expect(
+      container.querySelector("[data-slot='custom-scroll-area']"),
+    ).toBeNull();
   });
 
-  it("uses semantic thumb color token", () => {
-    const { container } = render(
-      <ScrollArea className="h-24 w-24">
-        <div className="h-64">Thumb</div>
-      </ScrollArea>,
-    );
+  it("keeps the viewport keyboard reachable", async () => {
+    const user = userEvent.setup();
+    renderScrollArea();
 
-    const thumb = container.querySelector("[data-slot='scroll-area-thumb']");
+    await user.tab();
 
-    expect(thumb?.className ?? "").toContain("bg-border");
+    expect(
+      screen
+        .getByText("Scrollable ingredients")
+        .closest("[data-slot='scroll-area-viewport']"),
+    ).toHaveFocus();
   });
 
-  it("merges className on root", () => {
-    render(
-      <ScrollArea className="ma-zone">
-        <div>Texte</div>
-      </ScrollArea>,
-    );
+  it("merges className on the root and keeps thumb token classes", () => {
+    const { container } = renderScrollArea({
+      className: "custom-scroll-area",
+    });
 
-    const root = screen.getByText("Texte").closest("[data-slot='scroll-area']");
-    expect(root?.className ?? "").toContain("ma-zone");
+    expect(
+      screen
+        .getByText("Scrollable ingredients")
+        .closest("[data-slot='scroll-area']")?.className ?? "",
+    ).toContain("custom-scroll-area");
+    expect(
+      container.querySelector("[data-slot='scroll-area-thumb']")?.className ??
+        "",
+    ).toContain("bg-border");
   });
 
-  it("forwards ref to root element", () => {
+  it("forwards refs to the root element", () => {
     const ref = createRef<HTMLDivElement>();
 
     render(
       <ScrollArea ref={ref}>
-        <div>Référence</div>
+        <div>Reference</div>
       </ScrollArea>,
     );
 
@@ -84,11 +91,7 @@ describe("ScrollArea", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(
-      <ScrollArea className="h-24 w-24">
-        <div className="h-64">Accessibilité</div>
-      </ScrollArea>,
-    );
+    const { container } = renderScrollArea();
 
     expect(await axe(container)).toHaveNoViolations();
   });

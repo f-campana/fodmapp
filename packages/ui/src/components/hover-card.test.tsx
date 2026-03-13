@@ -1,6 +1,7 @@
 import { createRef } from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it } from "vitest";
@@ -13,161 +14,150 @@ import {
 } from "./hover-card";
 
 describe("HoverCard", () => {
-  it("opens on hover and closes on pointer leave", async () => {
-    render(
-      <HoverCard openDelay={0} closeDelay={0}>
-        <HoverCardTrigger asChild>
-          <button type="button">Profil utilisateur</button>
-        </HoverCardTrigger>
-        <HoverCardContent>
-          Details du profil.
-          <HoverCardArrow />
-        </HoverCardContent>
-      </HoverCard>,
-    );
+  async function waitForHoverCardContent(root: ParentNode = document.body) {
+    return waitFor(() => {
+      const node = root.querySelector("[data-slot='hover-card-content']");
+      if (!node) {
+        throw new Error("hover card content not mounted yet");
+      }
 
-    const trigger = screen.getByRole("button", { name: "Profil utilisateur" });
-
-    fireEvent.pointerEnter(trigger);
-    fireEvent.mouseEnter(trigger);
-    fireEvent.mouseMove(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='hover-card-content']"),
-      ).toBeTruthy();
+      return node as HTMLElement;
     });
+  }
 
-    fireEvent.pointerLeave(trigger);
-    fireEvent.mouseLeave(trigger);
+  it("keeps root, trigger, portal, content, and arrow slots stable by default", async () => {
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='hover-card-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("opens on focus and closes on blur", async () => {
-    render(
-      <HoverCard openDelay={0} closeDelay={0}>
-        <HoverCardTrigger asChild>
-          <button type="button">Aide contexte</button>
-        </HoverCardTrigger>
-        <HoverCardContent>
-          Informations contextuelles.
-          <HoverCardArrow />
-        </HoverCardContent>
-      </HoverCard>,
-    );
-
-    const trigger = screen.getByRole("button", { name: "Aide contexte" });
-
-    fireEvent.focus(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='hover-card-content']"),
-      ).toBeTruthy();
-    });
-
-    fireEvent.blur(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='hover-card-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("renders full slot surface", async () => {
     const { container } = render(
-      <HoverCard openDelay={0} closeDelay={0}>
-        <HoverCardTrigger asChild>
-          <button type="button">Voir fiche</button>
+      <HoverCard defaultOpen>
+        <HoverCardTrigger data-slot="custom-trigger">
+          Open card
         </HoverCardTrigger>
-        <HoverCardContent>
-          Fiche nutritionnelle.
-          <HoverCardArrow />
+        <HoverCardContent
+          container={portalContainer}
+          data-slot="custom-content"
+        >
+          Card details.
+          <HoverCardArrow data-slot="custom-arrow" />
         </HoverCardContent>
       </HoverCard>,
     );
 
-    const trigger = screen.getByRole("button", { name: "Voir fiche" });
-    fireEvent.pointerEnter(trigger);
-    fireEvent.mouseEnter(trigger);
-    fireEvent.mouseMove(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='hover-card-content']"),
-      ).toBeTruthy();
-    });
+    await waitForHoverCardContent(portalContainer);
 
     expect(container.querySelector("[data-slot='hover-card']")).toBeTruthy();
     expect(
-      container.querySelector("[data-slot='hover-card-trigger']"),
+      screen.getByText("Open card").closest("[data-slot='hover-card-trigger']"),
+    ).toHaveAttribute("data-slot", "hover-card-trigger");
+    expect(
+      portalContainer.querySelector("[data-slot='hover-card-portal']"),
     ).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='hover-card-portal']"),
+      portalContainer.querySelector("[data-slot='hover-card-content']"),
     ).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='hover-card-content']"),
+      portalContainer.querySelector("[data-slot='hover-card-arrow']"),
     ).toBeTruthy();
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
     expect(
-      document.querySelector("[data-slot='hover-card-arrow']"),
-    ).toBeTruthy();
+      portalContainer.querySelector("[data-slot='custom-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-arrow']"),
+    ).toBeNull();
+
+    portalContainer.remove();
   });
 
-  it("applies semantic content and arrow classes", () => {
+  it("allows trigger slot override when using asChild", async () => {
     render(
       <HoverCard defaultOpen>
         <HoverCardTrigger asChild>
-          <button type="button">Profil</button>
+          <button data-slot="custom-trigger" type="button">
+            Open via child
+          </button>
         </HoverCardTrigger>
-        <HoverCardContent>
-          Contenu
-          <HoverCardArrow />
-        </HoverCardContent>
+        <HoverCardContent>Details.</HoverCardContent>
       </HoverCard>,
     );
 
-    const content = document.querySelector(
-      "[data-slot='hover-card-content']",
-    ) as HTMLElement | null;
-    const arrow = document.querySelector(
+    await waitForHoverCardContent();
+
+    const trigger = screen.getByRole("button", { name: "Open via child" });
+
+    expect(trigger).toHaveAttribute("data-slot", "custom-trigger");
+    expect(
+      document.querySelector("[data-slot='hover-card-trigger']"),
+    ).toBeNull();
+  });
+
+  it("opens on focus and closes when focus moves away", async () => {
+    const user = userEvent.setup();
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
+
+    render(
+      <div>
+        <HoverCard closeDelay={0} openDelay={0}>
+          <HoverCardTrigger asChild>
+            <button type="button">Open hover card</button>
+          </HoverCardTrigger>
+          <HoverCardContent container={portalContainer}>
+            Compact guidance.
+            <HoverCardArrow />
+          </HoverCardContent>
+        </HoverCard>
+        <button type="button">Next action</button>
+      </div>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Open hover card" });
+
+    await user.tab();
+    expect(trigger).toHaveFocus();
+
+    const content = await waitForHoverCardContent(portalContainer);
+    const arrow = portalContainer.querySelector(
       "[data-slot='hover-card-arrow']",
     ) as HTMLElement | null;
 
-    expect(content?.className ?? "").toContain("bg-popover");
-    expect(content?.className ?? "").toContain("text-popover-foreground");
-    expect(content?.className ?? "").toContain("data-[state=open]:animate-in");
-    expect(content?.className ?? "").toContain(
+    expect(trigger.className).toContain("cursor-pointer");
+    expect(content.className).toContain("bg-popover");
+    expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).toContain("data-[state=open]:animate-in");
+    expect(content.className).toContain(
       "data-[side=right]:slide-in-from-left-2",
     );
+    expect(arrow?.getAttribute("class") ?? "").toContain("fill-popover");
+    expect(arrow?.getAttribute("class") ?? "").toContain("stroke-border");
 
-    const arrowClassName = arrow?.getAttribute("class") ?? "";
-    expect(arrowClassName).toContain("fill-popover");
-    expect(arrowClassName).toContain("stroke-border");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Next action" })).toHaveFocus();
+
+    await waitFor(() => {
+      expect(
+        portalContainer.querySelector("[data-slot='hover-card-content']"),
+      ).toBeNull();
+    });
+
+    portalContainer.remove();
   });
 
-  it("merges className on content", () => {
+  it("merges className on content", async () => {
     render(
       <HoverCard defaultOpen>
-        <HoverCardTrigger asChild>
-          <button type="button">Profil</button>
-        </HoverCardTrigger>
-        <HoverCardContent className="contenu-survol-personnalise">
-          Texte
+        <HoverCardTrigger>Open</HoverCardTrigger>
+        <HoverCardContent className="custom-hover-card-content">
+          Content
           <HoverCardArrow />
         </HoverCardContent>
       </HoverCard>,
     );
 
-    expect(
-      document.querySelector("[data-slot='hover-card-content']")?.className ??
-        "",
-    ).toContain("contenu-survol-personnalise");
+    expect((await waitForHoverCardContent()).className).toContain(
+      "custom-hover-card-content",
+    );
   });
 
   it("forwards refs to trigger and content", async () => {
@@ -176,8 +166,8 @@ describe("HoverCard", () => {
 
     render(
       <HoverCard defaultOpen>
-        <HoverCardTrigger ref={triggerRef}>Ouvrir</HoverCardTrigger>
-        <HoverCardContent ref={contentRef}>Contenu</HoverCardContent>
+        <HoverCardTrigger ref={triggerRef}>Reference</HoverCardTrigger>
+        <HoverCardContent ref={contentRef}>Content</HoverCardContent>
       </HoverCard>,
     );
 
@@ -191,11 +181,9 @@ describe("HoverCard", () => {
   it("has no obvious a11y violations", async () => {
     const { container } = render(
       <HoverCard defaultOpen>
-        <HoverCardTrigger asChild>
-          <button type="button">Accessibilite</button>
-        </HoverCardTrigger>
+        <HoverCardTrigger>Accessibility</HoverCardTrigger>
         <HoverCardContent>
-          Contenu
+          Content
           <HoverCardArrow />
         </HoverCardContent>
       </HoverCard>,

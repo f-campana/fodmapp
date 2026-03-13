@@ -16,10 +16,10 @@ function ScrollArea({
 }: ScrollAreaProps) {
   return (
     <ScrollAreaPrimitive.Root
+      {...props}
       data-slot="scroll-area"
       type={type}
       className={cn("relative overflow-hidden", className)}
-      {...props}
     >
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
@@ -51,6 +51,7 @@ function ScrollBar({
 }: ScrollBarProps) {
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
+      {...props}
       data-slot="scroll-area-scrollbar"
       orientation={orientation}
       forceMount={forceMount}
@@ -61,7 +62,6 @@ function ScrollBar({
           : "h-2.5 flex-col border-t border-t-transparent",
         className,
       )}
-      {...props}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         forceMount

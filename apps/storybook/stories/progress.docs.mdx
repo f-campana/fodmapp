@@ -1,0 +1,78 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ProgressStories from "./progress.stories";
+import { progressRecommendedUsageCode } from "./progress.docs-source";
+
+<Meta of={ProgressStories} />
+
+<Title />
+<Subtitle>
+  Use Progress for inline status updates that need a numeric completion signal
+  without taking over the surrounding layout.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={progressRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Progress for task completion, imports, or short-running operations where
+users benefit from a quick status read.
+
+Avoid Progress when there is no meaningful progression to show or when a single
+loading state would be clearer.
+
+<Canvas of={ProgressStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect current value, maximum value, and custom root
+classes.
+
+<Controls of={ProgressStories.Playground} />
+
+## Composition patterns
+
+Pair the bar with concise status text. The long-context example shows how the
+bar behaves when labels and supporting copy wrap.
+
+<Canvas of={ProgressStories.LongContext} sourceState="none" />
+
+## Accessibility contract
+
+- the root exposes progressbar semantics with the current value when a numeric `value` is provided
+- indeterminate usage keeps the bar mounted without forcing `aria-valuenow`
+- root and indicator slot hooks stay stable for automation and regression checks
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root and indicator
+- Progress does not expose an `asChild` exception for these hooks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Progress example area
+- Storybook interaction checks verify progressbar semantics, indicator styling, and the rendered percentage label
+- UI tests cover slot stability, clamping, indeterminate semantics, class merging, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for indicator contrast and motion in light and dark themes
+- review for long labels and value context remaining readable on narrow layouts
+
+## Responsive notes
+
+Long labels may wrap, but the percentage and bar should remain legible together
+without horizontal overflow.
+
+<Canvas of={ProgressStories.ResponsiveStress} sourceState="none" />
