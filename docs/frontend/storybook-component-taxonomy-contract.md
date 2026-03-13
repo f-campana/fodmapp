@@ -4,7 +4,7 @@
 
 This document defines the canonical taxonomy contract for component stories under:
 
-- `apps/storybook/stories/*.stories.tsx`
+- `apps/storybook/stories/**/*.stories.tsx`
 
 It does not apply to:
 
@@ -48,9 +48,11 @@ The taxonomy checker must enforce:
 
 1. Every implementation component in `packages/ui/src/components/ui/{adapter,foundation,composed,utilities}/*.tsx` (excluding tests) is mapped in `component-taxonomy.json`.
 2. No taxonomy entry points to a non-existent component.
-3. Every mapped root component story file exists.
-4. Every root component story title exactly matches the mapped title.
-5. No unmapped root component story exists.
+3. Every mapped component story file exists.
+4. Every mapped component story title exactly matches the mapped title.
+5. No unmapped component story exists outside the excluded `foundations/*` and `reporting/*` directories.
+
+`storyFile` values in `component-taxonomy.json` are paths relative to `apps/storybook/stories`.
 
 Run locally:
 

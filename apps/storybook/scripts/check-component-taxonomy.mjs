@@ -83,12 +83,35 @@ function listUiComponentImplementations(implementationsDir) {
   };
 }
 
-function listRootStoryFiles(storiesDir) {
-  return sorted(
-    readdirSync(storiesDir)
-      .filter((file) => file.endsWith(".stories.tsx"))
-      .filter((file) => statSync(path.join(storiesDir, file)).isFile()),
-  );
+function listComponentStoryFiles(storiesDir) {
+  const storyFiles = [];
+  const excludedDirs = new Set(["foundations", "reporting"]);
+
+  function walk(currentDir, relativeDir = "") {
+    for (const entry of readdirSync(currentDir)) {
+      const entryPath = path.join(currentDir, entry);
+      const stats = statSync(entryPath);
+      const relativePath = relativeDir
+        ? path.posix.join(relativeDir, entry)
+        : entry;
+
+      if (stats.isDirectory()) {
+        if (excludedDirs.has(relativePath)) {
+          continue;
+        }
+        walk(entryPath, relativePath);
+        continue;
+      }
+
+      if (stats.isFile() && entry.endsWith(".stories.tsx")) {
+        storyFiles.push(relativePath);
+      }
+    }
+  }
+
+  walk(storiesDir);
+
+  return sorted(storyFiles);
 }
 
 function extractStoryTitle(storyFilePath) {
@@ -118,7 +141,7 @@ function main() {
   const implementations = listUiComponentImplementations(implementationsDir);
   const implementationSlugs = sorted(implementations.slugsByLane.keys());
   const taxonomySlugs = sorted(Object.keys(componentsMap));
-  const storyFiles = listRootStoryFiles(storiesDir);
+  const storyFiles = listComponentStoryFiles(storiesDir);
 
   const errors = [];
 
@@ -233,7 +256,7 @@ function main() {
 
   if (unmappedRootStoryFiles.length > 0) {
     errors.push(
-      `Unmapped root story files (must be represented in component-taxonomy.json): ${unmappedRootStoryFiles.join(", ")}`,
+      `Unmapped component story files (must be represented in component-taxonomy.json): ${unmappedRootStoryFiles.join(", ")}`,
     );
   }
 
@@ -272,7 +295,7 @@ function main() {
   }
 
   process.stdout.write(
-    `[storybook-taxonomy] OK: ${implementationSlugs.length} components mapped, ${storyFiles.length} root stories validated.\n`,
+    `[storybook-taxonomy] OK: ${implementationSlugs.length} components mapped, ${storyFiles.length} component stories validated.\n`,
   );
 }
 
