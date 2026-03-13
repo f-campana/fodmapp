@@ -1,0 +1,81 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as NavigationMenuStories from "./navigation-menu.stories";
+import { navigationMenuRecommendedUsageCode } from "./navigation-menu.docs-source";
+
+<Meta of={NavigationMenuStories} />
+
+<Title />
+<Subtitle>
+  Use NavigationMenu for grouped site or product navigation that reveals richer
+  linked content while keeping one active destination family at a time.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={navigationMenuRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use NavigationMenu when the top-level destination needs a richer preview than a
+single plain link, for example grouped product areas, resource hubs, or
+feature collections.
+
+Avoid NavigationMenu for one-off actions better served by buttons or menus, or
+for very deep hierarchies that need a full navigation pattern.
+
+<Canvas of={NavigationMenuStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect direction, orientation, and active-item callback
+behavior.
+
+<Controls of={NavigationMenuStories.Playground} />
+
+## Composition patterns
+
+The surfaced example keeps the same navigation contract inside a contained
+block. Add the indicator only when the active item needs extra visual emphasis.
+
+<Canvas of={NavigationMenuStories.OnSurface} sourceState="none" />
+<Canvas of={NavigationMenuStories.WithIndicator} sourceState="none" />
+
+## Accessibility contract
+
+- the active trigger exposes `aria-expanded` and links to its content through `aria-controls`
+- keyboard interaction can move focus between peer triggers without leaving the navigation cluster
+- the adapter renders the viewport positioning hook by default so the revealed panel keeps a stable placement contract
+- Escape closes the open panel and returns focus to the trigger in the interaction checks
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, list, item, trigger, content, link, viewport, and viewport-position elements
+- when using `NavigationMenuLink` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local navigation menu audit area
+- Storybook interaction checks verify keyboard open, focus return, trigger-to-content linkage, and the `asChild` slot exception
+- UI tests cover default-composition slot stability, the `NavigationMenuLink` `asChild` slot exception, active-item linkage, keyboard movement, class contracts, ref forwarding, and a11y
+
+What still needs manual review:
+
+- visual pass for viewport placement and indicator alignment across representative header layouts
+- responsive review for descriptive trigger labels and stacked navigation layouts on narrow screens
+
+## Responsive notes
+
+Use the responsive stress case when trigger labels become descriptive or the
+navigation needs to stack vertically. The viewport-position hook now stretches
+to the available width so narrow layouts can keep the revealed panel centered
+under the active cluster.

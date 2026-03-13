@@ -30,12 +30,12 @@ function NavigationMenu({
 }: NavigationMenuProps) {
   return (
     <NavigationMenuPrimitive.Root
+      {...props}
       data-slot="navigation-menu"
       className={cn(
         "relative z-10 flex max-w-max flex-1 items-center justify-center",
         className,
       )}
-      {...props}
     >
       {children}
       <NavigationMenuViewportPosition>
@@ -52,12 +52,12 @@ export type NavigationMenuListProps = React.ComponentProps<
 function NavigationMenuList({ className, ...props }: NavigationMenuListProps) {
   return (
     <NavigationMenuPrimitive.List
+      {...props}
       data-slot="navigation-menu-list"
       className={cn(
         "group flex flex-1 list-none items-center justify-center gap-1",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -69,9 +69,9 @@ export type NavigationMenuItemProps = React.ComponentProps<
 function NavigationMenuItem({ className, ...props }: NavigationMenuItemProps) {
   return (
     <NavigationMenuPrimitive.Item
+      {...props}
       data-slot="navigation-menu-item"
       className={cn(className)}
-      {...props}
     />
   );
 }
@@ -87,9 +87,9 @@ function NavigationMenuTrigger({
 }: NavigationMenuTriggerProps) {
   return (
     <NavigationMenuPrimitive.Trigger
+      {...props}
       data-slot="navigation-menu-trigger"
       className={cn(navigationMenuTriggerStyle(), className)}
-      {...props}
     >
       {children}
       <svg
@@ -121,6 +121,7 @@ function NavigationMenuContent({
 }: NavigationMenuContentProps) {
   return (
     <NavigationMenuPrimitive.Content
+      {...props}
       data-slot="navigation-menu-content"
       className={cn(
         "top-0 left-0 w-full md:absolute md:w-auto",
@@ -130,7 +131,6 @@ function NavigationMenuContent({
         "data-[motion=to-end]:slide-out-to-right-2 data-[motion=to-start]:slide-out-to-left-2",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -142,9 +142,9 @@ export type NavigationMenuLinkProps = React.ComponentProps<
 function NavigationMenuLink({ className, ...props }: NavigationMenuLinkProps) {
   return (
     <NavigationMenuPrimitive.Link
+      {...props}
       data-slot="navigation-menu-link"
       className={cn(className)}
-      {...props}
     />
   );
 }
@@ -159,14 +159,14 @@ function NavigationMenuIndicator({
 }: NavigationMenuIndicatorProps) {
   return (
     <NavigationMenuPrimitive.Indicator
+      {...props}
       data-slot="navigation-menu-indicator"
       className={cn(
-        "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden",
+        "top-full z-1 flex h-1.5 items-end justify-center overflow-hidden",
         "data-[state=visible]:animate-in data-[state=hidden]:animate-out",
         "data-[state=hidden]:fade-out data-[state=visible]:fade-in",
         className,
       )}
-      {...props}
     >
       <div className="relative top-[60%] size-2 rotate-45 rounded-tl-sm bg-border shadow-md" />
     </NavigationMenuPrimitive.Indicator>
@@ -183,6 +183,7 @@ function NavigationMenuViewport({
 }: NavigationMenuViewportProps) {
   return (
     <NavigationMenuPrimitive.Viewport
+      {...props}
       data-slot="navigation-menu-viewport"
       className={cn(
         "origin-top-center relative mt-1.5 h-(--radix-navigation-menu-viewport-height) w-full overflow-hidden rounded-(--radius) border border-border bg-popover text-popover-foreground shadow-lg",
@@ -192,7 +193,6 @@ function NavigationMenuViewport({
         "md:w-(--radix-navigation-menu-viewport-width)",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -203,9 +203,12 @@ function NavigationMenuViewportPosition({
 }: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="navigation-menu-viewport-position"
-      className={cn("absolute top-full left-0 flex justify-center", className)}
       {...props}
+      data-slot="navigation-menu-viewport-position"
+      className={cn(
+        "absolute top-full left-0 flex w-full justify-center",
+        className,
+      )}
     />
   );
 }

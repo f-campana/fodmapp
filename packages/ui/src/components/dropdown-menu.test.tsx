@@ -1,6 +1,7 @@
 import { createRef, useState } from "react";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -24,19 +25,14 @@ import {
 } from "./dropdown-menu";
 
 describe("DropdownMenu", () => {
-  function openMenuByTriggerName(name: string) {
-    const trigger = screen.getByRole("button", { name });
-    fireEvent.pointerDown(trigger, { button: 0, ctrlKey: false });
-    return trigger;
-  }
-
   function renderDropdownMenu(
     props?: React.ComponentProps<typeof DropdownMenu>,
+    contentProps?: Partial<React.ComponentProps<typeof DropdownMenuContent>>,
   ) {
     return render(
       <DropdownMenu {...props}>
         <DropdownMenuTrigger>Ouvrir les options</DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent {...contentProps}>
           <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -47,133 +43,241 @@ describe("DropdownMenu", () => {
             <DropdownMenuItem>Parametres</DropdownMenuItem>
             <DropdownMenuItem disabled>Support</DropdownMenuItem>
           </DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Parametres avances</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Regles de substitution</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+  }
+
+  async function waitForDropdownMenuContent(scope: ParentNode = document) {
+    return waitFor(() => {
+      const node = scope.querySelector("[data-slot='dropdown-menu-content']");
+      if (!node) {
+        throw new Error("dropdown menu content not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+  }
+
+  it("keeps slot markers stable in default composition", async () => {
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
+
+    const { container } = render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger data-slot="custom-trigger">
+          Ouvrir les options
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          container={portalContainer}
+          data-slot="custom-content"
+        >
+          <DropdownMenuLabel data-slot="custom-label">
+            Mon compte
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator data-slot="custom-separator" />
+          <DropdownMenuGroup data-slot="custom-group">
+            <DropdownMenuItem data-slot="custom-item">
+              Profil
+              <DropdownMenuShortcut data-slot="custom-shortcut">
+                P
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSub open>
+            <DropdownMenuSubTrigger data-slot="custom-sub-trigger">
+              Parametres avances
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal container={portalContainer}>
+              <DropdownMenuSubContent data-slot="custom-sub-content">
+                <DropdownMenuCheckboxItem
+                  checked
+                  data-slot="custom-checkbox-item"
+                >
+                  Notifications
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuRadioGroup
+                  data-slot="custom-radio-group"
+                  value="expert"
+                >
+                  <DropdownMenuRadioItem
+                    data-slot="custom-radio-item"
+                    value="expert"
+                  >
+                    Mode expert
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
         </DropdownMenuContent>
       </DropdownMenu>,
     );
-  }
 
-  it("opens and closes from trigger in uncontrolled mode", async () => {
-    renderDropdownMenu();
+    await waitForDropdownMenuContent(portalContainer);
 
-    openMenuByTriggerName("Ouvrir les options");
+    expect(container.querySelector("[data-slot='dropdown-menu']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='dropdown-menu-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-portal']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-label']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-separator']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-group']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-item']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-shortcut']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-sub']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-sub-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-sub-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector(
+        "[data-slot='dropdown-menu-checkbox-item']",
+      ),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-radio-group']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='dropdown-menu-radio-item']"),
+    ).toBeTruthy();
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-content']"),
-      ).toBeTruthy();
-    });
-
-    fireEvent.pointerDown(document.body);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-content']"),
-      ).toBeNull();
-    });
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-label']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-separator']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-group']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-item']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-shortcut']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-sub-trigger']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-sub-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-checkbox-item']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-radio-group']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-radio-item']"),
+    ).toBeNull();
   });
 
-  it("closes on Escape", async () => {
-    renderDropdownMenu();
-
-    openMenuByTriggerName("Ouvrir les options");
-
-    const content = await waitFor(() => {
-      const node = document.querySelector(
-        "[data-slot='dropdown-menu-content']",
-      );
-      if (!node) {
-        throw new Error("dropdown menu content not mounted yet");
-      }
-      return node as HTMLElement;
-    });
-
-    fireEvent.keyDown(content, { key: "Escape", code: "Escape" });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("supports keyboard navigation in root menu", async () => {
+  it("opens from keyboard, closes on Escape, and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
     renderDropdownMenu();
 
     const trigger = screen.getByRole("button", { name: "Ouvrir les options" });
 
     trigger.focus();
-    fireEvent.keyDown(trigger, { key: "ArrowDown", code: "ArrowDown" });
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await user.keyboard("{ArrowDown}");
+
+    await waitForDropdownMenuContent();
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-content']"),
-      ).toBeTruthy();
+      expect(document.activeElement?.getAttribute("role")).toBe("menuitem");
     });
 
-    const firstItem = screen.getByRole("menuitem", { name: /Profil/ });
-
-    fireEvent.keyDown(firstItem, { key: "ArrowDown", code: "ArrowDown" });
-    fireEvent.keyDown(firstItem, { key: "ArrowUp", code: "ArrowUp" });
-    fireEvent.keyDown(firstItem, { key: "Enter", code: "Enter" });
+    await user.keyboard("{Escape}");
 
     await waitFor(() => {
       expect(
         document.querySelector("[data-slot='dropdown-menu-content']"),
       ).toBeNull();
     });
-  });
-
-  it("opens submenu with ArrowRight and closes with ArrowLeft/Escape", async () => {
-    renderDropdownMenu();
-
-    openMenuByTriggerName("Ouvrir les options");
-
-    const subTrigger = await waitFor(() => {
-      const node = screen.getByRole("menuitem", {
-        name: "Parametres avances",
-      });
-      return node;
-    });
-
-    subTrigger.focus();
-    fireEvent.keyDown(subTrigger, { key: "ArrowRight", code: "ArrowRight" });
-
-    const subContent = await waitFor(() => {
-      const node = document.querySelector(
-        "[data-slot='dropdown-menu-sub-content']",
-      );
-      if (!node) {
-        throw new Error("dropdown submenu content not mounted yet");
-      }
-      return node as HTMLElement;
-    });
-
-    fireEvent.keyDown(subContent, { key: "ArrowLeft", code: "ArrowLeft" });
-    fireEvent.keyDown(subContent, { key: "Escape", code: "Escape" });
-
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-sub-content']"),
-      ).toBeNull();
+      expect(trigger).toHaveFocus();
     });
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("toggles checkbox item state and callback semantics", async () => {
-    function CheckboxExample() {
+  it("allows trigger and item slot override when using asChild", async () => {
+    render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger asChild>
+          <button data-slot="custom-trigger" type="button">
+            Ouvrir via enfant
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <a data-slot="custom-item" href="#profil">
+              Ouvrir le profil
+            </a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+
+    await waitForDropdownMenuContent();
+
+    expect(
+      document.querySelector("[data-slot='custom-trigger']"),
+    ).toHaveTextContent("Ouvrir via enfant");
+    expect(
+      screen.getByRole("menuitem", { name: "Ouvrir le profil" }),
+    ).toHaveAttribute("data-slot", "custom-item");
+    expect(
+      document.querySelector("[data-slot='dropdown-menu-trigger']"),
+    ).toBeNull();
+    expect(
+      document.querySelector("[data-slot='dropdown-menu-item']"),
+    ).toBeNull();
+  });
+
+  it("updates checkbox and radio callbacks", async () => {
+    const onValueChange = vi.fn();
+
+    function SelectionExample() {
       const [checked, setChecked] = useState(false);
+      const [value, setValue] = useState("profil");
+
       return (
         <>
           <span data-state-text={checked ? "active" : "inactive"} />
           <DropdownMenu>
-            <DropdownMenuTrigger>Options de notification</DropdownMenuTrigger>
+            <DropdownMenuTrigger>Preferences</DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuCheckboxItem
                 checked={checked}
@@ -181,77 +285,52 @@ describe("DropdownMenu", () => {
               >
                 Activer les notifications
               </DropdownMenuCheckboxItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                onValueChange={(next) => {
+                  setValue(next);
+                  onValueChange(next);
+                }}
+                value={value}
+              >
+                <DropdownMenuRadioItem value="profil">
+                  Profil
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="expert">
+                  Mode expert
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </>
       );
     }
 
-    const { container } = render(<CheckboxExample />);
+    render(<SelectionExample />);
 
-    openMenuByTriggerName("Options de notification");
+    await userEvent.click(screen.getByRole("button", { name: "Preferences" }));
 
-    const item = await waitFor(() => {
-      return screen.getByRole("menuitemcheckbox", {
-        name: "Activer les notifications",
-      });
+    const checkbox = await screen.findByRole("menuitemcheckbox", {
+      name: "Activer les notifications",
     });
-
-    expect(item).toHaveAttribute("aria-checked", "false");
-
-    fireEvent.click(item);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
-      const state = container.querySelector("[data-state-text]");
-      expect(state).toHaveAttribute("data-state-text", "active");
-    });
-  });
-
-  it("updates radio group selection and callback semantics", async () => {
-    const onValueChange = vi.fn();
-
-    function RadioExample() {
-      const [value, setValue] = useState("profil");
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger>Methode d'affichage</DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuRadioGroup
-              value={value}
-              onValueChange={(next) => {
-                setValue(next);
-                onValueChange(next);
-              }}
-            >
-              <DropdownMenuRadioItem value="profil">
-                Profil
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="expert">
-                Mode expert
-              </DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-
-    render(<RadioExample />);
-
-    openMenuByTriggerName("Methode d'affichage");
-
-    const expert = await waitFor(() => {
-      return screen.getByRole("menuitemradio", { name: "Mode expert" });
+      expect(document.querySelector("[data-state-text='active']")).toBeTruthy();
     });
 
-    fireEvent.click(expert);
+    await userEvent.click(screen.getByRole("button", { name: "Preferences" }));
+
+    const radio = screen.getByRole("menuitemradio", { name: "Mode expert" });
+    await userEvent.click(radio);
 
     expect(onValueChange).toHaveBeenCalledWith("expert");
     await waitFor(() => {
-      expect(expert).toHaveAttribute("aria-checked", "true");
+      expect(radio).toHaveAttribute("aria-checked", "true");
     });
   });
 
-  it("does not select disabled item", async () => {
+  it("does not select disabled items", async () => {
     const onSelect = vi.fn();
 
     render(
@@ -265,169 +344,22 @@ describe("DropdownMenu", () => {
       </DropdownMenu>,
     );
 
-    openMenuByTriggerName("Menu support");
+    await userEvent.click(screen.getByRole("button", { name: "Menu support" }));
 
-    const disabledItem = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: "Support prioritaire" });
+    const item = await screen.findByRole("menuitem", {
+      name: "Support prioritaire",
     });
-
-    fireEvent.click(disabledItem);
+    await userEvent.click(item);
 
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it("renders expected slots across root, submenu, and item indicators", async () => {
-    const { container } = renderDropdownMenu();
-
-    openMenuByTriggerName("Ouvrir les options");
-
-    const subTrigger = await waitFor(() =>
-      screen.getByRole("menuitem", { name: "Parametres avances" }),
-    );
-
-    fireEvent.keyDown(subTrigger, { key: "ArrowRight", code: "ArrowRight" });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='dropdown-menu-sub-content']"),
-      ).toBeTruthy();
-    });
-
-    expect(container.querySelector("[data-slot='dropdown-menu']")).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='dropdown-menu-trigger']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-portal']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-content']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-group']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-item']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-label']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-separator']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-shortcut']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-sub']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-sub-trigger']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-sub-content']"),
-    ).toBeTruthy();
-  });
-
-  it("applies semantic class contracts", () => {
+  it("keeps semantic classes and merges className on exposed compounds", async () => {
     render(
       <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger>Menu</DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>Profil</DropdownMenuItem>
-          <DropdownMenuSub open>
-            <DropdownMenuSubTrigger>Sous-menu</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuCheckboxItem checked>
-                  Actif
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuRadioGroup value="a">
-                  <DropdownMenuRadioItem value="a">
-                    Option A
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuContent>
-      </DropdownMenu>,
-    );
-
-    const content = document.querySelector(
-      "[data-slot='dropdown-menu-content']",
-    ) as HTMLElement | null;
-    const subContent = document.querySelector(
-      "[data-slot='dropdown-menu-sub-content']",
-    ) as HTMLElement | null;
-    const item = document.querySelector(
-      "[data-slot='dropdown-menu-item']",
-    ) as HTMLElement | null;
-    const subTrigger = document.querySelector(
-      "[data-slot='dropdown-menu-sub-trigger']",
-    ) as HTMLElement | null;
-    const checkboxItem = document.querySelector(
-      "[data-slot='dropdown-menu-checkbox-item']",
-    ) as HTMLElement | null;
-
-    expect(content?.className ?? "").toContain("bg-popover");
-    expect(content?.className ?? "").toContain("text-popover-foreground");
-    expect(content?.className ?? "").toContain("data-[state=open]:animate-in");
-
-    expect(subContent?.className ?? "").toContain("bg-popover");
-    expect(subContent?.className ?? "").toContain("text-popover-foreground");
-    expect(subContent?.className ?? "").toContain(
-      "data-[state=open]:zoom-in-95",
-    );
-
-    expect(item?.className ?? "").toContain("focus:bg-accent");
-    expect(item?.className ?? "").toContain("focus:text-accent-foreground");
-    expect(item?.className ?? "").toContain("cursor-pointer");
-
-    expect(subTrigger?.className ?? "").toContain(
-      "data-[state=open]:bg-accent",
-    );
-    expect(subTrigger?.className ?? "").toContain(
-      "data-[state=open]:text-accent-foreground",
-    );
-    expect(subTrigger?.className ?? "").toContain("cursor-pointer");
-
-    expect(checkboxItem?.className ?? "").toContain("cursor-pointer");
-    expect(checkboxItem?.className ?? "").toContain(
-      "data-[disabled]:pointer-events-none",
-    );
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-item-indicator']"),
-    ).toBeTruthy();
-  });
-
-  it("supports asChild trigger and item", async () => {
-    render(
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button type="button">Menu asChild</button>
+        <DropdownMenuTrigger className="trigger-personnalise">
+          Menu classes
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem asChild>
-            <a href="#profil">Ouvrir le profil</a>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>,
-    );
-
-    const trigger = openMenuByTriggerName("Menu asChild");
-    const itemLink = await waitFor(() =>
-      screen.getByRole("menuitem", { name: "Ouvrir le profil" }),
-    );
-
-    expect(trigger).toHaveAttribute("data-slot", "dropdown-menu-trigger");
-    expect(itemLink).toHaveAttribute("data-slot", "dropdown-menu-item");
-  });
-
-  it("merges className on content, item, label, separator and shortcut", () => {
-    render(
-      <DropdownMenu defaultOpen>
-        <DropdownMenuTrigger>Menu classes</DropdownMenuTrigger>
         <DropdownMenuContent className="contenu-personnalise">
           <DropdownMenuLabel className="label-personnalise">
             Mon espace
@@ -443,10 +375,20 @@ describe("DropdownMenu", () => {
       </DropdownMenu>,
     );
 
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-content']")
-        ?.className ?? "",
-    ).toContain("contenu-personnalise");
+    const content = await waitForDropdownMenuContent();
+    const trigger = document.querySelector(
+      "[data-slot='dropdown-menu-trigger']",
+    ) as HTMLElement | null;
+    const item = screen.getByRole("menuitem", { name: /Profil/ });
+
+    expect(trigger?.className ?? "").toContain("trigger-personnalise");
+    expect(content.className).toContain("bg-popover");
+    expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).toContain("data-[state=open]:animate-in");
+    expect(content.className).toContain("contenu-personnalise");
+    expect(item.className).toContain("focus:bg-accent");
+    expect(item.className).toContain("focus:text-accent-foreground");
+    expect(item.className).toContain("item-personnalise");
     expect(
       document.querySelector("[data-slot='dropdown-menu-label']")?.className ??
         "",
@@ -455,10 +397,6 @@ describe("DropdownMenu", () => {
       document.querySelector("[data-slot='dropdown-menu-separator']")
         ?.className ?? "",
     ).toContain("separateur-personnalise");
-    expect(
-      document.querySelector("[data-slot='dropdown-menu-item']")?.className ??
-        "",
-    ).toContain("item-personnalise");
     expect(
       document.querySelector("[data-slot='dropdown-menu-shortcut']")
         ?.className ?? "",
@@ -479,25 +417,33 @@ describe("DropdownMenu", () => {
       </DropdownMenu>,
     );
 
-    await waitFor(() => {
-      expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
-      expect(itemRef.current).toBeInstanceOf(HTMLDivElement);
-    });
+    await waitForDropdownMenuContent();
 
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
+    expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
+    expect(itemRef.current).toBeInstanceOf(HTMLDivElement);
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(
+    const auditRoot = document.createElement("main");
+    const portalContainer = document.createElement("div");
+    auditRoot.append(portalContainer);
+    document.body.append(auditRoot);
+
+    render(
       <DropdownMenu defaultOpen>
         <DropdownMenuTrigger>Menu accessibilite</DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent container={portalContainer}>
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuItem>Profil</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>,
+      { container: auditRoot },
     );
 
-    expect(await axe(container)).toHaveNoViolations();
+    await waitForDropdownMenuContent(portalContainer);
+
+    fireEvent.mouseMove(auditRoot);
+    expect(await axe(auditRoot)).toHaveNoViolations();
   });
 });

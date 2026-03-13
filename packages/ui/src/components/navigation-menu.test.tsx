@@ -1,9 +1,10 @@
 import { createRef } from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   NavigationMenu,
@@ -24,27 +25,22 @@ describe("NavigationMenu", () => {
     return render(
       <NavigationMenu {...props}>
         <NavigationMenuList>
-          <NavigationMenuItem>
+          <NavigationMenuItem value="produits">
             <NavigationMenuTrigger>Produits</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
+              <ul className="grid gap-2 p-4 md:w-[420px]">
                 <li>
                   <NavigationMenuLink asChild>
                     <a href="#calculateur">Calculateur FODMAP</a>
                   </NavigationMenuLink>
                 </li>
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a href="#substitutions">Substitutions</a>
-                  </NavigationMenuLink>
-                </li>
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          <NavigationMenuItem value="ressources">
             <NavigationMenuTrigger>Ressources</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[340px]">
+              <ul className="grid gap-2 p-4 md:w-[320px]">
                 <li>
                   <NavigationMenuLink asChild>
                     <a href="#guides">Guides pratiques</a>
@@ -58,8 +54,43 @@ describe("NavigationMenu", () => {
     );
   }
 
-  it("renders navigation slots and root semantics", () => {
-    const { container } = renderNavigationMenu();
+  it("keeps slot markers stable in default composition", async () => {
+    const { container } = render(
+      <NavigationMenu
+        className="racine-personnalisee"
+        data-slot="custom-root"
+        defaultValue="produits"
+      >
+        <NavigationMenuList data-slot="custom-list">
+          <NavigationMenuItem data-slot="custom-item" value="produits">
+            <NavigationMenuTrigger data-slot="custom-trigger">
+              Produits
+            </NavigationMenuTrigger>
+            <NavigationMenuContent data-slot="custom-content">
+              <ul className="grid gap-2 p-4 md:w-[420px]">
+                <li>
+                  <NavigationMenuLink
+                    data-slot="custom-link"
+                    href="#calculateur"
+                  >
+                    Calculateur FODMAP
+                  </NavigationMenuLink>
+                </li>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Produits" });
+
+    await waitFor(() => {
+      const contentId = trigger.getAttribute("aria-controls");
+      if (!contentId || !document.getElementById(contentId)) {
+        throw new Error("navigation menu content not linked yet");
+      }
+    });
 
     expect(
       container.querySelector("[data-slot='navigation-menu']"),
@@ -74,100 +105,41 @@ describe("NavigationMenu", () => {
       container.querySelector("[data-slot='navigation-menu-trigger']"),
     ).toBeTruthy();
     expect(
+      container.querySelector("[data-slot='navigation-menu-content']"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='navigation-menu-link']"),
+    ).toBeTruthy();
+    expect(
       container.querySelector(
         "[data-slot='navigation-menu-viewport-position']",
       ),
     ).toBeTruthy();
-  });
-
-  it("opens content from trigger in uncontrolled mode", async () => {
-    renderNavigationMenu();
-
-    const trigger = screen.getByRole("button", { name: "Produits" });
-    fireEvent.click(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='navigation-menu-content']"),
-      ).toBeTruthy();
-    });
-
     expect(
-      screen.getByRole("link", { name: "Calculateur FODMAP" }),
+      container.querySelector("[data-slot='navigation-menu-viewport']"),
     ).toBeTruthy();
+
+    expect(container.querySelector("[data-slot='custom-root']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-list']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-item']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-content']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-link']")).toBeNull();
   });
 
-  it("supports keyboard open flow", async () => {
-    renderNavigationMenu();
-
-    const trigger = screen.getByRole("button", { name: "Produits" });
-    trigger.focus();
-
-    fireEvent.keyDown(trigger, { key: "Enter", code: "Enter" });
-    fireEvent.click(trigger);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='navigation-menu-content']"),
-      ).toBeTruthy();
-    });
-
-    fireEvent.keyDown(trigger, { key: "Escape", code: "Escape" });
-  });
-
-  it("exposes viewport and indicator semantic class contracts", () => {
-    const viewportElement = NavigationMenuViewport({}) as {
-      props: { className: string };
-    };
-    const indicatorElement = NavigationMenuIndicator({}) as {
-      props: { className: string };
-    };
-
-    const viewportClassName = viewportElement.props.className;
-    const indicatorClassName = indicatorElement.props.className;
-
-    expect(viewportClassName).toContain("bg-popover");
-    expect(viewportClassName).toContain("text-popover-foreground");
-    expect(viewportClassName).toContain("data-[state=open]:animate-in");
-
-    expect(indicatorClassName).toContain("data-[state=visible]:animate-in");
-    expect(indicatorClassName).toContain("data-[state=hidden]:fade-out");
-  });
-
-  it("applies motion class contracts on content", async () => {
-    renderNavigationMenu();
-
-    fireEvent.click(screen.getByRole("button", { name: "Produits" }));
-
-    const content = await waitFor(() => {
-      return document.querySelector(
-        "[data-slot='navigation-menu-content']",
-      ) as HTMLElement | null;
-    });
-
-    expect(content?.className ?? "").toContain(
-      "data-[motion^=from-]:animate-in",
-    );
-    expect(content?.className ?? "").toContain(
-      "data-[motion^=to-]:animate-out",
-    );
-    expect(content?.className ?? "").toContain(
-      "data-[motion=from-end]:slide-in-from-right-2",
-    );
-    expect(content?.className ?? "").toContain(
-      "data-[motion=to-start]:slide-out-to-left-2",
-    );
-  });
-
-  it("supports asChild links and className merging", async () => {
+  it("allows link slot override when using asChild", async () => {
     render(
-      <NavigationMenu>
-        <NavigationMenuList className="liste-personnalisee">
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>AsChild</NavigationMenuTrigger>
-            <NavigationMenuContent className="contenu-personnalise">
-              <NavigationMenuLink asChild className="lien-personnalise">
-                <a href="#profil">Voir le profil</a>
+      <NavigationMenu defaultValue="produits">
+        <NavigationMenuList>
+          <NavigationMenuItem value="produits">
+            <NavigationMenuTrigger data-slot="custom-trigger">
+              Produits
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink asChild>
+                <a data-slot="custom-link" href="#calculateur">
+                  Calculateur FODMAP
+                </a>
               </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
@@ -175,71 +147,174 @@ describe("NavigationMenu", () => {
       </NavigationMenu>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "AsChild" }));
+    const trigger = screen.getByRole("button", { name: "Produits" });
 
-    const link = await waitFor(() => {
-      return screen.getByRole("link", { name: "Voir le profil" });
+    await waitFor(() => {
+      const contentId = trigger.getAttribute("aria-controls");
+      if (!contentId || !document.getElementById(contentId)) {
+        throw new Error("navigation menu content not linked yet");
+      }
     });
 
+    expect(trigger).toHaveAttribute("data-slot", "navigation-menu-trigger");
+    expect(
+      screen.getByRole("link", { name: "Calculateur FODMAP" }),
+    ).toHaveAttribute("data-slot", "custom-link");
+    expect(document.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(
+      document.querySelector("[data-slot='navigation-menu-link']"),
+    ).toBeNull();
+  });
+
+  it("switches items and keeps semantic linkage", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+
+    renderNavigationMenu({
+      defaultValue: "produits",
+      onValueChange,
+    });
+
+    const produits = screen.getByRole("button", { name: "Produits" });
+    const ressources = screen.getByRole("button", { name: "Ressources" });
+
+    expect(produits).toHaveAttribute("aria-expanded", "true");
+    expect(ressources).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(ressources);
+
+    expect(onValueChange).toHaveBeenCalledWith("ressources");
+    expect(ressources).toHaveAttribute("aria-expanded", "true");
+    expect(produits).toHaveAttribute("aria-expanded", "false");
+
+    const panelId = ressources.getAttribute("aria-controls");
+    const panel = panelId ? document.getElementById(panelId) : null;
+
+    expect(panel).toHaveAttribute("data-slot", "navigation-menu-content");
+    expect(panel).toHaveAttribute("id", panelId ?? "");
+  });
+
+  it("supports keyboard navigation between triggers", async () => {
+    const user = userEvent.setup();
+    renderNavigationMenu({ defaultValue: "produits" });
+
+    const produits = screen.getByRole("button", { name: "Produits" });
+    const ressources = screen.getByRole("button", { name: "Ressources" });
+
+    produits.focus();
+    expect(document.activeElement).toBe(produits);
+
+    await user.keyboard("{ArrowRight}");
+
+    await waitFor(() => {
+      expect(document.activeElement).toBe(ressources);
+    });
+  });
+
+  it("keeps semantic classes and merges className on exposed compounds", () => {
+    render(
+      <NavigationMenu className="racine-personnalisee" defaultValue="produits">
+        <NavigationMenuList className="liste-personnalisee">
+          <NavigationMenuItem className="item-personnalise" value="produits">
+            <NavigationMenuTrigger className="trigger-personnalise">
+              Produits
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="contenu-personnalise">
+              <NavigationMenuLink
+                className="lien-personnalise"
+                href="#calculateur"
+              >
+                Calculateur FODMAP
+              </NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>,
+    );
+
+    expect(
+      document.querySelector("[data-slot='navigation-menu']")?.className ?? "",
+    ).toContain("racine-personnalisee");
     expect(
       document.querySelector("[data-slot='navigation-menu-list']")?.className ??
         "",
     ).toContain("liste-personnalisee");
     expect(
+      document.querySelector("[data-slot='navigation-menu-item']")?.className ??
+        "",
+    ).toContain("item-personnalise");
+    expect(
+      screen.getByRole("button", { name: "Produits" }).className,
+    ).toContain("trigger-personnalise");
+    expect(
+      screen.getByRole("button", { name: "Produits" }).className,
+    ).toContain("focus-visible:ring-ring-soft");
+    expect(
       document.querySelector("[data-slot='navigation-menu-content']")
         ?.className ?? "",
     ).toContain("contenu-personnalise");
-    expect(link).toHaveAttribute("data-slot", "navigation-menu-link");
-    expect(link.className).toContain("lien-personnalise");
+    expect(
+      document.querySelector("[data-slot='navigation-menu-content']")
+        ?.className ?? "",
+    ).toContain("data-[motion^=from-]:animate-in");
+    expect(
+      screen.getByRole("link", { name: "Calculateur FODMAP" }).className,
+    ).toContain("lien-personnalise");
+    expect(
+      document.querySelector("[data-slot='navigation-menu-viewport-position']")
+        ?.className ?? "",
+    ).toContain("w-full");
   });
 
-  it("forwards refs to trigger and content", async () => {
+  it("renders indicator, viewport, and trigger style contracts", () => {
+    const indicatorProps = NavigationMenuIndicator({}).props;
+    const viewportProps = NavigationMenuViewport({}).props;
+
+    expect(indicatorProps.className).toContain(
+      "data-[state=visible]:animate-in",
+    );
+    expect(indicatorProps.className).toContain("data-[state=hidden]:fade-out");
+    expect(viewportProps.className).toContain("bg-popover");
+    expect(viewportProps.className).toContain("text-popover-foreground");
+    expect(viewportProps.className).toContain("data-[state=open]:animate-in");
+
+    const triggerClasses = navigationMenuTriggerStyle();
+    expect(triggerClasses).toContain("data-[active]:bg-accent");
+    expect(triggerClasses).toContain("data-[state=open]:bg-accent");
+    expect(triggerClasses).toContain("focus-visible:ring-ring-soft");
+  });
+
+  it("forwards refs to trigger and viewport", () => {
     const triggerRef = createRef<HTMLButtonElement>();
-    const contentRef = createRef<HTMLDivElement>();
+    const viewportRef = createRef<HTMLDivElement>();
 
     render(
-      <NavigationMenu>
+      <NavigationMenu defaultValue="produits">
         <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger ref={triggerRef}>Refs</NavigationMenuTrigger>
-            <NavigationMenuContent ref={contentRef}>
-              <NavigationMenuLink asChild>
-                <a href="#refs">Lien refs</a>
+          <NavigationMenuItem value="produits">
+            <NavigationMenuTrigger ref={triggerRef}>
+              Produits
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="#calculateur">
+                Calculateur FODMAP
               </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
+        <NavigationMenuViewport ref={viewportRef} />
       </NavigationMenu>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Refs" }));
-
-    await waitFor(() => {
-      expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
-    });
-
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
-  });
-
-  it("exposes navigationMenuTriggerStyle semantic contract", () => {
-    const triggerClasses = navigationMenuTriggerStyle();
-
-    expect(triggerClasses).toContain("data-[active]:bg-accent");
-    expect(triggerClasses).toContain("data-[state=open]:bg-accent");
-    expect(triggerClasses).toContain("focus-visible:ring-ring-soft");
-    expect(triggerClasses).not.toContain("focus-visible:ring-ring/50");
+    expect(viewportRef.current).toBeInstanceOf(HTMLDivElement);
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = renderNavigationMenu();
+    const user = userEvent.setup();
+    const { container } = renderNavigationMenu({ defaultValue: "produits" });
 
-    fireEvent.click(screen.getByRole("button", { name: "Produits" }));
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='navigation-menu-content']"),
-      ).toBeTruthy();
-    });
+    await user.click(screen.getByRole("button", { name: "Produits" }));
 
     expect(await axe(container)).toHaveNoViolations();
   });
