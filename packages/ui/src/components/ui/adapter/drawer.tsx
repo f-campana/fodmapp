@@ -6,6 +6,13 @@ import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "../../../lib/cn";
 
+interface DrawerContextValue {
+  setLastTrigger: (trigger: HTMLElement | null) => void;
+  lastTriggerRef: React.MutableRefObject<HTMLElement | null>;
+}
+
+const DrawerContext = React.createContext<DrawerContextValue | null>(null);
+
 export type DrawerProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
 
 function Drawer({
@@ -15,6 +22,16 @@ function Drawer({
   shouldScaleBackground = true,
   ...props
 }: DrawerProps) {
+  const lastTriggerRef = React.useRef<HTMLElement | null>(null);
+  const contextValue = React.useMemo<DrawerContextValue>(
+    () => ({
+      setLastTrigger(trigger) {
+        lastTriggerRef.current = trigger;
+      },
+      lastTriggerRef,
+    }),
+    [],
+  );
   const rootProps = {
     autoFocus,
     direction,
@@ -23,10 +40,12 @@ function Drawer({
   };
 
   return (
-    <DrawerPrimitive.Root {...rootProps}>
-      <span data-slot="drawer" hidden />
-      {children}
-    </DrawerPrimitive.Root>
+    <DrawerContext.Provider value={contextValue}>
+      <DrawerPrimitive.Root {...rootProps}>
+        <span data-slot="drawer" hidden />
+        {children}
+      </DrawerPrimitive.Root>
+    </DrawerContext.Provider>
   );
 }
 
@@ -35,9 +54,19 @@ export type DrawerTriggerProps = React.ComponentProps<
 >;
 
 function DrawerTrigger({ className, ...props }: DrawerTriggerProps) {
+  const context = React.useContext(DrawerContext);
+
   return (
     <DrawerPrimitive.Trigger
       {...props}
+      onFocus={(event) => {
+        props.onFocus?.(event);
+        context?.setLastTrigger(event.currentTarget);
+      }}
+      onPointerDown={(event) => {
+        props.onPointerDown?.(event);
+        context?.setLastTrigger(event.currentTarget);
+      }}
       data-slot="drawer-trigger"
       className={cn("cursor-pointer", className)}
     />
@@ -92,21 +121,9 @@ function DrawerContent({
   ref: forwardedRef,
   ...props
 }: DrawerContentProps) {
-  const contentRef = React.useRef<HTMLDivElement | null>(null);
-
-  const focusTrigger = (contentId: string) => {
-    const trigger = contentId
-      ? document.querySelector(`[aria-controls="${contentId}"]`)
-      : null;
-
-    if (trigger instanceof HTMLElement) {
-      trigger.focus();
-    }
-  };
+  const context = React.useContext(DrawerContext);
 
   const setContentRef = (node: HTMLDivElement | null) => {
-    contentRef.current = node;
-
     if (typeof forwardedRef === "function") {
       forwardedRef(node);
       return;
@@ -133,10 +150,16 @@ function DrawerContent({
           }
 
           const contentId = event.currentTarget.id;
-
-          requestAnimationFrame(() => {
-            focusTrigger(contentId);
-          });
+          window.setTimeout(() => {
+            const trigger = context?.lastTriggerRef.current;
+            if (
+              trigger instanceof HTMLElement &&
+              (contentId === "" ||
+                trigger.getAttribute("aria-controls") === contentId)
+            ) {
+              trigger.focus();
+            }
+          }, 0);
         }}
         className={cn(
           "fixed z-50 flex h-auto flex-col border border-border bg-popover text-popover-foreground shadow-lg outline-hidden",

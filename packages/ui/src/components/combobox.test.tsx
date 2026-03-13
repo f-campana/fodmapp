@@ -385,6 +385,12 @@ describe("Combobox", () => {
     const item = container.querySelector(
       "[data-slot='combobox-item']",
     ) as HTMLElement | null;
+    const group = container.querySelector(
+      "[data-slot='combobox-group']",
+    ) as HTMLElement | null;
+    const separator = container.querySelector(
+      "[data-slot='combobox-separator']",
+    ) as HTMLElement | null;
 
     expect(container.querySelector("[data-slot='combobox']")).toBeTruthy();
     expect(getComboboxPortal(container)).toBeTruthy();
@@ -396,9 +402,7 @@ describe("Combobox", () => {
     expect(
       container.querySelector("[data-slot='combobox-group']"),
     ).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='combobox-separator']"),
-    ).toBeTruthy();
+    expect(separator).toBeTruthy();
     expect(
       container.querySelector("[data-slot='combobox-item-indicator']"),
     ).toBeTruthy();
@@ -412,12 +416,19 @@ describe("Combobox", () => {
 
     expect(content?.className ?? "").toContain("bg-popover");
     expect(content?.className ?? "").toContain("text-popover-foreground");
+    expect(group?.className ?? "").toContain("[&_[cmdk-group-heading]]:px-2");
+    expect(group?.className ?? "").not.toContain(
+      "**:[[cmdk-group-heading]]:px-2",
+    );
 
     expect(item?.className ?? "").toContain("cursor-pointer");
     expect(item?.className ?? "").toContain("data-[selected=true]:bg-accent");
     expect(item?.className ?? "").toContain(
       "data-[disabled=true]:pointer-events-none",
     );
+    expect(separator?.className ?? "").toContain("bg-border");
+    expect(separator).toHaveAttribute("role", "presentation");
+    expect(separator).toHaveAttribute("cmdk-separator", "");
   });
 
   it("merges className and supports refs", async () => {

@@ -4,7 +4,7 @@ import * as React from "react";
 
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-import { Command as CommandPrimitive } from "cmdk";
+import { Command as CommandPrimitive, useCommandState } from "cmdk";
 
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { cn } from "../../../lib/cn";
@@ -392,7 +392,7 @@ function ComboboxContent({
           <CommandPrimitive
             className={cn(
               "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
-              "**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground",
+              "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
               commandClassName,
             )}
             shouldFilter
@@ -491,7 +491,7 @@ function ComboboxGroup({ className, heading, ...props }: ComboboxGroupProps) {
     <CommandPrimitive.Group
       className={cn(
         "overflow-hidden p-1 text-foreground",
-        "**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-1.5 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-medium **:[[cmdk-group-heading]]:text-muted-foreground",
+        "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
         className,
       )}
       data-slot="combobox-group"
@@ -587,12 +587,21 @@ export type ComboboxSeparatorProps = React.ComponentProps<
 >;
 
 function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
+  const { alwaysRender, ...separatorProps } = props;
+  const shouldRender = useCommandState((state) => !state.search);
+
+  if (!alwaysRender && !shouldRender) {
+    return null;
+  }
+
   return (
     <div
-      aria-hidden="true"
+      aria-hidden={separatorProps["aria-hidden"] ?? true}
+      cmdk-separator=""
       className={cn("-mx-1 h-px bg-border", className)}
       data-slot="combobox-separator"
-      {...props}
+      role={separatorProps.role ?? "presentation"}
+      {...separatorProps}
     />
   );
 }

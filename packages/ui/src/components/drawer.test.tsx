@@ -140,12 +140,6 @@ describe("Drawer", () => {
 
   it("opens from keyboard, moves focus into the drawer, and closes on Escape", async () => {
     const user = userEvent.setup();
-    const requestAnimationFrameSpy = vi
-      .spyOn(window, "requestAnimationFrame")
-      .mockImplementation((callback: FrameRequestCallback) => {
-        callback(0);
-        return 0;
-      });
 
     renderDrawer();
 
@@ -190,7 +184,56 @@ describe("Drawer", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     triggerFocusSpy.mockRestore();
-    requestAnimationFrameSpy.mockRestore();
+  });
+
+  it("restores focus to the trigger that opened the drawer when multiple triggers are present", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Drawer>
+        <DrawerTrigger>Premier declencheur</DrawerTrigger>
+        <DrawerTrigger>Second declencheur</DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Titre</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
+          </DrawerHeader>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    const firstTrigger = screen.getByRole("button", {
+      name: "Premier declencheur",
+    });
+    const secondTrigger = screen.getByRole("button", {
+      name: "Second declencheur",
+    });
+    const firstTriggerFocusSpy = vi.spyOn(firstTrigger, "focus");
+    const secondTriggerFocusSpy = vi.spyOn(secondTrigger, "focus");
+
+    secondTrigger.focus();
+    await user.keyboard("{Enter}");
+
+    const content = await waitForDrawerContent();
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "open");
+    });
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(content).toHaveAttribute("data-state", "closed");
+    });
+
+    fireEvent.animationEnd(content);
+
+    await waitFor(() => {
+      expect(secondTriggerFocusSpy).toHaveBeenCalled();
+    });
+    expect(firstTriggerFocusSpy).not.toHaveBeenCalled();
+
+    firstTriggerFocusSpy.mockRestore();
+    secondTriggerFocusSpy.mockRestore();
   });
 
   it("closes from the built-in close button", async () => {
