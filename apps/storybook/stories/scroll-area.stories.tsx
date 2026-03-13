@@ -117,13 +117,15 @@ function ScrollAreaExample(
   return (
     <ScrollArea
       className={[
-        "h-72 w-full rounded-(--radius) border border-border bg-background p-3",
+        "h-72 w-full rounded-(--radius) border border-border bg-background",
         args?.className ?? "",
       ].join(" ")}
       dir={args?.dir ?? "ltr"}
       type={args?.type ?? "always"}
     >
-      <WeeklyPlanList stress={options?.stress} />
+      <div className="p-3">
+        <WeeklyPlanList stress={options?.stress} />
+      </div>
     </ScrollArea>
   );
 }
@@ -195,6 +197,9 @@ export const InteractionChecks: Story = {
     await expect(scrollbars).toHaveLength(2);
     await expect(thumbs).toHaveLength(2);
     await expect(corners.length).toBeGreaterThan(0);
+    await expect(viewport?.scrollWidth ?? 0).toBeLessThanOrEqual(
+      viewport?.clientWidth ?? 0,
+    );
 
     await userEvent.tab();
     await expect(viewport).toHaveFocus();

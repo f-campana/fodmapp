@@ -56,17 +56,17 @@ function ScrollBar({
       orientation={orientation}
       forceMount={forceMount}
       className={cn(
-        "flex touch-none p-0.5 transition-colors select-none",
+        "flex touch-none select-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0",
         orientation === "vertical"
-          ? "h-full w-2.5 border-l border-l-transparent"
-          : "h-2.5 flex-col border-t border-t-transparent",
+          ? "h-full w-3 border-l border-l-transparent"
+          : "h-3 flex-col border-t border-t-transparent",
         className,
       )}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb
         forceMount
         data-slot="scroll-area-thumb"
-        className="relative flex-1 rounded-full bg-border"
+        className="relative flex-1 rounded-full bg-border/80"
       />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
   );
