@@ -1,0 +1,85 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ToggleStories from "./toggle.stories";
+import { toggleRecommendedUsageCode } from "./toggle.docs-source";
+
+<Meta of={ToggleStories} />
+
+<Title />
+<Subtitle>
+  Use Toggle for a single pressed or not pressed action state, especially in
+  toolbars and quick filters.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={toggleRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Toggle for transient UI state such as quick filters, formatting buttons, or
+temporary view changes.
+
+Prefer Switch when the state is a persistent product setting that should read as
+on or off beyond the current control surface.
+
+<Canvas of={ToggleStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect visual variants, size, default pressed state, and
+disabled behavior.
+
+<Controls of={ToggleStories.Playground} />
+
+## Behavior states
+
+Disabled state keeps the current pressed state visible while making the control
+non-interactive.
+
+<Canvas of={ToggleStories.Disabled} sourceState="none" />
+
+## Composition patterns
+
+Keep labels short in the default pattern. If a product surface needs longer
+copy, allow wrapping intentionally with class overrides rather than relying on
+accidental overflow.
+
+## Accessibility contract
+
+- the control is a real button with `aria-pressed`
+- click changes the pressed state and exposes the result semantically
+- focus styling stays visible on the active surface
+- cursor treatment stays explicit for active and disabled states
+
+## Slot hooks
+
+- in default composition, the `data-slot="toggle"` marker stays stable
+- when using `Toggle` with `asChild`, child attributes take precedence,
+  including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local toggle audit area
+- Storybook interaction checks verify pressed semantics and stable default slot hooks
+- UI tests cover pressed state, variants, disabled behavior, class merging, stable default slot hooks, `asChild` slot exceptions, refs, and a11y
+
+What is checked manually:
+
+- visual pass for focus visibility, cursor affordance, and spacing in light and dark themes
+- responsive pass for wrapped labels when product teams opt into longer copy
+
+## Responsive notes
+
+The default control assumes concise labels. When labels become descriptive, use
+intentional wrap overrides and confirm that the focus ring stays visible around
+the taller button.

@@ -18,6 +18,7 @@ function ToggleGroup({
 }: ToggleGroupProps) {
   return (
     <ToggleGroupPrimitive.Root
+      {...props}
       data-slot="toggle-group"
       data-orientation={orientation}
       orientation={orientation}
@@ -26,7 +27,6 @@ function ToggleGroup({
         orientation === "vertical" ? "flex-col" : "flex-row",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -44,6 +44,7 @@ function ToggleGroupItem({
 }: ToggleGroupItemProps) {
   return (
     <ToggleGroupPrimitive.Item
+      {...props}
       data-slot="toggle-group-item"
       data-variant={variant}
       data-size={size}
@@ -52,7 +53,6 @@ function ToggleGroupItem({
         "in-data-[slot=toggle-group]:rounded-(--radius-sm)",
         className,
       )}
-      {...props}
     />
   );
 }

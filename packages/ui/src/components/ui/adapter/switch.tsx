@@ -9,6 +9,7 @@ export type SwitchProps = React.ComponentProps<typeof SwitchPrimitive.Root>;
 function Switch({ className, ...props }: SwitchProps) {
   return (
     <SwitchPrimitive.Root
+      {...props}
       data-slot="switch"
       className={cn(
         "peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border border-transparent bg-input shadow-sm",
@@ -19,7 +20,6 @@ function Switch({ className, ...props }: SwitchProps) {
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
-      {...props}
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"

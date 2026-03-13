@@ -1,0 +1,81 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SliderStories from "./slider.stories";
+import { sliderRecommendedUsageCode } from "./slider.docs-source";
+
+<Meta of={SliderStories} />
+
+<Title />
+<Subtitle>
+  Use Slider for a quick horizontal adjustment when the user can understand the
+  current value from nearby context.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={sliderRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Slider for fast numeric adjustments such as tolerance thresholds, serving
+limits, or intensity ranges.
+
+Avoid Slider when users need exact text entry, multi-thumb comparisons, or a
+vertical control surface.
+
+<Canvas of={SliderStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect range limits, step size, disabled state, and the
+single-thumb value array.
+
+<Controls of={SliderStories.Playground} />
+
+## Value semantics
+
+This adapter renders one thumb. Pass exactly one number in `defaultValue` or
+`value`, and expect callbacks to receive that single-number array back.
+
+Use disabled state when the range should stay visible but temporarily locked.
+
+<Canvas of={SliderStories.Disabled} sourceState="none" />
+
+## Composition patterns
+
+Pair the control with a visible label and live readout so users do not have to
+infer the current value from thumb position alone.
+
+## Accessibility contract
+
+- the thumb exposes the standard `slider` role with `aria-valuemin`,
+  `aria-valuemax`, and `aria-valuenow`
+- arrow keys increment and decrement by the configured step
+- disabled state keeps the value readable while preventing interaction
+- focus treatment remains visible around the thumb in both themes
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local slider audit area
+- Storybook interaction checks verify slot markers, keyboard increments and decrements, and the live value update
+- UI tests cover single-thumb semantics, value attributes, disabled behavior, focus classes, class merging, refs, and a11y
+
+What is checked manually:
+
+- visual pass for thumb, track, and range integrity across light and dark themes
+- keyboard smoke pass to confirm step movement and visible focus at representative widths
+
+## Responsive notes
+
+Keep a live value readout close to the control on small screens. The thumb and
+track should remain fully visible without clipped edges, and the label should
+stay readable before the control wraps to a second line.

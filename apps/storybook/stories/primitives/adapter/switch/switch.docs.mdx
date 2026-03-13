@@ -1,0 +1,79 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SwitchStories from "./switch.stories";
+import { switchRecommendedUsageCode } from "./switch.docs-source";
+
+<Meta of={SwitchStories} />
+
+<Title />
+<Subtitle>
+  Use Switch for a persistent on or off setting that should take effect
+  immediately when the control changes.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={switchRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Switch for persistent settings such as reminders, notifications, or
+visibility preferences.
+
+Prefer Checkbox when the user is selecting items in a list or confirming a
+single form field rather than toggling a live setting.
+
+<Canvas of={SwitchStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect default checked state, disabled state, and
+invalid styling.
+
+<Controls of={SwitchStories.Playground} />
+
+## Behavior states
+
+Disabled state keeps the setting visible while making it explicitly
+non-interactive.
+
+<Canvas of={SwitchStories.Disabled} sourceState="none" />
+
+## Composition patterns
+
+Pair the control with a visible label and short supporting text in the same
+settings row so the accessible name and the product explanation stay aligned.
+
+## Accessibility contract
+
+- the linked label provides the control name
+- checked state is exposed through `aria-checked`
+- clicking the visible label toggles the same control
+- focus treatment remains visible and the pointer cursor stays explicit on the interactive surface
+- disabled state prevents interaction without hiding the current value
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local switch audit area
+- Storybook interaction checks verify label linkage, checked semantics, and stable default slot hooks
+- UI tests cover label-driven naming, click behavior, disabled state, semantic classes, class merging, refs, and a11y
+
+What is checked manually:
+
+- visual pass for thumb alignment, cursor affordance, and spacing in light and dark themes
+- keyboard smoke pass to confirm focus visibility on the switch surface
+
+## Responsive notes
+
+Keep the label and helper copy readable before the control collapses to a
+second line. On narrow screens, the switch should still align cleanly with the
+copy without clipped focus or awkward spacing.

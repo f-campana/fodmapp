@@ -1,6 +1,7 @@
 import { createRef } from "react";
 
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -8,10 +9,17 @@ import { describe, expect, it, vi } from "vitest";
 import { ToggleGroup, ToggleGroupItem } from "./toggle-group";
 
 describe("ToggleGroup", () => {
-  it("supports single selection mode", () => {
+  it("supports single selection mode with stable default slot markers", async () => {
+    const user = userEvent.setup();
+
     render(
-      <ToggleGroup type="single" defaultValue="a" aria-label="Préférences">
-        <ToggleGroupItem value="a" aria-label="Option A">
+      <ToggleGroup
+        type="single"
+        defaultValue="a"
+        aria-label="Preferences"
+        data-slot="custom-group"
+      >
+        <ToggleGroupItem value="a" aria-label="Option A" data-slot="custom-a">
           A
         </ToggleGroupItem>
         <ToggleGroupItem value="b" aria-label="Option B">
@@ -20,19 +28,26 @@ describe("ToggleGroup", () => {
       </ToggleGroup>,
     );
 
-    const optionA = screen.getByLabelText("Option A");
-    const optionB = screen.getByLabelText("Option B");
+    const optionA = screen.getByRole("radio", { name: "Option A" });
+    const optionB = screen.getByRole("radio", { name: "Option B" });
+    const root = optionA.closest("[data-slot='toggle-group']");
 
+    expect(root).toHaveAttribute("data-slot", "toggle-group");
+    expect(root).not.toHaveAttribute("data-slot", "custom-group");
+    expect(optionA).toHaveAttribute("data-slot", "toggle-group-item");
+    expect(optionA).not.toHaveAttribute("data-slot", "custom-a");
     expect(optionA).toHaveAttribute("data-state", "on");
     expect(optionB).toHaveAttribute("data-state", "off");
 
-    fireEvent.click(optionB);
+    await user.click(optionB);
 
     expect(optionB).toHaveAttribute("data-state", "on");
     expect(optionA).toHaveAttribute("data-state", "off");
   });
 
-  it("supports multiple selection mode", () => {
+  it("supports multiple selection mode", async () => {
+    const user = userEvent.setup();
+
     render(
       <ToggleGroup type="multiple" defaultValue={["a"]} aria-label="Filtres">
         <ToggleGroupItem value="a" aria-label="Option A">
@@ -44,16 +59,50 @@ describe("ToggleGroup", () => {
       </ToggleGroup>,
     );
 
-    const optionA = screen.getByLabelText("Option A");
-    const optionB = screen.getByLabelText("Option B");
+    const optionA = screen.getByRole("button", { name: "Option A" });
+    const optionB = screen.getByRole("button", { name: "Option B" });
 
-    fireEvent.click(optionB);
+    await user.click(optionB);
 
     expect(optionA).toHaveAttribute("data-state", "on");
     expect(optionB).toHaveAttribute("data-state", "on");
   });
 
-  it("handles keyboard navigation without breaking selection", () => {
+  it("allows clearing the active option in single selection mode", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+
+    render(
+      <ToggleGroup
+        type="single"
+        defaultValue="a"
+        aria-label="Preferences"
+        onValueChange={onValueChange}
+      >
+        <ToggleGroupItem value="a" aria-label="Option A">
+          A
+        </ToggleGroupItem>
+        <ToggleGroupItem value="b" aria-label="Option B">
+          B
+        </ToggleGroupItem>
+      </ToggleGroup>,
+    );
+
+    const optionA = screen.getByRole("radio", { name: "Option A" });
+
+    expect(optionA).toHaveAttribute("data-state", "on");
+    expect(optionA).toHaveAttribute("aria-checked", "true");
+
+    await user.click(optionA);
+
+    expect(onValueChange).toHaveBeenLastCalledWith("");
+    expect(optionA).toHaveAttribute("data-state", "off");
+    expect(optionA).toHaveAttribute("aria-checked", "false");
+  });
+
+  it("moves focus with arrow keys without changing single selection", async () => {
+    const user = userEvent.setup();
+
     render(
       <ToggleGroup type="single" defaultValue="a" aria-label="Navigation">
         <ToggleGroupItem value="a" aria-label="Option A">
@@ -65,25 +114,21 @@ describe("ToggleGroup", () => {
       </ToggleGroup>,
     );
 
-    const optionA = screen.getByLabelText("Option A");
-    const initiallyChecked = Array.from(
-      document.querySelectorAll("[data-slot='toggle-group-item']"),
-    ).filter((node) => node.getAttribute("data-state") === "on");
+    const optionA = screen.getByRole("radio", { name: "Option A" });
+    const optionB = screen.getByRole("radio", { name: "Option B" });
 
-    act(() => {
-      optionA.focus();
-      fireEvent.keyDown(optionA, { key: "ArrowRight", code: "ArrowRight" });
-    });
+    optionA.focus();
+    await user.keyboard("{ArrowRight}");
 
-    const afterEventChecked = Array.from(
-      document.querySelectorAll("[data-slot='toggle-group-item']"),
-    ).filter((node) => node.getAttribute("data-state") === "on");
-
-    expect(initiallyChecked).toHaveLength(1);
-    expect(afterEventChecked).toHaveLength(1);
+    expect(optionB).toHaveFocus();
+    expect(optionA).toHaveAttribute("data-state", "on");
+    expect(optionB).toHaveAttribute("data-state", "off");
+    expect(optionA).toHaveAttribute("aria-checked", "true");
+    expect(optionB).toHaveAttribute("aria-checked", "false");
   });
 
-  it("does not activate disabled items", () => {
+  it("does not activate disabled items", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
 
     render(
@@ -101,14 +146,16 @@ describe("ToggleGroup", () => {
       </ToggleGroup>,
     );
 
-    const optionB = screen.getByLabelText("Option B");
-    optionB.click();
+    const optionB = screen.getByRole("radio", { name: "Option B" });
 
     expect(optionB).toBeDisabled();
+
+    await user.click(optionB);
+
     expect(onValueChange).not.toHaveBeenCalledWith("b");
   });
 
-  it("renders slot and orientation data attributes", () => {
+  it("renders orientation metadata on the group root", () => {
     render(
       <ToggleGroup
         type="single"
@@ -121,15 +168,33 @@ describe("ToggleGroup", () => {
       </ToggleGroup>,
     );
 
-    const item = screen.getByLabelText("Option A");
+    const item = screen.getByRole("radio", { name: "Option A" });
     const root = item.closest("[data-slot='toggle-group']");
 
-    expect(root).toHaveAttribute("data-slot", "toggle-group");
     expect(root).toHaveAttribute("data-orientation", "vertical");
-    expect(item).toHaveAttribute("data-slot", "toggle-group-item");
   });
 
-  it("merges className on root", () => {
+  it("allows item slot override when using asChild", () => {
+    render(
+      <ToggleGroup type="single" defaultValue="a" aria-label="Composition">
+        <ToggleGroupItem asChild value="a" aria-label="Option A">
+          <button data-slot="custom-item" type="button">
+            Option A
+          </button>
+        </ToggleGroupItem>
+      </ToggleGroup>,
+    );
+
+    expect(screen.getByRole("radio", { name: "Option A" })).toHaveAttribute(
+      "data-slot",
+      "custom-item",
+    );
+    expect(
+      document.querySelector("[data-slot='toggle-group-item']"),
+    ).toBeNull();
+  });
+
+  it("merges className on the root", () => {
     render(
       <ToggleGroup type="single" className="mon-groupe" aria-label="Classe">
         <ToggleGroupItem value="a" aria-label="Option A">
@@ -139,17 +204,17 @@ describe("ToggleGroup", () => {
     );
 
     const root = screen
-      .getByLabelText("Option A")
+      .getByRole("radio", { name: "Option A" })
       .closest("[data-slot='toggle-group']");
 
     expect(root?.className ?? "").toContain("mon-groupe");
   });
 
-  it("forwards ref to group root", () => {
+  it("forwards ref to the group root", () => {
     const ref = createRef<HTMLDivElement>();
 
     render(
-      <ToggleGroup ref={ref} type="single" aria-label="Référence">
+      <ToggleGroup ref={ref} type="single" aria-label="Reference">
         <ToggleGroupItem value="a" aria-label="Option A">
           A
         </ToggleGroupItem>
@@ -161,7 +226,7 @@ describe("ToggleGroup", () => {
 
   it("has no obvious a11y violations", async () => {
     const { container } = render(
-      <ToggleGroup type="single" defaultValue="a" aria-label="Accessibilité">
+      <ToggleGroup type="single" defaultValue="a" aria-label="Accessibilite">
         <ToggleGroupItem value="a" aria-label="Option A">
           A
         </ToggleGroupItem>

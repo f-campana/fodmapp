@@ -12,7 +12,7 @@ const toggleVariants = cva(
     "text-sm font-medium select-none",
     "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
     "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-    "disabled:pointer-events-none disabled:opacity-50",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     "cursor-pointer",
     "data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
@@ -50,11 +50,11 @@ function Toggle({
 }: ToggleProps) {
   return (
     <TogglePrimitive.Root
+      {...props}
       data-slot="toggle"
       data-variant={variant}
       data-size={size}
       className={cn(toggleVariants({ variant, size, className }))}
-      {...props}
     />
   );
 }
