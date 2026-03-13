@@ -71,6 +71,7 @@ Source of truth: team operational state (live, update as status changes)
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/revolut-research-report`           | `codex/revolut-research-report`           | active             | Revolut research reporting                                                           | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/changeset-gate-deterministic`      | `codex/deterministic-changeset-gate-fix`  | active             | Deterministic changeset gate remediation                                             | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/turbo-audit-remediation`           | `codex/turbo-audit-remediation`           | active             | Turbo audit remediation                                                              | Cache correctness, CI cache, PR scope, scripts.                     |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/safe-harbor-mode-doc`              | `codex/safe-harbor-mode-doc`              | active             | Product framing note for strict vs guided safe-harbor modes                          | Discussion-only docs track.                                         |
 
 ## Maintenance Log: Local Main Path Migration (2026-03-04)
 
