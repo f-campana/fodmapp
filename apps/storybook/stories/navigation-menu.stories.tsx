@@ -42,7 +42,7 @@ const defaultShowcaseArgs = {
 } as const;
 
 const contentLinkClassName =
-  "block rounded-(--radius) px-3 py-3 text-sm font-medium transition-colors hover:bg-accent/40";
+  "block w-full rounded-(--radius) px-3 py-3 text-sm font-medium transition-colors hover:bg-accent/40";
 
 function NavigationPreviewShell({ children }: { children: ReactNode }) {
   return (
@@ -144,7 +144,7 @@ function PrimaryNavigation(
               Produits
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-1 p-2 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
+              <ul className="grid w-full gap-1 p-2 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
                 <li>
                   {options?.linkSlot ? (
                     <NavigationMenuLink asChild>
@@ -177,7 +177,7 @@ function PrimaryNavigation(
           <NavigationMenuItem value="ressources">
             <NavigationMenuTrigger>Ressources</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-1 p-2 md:w-[340px]">
+              <ul className="grid w-full gap-1 p-2 md:w-[340px]">
                 <li>
                   <NavigationMenuLink asChild>
                     <a className={contentLinkClassName} href="#guides">
@@ -209,28 +209,30 @@ function ResponsiveStressNavigation() {
               Planning hebdomadaire detaille
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-1 p-2">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className={contentLinkClassName}
-                      href="#planning-jour-par-jour"
-                    >
-                      Vue jour par jour
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className={contentLinkClassName}
-                      href="#planning-equipes"
-                    >
-                      Coordination des equipes
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
+              <div className="w-[17.5rem] max-w-full">
+                <ul className="flex w-full flex-col gap-1 p-2">
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#planning-jour-par-jour"
+                      >
+                        Vue jour par jour
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#planning-equipes"
+                      >
+                        Coordination des equipes
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem className="w-full" value="substitutions">
@@ -238,28 +240,30 @@ function ResponsiveStressNavigation() {
               Substitutions a reverifier avant service
             </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-1 p-2">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className={contentLinkClassName}
-                      href="#substitutions-prioritaires"
-                    >
-                      Substitutions prioritaires
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className={contentLinkClassName}
-                      href="#service-sensible"
-                    >
-                      Service sensible
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
+              <div className="w-[17.5rem] max-w-full">
+                <ul className="flex w-full flex-col gap-1 p-2">
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#substitutions-prioritaires"
+                      >
+                        Substitutions prioritaires
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#service-sensible"
+                      >
+                        Service sensible
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
