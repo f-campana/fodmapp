@@ -14,7 +14,7 @@
     },
     "alert-dialog": {
       "category": "adapter",
-      "storyFile": "alert-dialog.stories.tsx",
+      "storyFile": "primitives/adapter/alert-dialog/alert-dialog.stories.tsx",
       "title": "Primitives/Adapter/AlertDialog"
     },
     "alert": {
@@ -249,7 +249,7 @@
     },
     "slider": {
       "category": "adapter",
-      "storyFile": "slider.stories.tsx",
+      "storyFile": "primitives/adapter/slider/slider.stories.tsx",
       "title": "Primitives/Adapter/Slider"
     },
     "sonner": {
@@ -269,7 +269,7 @@
     },
     "switch": {
       "category": "adapter",
-      "storyFile": "switch.stories.tsx",
+      "storyFile": "primitives/adapter/switch/switch.stories.tsx",
       "title": "Primitives/Adapter/Switch"
     },
     "table": {
@@ -294,12 +294,12 @@
     },
     "toggle": {
       "category": "adapter",
-      "storyFile": "toggle.stories.tsx",
+      "storyFile": "primitives/adapter/toggle/toggle.stories.tsx",
       "title": "Primitives/Adapter/Toggle"
     },
     "toggle-group": {
       "category": "adapter",
-      "storyFile": "toggle-group.stories.tsx",
+      "storyFile": "primitives/adapter/toggle-group/toggle-group.stories.tsx",
       "title": "Primitives/Adapter/ToggleGroup"
     },
     "tooltip": {

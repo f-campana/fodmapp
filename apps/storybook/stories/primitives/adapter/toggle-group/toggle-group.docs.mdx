@@ -1,0 +1,96 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ToggleGroupStories from "./toggle-group.stories";
+import { toggleGroupRecommendedUsageCode } from "./toggle-group.docs-source";
+
+<Meta of={ToggleGroupStories} />
+
+<Title />
+<Subtitle>
+  Use ToggleGroup for a compact set of peer options when the user can switch or
+  combine choices directly from the control surface.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={toggleGroupRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use ToggleGroup for a small, visible set of quick filters, view switches, or
+compact severity selections.
+
+Avoid ToggleGroup when labels are long by default, when the option set is large,
+or when each choice needs its own helper text and form validation.
+
+<Canvas of={ToggleGroupStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect single or multiple mode, orientation, and the
+initial value shape.
+
+<Controls of={ToggleGroupStories.Playground} />
+
+## Behavior modes
+
+Single mode keeps one active option. Multiple mode lets users combine filters in
+the same row.
+
+<Canvas of={ToggleGroupStories.Multiple} sourceState="none" />
+
+## Orientation and layout
+
+Vertical orientation is the safer default when labels become more descriptive or
+the horizontal row starts feeling cramped.
+
+<Canvas of={ToggleGroupStories.Vertical} sourceState="none" />
+
+## Composition patterns
+
+Keep labels short in the default horizontal pattern. If product teams need
+longer labels, prefer vertical orientation or explicit wrap-friendly class
+overrides rather than assuming the default inline layout will adapt gracefully.
+
+## Accessibility contract
+
+- the group root exposes a real `group` container
+- in `single` mode, items expose radio semantics through `role="radio"` and
+  `aria-checked`
+- arrow keys move focus between items without changing the active selection
+- click changes the active item in single mode and toggles membership in
+  multiple mode
+- focus styling remains visible on the item surface
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the group root and
+  each item
+- when using `ToggleGroupItem` with `asChild`, child attributes take
+  precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local toggle group audit area
+- Storybook interaction checks verify keyboard focus movement, stable default slot hooks, and single-mode activation
+- UI tests cover single mode, multiple mode, disabled items, orientation metadata, stable default slot hooks, `asChild` slot exceptions, refs, and a11y
+
+What is checked manually:
+
+- visual pass for spacing, focus visibility, and active-state contrast in both themes
+- responsive pass for wrapped or vertical label layouts on narrow widths
+
+## Responsive notes
+
+Do not rely on the default inline row for verbose labels. When labels grow,
+switch to a vertical stack or add intentional wrapping classes so spacing and
+focus treatment remain readable on mobile.

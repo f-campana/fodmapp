@@ -25,9 +25,9 @@ export type AlertDialogTriggerProps = React.ComponentProps<
 function AlertDialogTrigger({ className, ...props }: AlertDialogTriggerProps) {
   return (
     <AlertDialogPrimitive.Trigger
-      data-slot="alert-dialog-trigger"
-      className={cn(className)}
       {...props}
+      data-slot="alert-dialog-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
@@ -52,6 +52,7 @@ export type AlertDialogOverlayProps = React.ComponentProps<
 function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
   return (
     <AlertDialogPrimitive.Overlay
+      {...props}
       data-slot="alert-dialog-overlay"
       className={cn(
         "fixed inset-0 z-50 bg-muted/80",
@@ -59,20 +60,26 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogOverlayProps) {
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         className,
       )}
-      {...props}
     />
   );
 }
 
 export type AlertDialogContentProps = React.ComponentProps<
   typeof AlertDialogPrimitive.Content
->;
+> & {
+  container?: AlertDialogPortalProps["container"];
+};
 
-function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
+function AlertDialogContent({
+  container,
+  className,
+  ...props
+}: AlertDialogContentProps) {
   return (
-    <AlertDialogPortal>
+    <AlertDialogPortal container={container}>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
+        {...props}
         data-slot="alert-dialog-content"
         className={cn(
           "fixed top-[50%] left-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 rounded-(--radius) border border-border bg-popover p-6 text-popover-foreground shadow-lg",
@@ -82,7 +89,6 @@ function AlertDialogContent({ className, ...props }: AlertDialogContentProps) {
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
           className,
         )}
-        {...props}
       />
     </AlertDialogPortal>
   );
@@ -93,9 +99,9 @@ export type AlertDialogHeaderProps = React.ComponentProps<"div">;
 function AlertDialogHeader({ className, ...props }: AlertDialogHeaderProps) {
   return (
     <div
+      {...props}
       data-slot="alert-dialog-header"
       className={cn("flex flex-col gap-1.5 text-left", className)}
-      {...props}
     />
   );
 }
@@ -105,9 +111,9 @@ export type AlertDialogFooterProps = React.ComponentProps<"div">;
 function AlertDialogFooter({ className, ...props }: AlertDialogFooterProps) {
   return (
     <div
+      {...props}
       data-slot="alert-dialog-footer"
       className={cn("flex flex-wrap justify-end gap-2", className)}
-      {...props}
     />
   );
 }
@@ -119,9 +125,9 @@ export type AlertDialogTitleProps = React.ComponentProps<
 function AlertDialogTitle({ className, ...props }: AlertDialogTitleProps) {
   return (
     <AlertDialogPrimitive.Title
+      {...props}
       data-slot="alert-dialog-title"
       className={cn("text-lg leading-none font-semibold", className)}
-      {...props}
     />
   );
 }
@@ -136,9 +142,9 @@ function AlertDialogDescription({
 }: AlertDialogDescriptionProps) {
   return (
     <AlertDialogPrimitive.Description
+      {...props}
       data-slot="alert-dialog-description"
       className={cn("text-sm text-muted-foreground", className)}
-      {...props}
     />
   );
 }
@@ -150,9 +156,9 @@ export type AlertDialogActionProps = React.ComponentProps<
 function AlertDialogAction({ className, ...props }: AlertDialogActionProps) {
   return (
     <AlertDialogPrimitive.Action
+      {...props}
       data-slot="alert-dialog-action"
       className={cn(buttonVariants({ variant: "default" }), className)}
-      {...props}
     />
   );
 }
@@ -164,9 +170,9 @@ export type AlertDialogCancelProps = React.ComponentProps<
 function AlertDialogCancel({ className, ...props }: AlertDialogCancelProps) {
   return (
     <AlertDialogPrimitive.Cancel
+      {...props}
       data-slot="alert-dialog-cancel"
       className={cn(buttonVariants({ variant: "outline" }), className)}
-      {...props}
     />
   );
 }

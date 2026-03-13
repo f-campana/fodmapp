@@ -1,0 +1,82 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as AlertDialogStories from "./alert-dialog.stories";
+import { alertDialogRecommendedUsageCode } from "./alert-dialog.docs-source";
+
+<Meta of={AlertDialogStories} />
+
+<Title />
+<Subtitle>
+  Use AlertDialog for destructive or irreversible actions that require an
+  explicit decision before the user continues.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={alertDialogRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use AlertDialog when the action is high-risk, destructive, or difficult to
+undo.
+
+Prefer Dialog when the modal task is neutral, informational, or safe to dismiss
+without forcing a binary decision.
+
+<Canvas of={AlertDialogStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled open state.
+
+<Controls of={AlertDialogStories.Playground} />
+
+## Composition patterns
+
+The base composition works in regular page flow. The surfaced example shows the
+same trigger inside a contained card without changing the portal or focus
+contract.
+
+<Canvas of={AlertDialogStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the open layer uses `role="alertdialog"` with linked title and description
+- focus moves to the cancel action on open and stays trapped inside the layer
+- Escape closes the layer and returns focus to the trigger
+- outside clicks do not dismiss the layer
+- focus treatment remains visible on trigger, cancel, and action controls in both themes
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on root, trigger,
+  portal, overlay, content, header, title, description, footer, cancel, and
+  action
+- when using `AlertDialogTrigger`, `AlertDialogCancel`, or `AlertDialogAction`
+  with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local alert dialog audit area
+- Storybook interaction checks verify local portal mounting, keyboard open and close, focus trapping, trigger focus return, and stable default slot hooks
+- UI tests cover local portal mounting, focus trapping, Escape close, outside-click prevention, semantic classes, ref forwarding, stable default slot hooks, `asChild` slot exceptions, and a11y
+
+What is checked manually:
+
+- visual pass for overlay contrast, action contrast, and readable spacing on the centered dialog surface
+- screen reader smoke pass for title and description announcement on a destructive confirmation flow
+
+## Responsive notes
+
+Open content should stay centered, readable, and fully visible at narrow widths.
+Long copy may wrap, but actions should remain visible without clipped focus or
+hidden portal content.
