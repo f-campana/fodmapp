@@ -1,6 +1,6 @@
 # FODMAPP Documentation Index
 
-Last updated: 2026-03-08
+Last updated: 2026-03-13
 
 This `/docs` tree is the canonical routing layer for repository-wide documentation.
 It does not contain every important document in the repo. Some canonical operating docs live next
@@ -86,6 +86,10 @@ Use this index when you know you need documentation, but do not yet know which s
   prototype scope.
 - [`docs/plans/mobile-onboarding-prd-fr-v1.md`](./plans/mobile-onboarding-prd-fr-v1.md): current
   high-signal product PRD for France-first mobile onboarding.
+- [`docs/plans/safe-harbor-food-categories-prd-fr-v1.md`](./plans/safe-harbor-food-categories-prd-fr-v1.md):
+  Safe-Harbor V1 PRD aligned to the implemented composition-zero contract.
+- [`docs/research/safe-harbor-evidence-pack-v1.md`](./research/safe-harbor-evidence-pack-v1.md):
+  rights-first evidence pack + copy guardrails for Safe-Harbor V1.
 
 ### Ops and repository governance
 
@@ -114,6 +118,10 @@ Use this index when you know you need documentation, but do not yet know which s
   baseline for controlled mobile execution.
 - [`docs/plans/mobile-onboarding-prd-fr-v1.md`](./plans/mobile-onboarding-prd-fr-v1.md): active
   France-first mobile onboarding PRD.
+- [`docs/plans/safe-harbor-food-categories-prd-fr-v1.md`](./plans/safe-harbor-food-categories-prd-fr-v1.md):
+  Safe-Harbor V1 PRD aligned to the implemented composition-zero contract.
+- [`docs/research/safe-harbor-evidence-pack-v1.md`](./research/safe-harbor-evidence-pack-v1.md):
+  rights-first evidence pack + copy guardrails for Safe-Harbor V1.
 - [`docs/plans/phase2-reporting-implementation-plan.md`](./plans/phase2-reporting-implementation-plan.md):
   canonical active reporting plan.
 - [`docs/plans/phase2-reporting-task-breakdown.md`](./plans/phase2-reporting-task-breakdown.md):
