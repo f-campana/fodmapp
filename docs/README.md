@@ -116,6 +116,8 @@ Use this index when you know you need documentation, but do not yet know which s
   decision-locked mobile execution control.
 - [`docs/research/alignment-v1-2026-02-26.md`](./research/alignment-v1-2026-02-26.md): alignment
   baseline for controlled mobile execution.
+- [`docs/research/safe-harbor-mode-framing-2026-03-13.md`](./research/safe-harbor-mode-framing-2026-03-13.md):
+  discussion note on strict vs guided safe-harbor product framing.
 - [`docs/plans/mobile-onboarding-prd-fr-v1.md`](./plans/mobile-onboarding-prd-fr-v1.md): active
   France-first mobile onboarding PRD.
 - [`docs/plans/safe-harbor-food-categories-prd-fr-v1.md`](./plans/safe-harbor-food-categories-prd-fr-v1.md):
