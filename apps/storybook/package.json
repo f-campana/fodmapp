@@ -14,7 +14,7 @@
     "storybook": "node ./scripts/storybook-dev.mjs",
     "storybook:build": "pnpm run styles:build && storybook build",
     "storybook:typecheck": "tsc -p tsconfig.json --noEmit && pnpm run stories:taxonomy:check",
-    "storybook:serve": "http-server ./storybook-static -p 6006 -a 127.0.0.1 -c-1 --silent",
+    "storybook:serve": "http-server ./storybook-static -p 6006 -a 127.0.0.1 --silent",
     "storybook:test": "start-server-and-test \"pnpm storybook:serve\" http://127.0.0.1:6006 \"test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\"",
     "stories:taxonomy:check": "node ./scripts/check-component-taxonomy.mjs",
     "storybook:dev": "storybook dev -p 6006 --ci"
