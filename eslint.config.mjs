@@ -21,6 +21,21 @@ export default defineConfig([
     "packages/design-tokens/src/generated/tokens.native.d.ts",
   ]),
   ...baseConfig,
+  {
+    files: ["apps/storybook/.storybook/preview.ts"],
+    rules: {
+      "import/no-unresolved": [
+        "error",
+        {
+          ignore: [
+            "^\\.\\/\\.next\\/types\\/",
+            "^astro:",
+            "^\\.\\/preview\\.generated\\.css$",
+          ],
+        },
+      ],
+    },
+  },
   ...markdownConfig.map((config) => ({
     ...config,
     files: ["apps/storybook/stories/**/*.{md,mdx}"],
