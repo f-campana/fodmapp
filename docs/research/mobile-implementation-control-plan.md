@@ -4,6 +4,12 @@ Date: 2026-02-26
 Research worktree: `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-research-realignment`
 Implementation worktree: `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-implementation-track`
 
+Role in mobile docs set:
+
+- Canonical locked-decision register: `docs/research/mobile-original-instruction-tracker.md`
+- Approved alignment baseline: `docs/research/alignment-v1-2026-02-26.md`
+- This file: execution control plan derived from the locked decisions
+
 Decision source of truth:
 
 - `docs/research/mobile-original-instruction-tracker.md` (Section 6: Locked Decisions)

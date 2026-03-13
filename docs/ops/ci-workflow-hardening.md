@@ -1,5 +1,11 @@
 # CI Workflow Hardening Runbook
 
+Status: Implemented
+Audience: Maintainer or operator; Reviewer or auditor
+Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.
+Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
+Last reviewed: 2026-03-11
+
 Last updated: 2026-03-04
 
 ## Scope
@@ -17,6 +23,15 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
 - API workflow job timeouts to fail fast on stalled runner container initialization
+- weekly docs hygiene drift audit with manual dispatch support and report artifacts
+
+## Preconditions
+
+- Work from a dedicated worktree branched from the intended base branch.
+- Sync repository dependencies before validation with `pnpm install`.
+- When CI semantics or environment contracts change, update `infra/ci/ENVIRONMENT.md` in the same
+  PR when applicable.
+- Run `./.github/scripts/quality-gate.sh --full` before requesting merge.
 
 ## Post-Cutover Status (ADR-018)
 
@@ -198,6 +213,34 @@ Operational behavior:
 - `api-gate` remains authoritative and fails the required `API` check when either upstream job times out
 - push-to-`main` API runs remain the source of truth after merge; stale PR runs should be canceled if still running
 
+## Docs Hygiene Audit Workflow Contract
+
+`.github/workflows/docs-hygiene-audit.yml` provides a report-only documentation drift audit for the
+tracked markdown surface of the repository.
+
+Trigger policy:
+
+- scheduled every Monday at `07:00` UTC
+- `workflow_dispatch` for manual runs on demand or branch validation
+
+Execution contract:
+
+- uses Node `22` only
+- runs `.github/scripts/docs-hygiene-audit.mjs` against tracked `*.md` and `*.mdx` files
+- writes a Markdown summary and JSON report artifact for each run
+
+Output contract:
+
+- appends `docs-hygiene-report.md` to the Actions job summary
+- uploads `docs-hygiene-report.md` and `docs-hygiene-report.json` as artifact
+  `docs-hygiene-audit-${run_id}`
+
+Semantics:
+
+- findings do not fail the workflow in v1
+- workflow failure is reserved for audit execution errors only
+- current known canon drift is intentionally surfaced with no baseline or allowlist
+
 ## Branch Protection Required Checks (`main`)
 
 Configure `main` to require these checks:
@@ -207,7 +250,7 @@ Configure `main` to require these checks:
 3. `Semantic PR Title`
 4. `Changeset PR Gate`
 
-## Manual Verification Checklist
+## Validation
 
 1. Open a docs-only PR.
 2. Confirm scoped Turbo jobs are skipped and `CI` still passes.
@@ -228,3 +271,4 @@ Configure `main` to require these checks:
 13. After merging to `main`, watch these workflows to completion before closing the incident: `Phase 2 Reporting`, `API`, `CI`, `Changesets release`.
 14. Open a PR touching `apps/storybook/**` and confirm `Storybook Deploy` does not run (production-only trigger policy).
 15. Merge a Storybook-impacting PR to `main` and confirm `Storybook Deploy` requests `vercel-production` environment approval, then publishes and writes URL in job summary.
+16. Trigger `Docs Hygiene Audit` manually and confirm the job stays green while publishing both summary and artifact outputs when findings exist.

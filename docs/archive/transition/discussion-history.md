@@ -1,3 +1,9 @@
+# Historical Record
+
+This file is archived for traceability only.
+Former active path: `docs/transition/discussion-history.md`.
+Link to this archive path directly when historical context is required.
+
 # Discussion History (Condensed)
 
 This timeline captures key points agreed during architecture planning and review.

@@ -2,6 +2,15 @@
 
 - What changed?
 
+## Documentation Governance
+
+Documentation audience:
+Canonical document(s):
+Lifecycle status after merge:
+Supersedes / archives:
+
+If this PR does not touch canonical documentation, write `N/A` for each field above.
+
 ## Validation
 
 - [ ] `./.github/scripts/quality-gate.sh --full` executed locally

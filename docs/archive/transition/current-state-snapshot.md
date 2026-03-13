@@ -1,3 +1,9 @@
+# Historical Record
+
+This file is archived for traceability only.
+Former active path: `docs/transition/current-state-snapshot.md`.
+Link to this archive path directly when historical context is required.
+
 # Current State Snapshot
 
 Snapshot date: 2026-02-25

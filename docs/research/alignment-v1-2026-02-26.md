@@ -2,6 +2,12 @@
 
 Status: Approved alignment baseline for controlled execution.
 
+Role in mobile docs set:
+
+- Canonical locked-decision register: `docs/research/mobile-original-instruction-tracker.md`
+- This file: approved alignment baseline for the active mobile research track
+- Execution control: `docs/research/mobile-implementation-control-plan.md`
+
 Scope reference:
 
 - Source-of-truth decisions: `docs/research/mobile-original-instruction-tracker.md` (Section 6).

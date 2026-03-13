@@ -1,3 +1,11 @@
+#
+
+# Historical Record
+
+This file is archived for traceability only.
+Former active path: `docs/transition/eslint-next-phase-plan.md`.
+Link to this archive path directly when historical context is required.
+
 # Phase Plan: ESLint Baseline Follow-up (Post Merge, PR #73)
 
 ## Status
