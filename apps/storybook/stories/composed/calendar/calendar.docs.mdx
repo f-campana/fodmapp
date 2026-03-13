@@ -1,0 +1,68 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CalendarStories from "./calendar.stories";
+import { calendarRecommendedUsageCode } from "./calendar.docs-source";
+
+<Meta of={CalendarStories} />
+
+<Title />
+<Subtitle>
+  Use Calendar when the full day grid should stay visible and users can choose a
+  date directly from that grid.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={calendarRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Calendar when the page already has room for an always-visible date grid or
+when the user needs to move between nearby dates with the keyboard.
+
+Prefer DatePicker when the date choice should stay behind a trigger until the
+user is ready to open it.
+
+<Canvas of={CalendarStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect compact grid options without changing the single
+date selection contract shown in the docs examples.
+
+<Controls of={CalendarStories.Playground} />
+
+## Accessibility contract
+
+- day buttons stay inside a calendar grid with explicit selected, today, and
+  disabled semantics
+- arrow keys move focus across the visible day grid
+- previous and next month buttons remain keyboard reachable
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local calendar audit area
+- Storybook interaction checks verify the stable root slot, today/disabled
+  semantics, keyboard date movement, and selection updates
+- UI tests cover stable slot hooks, single and range callbacks, keyboard
+  movement, month navigation, class merging, and a11y
+
+What is checked manually:
+
+- visual pass for selected, today, and disabled state distinction in light and
+  dark themes
+- compact-width smoke pass to confirm the one-month grid stays easy to scan
+
+## Responsive notes
+
+Prefer a single-month presentation on compact layouts so the seven-column grid
+stays readable without clipped day cells.

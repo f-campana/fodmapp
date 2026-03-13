@@ -1,83 +1,128 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
 
 import { Calendar } from "./calendar";
 
+const defaultMonth = new Date(2026, 2, 1);
+
+function getDayButton(container: HTMLElement, dayNumber: number) {
+  const button = Array.from(
+    container.querySelectorAll("[role='gridcell'] button"),
+  ).find((candidate) => candidate.textContent?.trim() === String(dayNumber));
+
+  if (!button) {
+    throw new Error(`No day button found for day ${dayNumber}.`);
+  }
+
+  return button as HTMLButtonElement;
+}
+
 describe("Calendar", () => {
-  it("renders root slot and semantic classes", () => {
+  it("keeps the root slot stable and exposes semantic day classes", () => {
     const { container } = render(
-      <Calendar defaultMonth={new Date(2026, 2, 1)} mode="single" />,
+      <Calendar
+        data-slot="custom-calendar"
+        defaultMonth={defaultMonth}
+        mode="single"
+        showOutsideDays={false}
+      />,
     );
 
     const root = container.querySelector("[data-slot='calendar']");
-    const dayButton = container.querySelector("[role='gridcell'] button");
+    const dayButton = getDayButton(container, 12);
 
-    expect(root).toBeTruthy();
+    expect(root).toHaveAttribute("data-slot", "calendar");
+    expect(container.querySelector("[data-slot='custom-calendar']")).toBeNull();
     expect(root?.className ?? "").toContain("border-border");
-    expect(dayButton?.className ?? "").toContain("aria-selected:bg-primary");
-    expect(dayButton?.className ?? "").toContain(
+    expect(dayButton.className).toContain("aria-selected:bg-primary");
+    expect(dayButton.className).toContain(
       "aria-selected:text-primary-foreground",
     );
   });
 
   it("supports single and range selection callbacks", async () => {
+    const user = userEvent.setup();
     const onSelectSingle = vi.fn();
     const onSelectRange = vi.fn();
 
     const { container, rerender } = render(
       <Calendar
-        defaultMonth={new Date(2026, 2, 1)}
+        defaultMonth={defaultMonth}
         mode="single"
         onSelect={onSelectSingle}
+        showOutsideDays={false}
       />,
     );
 
-    const singleDayButtons = container.querySelectorAll(
-      "[role='gridcell'] button",
-    );
+    await user.click(getDayButton(container, 12));
 
-    fireEvent.click(singleDayButtons[2] as Element);
-
-    expect(onSelectSingle).toHaveBeenCalled();
+    expect(onSelectSingle.mock.calls[0]?.[0]).toBeInstanceOf(Date);
 
     rerender(
       <Calendar
-        defaultMonth={new Date(2026, 2, 1)}
+        defaultMonth={defaultMonth}
         mode="range"
         onSelect={onSelectRange}
+        showOutsideDays={false}
       />,
     );
 
-    await waitFor(() => {
-      const rangeDayButtons = container.querySelectorAll(
-        "[role='gridcell'] button",
-      );
-      if (rangeDayButtons.length < 2) {
-        throw new Error("Range day buttons not mounted");
-      }
+    await user.click(getDayButton(container, 12));
+    await user.click(getDayButton(container, 18));
 
-      fireEvent.click(rangeDayButtons[3] as Element);
-      fireEvent.click(rangeDayButtons[8] as Element);
-    });
-
-    expect(onSelectRange).toHaveBeenCalled();
+    expect(onSelectRange.mock.calls[1]?.[0]).toEqual(
+      expect.objectContaining({
+        from: expect.any(Date),
+        to: expect.any(Date),
+      }),
+    );
   });
 
-  it("navigates to next and previous month", () => {
-    const { getByLabelText } = render(
-      <Calendar defaultMonth={new Date(2026, 2, 1)} mode="single" />,
+  it("moves focus with arrow keys across the day grid", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <Calendar
+        defaultMonth={defaultMonth}
+        mode="single"
+        showOutsideDays={false}
+      />,
     );
 
-    const nextButton = getByLabelText(/next month/i);
-    const previousButton = getByLabelText(/previous month/i);
+    const day12 = getDayButton(container, 12);
+    const day13 = getDayButton(container, 13);
 
-    fireEvent.click(nextButton);
-    fireEvent.click(previousButton);
+    day12.focus();
+    expect(day12).toHaveFocus();
 
-    expect(nextButton).toBeInTheDocument();
-    expect(previousButton).toBeInTheDocument();
+    await user.keyboard("{ArrowRight}");
+
+    await waitFor(() => {
+      expect(day13).toHaveFocus();
+    });
+  });
+
+  it("navigates to next and previous month", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Calendar
+        defaultMonth={defaultMonth}
+        mode="single"
+        showOutsideDays={false}
+      />,
+    );
+
+    const nextButton = screen.getByLabelText(/next month/i);
+    const previousButton = screen.getByLabelText(/previous month/i);
+
+    await user.click(nextButton);
+    expect(screen.getByText("April 2026")).toBeInTheDocument();
+
+    await user.click(previousButton);
+    expect(screen.getByText("March 2026")).toBeInTheDocument();
   });
 
   it("merges className", () => {
@@ -90,11 +135,13 @@ describe("Calendar", () => {
 
   it("has no obvious a11y violations", async () => {
     const { container } = render(
-      <Calendar defaultMonth={new Date(2026, 2, 1)} mode="single" />,
+      <Calendar
+        defaultMonth={defaultMonth}
+        mode="single"
+        showOutsideDays={false}
+      />,
     );
 
-    const results = await axe(container);
-
-    expect(results).toHaveNoViolations();
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -30,6 +30,7 @@ export interface DatePickerProps extends Omit<
   React.ComponentProps<"div">,
   "defaultValue" | "onChange"
 > {
+  "data-slot"?: string;
   value?: Date;
   defaultValue?: Date;
   onValueChange?: (value: Date | undefined) => void;
@@ -102,9 +103,9 @@ function DatePicker({
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <div
+        {...props}
         className={cn("w-full", className)}
         data-slot="date-picker"
-        {...props}
       >
         <PopoverTrigger asChild>
           <Button
@@ -153,15 +154,16 @@ function DatePicker({
             )}
             data-slot="date-picker-content"
           >
-            <Calendar
-              data-slot="date-picker-calendar"
-              initialFocus
-              mode="single"
-              onSelect={handleSelect}
-              selected={selectedDate}
-              className={cn(calendarPropsClassName, calendarClassName)}
-              {...restCalendarProps}
-            />
+            <div data-slot="date-picker-calendar">
+              <Calendar
+                initialFocus
+                mode="single"
+                onSelect={handleSelect}
+                selected={selectedDate}
+                className={cn(calendarPropsClassName, calendarClassName)}
+                {...restCalendarProps}
+              />
+            </div>
           </div>
         </PopoverContent>
       </div>

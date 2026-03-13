@@ -1,0 +1,76 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as DatePickerStories from "./date-picker.stories";
+import { datePickerRecommendedUsageCode } from "./date-picker.docs-source";
+
+<Meta of={DatePickerStories} />
+
+<Title />
+<Subtitle>
+  Use DatePicker when the date choice should stay behind a trigger and appear in
+  a popover only while the user is picking a single date.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={datePickerRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use DatePicker when the surrounding form should stay compact until the user
+needs the calendar.
+
+Prefer Calendar when the full date grid should remain visible in page flow.
+
+<Canvas of={DatePickerStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect trigger copy, disabled state, and the accessible
+name applied to the trigger.
+
+<Controls of={DatePickerStories.Playground} />
+
+## Composition patterns
+
+The base composition works in regular form flow. The surfaced example keeps the
+same trigger and popover behavior inside a contained card block.
+
+<Canvas of={DatePickerStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger remains a real button with an explicit accessible name
+- opening the trigger exposes a single-date calendar popover
+- selecting a day updates the trigger label and closes the popover
+- Escape closes the open popover and returns focus to the trigger
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local date picker audit area
+- Storybook interaction checks verify stable root and calendar slots, portal
+  mounting outside the canvas, single-date selection, and Escape close with
+  trigger focus return
+- UI tests cover stable root and calendar slots, open and close flows,
+  uncontrolled and controlled selection, class merging, refs, and a11y
+
+What is checked manually:
+
+- visual pass for trigger spacing, popover bounds, and calendar readability in
+  light and dark themes
+- compact-width smoke pass to confirm the open popover stays usable without
+  clipped calendar content
+
+## Responsive notes
+
+Keep the trigger full width on compact forms and prefer a single-month calendar
+so the popover remains easy to use at narrow widths.

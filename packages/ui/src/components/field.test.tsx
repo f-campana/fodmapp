@@ -7,7 +7,7 @@ import { Field } from "./field";
 import { Input } from "./input";
 
 describe("Field", () => {
-  it("links label and control", () => {
+  it("links the label to its wrapped control", () => {
     render(
       <Field id="email" label="Adresse email">
         <Input />
@@ -20,22 +20,26 @@ describe("Field", () => {
     );
   });
 
-  it("exposes hint and error through aria-describedby", () => {
+  it("merges existing aria-describedby with hint and error semantics", () => {
     render(
-      <Field
-        id="quantity"
-        label="Quantité"
-        hint="En grammes"
-        error="Valeur requise"
-      >
-        <Input />
-      </Field>,
+      <>
+        <p id="quantity-existing">Mesure utilisee dans le plan</p>
+        <Field
+          id="quantity"
+          label="Quantite"
+          hint="En grammes"
+          error="Valeur requise"
+        >
+          <Input aria-describedby="quantity-existing" />
+        </Field>
+      </>,
     );
 
-    const input = screen.getByLabelText("Quantité");
+    const input = screen.getByLabelText("Quantite");
+
     expect(input).toHaveAttribute(
       "aria-describedby",
-      "quantity-hint quantity-error",
+      "quantity-existing quantity-hint quantity-error",
     );
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByText("En grammes")).toHaveAttribute(
@@ -48,12 +52,37 @@ describe("Field", () => {
     );
   });
 
+  it("shows the required marker without forcing an invalid state", () => {
+    render(
+      <Field id="nom" label="Nom complet" required hint="Comme sur le dossier">
+        <Input />
+      </Field>,
+    );
+
+    const input = screen.getByLabelText(/Nom complet/);
+
+    expect(screen.getByText("*")).toBeInTheDocument();
+    expect(input).toHaveAttribute("aria-describedby", "nom-hint");
+    expect(input).not.toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("requires an explicit id on the field or the wrapped control", () => {
+    expect(() =>
+      render(
+        <Field label="Nom complet">
+          <Input />
+        </Field>,
+      ),
+    ).toThrow("Field requires either an `id` prop or a child with an `id`.");
+  });
+
   it("has no obvious a11y violations", async () => {
     const { container } = render(
       <Field id="nom" label="Nom complet">
         <Input />
       </Field>,
     );
+
     expect(await axe(container)).toHaveNoViolations();
   });
 });

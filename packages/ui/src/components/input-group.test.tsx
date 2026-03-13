@@ -14,19 +14,18 @@ import {
 } from "./input-group";
 
 describe("InputGroup", () => {
-  it("renders root and compound slots", () => {
+  it("keeps the root role and compound slot markers stable", () => {
     const { container } = render(
-      <InputGroup>
-        <InputGroupText>https://</InputGroupText>
-        <InputGroupInput placeholder="mon-profil" />
-        <InputGroupAddon>.fodmap.app</InputGroupAddon>
+      <InputGroup data-slot="custom-group" role="presentation">
+        <InputGroupText data-slot="custom-text">https://</InputGroupText>
+        <InputGroupInput data-slot="custom-input" placeholder="mon-profil" />
+        <InputGroupAddon data-slot="custom-addon">.fodmap.app</InputGroupAddon>
       </InputGroup>,
     );
 
-    expect(screen.getByRole("group")).toHaveAttribute(
-      "data-slot",
-      "input-group",
-    );
+    const group = screen.getByRole("group");
+
+    expect(group).toHaveAttribute("data-slot", "input-group");
     expect(
       container.querySelector("[data-slot='input-group-text']"),
     ).toBeTruthy();
@@ -36,6 +35,11 @@ describe("InputGroup", () => {
     expect(
       container.querySelector("[data-slot='input-group-addon']"),
     ).toBeTruthy();
+
+    expect(container.querySelector("[data-slot='custom-group']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-text']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-input']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-addon']")).toBeNull();
   });
 
   it("supports addon and button interaction composition", () => {
@@ -77,7 +81,7 @@ describe("InputGroup", () => {
     );
   });
 
-  it("merges className on root and compounds", () => {
+  it("merges className on the root and compounds", () => {
     const { container } = render(
       <InputGroup className="group-personnalise">
         <InputGroupAddon className="addon-personnalise">EUR</InputGroupAddon>
@@ -105,7 +109,7 @@ describe("InputGroup", () => {
     ).toContain("button-personnalise");
   });
 
-  it("forwards refs to root, input, and button", () => {
+  it("forwards refs to the root, input, and button", () => {
     const rootRef = createRef<HTMLDivElement>();
     const inputRef = createRef<HTMLInputElement>();
     const buttonRef = createRef<HTMLButtonElement>();

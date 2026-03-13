@@ -12,16 +12,18 @@ export type InputGroupProps = React.ComponentProps<"div">;
 function InputGroup({ className, ...props }: InputGroupProps) {
   return (
     <div
+      {...props}
       role="group"
       data-slot="input-group"
       className={cn(
         "flex w-full items-stretch rounded-(--radius) border border-input bg-background",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-within:border-ring focus-within:ring-2 focus-within:ring-ring-soft",
+        "has-[input[aria-invalid='true']]:border-validation-error-border",
+        "has-[input[aria-invalid='true']]:ring-2 has-[input[aria-invalid='true']]:ring-validation-error-ring-soft",
         "has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -31,6 +33,7 @@ export type InputGroupInputProps = React.ComponentProps<"input">;
 function InputGroupInput({ className, ...props }: InputGroupInputProps) {
   return (
     <input
+      {...props}
       data-slot="input-group-input"
       className={cn(
         "h-10 min-w-0 flex-1 bg-transparent px-3 py-2 text-sm shadow-none outline-hidden",
@@ -42,7 +45,6 @@ function InputGroupInput({ className, ...props }: InputGroupInputProps) {
         groupedItemClasses,
         className,
       )}
-      {...props}
     />
   );
 }
@@ -52,13 +54,13 @@ export type InputGroupAddonProps = React.ComponentProps<"div">;
 function InputGroupAddon({ className, ...props }: InputGroupAddonProps) {
   return (
     <div
+      {...props}
       data-slot="input-group-addon"
       className={cn(
-        "inline-flex h-10 items-center bg-muted/40 px-3 text-sm text-muted-foreground",
+        "inline-flex h-10 min-w-0 items-center truncate bg-muted/40 px-3 text-sm text-muted-foreground",
         groupedItemClasses,
         className,
       )}
-      {...props}
     />
   );
 }
@@ -68,13 +70,13 @@ export type InputGroupTextProps = React.ComponentProps<"span">;
 function InputGroupText({ className, ...props }: InputGroupTextProps) {
   return (
     <span
+      {...props}
       data-slot="input-group-text"
       className={cn(
-        "inline-flex h-10 items-center bg-muted/20 px-3 text-sm text-muted-foreground",
+        "inline-flex h-10 min-w-0 items-center truncate bg-muted/20 px-3 text-sm text-muted-foreground",
         groupedItemClasses,
         className,
       )}
-      {...props}
     />
   );
 }
@@ -88,10 +90,9 @@ function InputGroupButton({
 }: InputGroupButtonProps) {
   return (
     <button
-      data-slot="input-group-button"
-      type={type}
+      {...props}
       className={cn(
-        "inline-flex h-10 items-center justify-center gap-2 px-3 text-sm font-medium whitespace-nowrap",
+        "inline-flex h-10 min-w-0 items-center justify-center gap-2 px-3 text-sm font-medium whitespace-nowrap",
         "bg-background text-foreground",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "outline-hidden hover:bg-accent hover:text-accent-foreground",
@@ -100,7 +101,8 @@ function InputGroupButton({
         groupedItemClasses,
         className,
       )}
-      {...props}
+      data-slot="input-group-button"
+      type={type}
     />
   );
 }

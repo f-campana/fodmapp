@@ -7,7 +7,9 @@ import { DayPicker } from "react-day-picker";
 import { cn } from "../../../lib/cn";
 import { buttonVariants } from "../foundation/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  "data-slot"?: string;
+};
 
 function Calendar({
   className,
@@ -18,8 +20,9 @@ function Calendar({
 }: CalendarProps) {
   return (
     <DayPicker
-      data-slot="calendar"
       showOutsideDays={showOutsideDays}
+      {...props}
+      data-slot="calendar"
       className={cn(
         "w-fit rounded-(--radius) border border-border p-3",
         className,
@@ -52,16 +55,16 @@ function Calendar({
           "aria-selected:opacity-100",
         ),
         selected:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
         today: "text-accent-foreground",
         outside: "text-muted-foreground",
         disabled: "cursor-not-allowed text-muted-foreground opacity-50",
         range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
+          "aria-selected:bg-accent aria-selected:text-accent-foreground aria-selected:[&>button]:text-accent-foreground",
         range_start:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
         range_end:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
         hidden: "invisible",
         ...classNames,
       }}
@@ -96,7 +99,6 @@ function Calendar({
         },
         ...components,
       }}
-      {...props}
     />
   );
 }

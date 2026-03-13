@@ -49,9 +49,9 @@ export type InputOTPGroupProps = React.ComponentProps<"div">;
 function InputOTPGroup({ className, ...props }: InputOTPGroupProps) {
   return (
     <div
+      {...props}
       data-slot="input-otp-group"
       className={cn("flex items-center", className)}
-      {...props}
     />
   );
 }
@@ -72,6 +72,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
 
   return (
     <div
+      {...props}
       data-slot="input-otp-slot"
       data-active={slot.isActive ? "true" : "false"}
       data-invalid={invalid ? "true" : "false"}
@@ -84,7 +85,6 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
           "border-validation-error-border data-[active=true]:border-validation-error-border data-[active=true]:ring-validation-error-ring-soft",
         className,
       )}
-      {...props}
     >
       {slot.char ?? slot.placeholderChar}
       {slot.hasFakeCaret ? (
@@ -105,11 +105,11 @@ export type InputOTPSeparatorProps = React.ComponentProps<"div">;
 function InputOTPSeparator({ className, ...props }: InputOTPSeparatorProps) {
   return (
     <div
+      {...props}
       aria-hidden="true"
       data-slot="input-otp-separator"
       role="separator"
       className={cn("text-muted-foreground", className)}
-      {...props}
     >
       <svg
         aria-hidden="true"

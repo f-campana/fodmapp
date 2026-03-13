@@ -1,0 +1,68 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as InputGroupStories from "./input-group.stories";
+import { inputGroupRecommendedUsageCode } from "./input-group.docs-source";
+
+<Meta of={InputGroupStories} />
+
+<Title />
+<Subtitle>
+  Use InputGroup when one input needs leading, trailing, or action content that
+  should stay visually attached to the same control.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={inputGroupRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use InputGroup when prefix, suffix, addon, or action content is part of one
+continuous input task.
+
+Prefer separate controls when the surrounding content should be editable on its
+own or when the action should not be visually tied to the same field.
+
+<Canvas of={InputGroupStories.Default} sourceState="none" />
+
+## Composition patterns
+
+The surfaced example keeps the same grouped control while adding a trailing
+button for inline actions.
+
+<Canvas of={InputGroupStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the root stays a single `group` for the composed control
+- the input keeps its own accessible name just like a regular text field
+- invalid styling is driven by the input `aria-invalid` state
+- leading and trailing text remain presentational while the input and button stay
+  focusable
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local input group audit area
+- Storybook interaction checks verify stable root, input, and button slots plus
+  button interaction inside the same grouped control
+- UI tests cover stable slot hooks, addon and button composition, invalid and
+  disabled semantics, refs, and a11y
+
+What is checked manually:
+
+- visual pass for border seams, focus treatment, and surfaced button alignment
+- compact-width smoke pass to confirm long leading and trailing content does not
+  break the grouped layout
+
+## Responsive notes
+
+Keep leading and trailing content concise on compact layouts, and let the input
+remain the flexible region so the grouped border does not split or overflow.
