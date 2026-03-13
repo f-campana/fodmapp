@@ -119,7 +119,7 @@ function PrepRailRow() {
   ];
 
   return (
-    <div className="flex w-max gap-3 pb-2 pr-3">
+    <div className="flex w-max gap-3 pr-3 pb-2">
       {items.map((item) => (
         <div
           className="w-64 shrink-0 rounded-sm border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
@@ -153,7 +153,7 @@ function PantryGrid() {
   ];
 
   return (
-    <div className="grid w-max grid-cols-4 gap-3 pb-3 pr-3">
+    <div className="grid w-max grid-cols-4 gap-3 pr-3 pb-3">
       {items.map((item) => (
         <div
           className="min-h-28 w-60 rounded-sm border border-border bg-card px-3 py-3 text-sm leading-5 shadow-xs"
@@ -327,13 +327,18 @@ export const InteractionChecks: Story = {
         verticalRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],
       ).toHaveLength(1);
       await expect(
-        verticalHorizontalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
+        verticalHorizontalScrollbar?.querySelector(
+          "[data-slot='scroll-area-thumb']",
+        ),
       ).toBeNull();
       await expect(
-        horizontalRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],
+        horizontalRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ??
+          [],
       ).toHaveLength(1);
       await expect(
-        horizontalVerticalScrollbar?.querySelector("[data-slot='scroll-area-thumb']"),
+        horizontalVerticalScrollbar?.querySelector(
+          "[data-slot='scroll-area-thumb']",
+        ),
       ).toBeNull();
       await expect(
         bothAxesRoot?.querySelectorAll("[data-slot='scroll-area-thumb']") ?? [],

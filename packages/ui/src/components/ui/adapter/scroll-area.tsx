@@ -72,7 +72,7 @@ function ScrollBar({
       forceMount={forceMount}
       style={scrollbarStyle}
       className={cn(
-        "flex touch-none select-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 has-[>[data-slot='scroll-area-thumb']]:bg-background/55 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:bg-background/35 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:backdrop-blur-sm data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0",
+        "flex touch-none rounded-full p-[3px] transition-[opacity,background-color] duration-150 select-none has-[>[data-slot='scroll-area-thumb']]:bg-background/55 data-[state=hidden]:pointer-events-none data-[state=hidden]:opacity-0 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:bg-background/35 supports-[backdrop-filter]:has-[>[data-slot='scroll-area-thumb']]:backdrop-blur-sm",
         orientation === "vertical"
           ? "w-4 border-l border-l-transparent"
           : "h-4 flex-col border-t border-t-transparent",
