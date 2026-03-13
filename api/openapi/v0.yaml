@@ -24,6 +24,7 @@ servers:
 tags:
   - name: health
   - name: foods
+  - name: safe-harbors
   - name: swaps
   - name: me
   - name: sync
@@ -134,6 +135,27 @@ paths:
                 $ref: "#/components/schemas/FoodTraitsResponse"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /v0/safe-harbors:
+    get:
+      tags: [safe-harbors]
+      summary: Discover Safe-Harbor V1 foods grouped by cohort
+      operationId: listSafeHarbors
+      description: |
+        Returns Safe-Harbor V1 cohort groupings derived from CIQUAL-linked foods
+        and internal rules. This endpoint is additive to `/v0/foods` search and
+        does not imply full Phase 3 rollup coverage for the returned foods.
+
+        Public copy and metadata are project-authored. Cohort assignment is
+        limited to composition-compatible, plain-form items in approved V1
+        cohorts only.
+      responses:
+        "200":
+          description: Safe-harbor groups
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeHarborResponse"
 
   /v0/swaps:
     get:
@@ -774,6 +796,103 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TraitLabel"
+
+    SafeHarborCohortCode:
+      type: string
+      enum: [cohort_oil_fat, cohort_plain_protein, cohort_egg]
+
+    SafeHarborFoodItem:
+      allOf:
+        - $ref: "#/components/schemas/FoodIdentity"
+        - type: object
+          properties:
+            preparation_state:
+              type: string
+              nullable: true
+
+    SafeHarborCohort:
+      type: object
+      required:
+        - cohort_code
+        - label_fr
+        - label_en
+        - rationale_fr
+        - rationale_en
+        - caveat_fr
+        - caveat_en
+        - items
+        - total
+      properties:
+        cohort_code:
+          $ref: "#/components/schemas/SafeHarborCohortCode"
+        label_fr:
+          type: string
+        label_en:
+          type: string
+        rationale_fr:
+          type: string
+        rationale_en:
+          type: string
+        caveat_fr:
+          type: string
+        caveat_en:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafeHarborFoodItem"
+        total:
+          type: integer
+          minimum: 0
+
+    SafeHarborMeta:
+      type: object
+      required:
+        - total_cohorts
+        - total_foods
+        - cohort_rule_source_slug
+        - cohort_rule_version
+        - data_source_slug
+        - data_source_name
+        - attribution
+        - no_endorsement_notice
+      properties:
+        total_cohorts:
+          type: integer
+          minimum: 0
+        total_foods:
+          type: integer
+          minimum: 0
+        cohort_rule_source_slug:
+          type: string
+        cohort_rule_version:
+          type: string
+        data_source_slug:
+          type: string
+        data_source_name:
+          type: string
+        data_source_version:
+          type: string
+          nullable: true
+        data_source_published_at:
+          type: string
+          format: date
+          nullable: true
+        attribution:
+          type: string
+        no_endorsement_notice:
+          type: string
+
+    SafeHarborResponse:
+      type: object
+      required: [cohorts, meta]
+      properties:
+        cohorts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SafeHarborCohort"
+        meta:
+          $ref: "#/components/schemas/SafeHarborMeta"
 
     SwapItem:
       type: object

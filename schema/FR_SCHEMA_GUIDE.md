@@ -1041,6 +1041,7 @@ Endpoint set:
 - `GET /v0/foods/{food_slug}/rollup`
 - `GET /v0/foods/{food_slug}/subtypes`
 - `GET /v0/foods/{food_slug}/traits`
+- `GET /v0/safe-harbors`
 - `GET /v0/swaps?from={food_slug}&limit={int}&min_safety_score={0..1}`
 
 Public API contracts:
@@ -1083,6 +1084,18 @@ Subtype informative contract (`/v0/foods/{food_slug}/subtypes`):
 - freshness/context:
   - `rollup_serving_g`
   - `computed_at`
+
+Safe-Harbor V1 contract (`/v0/safe-harbors`):
+
+- dedicated browse endpoint; does not relax `/v0/foods` required `q` contract
+- limited to approved V1 cohorts only:
+  - `cohort_oil_fat`
+  - `cohort_plain_protein`
+  - `cohort_egg`
+- runtime/public cohort assignment derives from `CIQUAL`-linked foods plus `internal_rules_v1`
+- public rationale/caveat copy is project-authored and cautious
+- response metadata must expose CIQUAL attribution/version fields and a non-endorsement notice
+- endpoint does not imply full Phase 3 rollup coverage for returned foods
 
 ### 11.6 Systematic swap expansion Batch01 (Phase 3.3)
 

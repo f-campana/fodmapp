@@ -9,6 +9,7 @@ Last reviewed: 2026-03-08
 Read-only FastAPI service exposing Phase 3 product-layer data:
 
 - food metadata by `food_slug`
+- Safe-Harbor V1 cohort discovery derived from CIQUAL + internal rules
 - latest full rollup projection
 - curated culinary traits
 - active swap recommendations
@@ -73,3 +74,5 @@ Canonical v0 review contract is committed at:
 - `api/openapi/v0.yaml`
 
 v0 is slug-based, returns both FR/EN fields, and has no locale negotiation.
+Safe-Harbor V1 uses a dedicated endpoint (`GET /v0/safe-harbors`) so browse
+discovery does not weaken the required `/v0/foods?q=...` search contract.

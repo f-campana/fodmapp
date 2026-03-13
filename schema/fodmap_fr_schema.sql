@@ -162,6 +162,40 @@ CREATE TABLE foods (
   UNIQUE (canonical_name_fr, preparation_state)
 );
 
+CREATE TABLE safe_harbor_cohorts (
+  cohort_code TEXT PRIMARY KEY CHECK (
+    cohort_code IN ('cohort_oil_fat', 'cohort_plain_protein', 'cohort_egg')
+  ),
+  label_fr TEXT NOT NULL,
+  label_en TEXT NOT NULL,
+  rationale_fr TEXT NOT NULL,
+  rationale_en TEXT NOT NULL,
+  caveat_fr TEXT NOT NULL,
+  caveat_en TEXT NOT NULL,
+  sort_order SMALLINT NOT NULL CHECK (sort_order >= 1),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE food_safe_harbor_assignments (
+  food_id UUID PRIMARY KEY REFERENCES foods (food_id) ON DELETE CASCADE,
+  cohort_code TEXT NOT NULL REFERENCES safe_harbor_cohorts (cohort_code),
+  rule_source_id UUID NOT NULL REFERENCES sources (source_id),
+  data_source_id UUID NOT NULL REFERENCES sources (source_id),
+  assignment_version TEXT NOT NULL,
+  assignment_method TEXT NOT NULL CHECK (assignment_method IN ('ciqual_category_gate_v1')),
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CHECK (length(trim(assignment_version)) > 0)
+);
+
+CREATE INDEX idx_food_safe_harbor_assignments_cohort
+  ON food_safe_harbor_assignments (cohort_code, updated_at DESC, food_id);
+
+CREATE INDEX idx_food_safe_harbor_assignments_data_source
+  ON food_safe_harbor_assignments (data_source_id, rule_source_id);
+
 CREATE TABLE food_names (
   food_name_id BIGSERIAL PRIMARY KEY,
   food_id UUID NOT NULL REFERENCES foods (food_id) ON DELETE CASCADE,
@@ -883,6 +917,56 @@ INSERT INTO sources (
     TRUE,
     (SELECT license_id FROM data_licenses WHERE spdx_id = 'LicenseRef-Proprietary')
   );
+
+INSERT INTO safe_harbor_cohorts (
+  cohort_code,
+  label_fr,
+  label_en,
+  rationale_fr,
+  rationale_en,
+  caveat_fr,
+  caveat_en,
+  sort_order
+) VALUES
+  (
+    'cohort_oil_fat',
+    'Matières grasses simples',
+    'Simple fats and oils',
+    'Aliments retenus quand les données CIQUAL et les règles internes indiquent une matrice très pauvre en glucides fermentescibles.',
+    'Included when CIQUAL data and internal rules indicate a matrix that is very low in fermentable carbohydrate.',
+    'Formes simples uniquement. Les marinades, sauces et ajouts aromatiques peuvent changer la compatibilité. Pour une huile infusée maison, conserver au réfrigérateur et jeter après 4 jours.',
+    'Plain forms only. Marinades, sauces, and aromatic additions can change compatibility. For homemade infused oils, refrigerate and discard after 4 days.',
+    1
+  ),
+  (
+    'cohort_plain_protein',
+    'Protéines animales simples',
+    'Simple animal proteins',
+    'Aliments retenus quand les données CIQUAL et les règles internes indiquent une base animale simple, sans ingrédients riches en glucides fermentescibles ajoutés.',
+    'Included when CIQUAL data and internal rules indicate a simple animal-food base without added fermentable-carbohydrate ingredients.',
+    'Formes nature uniquement. La panure, les sauces, les marinades, la salaison et les assaisonnements peuvent changer la compatibilité.',
+    'Plain forms only. Breading, sauces, marinades, curing, and seasoning can change compatibility.',
+    2
+  ),
+  (
+    'cohort_egg',
+    'Œufs simples',
+    'Simple eggs',
+    'Aliments retenus quand les données CIQUAL et les règles internes indiquent des œufs ou parties d''œufs sans garniture complexe.',
+    'Included when CIQUAL data and internal rules indicate eggs or egg components without complex added fillings.',
+    'Formes simples uniquement. Les omelettes garnies, poudres composées et préparations avec ajout d''oignon, d''ail ou de sauce ne sont pas incluses.',
+    'Plain forms only. Filled omelets, compound powders, and preparations with added onion, garlic, or sauces are not included.',
+    3
+  )
+ON CONFLICT (cohort_code) DO UPDATE SET
+  label_fr = EXCLUDED.label_fr,
+  label_en = EXCLUDED.label_en,
+  rationale_fr = EXCLUDED.rationale_fr,
+  rationale_en = EXCLUDED.rationale_en,
+  caveat_fr = EXCLUDED.caveat_fr,
+  caveat_en = EXCLUDED.caveat_en,
+  sort_order = EXCLUDED.sort_order,
+  updated_at = now();
 
 INSERT INTO food_categories (code, parent_category_id, name_fr, name_en, level, source_system) VALUES
   ('proteines', NULL, 'Protéines', 'Proteins', 1, 'fr_market_v1'),

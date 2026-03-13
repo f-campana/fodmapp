@@ -110,6 +110,32 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/safe-harbors": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Discover Safe-Harbor V1 foods grouped by cohort
+     * @description Returns Safe-Harbor V1 cohort groupings derived from CIQUAL-linked foods
+     *     and internal rules. This endpoint is additive to `/v0/foods` search and
+     *     does not imply full Phase 3 rollup coverage for the returned foods.
+     *
+     *     Public copy and metadata are project-authored. Cohort assignment is
+     *     limited to composition-compatible, plain-form items in approved V1
+     *     cohorts only.
+     */
+    get: operations["listSafeHarbors"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v0/swaps": {
     parameters: {
       query?: never;
@@ -368,6 +394,42 @@ export interface components {
       texture_profiles?: components["schemas"]["TraitLabel"][];
       cooking_behaviors?: components["schemas"]["TraitLabel"][];
       cuisine_affinities?: components["schemas"]["TraitLabel"][];
+    };
+    /** @enum {string} */
+    SafeHarborCohortCode:
+      | "cohort_oil_fat"
+      | "cohort_plain_protein"
+      | "cohort_egg";
+    SafeHarborFoodItem: components["schemas"]["FoodIdentity"] & {
+      preparation_state?: string | null;
+    };
+    SafeHarborCohort: {
+      cohort_code: components["schemas"]["SafeHarborCohortCode"];
+      label_fr: string;
+      label_en: string;
+      rationale_fr: string;
+      rationale_en: string;
+      caveat_fr: string;
+      caveat_en: string;
+      items: components["schemas"]["SafeHarborFoodItem"][];
+      total: number;
+    };
+    SafeHarborMeta: {
+      total_cohorts: number;
+      total_foods: number;
+      cohort_rule_source_slug: string;
+      cohort_rule_version: string;
+      data_source_slug: string;
+      data_source_name: string;
+      data_source_version?: string | null;
+      /** Format: date */
+      data_source_published_at?: string | null;
+      attribution: string;
+      no_endorsement_notice: string;
+    };
+    SafeHarborResponse: {
+      cohorts: components["schemas"]["SafeHarborCohort"][];
+      meta: components["schemas"]["SafeHarborMeta"];
     };
     SwapItem: {
       from_food_slug: string;
@@ -1058,6 +1120,26 @@ export interface operations {
         };
       };
       404: components["responses"]["NotFound"];
+    };
+  };
+  listSafeHarbors: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Safe-harbor groups */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SafeHarborResponse"];
+        };
+      };
     };
   };
   listSwaps: {
