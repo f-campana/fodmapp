@@ -72,7 +72,21 @@ const defaultPlaygroundArgs = {
 } as const;
 
 const triggerClassName =
-  "inline-flex cursor-pointer items-center rounded-(--radius) border border-border bg-card px-4 py-3 text-sm font-medium";
+  "flex w-full max-w-sm cursor-pointer flex-col items-start gap-1 rounded-(--radius) border border-border bg-card px-4 py-4 text-left text-sm shadow-sm transition-colors hover:bg-accent/40";
+
+function ContextMenuTarget({ title }: { title: string }) {
+  return (
+    <>
+      <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        Clic droit ou Shift+F10
+      </span>
+      <span className="text-sm font-medium text-foreground">{title}</span>
+      <span className="text-sm text-muted-foreground">
+        Appui long sur tactile pour ouvrir les actions secondaires.
+      </span>
+    </>
+  );
+}
 
 const meta = {
   title: "Primitives/Adapter/ContextMenu",
@@ -137,7 +151,7 @@ function WorkspaceContextMenu(
           data-slot={options?.triggerSlot}
           type="button"
         >
-          Zone contextuelle
+          <ContextMenuTarget title="Zone de travail contextuelle" />
         </button>
       </ContextMenuTrigger>
       <ContextMenuContent {...contentProps}>
@@ -171,7 +185,7 @@ function PreferencesContextMenu(args: Story["args"]) {
     <ContextMenu {...args}>
       <ContextMenuTrigger asChild>
         <button className={triggerClassName} type="button">
-          Preferences d'affichage
+          <ContextMenuTarget title="Preferences d'affichage" />
         </button>
       </ContextMenuTrigger>
       <ContextMenuContent>
@@ -197,7 +211,7 @@ function SubmenuContextMenu(args: Story["args"]) {
     <ContextMenu {...args}>
       <ContextMenuTrigger asChild>
         <button className={triggerClassName} type="button">
-          Outils avances
+          <ContextMenuTarget title="Outils avances" />
         </button>
       </ContextMenuTrigger>
       <ContextMenuContent>
@@ -297,7 +311,9 @@ export const InteractionChecks: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='context-menu']");
-    const trigger = canvas.getByRole("button", { name: "Zone contextuelle" });
+    const trigger = canvas.getByRole("button", {
+      name: /Zone de travail contextuelle/,
+    });
 
     await expect(root).toHaveAttribute("data-slot", "context-menu");
     await expect(trigger).toHaveAttribute(
@@ -308,6 +324,7 @@ export const InteractionChecks: Story = {
       canvasElement.querySelector("[data-slot='context-menu-trigger']"),
     ).toBeNull();
     await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("text-sm");
 
     trigger.focus();
     await expect(trigger).toHaveFocus();
@@ -340,6 +357,7 @@ export const InteractionChecks: Story = {
 
     await expect(defaultItem).toHaveAttribute("data-slot", "context-menu-item");
     await expect(defaultItem.className).toContain("cursor-pointer");
+    await expect(defaultItem.className).toContain("text-sm");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-context-menu-item",

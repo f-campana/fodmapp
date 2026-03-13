@@ -66,7 +66,24 @@ const defaultPlaygroundArgs = {
 } as const;
 
 const triggerClassName =
-  "inline-flex cursor-pointer items-center rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium";
+  "inline-flex cursor-pointer items-center rounded-(--radius) border border-border bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent/40";
+
+function DropdownMenuActionRow({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-(--radius) border border-border bg-card px-4 py-4 shadow-sm">
+      <div className="min-w-0 space-y-1">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Actions rapides
+        </p>
+        <h3 className="text-sm font-semibold text-foreground">Mon espace</h3>
+        <p className="text-sm text-muted-foreground">
+          Gardez les raccourcis du compte actif a portee de main.
+        </p>
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  );
+}
 
 const meta = {
   title: "Primitives/Adapter/DropdownMenu",
@@ -138,17 +155,23 @@ function AccountDropdownMenu(
 
   return (
     <DropdownMenu {...args}>
-      {options?.triggerSlot ? (
-        <DropdownMenuTrigger asChild>
-          <button className={triggerClassName} type="button" {...triggerProps}>
+      <DropdownMenuActionRow>
+        {options?.triggerSlot ? (
+          <DropdownMenuTrigger asChild>
+            <button
+              className={triggerClassName}
+              type="button"
+              {...triggerProps}
+            >
+              Ouvrir les options
+            </button>
+          </DropdownMenuTrigger>
+        ) : (
+          <DropdownMenuTrigger className={triggerClassName}>
             Ouvrir les options
-          </button>
-        </DropdownMenuTrigger>
-      ) : (
-        <DropdownMenuTrigger className={triggerClassName}>
-          Ouvrir les options
-        </DropdownMenuTrigger>
-      )}
+          </DropdownMenuTrigger>
+        )}
+      </DropdownMenuActionRow>
       <DropdownMenuContent {...contentProps}>
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -313,6 +336,7 @@ export const InteractionChecks: Story = {
       canvasElement.querySelector("[data-slot='dropdown-menu-trigger']"),
     ).toBeNull();
     await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("text-sm");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     await userEvent.tab();
@@ -349,6 +373,7 @@ export const InteractionChecks: Story = {
       "dropdown-menu-item",
     );
     await expect(defaultItem.className).toContain("cursor-pointer");
+    await expect(defaultItem.className).toContain("text-sm");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-dropdown-menu-item",

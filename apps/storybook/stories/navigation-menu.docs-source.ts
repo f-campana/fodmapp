@@ -17,6 +17,9 @@ export function Example() {
             <NavigationMenuLink href="#calculateur">
               Calculateur FODMAP
             </NavigationMenuLink>
+            <NavigationMenuLink href="#substitutions">
+              Substitutions
+            </NavigationMenuLink>
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>

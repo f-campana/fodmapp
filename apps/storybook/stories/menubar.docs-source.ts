@@ -13,9 +13,15 @@ export function Example() {
       <MenubarMenu>
         <MenubarTrigger>Fichier</MenubarTrigger>
         <MenubarContent>
-          <MenubarItem>Profil</MenubarItem>
+          <MenubarItem>Ouvrir le profil</MenubarItem>
           <MenubarSeparator />
           <MenubarItem>Parametres</MenubarItem>
+        </MenubarContent>
+      </MenubarMenu>
+      <MenubarMenu>
+        <MenubarTrigger>Affichage</MenubarTrigger>
+        <MenubarContent>
+          <MenubarItem>Afficher les alertes</MenubarItem>
         </MenubarContent>
       </MenubarMenu>
     </Menubar>

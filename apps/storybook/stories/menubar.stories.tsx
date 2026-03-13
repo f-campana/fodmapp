@@ -103,6 +103,31 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function MenubarWorkspaceShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex w-full max-w-xl flex-col gap-3 rounded-(--radius) border border-border bg-card p-4 shadow-sm">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Barre de commandes
+          </p>
+          <h3 className="text-sm font-semibold text-foreground">
+            Espace de planification
+          </h3>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Fichier, Edition, Affichage
+        </p>
+      </div>
+      {children}
+      <p className="text-sm text-muted-foreground">
+        Gardez les commandes frequentes visibles sans masquer le contenu
+        principal.
+      </p>
+    </div>
+  );
+}
+
 function WorkspaceMenubar(
   args: Story["args"],
   portalContainer: HTMLDivElement | null,
@@ -118,41 +143,57 @@ function WorkspaceMenubar(
       : {};
 
   return (
-    <Menubar {...args}>
-      <MenubarMenu>
-        {options?.triggerSlot ? (
-          <MenubarTrigger asChild>
-            <button data-slot={options.triggerSlot} type="button">
-              Fichier
-            </button>
-          </MenubarTrigger>
-        ) : (
-          <MenubarTrigger>Fichier</MenubarTrigger>
-        )}
-        <MenubarContent {...contentProps}>
-          <MenubarLabel>Mon compte</MenubarLabel>
-          <MenubarSeparator />
-          <MenubarGroup>
-            <MenubarItem>
-              Profil
-              <MenubarShortcut>P</MenubarShortcut>
-            </MenubarItem>
-            {options?.itemSlot ? (
-              <MenubarItem asChild>
-                <a data-slot={options.itemSlot} href="#profil">
-                  Ouvrir le profil
-                </a>
-              </MenubarItem>
-            ) : (
+    <MenubarWorkspaceShell>
+      <Menubar {...args} className="w-full">
+        <MenubarMenu>
+          {options?.triggerSlot ? (
+            <MenubarTrigger asChild>
+              <button data-slot={options.triggerSlot} type="button">
+                Fichier
+              </button>
+            </MenubarTrigger>
+          ) : (
+            <MenubarTrigger>Fichier</MenubarTrigger>
+          )}
+          <MenubarContent {...contentProps}>
+            <MenubarLabel>Mon compte</MenubarLabel>
+            <MenubarSeparator />
+            <MenubarGroup>
               <MenubarItem>
-                Parametres
-                <MenubarShortcut>,</MenubarShortcut>
+                Profil
+                <MenubarShortcut>P</MenubarShortcut>
               </MenubarItem>
-            )}
-          </MenubarGroup>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
+              {options?.itemSlot ? (
+                <MenubarItem asChild>
+                  <a data-slot={options.itemSlot} href="#profil">
+                    Ouvrir le profil
+                  </a>
+                </MenubarItem>
+              ) : (
+                <MenubarItem>
+                  Parametres
+                  <MenubarShortcut>,</MenubarShortcut>
+                </MenubarItem>
+              )}
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Edition</MenubarTrigger>
+          <MenubarContent {...contentProps}>
+            <MenubarItem>Dupliquer</MenubarItem>
+            <MenubarItem>Renommer</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Affichage</MenubarTrigger>
+          <MenubarContent {...contentProps}>
+            <MenubarItem>Afficher les alertes</MenubarItem>
+            <MenubarItem>Mode detaille</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+    </MenubarWorkspaceShell>
   );
 }
 
@@ -305,10 +346,8 @@ export const InteractionChecks: Story = {
       "data-slot",
       "custom-menubar-trigger",
     );
-    await expect(
-      canvasElement.querySelector("[data-slot='menubar-trigger']"),
-    ).toBeNull();
     await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("text-sm");
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
     trigger.focus();
@@ -339,6 +378,7 @@ export const InteractionChecks: Story = {
 
     await expect(defaultItem).toHaveAttribute("data-slot", "menubar-item");
     await expect(defaultItem.className).toContain("cursor-pointer");
+    await expect(defaultItem.className).toContain("text-sm");
     await expect(customItem).toHaveAttribute(
       "data-slot",
       "custom-menubar-item",

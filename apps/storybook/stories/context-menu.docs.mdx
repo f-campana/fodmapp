@@ -30,6 +30,9 @@ compact action list on demand, for example a card, row, or workspace region.
 Avoid ContextMenu for primary actions that users must discover without relying
 on a secondary interaction.
 
+Open the surfaced example with a right-click, the keyboard context-menu key, or
+`Shift+F10`. A regular left click does not open a context menu.
+
 <Canvas of={ContextMenuStories.Default} sourceState="none" />
 
 ## Props and controls
@@ -55,6 +58,7 @@ and clearly attached to the trigger area.
 - checkbox and radio entries keep `menuitemcheckbox` and `menuitemradio` semantics
 - local portal mounting keeps the interaction checks scoped to the context menu audit area
 - submenu items keep the same slot and focus contract as the root menu content
+- the default story target states the required right-click or keyboard gesture explicitly
 
 ## Slot hooks
 

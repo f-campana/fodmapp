@@ -11,7 +11,7 @@ export const dropdownMenuRecommendedUsageCode = `import {
 export function Example() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>Ouvrir les options</DropdownMenuTrigger>
+      <DropdownMenuTrigger>Actions du compte</DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />

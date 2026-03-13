@@ -253,6 +253,9 @@ describe("NavigationMenu", () => {
       screen.getByRole("button", { name: "Produits" }).className,
     ).toContain("cursor-pointer");
     expect(
+      screen.getByRole("button", { name: "Produits" }).className,
+    ).toContain("text-sm");
+    expect(
       document.querySelector("[data-slot='navigation-menu-content']")
         ?.className ?? "",
     ).toContain("contenu-personnalise");
@@ -283,6 +286,7 @@ describe("NavigationMenu", () => {
 
     const triggerClasses = navigationMenuTriggerStyle();
     expect(triggerClasses).toContain("cursor-pointer");
+    expect(triggerClasses).toContain("text-sm");
     expect(triggerClasses).toContain("data-[active]:bg-accent");
     expect(triggerClasses).toContain("data-[state=open]:bg-accent");
     expect(triggerClasses).toContain("focus-visible:ring-ring-soft");

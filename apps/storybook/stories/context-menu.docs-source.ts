@@ -10,7 +10,9 @@ export const contextMenuRecommendedUsageCode = `import {
 export function Example() {
   return (
     <ContextMenu>
-      <ContextMenuTrigger>Zone contextuelle</ContextMenuTrigger>
+      <ContextMenuTrigger>
+        Clic droit dans la zone de travail
+      </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuLabel>Mon compte</ContextMenuLabel>
         <ContextMenuSeparator />
