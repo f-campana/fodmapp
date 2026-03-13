@@ -9,6 +9,7 @@ export type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>;
 function Checkbox({ className, ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
+      {...props}
       data-slot="checkbox"
       className={cn(
         "peer size-4 shrink-0 cursor-pointer rounded-[4px] border border-input bg-background shadow-sm",
@@ -19,7 +20,6 @@ function Checkbox({ className, ...props }: CheckboxProps) {
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
-      {...props}
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"

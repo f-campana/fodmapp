@@ -1,0 +1,85 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ScrollAreaStories from "./scroll-area.stories";
+import { scrollAreaRecommendedUsageCode } from "./scroll-area.docs-source";
+
+<Meta of={ScrollAreaStories} />
+
+<Title />
+<Subtitle>
+  Use ScrollArea when a bounded panel needs readable overflow without losing
+  keyboard reachability.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={scrollAreaRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use ScrollArea for dense lists, preparation notes, or compact dashboards that
+must stay inside a fixed block.
+
+Avoid ScrollArea when the page can grow naturally without forcing a nested
+scroll region.
+
+<Canvas of={ScrollAreaStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect scrollbar behavior, direction, and custom root
+classes.
+
+<Controls of={ScrollAreaStories.Playground} />
+
+## Composition patterns
+
+The base composition works in normal page flow. Use the surfaced pattern when
+the scroll region belongs inside a card or inset panel and border spacing needs
+visual review. Add the horizontal and two-axis variants when content can widen
+past the viewport or when the corner junction between both rails needs review.
+
+<Canvas of={ScrollAreaStories.OnSurface} sourceState="none" />
+
+<Canvas of={ScrollAreaStories.Horizontal} sourceState="none" />
+
+<Canvas of={ScrollAreaStories.BothAxes} sourceState="none" />
+
+## Accessibility contract
+
+- the viewport stays keyboard reachable through its tab stop
+- root, viewport, scrollbar, thumb, and corner slot hooks stay stable in default composition
+- only the overflowing axis renders a thumb, while the non-overflowing rail keeps its slot for layout stability
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, viewport, scrollbar, thumb, and corner
+- ScrollArea does not expose an `asChild` exception for these internal hooks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the ScrollArea example area
+- Storybook interaction checks verify vertical-only, horizontal-only, and two-axis overflow states, including the viewport tab stop and the expected thumb count for each axis configuration
+- UI tests cover slot stability, keyboard reachability, ref forwarding, root class merging, and a11y
+
+What is checked manually:
+
+- visual pass for clipped tracks or thumbs in light and dark themes
+- review for border collisions in surfaced and nested-card layouts
+
+## Responsive notes
+
+Long cards may wrap, and dual-axis overflow should stay readable without
+clipping the viewport or scrollbar chrome. Use the responsive stress story to
+review the two-axis case at narrow widths.
+
+<Canvas of={ScrollAreaStories.ResponsiveStress} sourceState="none" />

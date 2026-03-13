@@ -1,0 +1,80 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as RadioGroupStories from "./radio-group.stories";
+import { radioGroupRecommendedUsageCode } from "./radio-group.docs-source";
+
+<Meta of={RadioGroupStories} />
+
+<Title />
+<Subtitle>
+  Use RadioGroup when users must choose one option from a short, visible set.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={radioGroupRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use RadioGroup when the available choices are few enough to compare directly and
+the selected option should stay visible without opening another layer.
+
+Avoid RadioGroup when the option list is long, searchable, or better grouped
+behind a trigger.
+
+<Canvas of={RadioGroupStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to switch the selected value and confirm disabled behavior.
+
+<Controls of={RadioGroupStories.Playground} />
+
+## Behavior variants
+
+Disabled groups should remain readable while preventing interaction, not hide
+the available choices entirely.
+
+<Canvas of={RadioGroupStories.Disabled} sourceState="none" />
+
+## Composition patterns
+
+Use helper text when the decision carries product meaning. Surface composition
+works well when the choice belongs to a contained preference panel.
+
+<Canvas of={RadioGroupStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the root is exposed as a real `radiogroup`
+- each item exposes `radio` semantics with a single checked option
+- labels stay discoverable through `htmlFor` and visible text
+- keyboard users can move across the set while preserving single selection
+- focus remains visible on each item without reducing legibility
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the RadioGroup example area
+- Storybook interaction checks verify semantic selection changes on the rendered surface
+- UI tests cover controlled and uncontrolled state, keyboard tab-stop behavior, disabled items, stable slot hooks, refs, and a11y
+
+What is checked manually:
+
+- visual pass for label spacing, checked indicator contrast, and cursor behavior
+- narrow-width pass to confirm long labels wrap without breaking alignment
+
+## Responsive notes
+
+Allow labels to wrap freely. The selected indicator should stay aligned to the
+first line and the group should not introduce horizontal scrolling.
+
+<Canvas of={RadioGroupStories.ResponsiveStress} sourceState="none" />

@@ -1,0 +1,84 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as TabsStories from "./tabs.stories";
+import { tabsRecommendedUsageCode } from "./tabs.docs-source";
+
+<Meta of={TabsStories} />
+
+<Title />
+<Subtitle>
+  Use Tabs when users need to switch between peer views while keeping a single
+  active panel visible at a time.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={tabsRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Tabs when users need to compare alternate views of the same task, such as
+ingredients versus preparation, notes versus activity, or summary versus
+details.
+
+Avoid Tabs when all sections should remain visible together or when content is
+better revealed progressively instead of switched.
+
+<Canvas of={TabsStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test orientation, default active value, and callback
+behavior quickly.
+
+<Controls of={TabsStories.Playground} />
+
+## Composition patterns
+
+Horizontal tabs work best for short peer labels. Use a surfaced composition when
+the switcher belongs inside a contained panel. Use vertical tabs when labels are
+more descriptive or when horizontal space becomes constrained.
+
+<Canvas of={TabsStories.OnSurface} sourceState="none" />
+<Canvas of={TabsStories.Vertical} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger list is exposed as a real `tablist`
+- each trigger exposes selected state through `aria-selected`
+- each panel is linked to its trigger through `aria-controls` and `aria-labelledby`
+- keyboard users can move focus with arrow keys and activate the intended tab
+- focus treatment remains visible on the active interaction surface
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on root, list, trigger, and content
+- when using `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Tabs example area
+- Storybook interaction checks verify click and keyboard activation
+- UI tests cover slot markers for default composition, the `asChild` slot exception, class contracts, semantic linkage, disabled behavior, and a11y
+
+What is checked manually:
+
+- keyboard smoke pass in both orientations
+- visual review for tab label wrapping, panel spacing, and surfaced usage
+
+## Responsive notes
+
+Do not rely on clipped overflow as the first-read experience for descriptive
+labels. If labels get longer, a constrained vertical composition is easier to
+scan and keeps the active panel readable on first paint.
+
+<Canvas of={TabsStories.ResponsiveStress} sourceState="none" />

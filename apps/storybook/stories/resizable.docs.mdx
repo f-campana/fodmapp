@@ -1,0 +1,76 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ResizableStories from "./resizable.stories";
+import { resizableRecommendedUsageCode } from "./resizable.docs-source";
+
+<Meta of={ResizableStories} />
+
+<Title />
+<Subtitle>
+  Use Resizable when two or more working areas must stay visible together and
+  users benefit from allocating space themselves.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={resizableRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Resizable for dense working layouts such as notes plus editor, plan plus
+preview, or reference plus active task area.
+
+Avoid it when one panel is clearly secondary, when the layout is mostly static,
+or when users do not need to tune the space allocation themselves.
+
+<Canvas of={ResizableStories.Horizontal} sourceState="none" />
+
+## Props and controls
+
+Use the playground to switch orientation, confirm disabled behavior, and review
+how persisted layouts are identified with `id`.
+
+<Controls of={ResizableStories.Playground} />
+
+## Layout patterns
+
+Horizontal groups support side-by-side work. Vertical groups are better when the
+reference area should stay above the active area. The example stories use a
+deterministic demo canvas so the panel sizing remains readable in Storybook.
+
+<Canvas of={ResizableStories.Vertical} sourceState="none" />
+
+## Accessibility contract
+
+- each separator exposes `role="separator"` and the correct `aria-orientation`
+- handles remain keyboard focusable and keep visible focus treatment
+- handle and grip affordances stay visible on both orientations
+- panel content remains readable while the handle is the active control
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Resizable example area
+- Storybook interaction checks verify slot markers, separator semantics, and keyboard-driven layout updates
+- UI tests cover slots, class contracts, handle semantics, refs, and a11y
+
+What is checked manually:
+
+- visual review for panel legibility in both orientations
+- keyboard smoke pass to confirm separator focus and adjustment feedback
+
+## Responsive notes
+
+The responsive stress case is an engineering proof, not the primary product
+presentation. Under constrained widths, prefer a stacked allocation that keeps
+all working areas readable on first paint.
+
+<Canvas of={ResizableStories.ResponsiveStress} sourceState="none" />

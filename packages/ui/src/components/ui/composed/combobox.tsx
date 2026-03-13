@@ -4,7 +4,7 @@ import * as React from "react";
 
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-import { Command as CommandPrimitive } from "cmdk";
+import { Command as CommandPrimitive, useCommandState } from "cmdk";
 
 import { useControllableState } from "../../../hooks/use-controllable-state";
 import { cn } from "../../../lib/cn";
@@ -312,7 +312,7 @@ function ComboboxTrigger({
       aria-controls={context.contentId}
       aria-expanded={context.open}
       className={cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
+        "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft",
@@ -354,47 +354,53 @@ export interface ComboboxContentProps extends React.ComponentProps<
   typeof PopoverPrimitive.Content
 > {
   commandClassName?: string;
+  container?: React.ComponentProps<typeof PopoverPrimitive.Portal>["container"];
 }
 
 function ComboboxContent({
+  container,
   className,
   children,
   commandClassName,
+  "aria-label": ariaLabel,
   sideOffset = 4,
   ...props
 }: ComboboxContentProps) {
   const context = useComboboxContext("ComboboxContent");
 
   return (
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        className={cn(
-          "z-50 w-(--radix-popover-trigger-width) min-w-[12rem] overflow-hidden rounded-(--radius) border border-border bg-popover p-0 text-popover-foreground shadow-md",
-          "origin-(--radix-popover-content-transform-origin)",
-          "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out",
-          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-          "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
-          "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          className,
-        )}
-        data-slot="combobox-content"
-        id={context.contentId}
-        sideOffset={sideOffset}
-        {...props}
-      >
-        <CommandPrimitive
+    <PopoverPrimitive.Portal container={container}>
+      <div data-slot="combobox-portal">
+        <PopoverPrimitive.Content
+          aria-label={ariaLabel ?? "Suggestions de recherche"}
           className={cn(
-            "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
-            "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
-            commandClassName,
+            "z-50 w-(--radix-popover-trigger-width) min-w-[12rem] overflow-hidden rounded-(--radius) border border-border bg-popover p-0 text-popover-foreground shadow-md",
+            "origin-(--radix-popover-content-transform-origin)",
+            "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
+            "data-[state=open]:animate-in data-[state=closed]:animate-out",
+            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2",
+            "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+            className,
           )}
-          shouldFilter
+          data-slot="combobox-content"
+          id={context.contentId}
+          sideOffset={sideOffset}
+          {...props}
         >
-          {children}
-        </CommandPrimitive>
-      </PopoverPrimitive.Content>
+          <CommandPrimitive
+            className={cn(
+              "flex h-full w-full flex-col overflow-hidden bg-popover text-popover-foreground",
+              "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+              commandClassName,
+            )}
+            shouldFilter
+          >
+            {children}
+          </CommandPrimitive>
+        </PopoverPrimitive.Content>
+      </div>
     </PopoverPrimitive.Portal>
   );
 }
@@ -538,7 +544,7 @@ function ComboboxItem({
   return (
     <CommandPrimitive.Item
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+        "relative flex w-full cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
@@ -581,12 +587,21 @@ export type ComboboxSeparatorProps = React.ComponentProps<
 >;
 
 function ComboboxSeparator({ className, ...props }: ComboboxSeparatorProps) {
+  const { alwaysRender, ...separatorProps } = props;
+  const shouldRender = useCommandState((state) => !state.search);
+
+  if (!alwaysRender && !shouldRender) {
+    return null;
+  }
+
   return (
-    <CommandPrimitive.Separator
+    <div
+      aria-hidden={separatorProps["aria-hidden"] ?? true}
+      cmdk-separator=""
       className={cn("-mx-1 h-px bg-border", className)}
       data-slot="combobox-separator"
-      role="presentation"
-      {...props}
+      role={separatorProps.role ?? "presentation"}
+      {...separatorProps}
     />
   );
 }

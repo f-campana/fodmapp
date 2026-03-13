@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import type { ReactNode } from "react";
 import { expect, userEvent, within } from "storybook/test";
 
 import {
@@ -9,10 +10,33 @@ import {
   AccordionTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function AccordionAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-accordion-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  type: "single",
+  collapsible: true,
+  disabled: false,
+  dir: "ltr",
+} as const;
+
 const meta = {
   title: "Primitives/Adapter/Accordion",
   component: Accordion,
-  tags: ["autodocs"],
   argTypes: {
     type: {
       description: "Accordion mode: one item or many items opened at a time.",
@@ -23,7 +47,8 @@ const meta = {
     collapsible: {
       description: "Allows closing an opened item in single mode.",
       control: { type: "boolean" },
-      table: { defaultValue: { summary: "false" } },
+      if: { arg: "type", eq: "single" },
+      table: { defaultValue: { summary: "true" } },
     },
     disabled: {
       description: "Disables all accordion items when true.",
@@ -42,14 +67,16 @@ const meta = {
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    type: "single",
-    collapsible: true,
-    disabled: false,
-    dir: "ltr",
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
+    a11y: {
+      test: "error",
+      context: {
+        include: ["[data-accordion-audit-root]"],
+      },
+    },
   },
 } satisfies Meta<typeof Accordion>;
 
@@ -57,10 +84,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: () => (
-    <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
-      <Accordion collapsible dir="ltr" type="single">
+function DefaultAccordion(args: Story["args"]) {
+  const disabled = args?.disabled ?? false;
+  const dir = args?.dir ?? "ltr";
+  const collapsible =
+    args && "collapsible" in args ? (args.collapsible ?? true) : true;
+
+  if (args?.type === "multiple") {
+    return (
+      <Accordion disabled={disabled} dir={dir} type="multiple">
         <AccordionItem value="item-1">
           <AccordionTrigger>Quels aliments remplacer ?</AccordionTrigger>
           <AccordionContent>
@@ -69,89 +101,198 @@ export const Default: Story = {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
-          <AccordionTrigger>Comment preparer les legumes ?</AccordionTrigger>
+          <AccordionTrigger>Comment préparer les légumes ?</AccordionTrigger>
           <AccordionContent>
             Faites une cuisson douce et testez des portions progressives.
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </div>
+    );
+  }
+
+  return (
+    <Accordion
+      collapsible={collapsible}
+      disabled={disabled}
+      dir={dir}
+      type="single"
+    >
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Quels aliments remplacer ?</AccordionTrigger>
+        <AccordionContent>
+          Remplacez l&apos;oignon par de la ciboulette pour limiter les FODMAP.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Comment préparer les légumes ?</AccordionTrigger>
+        <AccordionContent>
+          Faites une cuisson douce et testez des portions progressives.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <AccordionAuditFrame maxWidth="xl">
+      <DefaultAccordion {...args} />
+    </AccordionAuditFrame>
   ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const root = canvasElement.querySelector("[data-slot='accordion']");
-    const trigger = canvas.getByRole("button", {
-      name: "Quels aliments remplacer ?",
-    });
+};
 
-    await expect(root).toHaveAttribute("data-slot", "accordion");
-    await expect(trigger).toHaveAttribute("data-slot", "accordion-trigger");
-    await expect(trigger.className).toContain("focus-visible:ring-ring-soft");
-    await expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <AccordionAuditFrame maxWidth="xl">
+      <DefaultAccordion {...defaultPlaygroundArgs} />
+    </AccordionAuditFrame>
+  ),
+};
 
-    await userEvent.click(trigger);
-
-    const content = canvas
-      .getByText(
-        "Remplacez l'oignon par de la ciboulette pour limiter les FODMAP.",
-      )
-      .closest("[data-slot='accordion-content']");
-    const contentInner = canvas
-      .getByText(
-        "Remplacez l'oignon par de la ciboulette pour limiter les FODMAP.",
-      )
-      .closest("[data-slot='accordion-content-inner']");
-
-    await expect(content).toHaveAttribute("data-slot", "accordion-content");
-    await expect(contentInner).toHaveAttribute(
-      "data-slot",
-      "accordion-content-inner",
-    );
-    await expect(content?.className ?? "").toContain(
-      "data-[state=open]:animate-accordion-down",
-    );
-  },
+export const OnSurface: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <AccordionAuditFrame maxWidth="xl" surface>
+      <DefaultAccordion {...defaultPlaygroundArgs} />
+    </AccordionAuditFrame>
+  ),
 };
 
 export const Multiple: Story = {
+  parameters: fixedStoryParameters,
   render: () => (
-    <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
+    <AccordionAuditFrame maxWidth="xl">
       <Accordion defaultValue={["item-1"]} type="multiple">
         <AccordionItem value="item-1">
-          <AccordionTrigger>Petit dejeuner</AccordionTrigger>
+          <AccordionTrigger>Petit déjeuner</AccordionTrigger>
           <AccordionContent>
-            Favorisez les portions mesurees en debut de journee.
+            Favorisez les portions mesurées en début de journée.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
-          <AccordionTrigger>Dejeuner</AccordionTrigger>
+          <AccordionTrigger>Déjeuner</AccordionTrigger>
           <AccordionContent>
-            Privilegiez une base simple et ajoutez les fibres progressivement.
+            Privilégiez une base simple et ajoutez les fibres progressivement.
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </div>
+    </AccordionAuditFrame>
   ),
 };
 
 export const Collapsible: Story = {
+  parameters: fixedStoryParameters,
   render: () => (
-    <div className="w-full max-w-xl rounded-(--radius) border border-border bg-card p-4">
+    <AccordionAuditFrame maxWidth="xl">
       <Accordion collapsible defaultValue="item-1" type="single">
         <AccordionItem value="item-1">
           <AccordionTrigger>Plan de la semaine</AccordionTrigger>
           <AccordionContent>
-            Organisez vos repas en avance pour eviter les choix impulsifs.
+            Organisez vos repas en avance pour éviter les choix impulsifs.
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </div>
+    </AccordionAuditFrame>
   ),
 };
 
 export const DarkMode: Story = {
   ...Default,
+  parameters: fixedStoryParameters,
   globals: {
     theme: "dark",
   },
+};
+
+export const InteractionChecks: Story = {
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      disable: true,
+    },
+  },
+  render: () => (
+    <AccordionAuditFrame maxWidth="xl">
+      <DefaultAccordion {...defaultPlaygroundArgs} />
+    </AccordionAuditFrame>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const root = canvasElement.querySelector("[data-slot='accordion']");
+    const firstTrigger = canvas.getByRole("button", {
+      name: "Quels aliments remplacer ?",
+    });
+    const secondTrigger = canvas.getByRole("button", {
+      name: "Comment préparer les légumes ?",
+    });
+
+    await expect(root).toHaveAttribute("data-slot", "accordion");
+    await expect(firstTrigger).toHaveAttribute("aria-expanded", "false");
+    await expect(secondTrigger).toHaveAttribute("aria-expanded", "false");
+
+    await expect(firstTrigger.className).toContain("min-h-11");
+    await expect(firstTrigger.className).toContain(
+      "focus-visible:ring-ring-soft",
+    );
+
+    await userEvent.click(firstTrigger);
+
+    await expect(firstTrigger).toHaveAttribute("aria-expanded", "true");
+    const firstRegion = canvas.getByRole("region", {
+      name: "Quels aliments remplacer ?",
+    });
+    await expect(firstRegion).toBeVisible();
+    await expect(firstRegion).toHaveAttribute(
+      "id",
+      firstTrigger.getAttribute("aria-controls") ?? "",
+    );
+    await expect(firstRegion).toHaveAttribute(
+      "aria-labelledby",
+      firstTrigger.getAttribute("id") ?? "",
+    );
+
+    await userEvent.click(secondTrigger);
+
+    await expect(firstTrigger).toHaveAttribute("aria-expanded", "false");
+    await expect(secondTrigger).toHaveAttribute("aria-expanded", "true");
+
+    await userEvent.click(secondTrigger);
+    await expect(secondTrigger).toHaveAttribute("aria-expanded", "false");
+  },
+};
+
+export const ResponsiveStress: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <AccordionAuditFrame maxWidth="sm">
+      <Accordion collapsible defaultValue="item-1" type="single">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>
+            Quels aliments à faible teneur en FODMAP pouvez-vous préparer à
+            l&apos;avance pour un déjeuner transportable pendant une semaine
+            très chargée ?
+          </AccordionTrigger>
+          <AccordionContent>
+            Préparez une base simple la veille, répartissez-la en portions
+            individuelles et ajoutez au dernier moment les éléments fragiles
+            pour conserver une texture agréable et limiter les écarts de
+            tolérance.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>
+            Comment réintroduire progressivement plusieurs légumes cuits sans
+            perdre en lisibilité lorsque l&apos;intitulé de la section devient
+            plus long sur mobile ?
+          </AccordionTrigger>
+          <AccordionContent>
+            Commencez par une portion modeste, gardez une seule variable
+            nouvelle par repas et notez la tolérance sur plusieurs jours avant
+            d&apos;augmenter la variété ou le volume.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </AccordionAuditFrame>
+  ),
 };

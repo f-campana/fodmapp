@@ -8,63 +8,80 @@ import { describe, expect, it } from "vitest";
 import { Progress } from "./progress";
 
 describe("Progress", () => {
-  it("renders progressbar semantics", () => {
-    render(<Progress value={60} aria-label="Progression" />);
+  it("keeps root and indicator slots stable", () => {
+    const { container } = render(
+      <Progress data-slot="custom-progress" value={60} aria-label="Progress" />,
+    );
 
-    const progress = screen.getByRole("progressbar", { name: "Progression" });
+    const progress = screen.getByRole("progressbar", { name: "Progress" });
+    const indicator = progress.querySelector(
+      "[data-slot='progress-indicator']",
+    );
+
     expect(progress).toHaveAttribute("data-slot", "progress");
     expect(progress).toHaveAttribute("aria-valuenow", "60");
+    expect(indicator).toHaveAttribute("data-slot", "progress-indicator");
+    expect(container.querySelector("[data-slot='custom-progress']")).toBeNull();
   });
 
-  it("updates indicator transform from value", () => {
+  it("updates the indicator transform from the current value", () => {
     render(<Progress value={60} aria-label="Charge" />);
 
-    const indicator =
+    expect(
       screen
         .getByRole("progressbar", { name: "Charge" })
-        .querySelector("[data-slot='progress-indicator']") ?? undefined;
-
-    expect(indicator).toHaveAttribute("data-slot", "progress-indicator");
-    expect(indicator).toHaveStyle({ transform: "translateX(-40%)" });
+        .querySelector("[data-slot='progress-indicator']"),
+    ).toHaveStyle({ transform: "translateX(-40%)" });
   });
 
   it("clamps out-of-range values", () => {
-    const { rerender } = render(<Progress value={-20} aria-label="Niveau" />);
+    const { rerender } = render(<Progress value={-20} aria-label="Level" />);
 
-    expect(screen.getByRole("progressbar", { name: "Niveau" })).toHaveAttribute(
+    expect(screen.getByRole("progressbar", { name: "Level" })).toHaveAttribute(
       "aria-valuenow",
       "0",
     );
 
-    rerender(<Progress value={140} aria-label="Niveau" />);
+    rerender(<Progress value={140} aria-label="Level" />);
 
-    expect(screen.getByRole("progressbar", { name: "Niveau" })).toHaveAttribute(
+    expect(screen.getByRole("progressbar", { name: "Level" })).toHaveAttribute(
       "aria-valuenow",
       "100",
     );
   });
 
-  it("merges className", () => {
+  it("preserves indeterminate semantics when value is undefined", () => {
+    render(<Progress aria-label="Loading" />);
+
+    const progress = screen.getByRole("progressbar", { name: "Loading" });
+
+    expect(progress).not.toHaveAttribute("aria-valuenow");
+    expect(
+      progress.querySelector("[data-slot='progress-indicator']"),
+    ).toHaveStyle({ transform: "translateX(-100%)" });
+  });
+
+  it("merges className on the root", () => {
     render(
-      <Progress value={10} aria-label="État" className="ma-progression" />,
+      <Progress value={10} aria-label="Status" className="custom-progress" />,
     );
 
     expect(
-      screen.getByRole("progressbar", { name: "État" }).className,
-    ).toContain("ma-progression");
+      screen.getByRole("progressbar", { name: "Status" }).className,
+    ).toContain("custom-progress");
   });
 
-  it("forwards ref to progress root", () => {
+  it("forwards refs to the root element", () => {
     const ref = createRef<HTMLDivElement>();
 
-    render(<Progress ref={ref} value={30} aria-label="Ref" />);
+    render(<Progress ref={ref} value={30} aria-label="Reference" />);
 
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
 
   it("has no obvious a11y violations", async () => {
     const { container } = render(
-      <Progress value={45} aria-label="Chargement" />,
+      <Progress value={45} aria-label="Loading progress" />,
     );
 
     expect(await axe(container)).toHaveNoViolations();

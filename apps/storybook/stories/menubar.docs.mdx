@@ -1,0 +1,81 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as MenubarStories from "./menubar.stories";
+import { menubarRecommendedUsageCode } from "./menubar.docs-source";
+
+<Meta of={MenubarStories} />
+
+<Title />
+<Subtitle>
+  Use Menubar for compact command families that should stay visible as a
+  horizontal application-style control strip.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={menubarRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Menubar when a small set of command groups must remain available at the top
+of a workspace, for example file actions, view toggles, or lightweight tools.
+
+Avoid Menubar for deep site navigation or action lists that need large labels
+and explanations.
+
+<Canvas of={MenubarStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect direction, looping behavior, and the base menu
+contract.
+
+<Controls of={MenubarStories.Playground} />
+
+## Composition patterns
+
+The surfaced example shows the same command strip inside a contained block.
+Checkbox, radio, and submenu variants are appropriate when the command family
+still reads as a compact toolbar-level control.
+
+<Canvas of={MenubarStories.OnSurface} sourceState="none" />
+<Canvas of={MenubarStories.CheckboxAndRadio} sourceState="none" />
+<Canvas of={MenubarStories.Submenu} sourceState="none" />
+
+## Accessibility contract
+
+- the active trigger exposes `aria-expanded` and opens a linked menu surface
+- Escape closes the open layer and returns focus to the trigger
+- checkbox and radio entries keep `menuitemcheckbox` and `menuitemradio` semantics
+- local portal mounting keeps the interaction checks scoped to the menubar audit area
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, menu marker, trigger, content, label, separator, group, item, shortcut, checkbox and radio items, and submenu pieces
+- when using `MenubarTrigger` or `MenubarItem` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local menubar audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, checkbox and radio callbacks, disabled items, semantic classes, ref forwarding, and a11y
+
+What still needs manual review:
+
+- visual pass for submenu alignment and command density in both themes
+- keyboard smoke pass across adjacent triggers when labels are translated or wrapped
+
+## Responsive notes
+
+The menubar root now keeps horizontal overflow scrollable instead of forcing
+clipping. Use the responsive stress case to review long trigger labels on a
+narrow surface before introducing additional command groups.

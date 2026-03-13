@@ -1,0 +1,78 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as DialogStories from "./dialog.stories";
+import { dialogRecommendedUsageCode } from "./dialog.docs-source";
+
+<Meta of={DialogStories} />
+
+<Title />
+<Subtitle>
+  Use Dialog for short blocking decisions that need focused confirmation before
+  users continue.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={dialogRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Dialog when the user must confirm, review, or cancel a short action in a
+modal context.
+
+Avoid Dialog for long multi-step forms, persistent side panels, or lightweight
+contextual hints.
+
+<Canvas of={DialogStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled open state, plus the
+modal toggle.
+
+<Controls of={DialogStories.Playground} />
+
+## Composition patterns
+
+The base composition works in regular page flow. The surfaced example shows the
+same dialog trigger inside a card-like block without changing the overlay
+contract.
+
+<Canvas of={DialogStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes `aria-expanded` and opens a labelled dialog
+- Escape closes the open layer and returns focus to the trigger
+- portal content stays keyboard reachable even when rendered into a local test container
+- focus styling remains visible on close controls in light and dark themes
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, content, header, title, description, body, footer, and close controls
+- when using `DialogTrigger` or `DialogClose` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local dialog audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, container-based portal mounting, overlay dismissal, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for trigger and close cursor affordance, overlay contrast, and spacing on the centered dialog surface
+- screen reader smoke pass for title and description announcement on a representative flow
+
+## Responsive notes
+
+Dialog content keeps a capped width and recenters on narrow screens. Long body
+copy may wrap, but actions should remain readable without horizontal overflow.

@@ -1,0 +1,81 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as DropdownMenuStories from "./dropdown-menu.stories";
+import { dropdownMenuRecommendedUsageCode } from "./dropdown-menu.docs-source";
+
+<Meta of={DropdownMenuStories} />
+
+<Title />
+<Subtitle>
+  Use DropdownMenu for short action lists that stay anchored to a trigger
+  without introducing a persistent navigation pattern.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={dropdownMenuRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use DropdownMenu when several related actions should stay close to one button,
+for example account shortcuts, quick state changes, or compact command groups.
+
+Avoid DropdownMenu for long-form editing, dense navigation, or options that
+must stay visible while the surrounding page changes.
+
+<Canvas of={DropdownMenuStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled open state, plus the
+modal toggle and reading direction.
+
+<Controls of={DropdownMenuStories.Playground} />
+
+## Composition patterns
+
+The base composition works directly in page flow. Use a surfaced trigger when
+the action belongs inside a contained block, and add checkbox, radio, or
+submenu variants only when the menu still stays compact.
+
+<Canvas of={DropdownMenuStories.OnSurface} sourceState="none" />
+<Canvas of={DropdownMenuStories.CheckboxAndRadio} sourceState="none" />
+<Canvas of={DropdownMenuStories.Submenu} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes `aria-expanded` and opens a labelled menu surface
+- Escape closes the open layer and returns focus to the trigger
+- checkbox and radio entries keep `menuitemcheckbox` and `menuitemradio` semantics
+- local portal mounting keeps the interaction checks scoped to the dropdown audit area
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, content, label, separator, group, item, shortcut, checkbox and radio items, and submenu pieces
+- when using `DropdownMenuTrigger` or `DropdownMenuItem` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local dropdown audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, checkbox and radio callbacks, disabled items, semantic classes, ref forwarding, and a11y
+
+What still needs manual review:
+
+- visual pass for submenu spacing, pointer affordance, and layer alignment in the intended theme contexts
+- keyboard smoke pass for wrapped labels or translated copy if menu labels get substantially longer
+
+## Responsive notes
+
+Dropdown menus should stay short enough to scan in one glance. If labels become
+long or start to imply persistent choices, prefer a larger surfaced pattern
+instead of relying on a wider menu.

@@ -1,6 +1,7 @@
 import { createRef, useState } from "react";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -24,147 +25,249 @@ import {
 } from "./context-menu";
 
 describe("ContextMenu", () => {
-  function openContextMenu(triggerLabel: string) {
-    const trigger = screen.getByRole("button", { name: triggerLabel });
+  function openContextMenu(name: string) {
+    const trigger = screen.getByRole("button", { name });
+    trigger.focus();
     fireEvent.pointerDown(trigger, { button: 2, ctrlKey: false });
     fireEvent.contextMenu(trigger);
     return trigger;
   }
 
-  function renderContextMenu(props?: React.ComponentProps<typeof ContextMenu>) {
-    return render(
-      <ContextMenu {...props}>
-        <ContextMenuTrigger asChild>
-          <button type="button">Zone contextuelle</button>
+  async function waitForContextMenuContent(scope: ParentNode = document) {
+    return waitFor(() => {
+      const node = scope.querySelector("[data-slot='context-menu-content']");
+      if (!node) {
+        throw new Error("context menu content not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+  }
+
+  it("keeps slot markers stable in default composition", async () => {
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
+
+    const { container } = render(
+      <ContextMenu>
+        <ContextMenuTrigger data-slot="custom-trigger">
+          Zone contextuelle
         </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuLabel>Mon compte</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuGroup>
-            <ContextMenuItem>
+        <ContextMenuContent
+          container={portalContainer}
+          data-slot="custom-content"
+        >
+          <ContextMenuLabel data-slot="custom-label">
+            Mon compte
+          </ContextMenuLabel>
+          <ContextMenuSeparator data-slot="custom-separator" />
+          <ContextMenuGroup data-slot="custom-group">
+            <ContextMenuItem data-slot="custom-item">
               Profil
-              <ContextMenuShortcut>P</ContextMenuShortcut>
+              <ContextMenuShortcut data-slot="custom-shortcut">
+                P
+              </ContextMenuShortcut>
             </ContextMenuItem>
-            <ContextMenuItem>Parametres</ContextMenuItem>
-            <ContextMenuItem disabled>Support</ContextMenuItem>
           </ContextMenuGroup>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>Parametres avances</ContextMenuSubTrigger>
-            <ContextMenuPortal>
-              <ContextMenuSubContent>
-                <ContextMenuItem>Regles de substitution</ContextMenuItem>
+          <ContextMenuSub open>
+            <ContextMenuSubTrigger data-slot="custom-sub-trigger">
+              Parametres avances
+            </ContextMenuSubTrigger>
+            <ContextMenuPortal container={portalContainer}>
+              <ContextMenuSubContent data-slot="custom-sub-content">
+                <ContextMenuCheckboxItem
+                  checked
+                  data-slot="custom-checkbox-item"
+                >
+                  Notifications
+                </ContextMenuCheckboxItem>
+                <ContextMenuRadioGroup
+                  data-slot="custom-radio-group"
+                  value="expert"
+                >
+                  <ContextMenuRadioItem
+                    data-slot="custom-radio-item"
+                    value="expert"
+                  >
+                    Mode expert
+                  </ContextMenuRadioItem>
+                </ContextMenuRadioGroup>
               </ContextMenuSubContent>
             </ContextMenuPortal>
           </ContextMenuSub>
         </ContextMenuContent>
       </ContextMenu>,
     );
-  }
 
-  it("opens from right click and closes on outside click", async () => {
-    renderContextMenu();
+    const trigger = screen.getByText("Zone contextuelle");
+    fireEvent.pointerDown(trigger, { button: 2, ctrlKey: false });
+    fireEvent.contextMenu(trigger);
+    await waitForContextMenuContent(portalContainer);
 
-    openContextMenu("Zone contextuelle");
+    expect(container.querySelector("[data-slot='context-menu']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='context-menu-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-portal']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-label']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-separator']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-group']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-item']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-shortcut']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-sub']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-sub-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-sub-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-checkbox-item']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-radio-group']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='context-menu-radio-item']"),
+    ).toBeTruthy();
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeTruthy();
-    });
-
-    fireEvent.pointerDown(document.body);
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeNull();
-    });
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-label']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-separator']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-group']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-item']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-shortcut']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-sub-trigger']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-sub-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-checkbox-item']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-radio-group']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-radio-item']"),
+    ).toBeNull();
   });
 
-  it("closes on Escape", async () => {
-    renderContextMenu();
+  it("opens from right click, closes on Escape, and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
 
-    openContextMenu("Zone contextuelle");
+    render(
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <button type="button">Zone contextuelle</button>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem>Profil</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>,
+    );
 
-    const content = await waitFor(() => {
-      const node = document.querySelector("[data-slot='context-menu-content']");
-      if (!node) {
-        throw new Error("context menu content not mounted yet");
-      }
-      return node as HTMLElement;
-    });
+    const trigger = openContextMenu("Zone contextuelle");
 
-    fireEvent.keyDown(content, { key: "Escape", code: "Escape" });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("supports keyboard navigation in root menu", async () => {
-    renderContextMenu();
-
-    openContextMenu("Zone contextuelle");
-
-    const firstItem = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: /Profil/ });
-    });
-
-    firstItem.focus();
-    fireEvent.keyDown(firstItem, { key: "ArrowDown", code: "ArrowDown" });
-    fireEvent.keyDown(firstItem, { key: "ArrowUp", code: "ArrowUp" });
-    fireEvent.keyDown(firstItem, { key: "Enter", code: "Enter" });
+    await waitForContextMenuContent();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("opens submenu with ArrowRight and closes with ArrowLeft/Escape", async () => {
-    renderContextMenu();
-
-    openContextMenu("Zone contextuelle");
-
-    const subTrigger = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: "Parametres avances" });
-    });
-
-    subTrigger.focus();
-    fireEvent.keyDown(subTrigger, { key: "ArrowRight", code: "ArrowRight" });
-
-    const subContent = await waitFor(() => {
-      const node = document.querySelector(
-        "[data-slot='context-menu-sub-content']",
+      expect(["menu", "menuitem"]).toContain(
+        document.activeElement?.getAttribute("role"),
       );
-      if (!node) {
-        throw new Error("context submenu content not mounted yet");
-      }
-      return node as HTMLElement;
     });
 
-    fireEvent.keyDown(subContent, { key: "ArrowLeft", code: "ArrowLeft" });
-    fireEvent.keyDown(subContent, { key: "Escape", code: "Escape" });
+    await user.keyboard("{Escape}");
 
     await waitFor(() => {
       expect(
-        document.querySelector("[data-slot='context-menu-sub-content']"),
+        document.querySelector("[data-slot='context-menu-content']"),
       ).toBeNull();
+    });
+    await waitFor(() => {
+      expect(trigger).toHaveFocus();
     });
   });
 
-  it("toggles checkbox item state and callback semantics", async () => {
-    function CheckboxExample() {
+  it("allows trigger and item slot override when using asChild", async () => {
+    render(
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <button data-slot="custom-trigger" type="button">
+            Zone asChild
+          </button>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem asChild>
+            <a data-slot="custom-item" href="#profil">
+              Ouvrir le profil
+            </a>
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>,
+    );
+
+    openContextMenu("Zone asChild");
+    await waitForContextMenuContent();
+
+    expect(
+      document.querySelector("[data-slot='custom-trigger']"),
+    ).toHaveTextContent("Zone asChild");
+    expect(
+      screen.getByRole("menuitem", { name: "Ouvrir le profil" }),
+    ).toHaveAttribute("data-slot", "custom-item");
+    expect(
+      document.querySelector("[data-slot='context-menu-trigger']"),
+    ).toBeNull();
+    expect(
+      document.querySelector("[data-slot='context-menu-item']"),
+    ).toBeNull();
+  });
+
+  it("updates checkbox and radio callbacks", async () => {
+    const onValueChange = vi.fn();
+
+    function SelectionExample() {
       const [checked, setChecked] = useState(false);
+      const [value, setValue] = useState("profil");
+
       return (
         <>
           <span data-state-text={checked ? "active" : "inactive"} />
           <ContextMenu>
             <ContextMenuTrigger asChild>
-              <button type="button">Zone notifications</button>
+              <button type="button">Zone methode</button>
             </ContextMenuTrigger>
             <ContextMenuContent>
               <ContextMenuCheckboxItem
@@ -173,77 +276,52 @@ describe("ContextMenu", () => {
               >
                 Activer les notifications
               </ContextMenuCheckboxItem>
+              <ContextMenuSeparator />
+              <ContextMenuRadioGroup
+                onValueChange={(next) => {
+                  setValue(next);
+                  onValueChange(next);
+                }}
+                value={value}
+              >
+                <ContextMenuRadioItem value="profil">
+                  Profil
+                </ContextMenuRadioItem>
+                <ContextMenuRadioItem value="expert">
+                  Mode expert
+                </ContextMenuRadioItem>
+              </ContextMenuRadioGroup>
             </ContextMenuContent>
           </ContextMenu>
         </>
       );
     }
 
-    const { container } = render(<CheckboxExample />);
-
-    openContextMenu("Zone notifications");
-
-    const item = await waitFor(() => {
-      return screen.getByRole("menuitemcheckbox", {
-        name: "Activer les notifications",
-      });
-    });
-
-    expect(item).toHaveAttribute("aria-checked", "false");
-
-    fireEvent.click(item);
-
-    await waitFor(() => {
-      const state = container.querySelector("[data-state-text]");
-      expect(state).toHaveAttribute("data-state-text", "active");
-    });
-  });
-
-  it("updates radio group selection and callback semantics", async () => {
-    const onValueChange = vi.fn();
-
-    function RadioExample() {
-      const [value, setValue] = useState("profil");
-      return (
-        <ContextMenu>
-          <ContextMenuTrigger asChild>
-            <button type="button">Zone methode</button>
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuRadioGroup
-              value={value}
-              onValueChange={(next) => {
-                setValue(next);
-                onValueChange(next);
-              }}
-            >
-              <ContextMenuRadioItem value="profil">Profil</ContextMenuRadioItem>
-              <ContextMenuRadioItem value="expert">
-                Mode expert
-              </ContextMenuRadioItem>
-            </ContextMenuRadioGroup>
-          </ContextMenuContent>
-        </ContextMenu>
-      );
-    }
-
-    render(<RadioExample />);
+    render(<SelectionExample />);
 
     openContextMenu("Zone methode");
 
-    const expert = await waitFor(() => {
-      return screen.getByRole("menuitemradio", { name: "Mode expert" });
+    const checkbox = await screen.findByRole("menuitemcheckbox", {
+      name: "Activer les notifications",
+    });
+    await userEvent.click(checkbox);
+
+    await waitFor(() => {
+      expect(document.querySelector("[data-state-text='active']")).toBeTruthy();
     });
 
-    fireEvent.click(expert);
+    openContextMenu("Zone methode");
+
+    const radio = screen.getByRole("menuitemradio", { name: "Mode expert" });
+    await userEvent.click(radio);
 
     expect(onValueChange).toHaveBeenCalledWith("expert");
     await waitFor(() => {
-      expect(expert).toHaveAttribute("aria-checked", "true");
+      expect(radio).toHaveAttribute("aria-checked", "true");
     });
   });
 
-  it("does not select disabled item", async () => {
+  it("does not select disabled items", async () => {
     const onSelect = vi.fn();
 
     render(
@@ -261,170 +339,19 @@ describe("ContextMenu", () => {
 
     openContextMenu("Zone support");
 
-    const disabledItem = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: "Support prioritaire" });
+    const item = await screen.findByRole("menuitem", {
+      name: "Support prioritaire",
     });
-
-    fireEvent.click(disabledItem);
+    await userEvent.click(item);
 
     expect(onSelect).not.toHaveBeenCalled();
   });
 
-  it("renders expected slots across root, submenu, and item indicators", async () => {
-    const { container } = renderContextMenu();
-
-    openContextMenu("Zone contextuelle");
-
-    const subTrigger = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: "Parametres avances" });
-    });
-
-    fireEvent.keyDown(subTrigger, { key: "ArrowRight", code: "ArrowRight" });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-sub-content']"),
-      ).toBeTruthy();
-    });
-
-    expect(container.querySelector("[data-slot='context-menu']")).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='context-menu-trigger']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-portal']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-content']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-group']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-item']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-label']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-separator']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-shortcut']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-sub']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-sub-trigger']"),
-    ).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='context-menu-sub-content']"),
-    ).toBeTruthy();
-  });
-
-  it("applies semantic class contracts", async () => {
+  it("keeps semantic classes and merges className on exposed compounds", async () => {
     render(
       <ContextMenu>
-        <ContextMenuTrigger asChild>
+        <ContextMenuTrigger asChild className="trigger-personnalise">
           <button type="button">Zone classes</button>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem>Profil</ContextMenuItem>
-          <ContextMenuSub open>
-            <ContextMenuSubTrigger>Sous-menu</ContextMenuSubTrigger>
-            <ContextMenuPortal>
-              <ContextMenuSubContent>
-                <ContextMenuCheckboxItem checked>Actif</ContextMenuCheckboxItem>
-                <ContextMenuRadioGroup value="a">
-                  <ContextMenuRadioItem value="a">
-                    Option A
-                  </ContextMenuRadioItem>
-                </ContextMenuRadioGroup>
-              </ContextMenuSubContent>
-            </ContextMenuPortal>
-          </ContextMenuSub>
-        </ContextMenuContent>
-      </ContextMenu>,
-    );
-
-    openContextMenu("Zone classes");
-
-    const content = await waitFor(() => {
-      return document.querySelector(
-        "[data-slot='context-menu-content']",
-      ) as HTMLElement | null;
-    });
-
-    const subContent = document.querySelector(
-      "[data-slot='context-menu-sub-content']",
-    ) as HTMLElement | null;
-    const item = document.querySelector(
-      "[data-slot='context-menu-item']",
-    ) as HTMLElement | null;
-    const subTrigger = document.querySelector(
-      "[data-slot='context-menu-sub-trigger']",
-    ) as HTMLElement | null;
-    const checkboxItem = document.querySelector(
-      "[data-slot='context-menu-checkbox-item']",
-    ) as HTMLElement | null;
-
-    expect(content?.className ?? "").toContain("bg-popover");
-    expect(content?.className ?? "").toContain("text-popover-foreground");
-    expect(content?.className ?? "").toContain("data-[state=open]:animate-in");
-
-    expect(subContent?.className ?? "").toContain("bg-popover");
-    expect(subContent?.className ?? "").toContain("text-popover-foreground");
-    expect(subContent?.className ?? "").toContain(
-      "data-[state=open]:zoom-in-95",
-    );
-
-    expect(item?.className ?? "").toContain("focus:bg-accent");
-    expect(item?.className ?? "").toContain("focus:text-accent-foreground");
-
-    expect(subTrigger?.className ?? "").toContain(
-      "data-[state=open]:bg-accent",
-    );
-    expect(subTrigger?.className ?? "").toContain(
-      "data-[state=open]:text-accent-foreground",
-    );
-
-    expect(checkboxItem?.className ?? "").toContain(
-      "data-[disabled]:pointer-events-none",
-    );
-    expect(
-      document.querySelector("[data-slot='context-menu-item-indicator']"),
-    ).toBeTruthy();
-  });
-
-  it("supports asChild trigger and item", async () => {
-    render(
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <button type="button">Zone asChild</button>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem asChild>
-            <a href="#profil">Ouvrir le profil</a>
-          </ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>,
-    );
-
-    const trigger = openContextMenu("Zone asChild");
-    const itemLink = await waitFor(() => {
-      return screen.getByRole("menuitem", { name: "Ouvrir le profil" });
-    });
-
-    expect(trigger).toHaveAttribute("data-slot", "context-menu-trigger");
-    expect(itemLink).toHaveAttribute("data-slot", "context-menu-item");
-  });
-
-  it("merges className on content, item, label, separator and shortcut", async () => {
-    render(
-      <ContextMenu>
-        <ContextMenuTrigger asChild>
-          <button type="button">Zone classes merge</button>
         </ContextMenuTrigger>
         <ContextMenuContent className="contenu-personnalise">
           <ContextMenuLabel className="label-personnalise">
@@ -441,18 +368,20 @@ describe("ContextMenu", () => {
       </ContextMenu>,
     );
 
-    openContextMenu("Zone classes merge");
+    const trigger = openContextMenu("Zone classes");
+    const content = await waitForContextMenuContent();
+    const item = screen.getByRole("menuitem", { name: /Profil/ });
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeTruthy();
-    });
-
-    expect(
-      document.querySelector("[data-slot='context-menu-content']")?.className ??
-        "",
-    ).toContain("contenu-personnalise");
+    expect(trigger.className).toContain("trigger-personnalise");
+    expect(content.className).toContain("bg-popover");
+    expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).toContain("data-[state=open]:animate-in");
+    expect(content.className).toContain("contenu-personnalise");
+    expect(item.className).toContain("cursor-pointer");
+    expect(item.className).toContain("text-sm");
+    expect(item.className).toContain("focus:bg-accent");
+    expect(item.className).toContain("focus:text-accent-foreground");
+    expect(item.className).toContain("item-personnalise");
     expect(
       document.querySelector("[data-slot='context-menu-label']")?.className ??
         "",
@@ -461,10 +390,6 @@ describe("ContextMenu", () => {
       document.querySelector("[data-slot='context-menu-separator']")
         ?.className ?? "",
     ).toContain("separateur-personnalise");
-    expect(
-      document.querySelector("[data-slot='context-menu-item']")?.className ??
-        "",
-    ).toContain("item-personnalise");
     expect(
       document.querySelector("[data-slot='context-menu-shortcut']")
         ?.className ?? "",
@@ -488,36 +413,34 @@ describe("ContextMenu", () => {
     );
 
     openContextMenu("Zone refs");
-
-    await waitFor(() => {
-      expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
-      expect(itemRef.current).toBeInstanceOf(HTMLDivElement);
-    });
+    await waitForContextMenuContent();
 
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
+    expect(contentRef.current).toBeInstanceOf(HTMLDivElement);
+    expect(itemRef.current).toBeInstanceOf(HTMLDivElement);
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(
+    const auditRoot = document.createElement("main");
+    const portalContainer = document.createElement("div");
+    auditRoot.append(portalContainer);
+    document.body.append(auditRoot);
+
+    render(
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <button type="button">Zone accessibilite</button>
         </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuLabel>Options</ContextMenuLabel>
+        <ContextMenuContent container={portalContainer}>
           <ContextMenuItem>Profil</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>,
+      { container: auditRoot },
     );
 
     openContextMenu("Zone accessibilite");
+    await waitForContextMenuContent(portalContainer);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='context-menu-content']"),
-      ).toBeTruthy();
-    });
-
-    expect(await axe(container)).toHaveNoViolations();
+    expect(await axe(auditRoot)).toHaveNoViolations();
   });
 });

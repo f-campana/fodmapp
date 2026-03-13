@@ -1,0 +1,78 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as DrawerStories from "./drawer.stories";
+import { drawerRecommendedUsageCode } from "./drawer.docs-source";
+
+<Meta of={DrawerStories} />
+
+<Title />
+<Subtitle>
+  Use Drawer for short task clusters that should slide in from an edge without
+  replacing the current screen.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={drawerRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Drawer for quick actions, compact filters, or mobile-first edits that
+benefit from edge-origin motion.
+
+Avoid Drawer for dense desktop configuration screens or flows that require
+multiple persistent columns.
+
+<Canvas of={DrawerStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test direction, dismissal, modal behavior, and background
+scaling.
+
+<Controls of={DrawerStories.Playground} />
+
+## Directional variants
+
+Bottom is the default mobile-first pattern. Right-side drawers work better for
+desktop inspector-like tasks.
+
+<Canvas of={DrawerStories.RightSide} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes `aria-expanded` and opens a labelled dialog surface
+- Escape closes the drawer and returns focus to the trigger
+- focus moves into the open drawer before dismissal
+- portal content can render into a local container for isolated interaction checks
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, content, handle, header, title, description, footer, and close controls
+- when using `DrawerTrigger` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local drawer audit area
+- Storybook interaction checks verify keyboard open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, container-based portal mounting, close-button and overlay dismissal, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for trigger and close cursor affordance, motion direction, and edge alignment on bottom and right variants
+- touch smoke pass for right-side viewport alignment and reachable wrapped footer actions on a narrow viewport
+
+## Responsive notes
+
+The bottom drawer is the primary mobile layout. Side drawers should stay within
+their capped width and avoid clipping footer actions when viewport height is
+limited.

@@ -1,5 +1,16 @@
 # @fodmap/storybook
 
+## Unreleased
+
+### Internal
+
+- Add optional local-only Agentation integration for Storybook UI refinement.
+
+  Enable with:
+  `STORYBOOK_ENABLE_AGENTATION=true pnpm --filter @fodmap/storybook storybook`
+
+  Default behavior remains disabled unless the flag is explicitly set.
+
 ## 0.1.26
 
 ### Patch Changes

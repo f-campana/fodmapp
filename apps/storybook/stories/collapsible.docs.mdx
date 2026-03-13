@@ -1,0 +1,89 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CollapsibleStories from "./collapsible.stories";
+import { collapsibleRecommendedUsageCode } from "./collapsible.docs-source";
+
+<Meta of={CollapsibleStories} />
+
+<Title />
+<Subtitle>
+  Use Collapsible for a single optional detail that should stay close to its
+  trigger without introducing a full multi-section disclosure pattern.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={collapsibleRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Collapsible when one question or one action needs an optional explanation,
+for example a preparation note, a substitution hint, or a secondary checklist.
+
+Prefer Accordion when several related sections need the same treatment and users
+may compare or scan them as a group.
+
+<Canvas of={CollapsibleStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground for quick contract discovery and state checks.
+
+<Controls of={CollapsibleStories.Playground} />
+
+## Composition patterns
+
+Use the bare block pattern when the disclosure lives directly in page flow. Use
+the surfaced pattern when the content belongs inside a card, inset panel, or
+contained form section.
+
+<Canvas of={CollapsibleStories.OnSurface} sourceState="none" />
+
+## Behavior states
+
+`defaultOpen` is useful when the extra guidance should be visible on first
+render. Disabled mode should keep the trigger visible but clearly non-active.
+
+<Canvas of={CollapsibleStories.Disabled} sourceState="none" />
+<Canvas of={CollapsibleStories.InitiallyOpen} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger is a real button with visible focus treatment
+- expanded or collapsed state is exposed through `aria-expanded`
+- trigger and content stay linked through `aria-controls` and `id`
+- hidden content is removed from the reading order until opened
+- touch targets keep the same minimum interactive height as other disclosure controls
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on root, trigger, and content
+- when using `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Collapsible example area
+- Storybook interaction checks verify open, close, and semantic linkage
+- UI tests cover slot markers for default composition, the `asChild` slot exception, uncontrolled behavior, disabled state, refs, and a11y
+
+What is checked manually:
+
+- keyboard smoke pass to confirm focus visibility in the intended theme contexts
+- visual review for wrapped labels and open content spacing at narrow widths
+
+## Responsive notes
+
+Long labels are allowed to wrap. The responsive stress case should show the
+opened detail immediately so both trigger and content spacing can be reviewed on
+first paint.
+
+<Canvas of={CollapsibleStories.ResponsiveStress} sourceState="none" />

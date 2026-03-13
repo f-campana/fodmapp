@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "build": "pnpm run storybook:build",
+    "styles:build": "node ./scripts/build-preview-styles.mjs",
+    "styles:watch": "node ./scripts/build-preview-styles.mjs --watch",
     "typecheck": "pnpm run storybook:typecheck",
     "test": "pnpm run test:local",
     "test:local": "pnpm run storybook:build && pnpm run storybook:test",
     "test:ci": "pnpm run storybook:test",
-    "storybook": "storybook dev -p 6006 --ci",
-    "storybook:build": "storybook build",
+    "storybook": "node ./scripts/storybook-dev.mjs",
+    "storybook:build": "pnpm run styles:build && storybook build",
     "storybook:typecheck": "tsc -p tsconfig.json --noEmit && pnpm run stories:taxonomy:check",
     "storybook:serve": "http-server ./storybook-static -p 6006 -a 127.0.0.1 --silent",
     "storybook:test": "start-server-and-test \"pnpm storybook:serve\" http://127.0.0.1:6006 \"test-storybook --url http://127.0.0.1:6006 --maxWorkers=2\"",
-    "stories:taxonomy:check": "node ./scripts/check-component-taxonomy.mjs"
+    "stories:taxonomy:check": "node ./scripts/check-component-taxonomy.mjs",
+    "storybook:dev": "storybook dev -p 6006 --ci"
   },
   "dependencies": {
     "@fodmap/design-tokens": "workspace:*",
@@ -25,10 +28,12 @@
   },
   "devDependencies": {
     "@storybook/addon-a11y": "10.2.14",
+    "@storybook/addon-docs": "10.2.14",
     "@storybook/react-vite": "10.2.14",
     "@storybook/test-runner": "0.24.2",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "agentation": "2.2.1",
     "http-server": "14.1.1",
     "lucide-react": "^0.576.0",
     "playwright": "1.58.2",

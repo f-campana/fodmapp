@@ -1,0 +1,85 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ContextMenuStories from "./context-menu.stories";
+import { contextMenuRecommendedUsageCode } from "./context-menu.docs-source";
+
+<Meta of={ContextMenuStories} />
+
+<Title />
+<Subtitle>
+  Use ContextMenu for secondary actions that should appear from a contextual
+  target without consuming permanent layout space.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={contextMenuRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use ContextMenu when the same surface already exists on screen and needs a
+compact action list on demand, for example a card, row, or workspace region.
+
+Avoid ContextMenu for primary actions that users must discover without relying
+on a secondary interaction.
+
+Open the surfaced example with a right-click, the keyboard context-menu key, or
+`Shift+F10`. A regular left click does not open a context menu.
+
+<Canvas of={ContextMenuStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect modal behavior, reading direction, and callback
+behavior quickly.
+
+<Controls of={ContextMenuStories.Playground} />
+
+## Composition patterns
+
+The surfaced composition keeps the target visually present. Add checkbox,
+radio, or submenu variants only when the contextual action list remains short
+and clearly attached to the trigger area.
+
+<Canvas of={ContextMenuStories.OnSurface} sourceState="none" />
+<Canvas of={ContextMenuStories.CheckboxAndRadio} sourceState="none" />
+<Canvas of={ContextMenuStories.Submenu} sourceState="none" />
+
+## Accessibility contract
+
+- the contextual target can regain focus after Escape closes the open menu
+- checkbox and radio entries keep `menuitemcheckbox` and `menuitemradio` semantics
+- local portal mounting keeps the interaction checks scoped to the context menu audit area
+- submenu items keep the same slot and focus contract as the root menu content
+- the default story target states the required right-click or keyboard gesture explicitly
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the root, trigger, content, label, separator, group, item, shortcut, checkbox and radio items, and submenu pieces
+- when using `ContextMenuTrigger` or `ContextMenuItem` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local context menu audit area
+- Storybook interaction checks verify contextual open, local portal mounting, the `asChild` slot exception, Escape close, and trigger focus return
+- UI tests cover default-composition slot stability, the `asChild` slot exception, checkbox and radio callbacks, disabled items, semantic classes, ref forwarding, and a11y
+
+What still needs manual review:
+
+- visual pass for target affordance, submenu alignment, and context-menu placement near viewport edges
+- pointer-device smoke pass on representative surfaces to confirm the target area feels intentional
+
+## Responsive notes
+
+Context menus should stay compact even when the target surface is narrow. If
+the action list starts to require scanning or explanation, move the task to a
+more discoverable inline or surfaced control.

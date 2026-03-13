@@ -1,0 +1,79 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as TooltipStories from "./tooltip.stories";
+import { tooltipRecommendedUsageCode } from "./tooltip.docs-source";
+
+<Meta of={TooltipStories} />
+
+<Title />
+<Subtitle>
+  Use Tooltip for brief contextual guidance that should stay visually tied to a
+  trigger without becoming a richer popover.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={tooltipRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Tooltip for short help text, quick portion reminders, or clarifying notes
+that support an existing control.
+
+Avoid Tooltip for long instructions, interactive content, or blocking
+confirmation flows.
+
+<Canvas of={TooltipStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect uncontrolled and controlled visibility, plus the
+hoverable-content toggle.
+
+<Controls of={TooltipStories.Playground} />
+
+## Composition patterns
+
+The default example shows the compact open state. Use the surfaced pattern when
+the trigger sits inside a card-like panel and the tooltip gap needs visual
+review against neighboring borders.
+
+<Canvas of={TooltipStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger remains keyboard reachable and keeps focus after Escape closes the tooltip
+- open content stays linked to the trigger through `aria-describedby`
+- content can mount into a local container for isolated interaction and a11y checks
+
+## Slot hooks
+
+- in default composition, `data-slot` hooks stay stable on the provider, root, trigger, and content
+- when using `TooltipTrigger` with `asChild`, child attributes take precedence, including `data-slot`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local tooltip audit area
+- Storybook interaction checks verify keyboard focus open, local container mounting, the `asChild` slot exception, Escape close, and trigger focus retention
+- UI tests cover default-composition slot stability, the `asChild` slot exception, local container mounting, semantic classes, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for compact trigger-to-panel spacing and non-touching borders
+- narrow-width review to confirm the open layer stays visible without clipped copy
+
+## Responsive notes
+
+Tooltip content keeps a compact width and collision padding so long copy can
+wrap without hiding the panel at narrow widths.
+
+<Canvas of={TooltipStories.ResponsiveStress} sourceState="none" />

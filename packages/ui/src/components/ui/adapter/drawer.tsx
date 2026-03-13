@@ -6,23 +6,46 @@ import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "../../../lib/cn";
 
+interface DrawerContextValue {
+  setLastTrigger: (trigger: HTMLElement | null) => void;
+  lastTriggerRef: React.MutableRefObject<HTMLElement | null>;
+}
+
+const DrawerContext = React.createContext<DrawerContextValue | null>(null);
+
 export type DrawerProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
 
 function Drawer({
+  autoFocus = true,
   children,
   direction = "bottom",
   shouldScaleBackground = true,
   ...props
 }: DrawerProps) {
+  const lastTriggerRef = React.useRef<HTMLElement | null>(null);
+  const contextValue = React.useMemo<DrawerContextValue>(
+    () => ({
+      setLastTrigger(trigger) {
+        lastTriggerRef.current = trigger;
+      },
+      lastTriggerRef,
+    }),
+    [],
+  );
+  const rootProps = {
+    autoFocus,
+    direction,
+    shouldScaleBackground,
+    ...props,
+  };
+
   return (
-    <DrawerPrimitive.Root
-      direction={direction}
-      shouldScaleBackground={shouldScaleBackground}
-      {...props}
-    >
-      <span data-slot="drawer" hidden />
-      {children}
-    </DrawerPrimitive.Root>
+    <DrawerContext.Provider value={contextValue}>
+      <DrawerPrimitive.Root {...rootProps}>
+        <span data-slot="drawer" hidden />
+        {children}
+      </DrawerPrimitive.Root>
+    </DrawerContext.Provider>
   );
 }
 
@@ -31,11 +54,21 @@ export type DrawerTriggerProps = React.ComponentProps<
 >;
 
 function DrawerTrigger({ className, ...props }: DrawerTriggerProps) {
+  const context = React.useContext(DrawerContext);
+
   return (
     <DrawerPrimitive.Trigger
-      data-slot="drawer-trigger"
-      className={cn(className)}
       {...props}
+      onFocus={(event) => {
+        props.onFocus?.(event);
+        context?.setLastTrigger(event.currentTarget);
+      }}
+      onPointerDown={(event) => {
+        props.onPointerDown?.(event);
+        context?.setLastTrigger(event.currentTarget);
+      }}
+      data-slot="drawer-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
@@ -76,19 +109,58 @@ export interface DrawerContentProps extends React.ComponentProps<
   typeof DrawerPrimitive.Content
 > {
   closeLabel?: string;
+  container?: DrawerPortalProps["container"];
 }
 
 function DrawerContent({
+  container,
   className,
   children,
   closeLabel = "Fermer",
+  onAnimationEnd,
+  ref: forwardedRef,
   ...props
 }: DrawerContentProps) {
+  const context = React.useContext(DrawerContext);
+
+  const setContentRef = (node: HTMLDivElement | null) => {
+    if (typeof forwardedRef === "function") {
+      forwardedRef(node);
+      return;
+    }
+
+    if (forwardedRef) {
+      forwardedRef.current = node;
+    }
+  };
+
   return (
-    <DrawerPortal>
+    <DrawerPortal container={container}>
       <DrawerOverlay />
       <DrawerPrimitive.Content
-        data-slot="drawer-content"
+        ref={setContentRef}
+        onAnimationEnd={(event) => {
+          onAnimationEnd?.(event);
+
+          if (
+            event.defaultPrevented ||
+            event.currentTarget.getAttribute("data-state") !== "closed"
+          ) {
+            return;
+          }
+
+          const contentId = event.currentTarget.id;
+          window.setTimeout(() => {
+            const trigger = context?.lastTriggerRef.current;
+            if (
+              trigger instanceof HTMLElement &&
+              (contentId === "" ||
+                trigger.getAttribute("aria-controls") === contentId)
+            ) {
+              trigger.focus();
+            }
+          }, 0);
+        }}
         className={cn(
           "fixed z-50 flex h-auto flex-col border border-border bg-popover text-popover-foreground shadow-lg outline-hidden",
           "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
@@ -105,6 +177,7 @@ function DrawerContent({
           className,
         )}
         {...props}
+        data-slot="drawer-content"
       >
         <div
           aria-hidden="true"
@@ -114,15 +187,15 @@ function DrawerContent({
         {children}
         <DrawerPrimitive.Close
           aria-label={closeLabel}
-          data-slot="drawer-close"
           className={cn(
-            "absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-(--radius) border border-transparent",
+            "absolute top-4 right-4 inline-flex size-8 cursor-pointer items-center justify-center rounded-(--radius) border border-transparent",
             "text-muted-foreground transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
             "hover:bg-accent hover:text-accent-foreground",
             "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
             "disabled:pointer-events-none disabled:opacity-50",
           )}
           type="button"
+          data-slot="drawer-close"
         >
           <svg
             aria-hidden="true"
@@ -152,16 +225,16 @@ export type DrawerCloseProps = React.ComponentProps<
 function DrawerClose({ className, ...props }: DrawerCloseProps) {
   return (
     <DrawerPrimitive.Close
+      {...props}
       data-slot="drawer-close"
       className={cn(
-        "inline-flex items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
+        "inline-flex cursor-pointer items-center justify-center rounded-(--radius) border border-border px-3 py-2 text-sm font-medium",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "hover:bg-accent hover:text-accent-foreground",
         "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "disabled:pointer-events-none disabled:opacity-50",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -171,9 +244,9 @@ export type DrawerHeaderProps = React.ComponentProps<"div">;
 function DrawerHeader({ className, ...props }: DrawerHeaderProps) {
   return (
     <div
-      data-slot="drawer-header"
       className={cn("grid gap-1.5 p-4 text-left", className)}
       {...props}
+      data-slot="drawer-header"
     />
   );
 }
@@ -183,9 +256,9 @@ export type DrawerFooterProps = React.ComponentProps<"div">;
 function DrawerFooter({ className, ...props }: DrawerFooterProps) {
   return (
     <div
-      data-slot="drawer-footer"
       className={cn("mt-auto flex flex-wrap justify-end gap-2 p-4", className)}
       {...props}
+      data-slot="drawer-footer"
     />
   );
 }
@@ -197,9 +270,9 @@ export type DrawerTitleProps = React.ComponentProps<
 function DrawerTitle({ className, ...props }: DrawerTitleProps) {
   return (
     <DrawerPrimitive.Title
-      data-slot="drawer-title"
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
+      data-slot="drawer-title"
     />
   );
 }
@@ -211,9 +284,9 @@ export type DrawerDescriptionProps = React.ComponentProps<
 function DrawerDescription({ className, ...props }: DrawerDescriptionProps) {
   return (
     <DrawerPrimitive.Description
-      data-slot="drawer-description"
       className={cn("text-sm text-muted-foreground", className)}
       {...props}
+      data-slot="drawer-description"
     />
   );
 }

@@ -1,0 +1,89 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as AccordionStories from "./accordion.stories";
+import { accordionRecommendedUsageCode } from "./accordion.docs-source";
+
+<Meta of={AccordionStories} />
+
+<Title />
+<Subtitle>
+  Use Accordion to reveal related content step by step without overwhelming the
+  page.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={accordionRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Accordion when content is grouped by topic and users can read one section at
+a time, for example preparation tips, substitution guidance, or short checklists.
+
+Avoid Accordion when users must compare many sections side by side, scan every
+answer quickly, or keep most sections open while deciding.
+
+<Canvas of={AccordionStories.Default} sourceState="none" />
+
+## Behavior Modes
+
+`single`: one item stays open at a time.  
+`multiple`: several items can stay open together.  
+`collapsible`: in `single` mode, users can close the currently open item.
+
+<Canvas of={AccordionStories.Multiple} sourceState="none" />
+<Canvas of={AccordionStories.Collapsible} sourceState="none" />
+
+## Composition Patterns
+
+Use the bare block pattern when accordion is part of the page flow. Use the
+surface composition when the content belongs inside a card, panel, or inset
+container.
+
+<Canvas of={AccordionStories.OnSurface} sourceState="none" />
+
+## Accessibility Contract
+
+This component follows the standard accessible accordion pattern:
+
+- each section header is a real button inside a heading
+- keyboard users can move between headers with arrow keys
+- expanded/collapsed state is exposed through `aria-expanded`
+- each header is linked to a labelled content region
+- focus remains visible in light and dark themes
+- header targets keep a minimum touch-friendly height (`44px`)
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan on the Accordion example area; any
+  violation fails the test run (`a11y.test: "error"`).
+- Storybook interaction checks verify open/close behavior and semantic state
+  changes.
+- Unit tests cover `single`, `multiple`, controlled/uncontrolled usage,
+  disabled behavior, keyboard navigation, and RTL behavior.
+
+What is checked manually:
+
+- Keyboard smoke pass in light and dark themes (focus visibility and trigger
+  navigation).
+- Screen reader smoke pass to confirm header names and associated regions on
+  representative content.
+
+## Responsive Notes
+
+Long labels are allowed to wrap. The chevron should stay visible, spacing should
+remain readable at narrow widths, and no horizontal overflow should appear in
+light, dark, or surfaced contexts.
+
+The example below is a stress case for long labels on small screens. It is not
+the primary product presentation.
+
+<Canvas of={AccordionStories.ResponsiveStress} sourceState="none" />

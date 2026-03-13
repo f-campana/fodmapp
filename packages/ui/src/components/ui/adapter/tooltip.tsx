@@ -39,29 +39,35 @@ export type TooltipTriggerProps = React.ComponentProps<
 function TooltipTrigger({ className, ...props }: TooltipTriggerProps) {
   return (
     <TooltipPrimitive.Trigger
-      data-slot="tooltip-trigger"
-      className={cn(className)}
       {...props}
+      data-slot="tooltip-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
 
 export type TooltipContentProps = React.ComponentProps<
   typeof TooltipPrimitive.Content
->;
+> & {
+  container?: React.ComponentProps<typeof TooltipPrimitive.Portal>["container"];
+};
 
 function TooltipContent({
+  container,
   className,
+  collisionPadding = 8,
   sideOffset = 6,
   ...props
 }: TooltipContentProps) {
   return (
-    <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Portal container={container}>
       <TooltipPrimitive.Content
+        {...props}
+        collisionPadding={collisionPadding}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-w-xs overflow-hidden rounded-(--radius) border border-border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md",
+          "z-50 w-fit max-w-[min(18rem,calc(100vw-1rem))] overflow-hidden rounded-(--radius) border border-border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md",
           "origin-(--radix-tooltip-content-transform-origin)",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -70,7 +76,6 @@ function TooltipContent({
           "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className,
         )}
-        {...props}
       />
     </TooltipPrimitive.Portal>
   );

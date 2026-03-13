@@ -24,9 +24,9 @@ export type HoverCardTriggerProps = React.ComponentProps<
 function HoverCardTrigger({ className, ...props }: HoverCardTriggerProps) {
   return (
     <HoverCardPrimitive.Trigger
-      data-slot="hover-card-trigger"
-      className={cn(className)}
       {...props}
+      data-slot="hover-card-trigger"
+      className={cn("cursor-pointer", className)}
     />
   );
 }
@@ -45,20 +45,26 @@ function HoverCardPortal({ children, ...props }: HoverCardPortalProps) {
 
 export type HoverCardContentProps = React.ComponentProps<
   typeof HoverCardPrimitive.Content
->;
+> & {
+  container?: HoverCardPortalProps["container"];
+};
 
 function HoverCardContent({
+  container,
   className,
+  collisionPadding = 8,
   sideOffset = 8,
   ...props
 }: HoverCardContentProps) {
   return (
-    <HoverCardPortal>
+    <HoverCardPortal container={container}>
       <HoverCardPrimitive.Content
+        {...props}
+        collisionPadding={collisionPadding}
         data-slot="hover-card-content"
         sideOffset={sideOffset}
         className={cn(
-          "z-50 w-72 rounded-(--radius) border border-border bg-popover p-4 text-popover-foreground shadow-md",
+          "z-50 w-72 max-w-[min(18rem,calc(100vw-1rem))] rounded-(--radius) border border-border bg-popover p-4 text-popover-foreground shadow-md",
           "origin-(--radix-hover-card-content-transform-origin)",
           "duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -68,7 +74,6 @@ function HoverCardContent({
           "data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
           className,
         )}
-        {...props}
       />
     </HoverCardPortal>
   );
@@ -86,11 +91,11 @@ function HoverCardArrow({
 }: HoverCardArrowProps) {
   return (
     <HoverCardPrimitive.Arrow
+      {...props}
       data-slot="hover-card-arrow"
       width={width}
       height={height}
       className={cn("fill-popover stroke-border", className)}
-      {...props}
     />
   );
 }

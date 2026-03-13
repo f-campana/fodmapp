@@ -1,6 +1,17 @@
-import { createRef, useState } from "react";
+import {
+  type ComponentProps,
+  createRef,
+  type ReactNode,
+  useState,
+} from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -23,7 +34,23 @@ window.HTMLElement.prototype.hasPointerCapture = vi.fn();
 window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 window.HTMLElement.prototype.setPointerCapture = vi.fn();
 
+function SelectTestHarness({
+  children,
+}: {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return <div ref={setPortalContainer}>{children(portalContainer)}</div>;
+}
+
 describe("Select", () => {
+  type SelectValueChangeHandler = NonNullable<
+    ComponentProps<typeof Select>["onValueChange"]
+  >;
+
   function openSelect() {
     const trigger = screen.getByRole("combobox");
     trigger.focus();
@@ -31,13 +58,23 @@ describe("Select", () => {
     return trigger;
   }
 
-  function renderSelect(props?: React.ComponentProps<typeof Select>) {
+  function renderSelectWithPortal(
+    renderChildren: (portalContainer: HTMLDivElement | null) => ReactNode,
+  ) {
     return render(
+      <SelectTestHarness>
+        {(portalContainer) => renderChildren(portalContainer)}
+      </SelectTestHarness>,
+    );
+  }
+
+  function renderSelect(props?: React.ComponentProps<typeof Select>) {
+    return renderSelectWithPortal((portalContainer) => (
       <Select {...props}>
         <SelectTrigger>
           <SelectValue placeholder="Choisir une option" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent container={portalContainer}>
           <SelectGroup>
             <SelectLabel>Options</SelectLabel>
             <SelectSeparator />
@@ -48,35 +85,75 @@ describe("Select", () => {
             </SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select>,
-    );
+      </Select>
+    ));
+  }
+
+  function getSelectPortal(container: HTMLElement) {
+    return container.querySelector("[data-slot='select-portal']");
+  }
+
+  function getSelectContent(container: HTMLElement) {
+    return container.querySelector("[data-slot='select-content']");
+  }
+
+  function getSelectViewport(container: HTMLElement) {
+    return container.querySelector("[data-slot='select-viewport']");
+  }
+
+  function getSelectItem(container: HTMLElement) {
+    return container.querySelector("[data-slot='select-item']");
+  }
+
+  function getSelectOption(container: HTMLElement, name: string) {
+    return within(container).getByRole("option", { name });
+  }
+
+  function querySelectOption(container: HTMLElement, name: string) {
+    return within(container).queryByRole("option", { name });
+  }
+
+  function renderDisabledItemSelect(onValueChange: SelectValueChangeHandler) {
+    return renderSelectWithPortal((portalContainer) => (
+      <Select onValueChange={onValueChange}>
+        <SelectTrigger>
+          <SelectValue placeholder="Choisir une option" />
+        </SelectTrigger>
+        <SelectContent container={portalContainer}>
+          <SelectGroup>
+            <SelectItem disabled value="support">
+              Support prioritaire
+            </SelectItem>
+            <SelectItem value="profil">Profil</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    ));
   }
 
   it("opens and closes from trigger in uncontrolled mode", async () => {
-    renderSelect();
+    const { container } = renderSelect();
 
     openSelect();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='select-content']"),
-      ).toBeTruthy();
+      expect(getSelectContent(container)).toBeTruthy();
     });
 
     fireEvent.pointerDown(document.body);
 
     await waitFor(() => {
-      expect(document.querySelector("[data-slot='select-content']")).toBeNull();
+      expect(getSelectContent(container)).toBeNull();
     });
   });
 
   it("closes on Escape", async () => {
-    renderSelect();
+    const { container } = renderSelect();
 
     openSelect();
 
     const content = await waitFor(() => {
-      const node = document.querySelector("[data-slot='select-content']");
+      const node = getSelectContent(container);
       if (!node) {
         throw new Error("select content not mounted yet");
       }
@@ -86,14 +163,14 @@ describe("Select", () => {
     fireEvent.keyDown(content, { key: "Escape", code: "Escape" });
 
     await waitFor(() => {
-      expect(document.querySelector("[data-slot='select-content']")).toBeNull();
+      expect(getSelectContent(container)).toBeNull();
     });
   });
 
   it("supports keyboard navigation and selection", async () => {
     const onValueChange = vi.fn();
 
-    renderSelect({ onValueChange });
+    const { container } = renderSelect({ onValueChange });
 
     const trigger = screen.getByRole("combobox");
 
@@ -101,12 +178,10 @@ describe("Select", () => {
     fireEvent.keyDown(trigger, { key: "ArrowDown", code: "ArrowDown" });
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='select-content']"),
-      ).toBeTruthy();
+      expect(getSelectContent(container)).toBeTruthy();
     });
 
-    const firstItem = screen.getByRole("option", { name: "Profil" });
+    const firstItem = getSelectOption(container, "Profil");
     firstItem.focus();
     fireEvent.keyDown(firstItem, { key: "ArrowDown", code: "ArrowDown" });
     fireEvent.keyDown(firstItem, { key: "ArrowUp", code: "ArrowUp" });
@@ -118,22 +193,29 @@ describe("Select", () => {
   it("updates controlled value via onValueChange", async () => {
     const onValueChange = vi.fn();
 
-    function ControlledExample() {
+    function ControlledExampleWithPortal({
+      onValueChange: handleValueChange,
+      portalContainer,
+    }: {
+      onValueChange: (value: string) => void;
+      portalContainer: HTMLDivElement | null;
+    }) {
       const [value, setValue] = useState("profil");
+
       return (
         <>
           <span data-value={value} />
           <Select
             onValueChange={(next) => {
               setValue(next);
-              onValueChange(next);
+              handleValueChange(next);
             }}
             value={value}
           >
             <SelectTrigger>
               <SelectValue placeholder="Choisir une option" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent container={portalContainer}>
               <SelectGroup>
                 <SelectItem value="profil">Profil</SelectItem>
                 <SelectItem value="mode-expert">Mode expert</SelectItem>
@@ -144,15 +226,25 @@ describe("Select", () => {
       );
     }
 
-    const { container } = render(<ControlledExample />);
+    const { container } = render(
+      <SelectTestHarness>
+        {(portalContainer) => (
+          <ControlledExampleWithPortal
+            onValueChange={onValueChange}
+            portalContainer={portalContainer}
+          />
+        )}
+      </SelectTestHarness>,
+    );
 
     openSelect();
 
-    const expert = await waitFor(() => {
-      return screen.getByRole("option", { name: "Mode expert" });
-    });
+    const expert = await waitFor(() =>
+      querySelectOption(container, "Mode expert"),
+    );
 
-    fireEvent.click(expert);
+    expect(expert).toBeTruthy();
+    fireEvent.click(expert!);
 
     expect(onValueChange).toHaveBeenCalledWith("mode-expert");
 
@@ -165,29 +257,16 @@ describe("Select", () => {
   it("does not select disabled item", async () => {
     const onValueChange = vi.fn();
 
-    render(
-      <Select onValueChange={onValueChange}>
-        <SelectTrigger>
-          <SelectValue placeholder="Choisir une option" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectItem disabled value="support">
-              Support prioritaire
-            </SelectItem>
-            <SelectItem value="profil">Profil</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>,
-    );
+    const { container } = renderDisabledItemSelect(onValueChange);
 
     openSelect();
 
-    const disabledItem = await waitFor(() => {
-      return screen.getByRole("option", { name: "Support prioritaire" });
-    });
+    const disabledItem = await waitFor(() =>
+      querySelectOption(container, "Support prioritaire"),
+    );
 
-    fireEvent.click(disabledItem);
+    expect(disabledItem).toBeTruthy();
+    fireEvent.click(disabledItem!);
 
     expect(onValueChange).not.toHaveBeenCalledWith("support");
   });
@@ -201,12 +280,12 @@ describe("Select", () => {
   });
 
   it("renders expected slots across root, content, viewport, and indicators", async () => {
-    const { container } = render(
+    const { container } = renderSelectWithPortal((portalContainer) => (
       <Select defaultValue="profil">
         <SelectTrigger>
           <SelectValue placeholder="Choisir une option" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent container={portalContainer}>
           <SelectGroup>
             <SelectLabel>Options</SelectLabel>
             <SelectSeparator />
@@ -220,15 +299,13 @@ describe("Select", () => {
             })}
           </SelectGroup>
         </SelectContent>
-      </Select>,
-    );
+      </Select>
+    ));
 
     openSelect();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='select-content']"),
-      ).toBeTruthy();
+      expect(getSelectContent(container)).toBeTruthy();
     });
 
     expect(container.querySelector("[data-slot='select']")).toBeTruthy();
@@ -236,20 +313,19 @@ describe("Select", () => {
       container.querySelector("[data-slot='select-trigger']"),
     ).toBeTruthy();
     expect(container.querySelector("[data-slot='select-value']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-portal']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-content']")).toBeTruthy();
+    expect(getSelectPortal(container)).toBeTruthy();
+    expect(getSelectContent(container)).toBeTruthy();
+    expect(getSelectViewport(container)).toHaveAttribute("tabindex", "0");
+    expect(getSelectViewport(container)).toHaveAttribute("role", "group");
+    expect(container.querySelector("[data-slot='select-label']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='select-group']")).toBeTruthy();
+    expect(getSelectItem(container)).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='select-viewport']"),
+      container.querySelector("[data-slot='select-separator']"),
     ).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-label']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-group']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-item']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='select-icon']")).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='select-separator']"),
-    ).toBeTruthy();
-    expect(document.querySelector("[data-slot='select-icon']")).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='select-item-indicator']"),
+      container.querySelector("[data-slot='select-item-indicator']"),
     ).toBeTruthy();
   });
 
@@ -261,19 +337,16 @@ describe("Select", () => {
     const trigger = container.querySelector(
       "[data-slot='select-trigger']",
     ) as HTMLElement | null;
-    const content = await waitFor(() => {
-      return document.querySelector(
-        "[data-slot='select-content']",
-      ) as HTMLElement | null;
-    });
-    const item = document.querySelector(
-      "[data-slot='select-item']",
-    ) as HTMLElement | null;
+    const content = await waitFor(
+      () => getSelectContent(container) as HTMLElement | null,
+    );
+    const item = getSelectItem(container) as HTMLElement | null;
 
     expect(trigger?.className ?? "").toContain("border-input");
+    expect(trigger?.className ?? "").toContain("cursor-pointer");
     expect(trigger?.className ?? "").toContain("focus-visible:ring-ring-soft");
     expect(trigger?.className ?? "").toContain(
-      "data-[placeholder]:text-muted-foreground",
+      "data-placeholder:text-muted-foreground",
     );
 
     expect(content?.className ?? "").toContain("bg-popover");
@@ -285,15 +358,19 @@ describe("Select", () => {
 
     expect(item?.className ?? "").toContain("focus:bg-accent");
     expect(item?.className ?? "").toContain("focus:text-accent-foreground");
+    expect(item?.className ?? "").toContain("cursor-pointer");
   });
 
   it("merges className on trigger, content, item, label, and separator", async () => {
-    const { container } = render(
+    const { container } = renderSelectWithPortal((portalContainer) => (
       <Select>
         <SelectTrigger className="declencheur-personnalise">
           <SelectValue placeholder="Choisir une option" />
         </SelectTrigger>
-        <SelectContent className="contenu-personnalise">
+        <SelectContent
+          className="contenu-personnalise"
+          container={portalContainer}
+        >
           <SelectGroup>
             <SelectLabel className="label-personnalise">Options</SelectLabel>
             <SelectSeparator className="separateur-personnalise" />
@@ -302,24 +379,22 @@ describe("Select", () => {
             </SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select>,
-    );
+      </Select>
+    ));
 
     openSelect();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='select-content']"),
-      ).toBeTruthy();
+      expect(getSelectContent(container)).toBeTruthy();
     });
 
     const trigger = container.querySelector(
       "[data-slot='select-trigger']",
     ) as HTMLElement | null;
-    const content = document.querySelector("[data-slot='select-content']");
-    const item = document.querySelector("[data-slot='select-item']");
-    const label = document.querySelector("[data-slot='select-label']");
-    const separator = document.querySelector("[data-slot='select-separator']");
+    const content = getSelectContent(container);
+    const item = getSelectItem(container);
+    const label = container.querySelector("[data-slot='select-label']");
+    const separator = container.querySelector("[data-slot='select-separator']");
 
     expect(trigger?.className ?? "").toContain("declencheur-personnalise");
     expect(content?.className ?? "").toContain("contenu-personnalise");
@@ -333,20 +408,20 @@ describe("Select", () => {
     const contentRef = createRef<HTMLDivElement>();
     const itemRef = createRef<HTMLDivElement>();
 
-    render(
+    renderSelectWithPortal((portalContainer) => (
       <Select>
         <SelectTrigger ref={triggerRef}>
           <SelectValue placeholder="Choisir une option" />
         </SelectTrigger>
-        <SelectContent ref={contentRef}>
+        <SelectContent container={portalContainer} ref={contentRef}>
           <SelectGroup>
             <SelectItem ref={itemRef} value="profil">
               Profil
             </SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select>,
-    );
+      </Select>
+    ));
 
     openSelect();
 
@@ -359,29 +434,27 @@ describe("Select", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(
+    const { container } = renderSelectWithPortal((portalContainer) => (
       <Select>
         <SelectTrigger>
           <SelectValue placeholder="Choisir une option" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent container={portalContainer}>
           <SelectGroup>
             <SelectItem value="profil">Profil</SelectItem>
             <SelectItem value="mode-expert">Mode expert</SelectItem>
           </SelectGroup>
         </SelectContent>
-      </Select>,
-    );
+      </Select>
+    ));
 
     openSelect();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='select-content']"),
-      ).toBeTruthy();
+      expect(getSelectContent(container)).toBeTruthy();
     });
 
-    expect(await axe(container)).toHaveNoViolations();
+    expect(await axe(getSelectPortal(container)!)).toHaveNoViolations();
   });
 
   it("exposes scroll button slots from dedicated components", () => {

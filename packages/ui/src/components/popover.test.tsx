@@ -1,6 +1,13 @@
 import { createRef } from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it } from "vitest";
@@ -26,20 +33,103 @@ describe("Popover", () => {
     );
   }
 
-  it("opens and closes from trigger in uncontrolled mode", async () => {
-    renderPopover();
-
-    fireEvent.click(screen.getByRole("button", { name: "Voir les details" }));
-
-    const content = await waitFor(() => {
+  async function waitForPopoverContent() {
+    return waitFor(() => {
       const node = document.querySelector("[data-slot='popover-content']");
       if (!node) {
         throw new Error("popover content not mounted yet");
       }
+
       return node as HTMLElement;
     });
+  }
 
-    expect(content.textContent ?? "").toContain("Informations nutritionnelles");
+  it("keeps slot markers stable on exposed compounds", async () => {
+    const portalContainer = document.createElement("div");
+    document.body.append(portalContainer);
+
+    const { container } = render(
+      <Popover defaultOpen>
+        <PopoverAnchor data-slot="custom-anchor">Point d'ancrage</PopoverAnchor>
+        <PopoverTrigger data-slot="custom-trigger">Ouvrir</PopoverTrigger>
+        <PopoverContent container={portalContainer} data-slot="custom-content">
+          Contenu
+          <PopoverArrow data-slot="custom-arrow" />
+        </PopoverContent>
+      </Popover>,
+    );
+
+    await waitForPopoverContent();
+
+    expect(container.querySelector("[data-slot='popover']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='popover-anchor']"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='popover-trigger']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='popover-portal']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='popover-content']"),
+    ).toBeTruthy();
+    expect(
+      portalContainer.querySelector("[data-slot='popover-arrow']"),
+    ).toBeTruthy();
+
+    expect(container.querySelector("[data-slot='custom-anchor']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-trigger']")).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-content']"),
+    ).toBeNull();
+    expect(
+      portalContainer.querySelector("[data-slot='custom-arrow']"),
+    ).toBeNull();
+  });
+
+  it("opens from keyboard, closes on Escape, and returns focus to the trigger", async () => {
+    const user = userEvent.setup();
+    renderPopover();
+
+    const trigger = screen.getByRole("button", { name: "Voir les details" });
+
+    trigger.focus();
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await user.keyboard("{Enter}");
+
+    const content = await waitForPopoverContent();
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    await waitFor(() => {
+      expect(content.contains(document.activeElement)).toBe(true);
+    });
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(
+        document.querySelector("[data-slot='popover-content']"),
+      ).toBeNull();
+    });
+    await waitFor(() => {
+      expect(trigger).toHaveFocus();
+    });
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("closes on outside interaction", async () => {
+    renderPopover();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Voir les details" }),
+    );
+
+    await waitForPopoverContent();
 
     fireEvent.pointerDown(document.body);
 
@@ -50,31 +140,9 @@ describe("Popover", () => {
     });
   });
 
-  it("closes on Escape", async () => {
-    renderPopover();
-
-    fireEvent.click(screen.getByRole("button", { name: "Voir les details" }));
-
-    const content = await waitFor(() => {
-      const node = document.querySelector("[data-slot='popover-content']");
-      if (!node) {
-        throw new Error("popover content not mounted yet");
-      }
-      return node as HTMLElement;
-    });
-
-    fireEvent.keyDown(content, { key: "Escape", code: "Escape" });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='popover-content']"),
-      ).toBeNull();
-    });
-  });
-
-  it("renders anchor and full slot surface", async () => {
-    const { container } = render(
-      <Popover>
+  it("renders anchor and semantic content contracts", async () => {
+    render(
+      <Popover defaultOpen>
         <PopoverAnchor>Point d'ancrage</PopoverAnchor>
         <PopoverTrigger>Ouvrir</PopoverTrigger>
         <PopoverContent>
@@ -84,48 +152,48 @@ describe("Popover", () => {
       </Popover>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Ouvrir" }));
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='popover-content']"),
-      ).toBeTruthy();
-    });
-
-    expect(container.querySelector("[data-slot='popover']")).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='popover-trigger']"),
-    ).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='popover-anchor']"),
-    ).toBeTruthy();
-    expect(document.querySelector("[data-slot='popover-portal']")).toBeTruthy();
-    expect(
-      document.querySelector("[data-slot='popover-content']"),
-    ).toBeTruthy();
-    expect(document.querySelector("[data-slot='popover-arrow']")).toBeTruthy();
-  });
-
-  it("applies semantic content and arrow classes", () => {
-    renderPopover({ defaultOpen: true });
-
-    const content = document.querySelector(
-      "[data-slot='popover-content']",
-    ) as HTMLElement | null;
+    const trigger = screen.getByRole("button", { name: "Ouvrir" });
+    const anchor = screen.getByText("Point d'ancrage");
+    const content = await waitForPopoverContent();
     const arrow = document.querySelector(
       "[data-slot='popover-arrow']",
     ) as HTMLElement | null;
 
-    expect(content?.className ?? "").toContain("bg-popover");
-    expect(content?.className ?? "").toContain("text-popover-foreground");
-    expect(content?.className ?? "").toContain("data-[state=open]:animate-in");
-    expect(content?.className ?? "").toContain(
-      "data-[side=right]:slide-in-from-left-2",
-    );
+    expect(trigger).toHaveAttribute("data-slot", "popover-trigger");
+    expect(anchor).toHaveAttribute("data-slot", "popover-anchor");
+    expect(content).toHaveAttribute("aria-label", "Popover");
+    expect(trigger.className).toContain("cursor-pointer");
+    expect(content.className).toContain("bg-popover");
+    expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).toContain("data-[state=open]:animate-in");
+    expect(content.className).not.toContain("slide-in-from-left-2");
+    expect(content.className).not.toContain("slide-in-from-top-2");
 
     const arrowClassName = arrow?.getAttribute("class") ?? "";
     expect(arrowClassName).toContain("fill-popover");
     expect(arrowClassName).toContain("stroke-border");
+  });
+
+  it("allows trigger slot override when using asChild", async () => {
+    render(
+      <Popover defaultOpen>
+        <PopoverTrigger asChild>
+          <button data-slot="custom-trigger" type="button">
+            Ouvrir via enfant
+          </button>
+        </PopoverTrigger>
+        <PopoverContent>Contenu</PopoverContent>
+      </Popover>,
+    );
+
+    await waitForPopoverContent();
+
+    const trigger = screen.getByRole("button", { name: "Ouvrir via enfant" });
+
+    expect(trigger).toHaveAttribute("data-slot", "custom-trigger");
+    expect(
+      document.querySelector("[data-slot='popover-content']"),
+    ).toBeTruthy();
   });
 
   it("merges className on content", () => {
@@ -165,6 +233,10 @@ describe("Popover", () => {
   it("has no obvious a11y violations", async () => {
     const { container } = renderPopover({ defaultOpen: true });
 
-    expect(await axe(container)).toHaveNoViolations();
+    await waitForPopoverContent();
+
+    await act(async () => {
+      expect(await axe(container)).toHaveNoViolations();
+    });
   });
 });

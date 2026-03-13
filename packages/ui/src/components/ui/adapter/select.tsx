@@ -51,12 +51,12 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "flex h-10 w-full items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
+        "flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-(--radius) border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-hidden",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
         "aria-invalid:border-validation-error-border aria-invalid:ring-validation-error-ring-soft",
         "disabled:pointer-events-none disabled:opacity-50",
-        "data-[placeholder]:text-muted-foreground",
+        "data-placeholder:text-muted-foreground",
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:text-muted-foreground",
         className,
       )}
@@ -89,9 +89,12 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
 
 export type SelectContentProps = React.ComponentProps<
   typeof SelectPrimitive.Content
->;
+> & {
+  container?: React.ComponentProps<typeof SelectPrimitive.Portal>["container"];
+};
 
 function SelectContent({
+  container,
   className,
   children,
   position = "popper",
@@ -99,7 +102,7 @@ function SelectContent({
   ...props
 }: SelectContentProps) {
   return (
-    <SelectPrimitive.Portal>
+    <SelectPrimitive.Portal container={container}>
       <div data-slot="select-portal">
         <SelectPrimitive.Content
           className={cn(
@@ -128,6 +131,8 @@ function SelectContent({
                 "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)",
             )}
             data-slot="select-viewport"
+            role="group"
+            tabIndex={0}
           >
             {children}
           </SelectPrimitive.Viewport>
@@ -158,10 +163,10 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
   return (
     <SelectPrimitive.Item
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-(--radius) py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
+        "relative flex w-full cursor-pointer items-center gap-2 rounded-(--radius) py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
         "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
         "focus:bg-accent focus:text-accent-foreground",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "data-disabled:pointer-events-none data-disabled:opacity-50",
         className,
       )}
       data-slot="select-item"
@@ -219,7 +224,7 @@ function SelectScrollUpButton({
   return (
     <SelectPrimitive.ScrollUpButton
       className={cn(
-        "flex cursor-default items-center justify-center py-1 text-muted-foreground",
+        "flex cursor-pointer items-center justify-center py-1 text-muted-foreground",
         className,
       )}
       data-slot="select-scroll-up-button"
@@ -255,7 +260,7 @@ function SelectScrollDownButton({
   return (
     <SelectPrimitive.ScrollDownButton
       className={cn(
-        "flex cursor-default items-center justify-center py-1 text-muted-foreground",
+        "flex cursor-pointer items-center justify-center py-1 text-muted-foreground",
         className,
       )}
       data-slot="select-scroll-down-button"

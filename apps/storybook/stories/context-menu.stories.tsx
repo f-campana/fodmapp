@@ -1,3 +1,5 @@
+import { type ReactNode, useState } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import {
@@ -27,13 +29,76 @@ import {
   ContextMenuTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function ContextMenuAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-context-menu-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+function ContextMenuStoryCanvas({
+  children,
+  ...props
+}: Omit<StoryFrameProps, "children"> & {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return (
+    <ContextMenuAuditFrame {...props}>
+      <div className="w-full" ref={setPortalContainer}>
+        {children(portalContainer)}
+      </div>
+    </ContextMenuAuditFrame>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  modal: true,
+  dir: "ltr",
+  onOpenChange: fn(),
+} as const;
+
+const defaultShowcaseArgs = {
+  modal: true,
+  dir: "ltr",
+} as const;
+
+const triggerClassName =
+  "flex w-full max-w-sm cursor-pointer flex-col items-start gap-1 rounded-(--radius) border border-border bg-card px-4 py-4 text-left text-sm shadow-sm transition-colors hover:bg-accent/40";
+
+function ContextMenuTarget({ title }: { title: string }) {
+  return (
+    <>
+      <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        Clic droit ou Shift+F10
+      </span>
+      <span className="text-sm font-medium text-foreground">{title}</span>
+      <span className="text-sm text-muted-foreground">
+        Appui long sur tactile pour ouvrir les actions secondaires.
+      </span>
+    </>
+  );
+}
+
 const meta = {
   title: "Primitives/Adapter/ContextMenu",
   component: ContextMenu,
-  tags: ["autodocs"],
   argTypes: {
     modal: {
-      description: "Whether outside interactions are blocked while open.",
+      description: "Keeps outside interaction inert while the menu is open.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "true" } },
     },
@@ -44,24 +109,22 @@ const meta = {
       table: { defaultValue: { summary: "ltr" } },
     },
     onOpenChange: {
-      description: "Callback invoked when open state changes.",
+      description: "Callback fired whenever the open state changes.",
     },
     children: {
-      description: "ContextMenuTrigger and ContextMenuContent composition.",
+      description: "Trigger and content composition.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    modal: true,
-    dir: "ltr",
-    onOpenChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
     a11y: {
-      config: {
-        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      test: "error",
+      context: {
+        include: ["[data-context-menu-audit-root]"],
       },
     },
   },
@@ -71,168 +134,262 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex min-h-52 items-center justify-center">
-      <ContextMenu {...args}>
-        <ContextMenuTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-4 py-3 text-sm font-medium"
-            type="button"
-          >
-            Ouvrir le menu contextuel
-          </button>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuLabel>Mon compte</ContextMenuLabel>
-          <ContextMenuSeparator />
-          <ContextMenuGroup>
-            <ContextMenuItem>
-              Profil
-              <ContextMenuShortcut>⇧⌘P</ContextMenuShortcut>
+function WorkspaceContextMenu(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+  options?: {
+    triggerSlot?: string;
+    itemSlot?: string;
+    useLocalPortal?: boolean;
+  },
+) {
+  const contentProps =
+    options?.useLocalPortal && portalContainer
+      ? { container: portalContainer }
+      : {};
+
+  return (
+    <ContextMenu {...args}>
+      <ContextMenuTrigger asChild>
+        <button
+          className={triggerClassName}
+          data-slot={options?.triggerSlot}
+          type="button"
+        >
+          <ContextMenuTarget title="Zone de travail contextuelle" />
+        </button>
+      </ContextMenuTrigger>
+      <ContextMenuContent {...contentProps}>
+        <ContextMenuLabel>Mon compte</ContextMenuLabel>
+        <ContextMenuSeparator />
+        <ContextMenuGroup>
+          <ContextMenuItem>
+            Profil
+            <ContextMenuShortcut>P</ContextMenuShortcut>
+          </ContextMenuItem>
+          {options?.itemSlot ? (
+            <ContextMenuItem asChild>
+              <a data-slot={options.itemSlot} href="#profil">
+                Ouvrir le profil
+              </a>
             </ContextMenuItem>
+          ) : (
             <ContextMenuItem>
               Parametres
-              <ContextMenuShortcut>⌘,</ContextMenuShortcut>
+              <ContextMenuShortcut>,</ContextMenuShortcut>
             </ContextMenuItem>
-          </ContextMenuGroup>
-        </ContextMenuContent>
-      </ContextMenu>
-    </div>
+          )}
+        </ContextMenuGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
+function PreferencesContextMenu(args: Story["args"]) {
+  return (
+    <ContextMenu {...args}>
+      <ContextMenuTrigger asChild>
+        <button className={triggerClassName} type="button">
+          <ContextMenuTarget title="Preferences d'affichage" />
+        </button>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuCheckboxItem checked>
+          Activer les notifications
+        </ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem>
+          Activer les alertes rapides
+        </ContextMenuCheckboxItem>
+        <ContextMenuSeparator />
+        <ContextMenuLabel inset>Methode d'affichage</ContextMenuLabel>
+        <ContextMenuRadioGroup value="resume">
+          <ContextMenuRadioItem value="resume">Resume</ContextMenuRadioItem>
+          <ContextMenuRadioItem value="detail">Detaille</ContextMenuRadioItem>
+        </ContextMenuRadioGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
+function SubmenuContextMenu(
+  args: Story["args"],
+  portalContainer?: HTMLDivElement | null,
+) {
+  return (
+    <ContextMenu {...args}>
+      <ContextMenuTrigger asChild>
+        <button className={triggerClassName} type="button">
+          <ContextMenuTarget title="Outils avances" />
+        </button>
+      </ContextMenuTrigger>
+      <ContextMenuContent container={portalContainer}>
+        <ContextMenuItem>Tableau principal</ContextMenuItem>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>Parametres avances</ContextMenuSubTrigger>
+          <ContextMenuPortal container={portalContainer}>
+            <ContextMenuSubContent>
+              <ContextMenuItem>Regles de substitution</ContextMenuItem>
+              <ContextMenuItem>Options de score</ContextMenuItem>
+            </ContextMenuSubContent>
+          </ContextMenuPortal>
+        </ContextMenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) => WorkspaceContextMenu(args, portalContainer)}
+    </ContextMenuStoryCanvas>
+  ),
+};
+
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        WorkspaceContextMenu(defaultShowcaseArgs, portalContainer)
+      }
+    </ContextMenuStoryCanvas>
+  ),
+};
+
+export const OnSurface: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
+      {(portalContainer) =>
+        WorkspaceContextMenu(defaultShowcaseArgs, portalContainer)
+      }
+    </ContextMenuStoryCanvas>
+  ),
+};
+
+export const CheckboxAndRadio: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ContextMenuAuditFrame centeredMinHeight={72} maxWidth="md">
+      <PreferencesContextMenu {...defaultShowcaseArgs} />
+    </ContextMenuAuditFrame>
+  ),
+};
+
+export const Submenu: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        SubmenuContextMenu(defaultShowcaseArgs, portalContainer)
+      }
+    </ContextMenuStoryCanvas>
+  ),
+};
+
+export const DarkMode: Story = {
+  ...Default,
+  parameters: fixedStoryParameters,
+  globals: {
+    theme: "dark",
+  },
+};
+
+export const InteractionChecks: Story = {
+  args: {
+    ...defaultPlaygroundArgs,
+    onOpenChange: fn(),
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      disable: true,
+    },
+  },
+  render: (args) => (
+    <ContextMenuStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        WorkspaceContextMenu(args, portalContainer, {
+          triggerSlot: "custom-context-menu-trigger",
+          itemSlot: "custom-context-menu-item",
+          useLocalPortal: true,
+        })
+      }
+    </ContextMenuStoryCanvas>
   ),
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='context-menu']");
     const trigger = canvas.getByRole("button", {
-      name: "Ouvrir le menu contextuel",
+      name: /Zone de travail contextuelle/,
     });
 
     await expect(root).toHaveAttribute("data-slot", "context-menu");
-    await expect(trigger).toHaveAttribute("data-slot", "context-menu-trigger");
+    await expect(trigger).toHaveAttribute(
+      "data-slot",
+      "custom-context-menu-trigger",
+    );
+    await expect(
+      canvasElement.querySelector("[data-slot='context-menu-trigger']"),
+    ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("text-sm");
 
+    trigger.focus();
+    await expect(trigger).toHaveFocus();
+    await fireEvent.pointerDown(trigger, { button: 2, ctrlKey: false });
     await fireEvent.contextMenu(trigger);
 
     const content = await waitFor(() => {
-      const node = document.body.querySelector(
+      const node = canvasElement.querySelector(
         "[data-slot='context-menu-content']",
       );
       if (!node) {
         throw new Error("ContextMenu content is not mounted yet.");
       }
+
       return node as HTMLElement;
     });
 
-    const portal = document.body.querySelector(
-      "[data-slot='context-menu-portal']",
-    );
-    const firstItem = document.body.querySelector(
-      "[data-slot='context-menu-item']",
-    ) as HTMLElement | null;
-
     await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-    await expect(portal).toHaveAttribute("data-slot", "context-menu-portal");
-    await expect(content).toHaveAttribute("data-slot", "context-menu-content");
+    await expect(
+      canvasElement.querySelector("[data-slot='context-menu-portal']"),
+    ).toBeTruthy();
+    await expect(canvasElement.contains(content)).toBe(true);
 
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("text-popover-foreground");
-    await expect(content.className).toContain("data-[state=open]:animate-in");
-    await expect(content.className).toContain(
-      "data-[side=right]:slide-in-from-left-2",
-    );
+    const defaultItem = within(content).getByRole("menuitem", {
+      name: /^Profil/,
+    });
+    const customItem = within(content).getByRole("menuitem", {
+      name: "Ouvrir le profil",
+    });
 
-    await expect(firstItem?.className ?? "").toContain("focus:bg-accent");
-    await expect(firstItem?.className ?? "").not.toContain(
-      "focus-visible:ring-ring/50",
-    );
-  },
-};
-
-export const CheckboxAndRadio: Story = {
-  render: (args) => (
-    <div className="flex min-h-52 items-center justify-center">
-      <ContextMenu {...args}>
-        <ContextMenuTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-4 py-3 text-sm font-medium"
-            type="button"
-          >
-            Preferences d'affichage
-          </button>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuCheckboxItem checked>
-            Activer les notifications
-          </ContextMenuCheckboxItem>
-          <ContextMenuCheckboxItem>
-            Activer les alertes rapides
-          </ContextMenuCheckboxItem>
-          <ContextMenuSeparator />
-          <ContextMenuLabel inset>Methode d'affichage</ContextMenuLabel>
-          <ContextMenuRadioGroup value="resume">
-            <ContextMenuRadioItem value="resume">Resume</ContextMenuRadioItem>
-            <ContextMenuRadioItem value="detail">Detaille</ContextMenuRadioItem>
-          </ContextMenuRadioGroup>
-        </ContextMenuContent>
-      </ContextMenu>
-    </div>
-  ),
-};
-
-export const Submenu: Story = {
-  render: (args) => (
-    <div className="flex min-h-52 items-center justify-center">
-      <ContextMenu {...args}>
-        <ContextMenuTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-4 py-3 text-sm font-medium"
-            type="button"
-          >
-            Outils avances
-          </button>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem>Tableau principal</ContextMenuItem>
-          <ContextMenuSub>
-            <ContextMenuSubTrigger>Parametres avances</ContextMenuSubTrigger>
-            <ContextMenuPortal>
-              <ContextMenuSubContent>
-                <ContextMenuItem>Regles de substitution</ContextMenuItem>
-                <ContextMenuItem>Options de score</ContextMenuItem>
-              </ContextMenuSubContent>
-            </ContextMenuPortal>
-          </ContextMenuSub>
-        </ContextMenuContent>
-      </ContextMenu>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole("button", { name: "Outils avances" });
-    await fireEvent.contextMenu(trigger);
-
-    const subTrigger = await waitFor(() =>
-      document.body.querySelector("[data-slot='context-menu-sub-trigger']"),
-    );
-
-    await userEvent.hover(subTrigger as HTMLElement);
-
-    await expect(subTrigger).toHaveAttribute(
+    await expect(defaultItem).toHaveAttribute("data-slot", "context-menu-item");
+    await expect(defaultItem.className).toContain("cursor-pointer");
+    await expect(defaultItem.className).toContain("text-sm");
+    await expect(customItem).toHaveAttribute(
       "data-slot",
-      "context-menu-sub-trigger",
+      "custom-context-menu-item",
     );
-    await expect((subTrigger as HTMLElement).className).toContain(
-      "data-[state=open]:bg-accent",
-    );
-  },
-};
 
-export const DarkMode: Story = {
-  ...Default,
-  args: {
-    ...Default.args,
-    onOpenChange: fn(),
-  },
-  globals: {
-    theme: "dark",
+    await waitFor(() => {
+      if (!content.contains(document.activeElement)) {
+        throw new Error("Context menu focus has not moved into the content.");
+      }
+    });
+
+    await userEvent.keyboard("{Escape}");
+
+    await waitFor(() => {
+      if (canvasElement.querySelector("[data-slot='context-menu-content']")) {
+        throw new Error("ContextMenu content is still mounted after Escape.");
+      }
+    });
+    await waitFor(() => {
+      if (document.activeElement !== trigger) {
+        throw new Error("ContextMenu trigger has not regained focus yet.");
+      }
+    });
   },
 };

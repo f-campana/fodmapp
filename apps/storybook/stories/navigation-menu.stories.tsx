@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import type { ReactNode } from "react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import {
@@ -10,14 +11,80 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-  NavigationMenuViewport,
 } from "@fodmap/ui";
+
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function NavigationMenuAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-navigation-menu-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  dir: "ltr",
+  orientation: "horizontal",
+  onValueChange: fn(),
+} as const;
+
+const defaultShowcaseArgs = {
+  dir: "ltr",
+  orientation: "horizontal",
+} as const;
+
+const contentLinkClassName =
+  "block w-full rounded-(--radius) px-3 py-3 text-sm font-medium transition-colors hover:bg-accent/40";
+
+function NavigationPreviewShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-full rounded-(--radius) border border-border bg-card px-4 py-4 shadow-sm">
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+            Navigation produit
+          </p>
+          <h3 className="text-sm font-semibold text-foreground">
+            Plateforme FODMAP
+          </h3>
+          <p className="max-w-xl text-sm text-muted-foreground">
+            Regroupez les destinations principales sans perdre le contexte de la
+            page active.
+          </p>
+        </div>
+        <div className="w-full">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function NavigationResponsiveShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-full max-w-[19rem] rounded-(--radius) border border-border bg-card p-3 shadow-sm">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+          Navigation compacte
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Les destinations longues restent lisibles dans une colonne etroite.
+        </p>
+      </div>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
 
 const meta = {
   title: "Primitives/Adapter/NavigationMenu",
   component: NavigationMenu,
-  tags: ["autodocs"],
   argTypes: {
     dir: {
       description: "Reading direction used by keyboard navigation and layout.",
@@ -32,25 +99,23 @@ const meta = {
       table: { defaultValue: { summary: "horizontal" } },
     },
     onValueChange: {
-      description: "Callback invoked when active item value changes.",
-      table: { type: { summary: "(value: string) => void" } },
+      description: "Callback fired whenever the active item changes.",
     },
     children: {
-      description: "Composed navigation menu primitives.",
+      description:
+        "List, item, trigger, content, and optional indicator composition.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    dir: "ltr",
-    orientation: "horizontal",
-    onValueChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
     a11y: {
-      config: {
-        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      test: "error",
+      context: {
+        include: ["[data-navigation-menu-audit-root]"],
       },
     },
   },
@@ -60,31 +125,48 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-start justify-center pt-8">
-      <NavigationMenu {...args}>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Produits</NavigationMenuTrigger>
+function PrimaryNavigation(
+  args: Story["args"],
+  options?: {
+    includeIndicator?: boolean;
+    linkSlot?: string;
+  },
+) {
+  return (
+    <NavigationPreviewShell>
+      <NavigationMenu
+        className="w-full max-w-xl flex-col items-start justify-start [&>[data-slot='navigation-menu-viewport-position']]:static [&>[data-slot='navigation-menu-viewport-position']]:mt-2 [&>[data-slot='navigation-menu-viewport-position']]:w-full [&>[data-slot='navigation-menu-viewport-position']]:justify-start"
+        {...args}
+      >
+        <NavigationMenuList className="w-full justify-start">
+          <NavigationMenuItem value="produits">
+            <NavigationMenuTrigger data-slot="custom-navigation-menu-trigger">
+              Produits
+            </NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
+              <ul className="grid w-full gap-1 p-2 md:w-[420px] lg:w-[520px] lg:grid-cols-2">
                 <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#calculateur"
-                    >
-                      Calculateur FODMAP
-                    </a>
-                  </NavigationMenuLink>
+                  {options?.linkSlot ? (
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        data-slot={options.linkSlot}
+                        href="#calculateur"
+                      >
+                        Calculateur FODMAP
+                      </a>
+                    </NavigationMenuLink>
+                  ) : (
+                    <NavigationMenuLink asChild>
+                      <a className={contentLinkClassName} href="#calculateur">
+                        Calculateur FODMAP
+                      </a>
+                    </NavigationMenuLink>
+                  )}
                 </li>
                 <li>
                   <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#substitutions"
-                    >
+                    <a className={contentLinkClassName} href="#substitutions">
                       Substitutions
                     </a>
                   </NavigationMenuLink>
@@ -92,16 +174,13 @@ export const Default: Story = {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          <NavigationMenuItem value="ressources">
             <NavigationMenuTrigger>Ressources</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[340px]">
+              <ul className="grid w-full gap-1 p-2 md:w-[340px]">
                 <li>
                   <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#guides"
-                    >
+                    <a className={contentLinkClassName} href="#guides">
                       Guides pratiques
                     </a>
                   </NavigationMenuLink>
@@ -110,10 +189,152 @@ export const Default: Story = {
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>
+        {options?.includeIndicator ? <NavigationMenuIndicator /> : null}
       </NavigationMenu>
-    </div>
+    </NavigationPreviewShell>
+  );
+}
+
+function ResponsiveStressNavigation() {
+  return (
+    <NavigationResponsiveShell>
+      <NavigationMenu
+        className="w-full max-w-[19rem] flex-col items-stretch justify-start [&>[data-slot='navigation-menu-viewport-position']]:static [&>[data-slot='navigation-menu-viewport-position']]:mt-2 [&>[data-slot='navigation-menu-viewport-position']]:w-full [&>[data-slot='navigation-menu-viewport-position']]:justify-stretch"
+        defaultValue="planning"
+        orientation="vertical"
+      >
+        <NavigationMenuList className="w-full flex-col items-stretch justify-start">
+          <NavigationMenuItem className="w-full" value="planning">
+            <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
+              Planning hebdomadaire detaille
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="w-[17.5rem] max-w-full">
+                <ul className="flex w-full flex-col gap-1 p-2">
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#planning-jour-par-jour"
+                      >
+                        Vue jour par jour
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#planning-equipes"
+                      >
+                        Coordination des equipes
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem className="w-full" value="substitutions">
+            <NavigationMenuTrigger className="w-full justify-between text-left whitespace-normal">
+              Substitutions a reverifier avant service
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="w-[17.5rem] max-w-full">
+                <ul className="flex w-full flex-col gap-1 p-2">
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#substitutions-prioritaires"
+                      >
+                        Substitutions prioritaires
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                  <li className="w-full">
+                    <NavigationMenuLink asChild>
+                      <a
+                        className={contentLinkClassName}
+                        href="#service-sensible"
+                      >
+                        Service sensible
+                      </a>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </NavigationResponsiveShell>
+  );
+}
+
+export const Playground: Story = {
+  render: (args) => (
+    <NavigationMenuAuditFrame maxWidth="3xl">
+      {PrimaryNavigation(args)}
+    </NavigationMenuAuditFrame>
   ),
-  play: async ({ canvasElement }) => {
+};
+
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <NavigationMenuAuditFrame maxWidth="3xl">
+      {PrimaryNavigation(defaultShowcaseArgs)}
+    </NavigationMenuAuditFrame>
+  ),
+};
+
+export const OnSurface: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <NavigationMenuAuditFrame maxWidth="3xl" surface>
+      {PrimaryNavigation(defaultShowcaseArgs)}
+    </NavigationMenuAuditFrame>
+  ),
+};
+
+export const WithIndicator: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <NavigationMenuAuditFrame maxWidth="3xl">
+      {PrimaryNavigation(defaultShowcaseArgs, { includeIndicator: true })}
+    </NavigationMenuAuditFrame>
+  ),
+};
+
+export const DarkMode: Story = {
+  ...Default,
+  parameters: fixedStoryParameters,
+  globals: {
+    theme: "dark",
+  },
+};
+
+export const InteractionChecks: Story = {
+  args: {
+    ...defaultPlaygroundArgs,
+    onValueChange: fn(),
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      disable: true,
+    },
+  },
+  render: (args) => (
+    <NavigationMenuAuditFrame maxWidth="3xl">
+      {PrimaryNavigation(args, {
+        includeIndicator: true,
+        linkSlot: "custom-navigation-menu-link",
+      })}
+    </NavigationMenuAuditFrame>
+  ),
+  play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='navigation-menu']");
     const list = canvasElement.querySelector(
@@ -127,173 +348,79 @@ export const Default: Story = {
       "data-slot",
       "navigation-menu-trigger",
     );
+    await expect(
+      canvasElement.querySelector(
+        "[data-slot='custom-navigation-menu-trigger']",
+      ),
+    ).toBeNull();
+    await expect(trigger.className).toContain("cursor-pointer");
+    await expect(trigger.className).toContain("text-sm");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-    await userEvent.click(trigger);
+    await userEvent.tab();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
 
     const content = await waitFor(() => {
-      const node = document.body.querySelector(
+      const node = canvasElement.querySelector(
         "[data-slot='navigation-menu-content']",
       );
       if (!node) {
         throw new Error("NavigationMenu content is not mounted yet.");
       }
+
       return node as HTMLElement;
     });
 
-    const viewport = canvasElement.querySelector(
-      "[data-slot='navigation-menu-viewport']",
-    );
-    const viewportPosition = canvasElement.querySelector(
-      "[data-slot='navigation-menu-viewport-position']",
-    );
-
-    await expect(content.className).toContain(
-      "data-[motion^=from-]:animate-in",
-    );
-    await expect(content.className).toContain("data-[motion^=to-]:animate-out");
-    await expect(content.className).toContain(
-      "data-[motion=from-end]:slide-in-from-right-2",
-    );
-    await expect(content.className).toContain(
-      "data-[motion=to-start]:slide-out-to-left-2",
+    await expect(args.onValueChange).toHaveBeenCalledWith("produits");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(content).toHaveAttribute(
+      "id",
+      trigger.getAttribute("aria-controls") ?? "",
     );
 
-    await expect(viewportPosition).toHaveAttribute(
-      "data-slot",
-      "navigation-menu-viewport-position",
-    );
-    await expect(viewport).toHaveAttribute(
-      "data-slot",
-      "navigation-menu-viewport",
-    );
-    await expect((viewport as HTMLElement).className).toContain("bg-popover");
-    await expect((viewport as HTMLElement).className).toContain(
-      "text-popover-foreground",
-    );
-
-    await expect(trigger.className).toContain("focus-visible:ring-ring-soft");
-    await expect(trigger.className).not.toContain("focus-visible:ring-ring/50");
-  },
-};
-
-export const WithViewport: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-start justify-center pt-8">
-      <NavigationMenu {...args}>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Documentation</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[380px]">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#api"
-                    >
-                      API
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-        <NavigationMenuIndicator />
-        <NavigationMenuViewport />
-      </NavigationMenu>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const trigger = canvas.getByRole("button", { name: "Documentation" });
-
-    await userEvent.click(trigger);
-
-    const indicator = await waitFor(() => {
-      const node = canvasElement.querySelector(
-        "[data-slot='navigation-menu-indicator']",
-      );
-      if (!node) {
-        throw new Error("NavigationMenu indicator is not mounted yet.");
-      }
-      return node as HTMLElement;
+    const customLink = within(content).getByRole("link", {
+      name: "Calculateur FODMAP",
     });
-
-    await expect(indicator.className).toContain(
-      "data-[state=visible]:animate-in",
+    await expect(customLink).toHaveAttribute(
+      "data-slot",
+      "custom-navigation-menu-link",
     );
-    await expect(indicator.className).toContain("data-[state=hidden]:fade-out");
-  },
-};
+    await expect(
+      within(content).getByRole("link", { name: "Substitutions" }).className,
+    ).toContain("text-sm");
 
-export const MultiItem: Story = {
-  render: (args) => (
-    <div className="flex min-h-56 items-start justify-center pt-8">
-      <NavigationMenu {...args}>
-        <NavigationMenuList>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Produits</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[300px]">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#produits"
-                    >
-                      Catalogue
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Entreprise</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <ul className="grid gap-2 p-4 md:w-[300px]">
-                <li>
-                  <NavigationMenuLink asChild>
-                    <a
-                      className="block rounded-(--radius) border border-border p-3 text-sm"
-                      href="#equipe"
-                    >
-                      Equipe
-                    </a>
-                  </NavigationMenuLink>
-                </li>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
-  ),
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.click(canvas.getByRole("button", { name: "Entreprise" }));
-
+    await userEvent.keyboard("{Escape}");
     await waitFor(() => {
-      const link = document.body.querySelector("a[href='#equipe']");
-      if (!link) {
-        throw new Error("Expected entreprise menu link to be mounted.");
+      if (trigger.getAttribute("aria-expanded") !== "false") {
+        throw new Error(
+          "NavigationMenu trigger is still expanded after Escape.",
+        );
       }
     });
-
-    const triggerClasses = navigationMenuTriggerStyle();
-    await expect(triggerClasses).toContain("data-[active]:bg-accent");
-    await expect(triggerClasses).toContain("data-[state=open]:bg-accent");
+    await waitFor(() => {
+      if (document.activeElement !== trigger) {
+        throw new Error("NavigationMenu trigger has not regained focus yet.");
+      }
+    });
   },
 };
 
-export const DarkMode: Story = {
-  ...Default,
-  args: {
-    ...Default.args,
-    onValueChange: fn(),
+export const ResponsiveStress: Story = {
+  parameters: {
+    controls: { disable: true },
+    a11y: {
+      config: {
+        rules: [{ id: "aria-hidden-focus", enabled: false }],
+      },
+    },
+    docs: {
+      disable: true,
+    },
   },
-  globals: {
-    theme: "dark",
-  },
+  render: () => (
+    <NavigationMenuAuditFrame centeredMinHeight={72} maxWidth="md">
+      <ResponsiveStressNavigation />
+    </NavigationMenuAuditFrame>
+  ),
 };

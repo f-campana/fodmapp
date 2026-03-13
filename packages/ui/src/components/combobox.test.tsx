@@ -1,6 +1,12 @@
-import { createRef, useState } from "react";
+import { createRef, type ReactNode, useState } from "react";
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -23,11 +29,33 @@ window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 window.HTMLElement.prototype.setPointerCapture = vi.fn();
 
-function renderSingle(props?: React.ComponentProps<typeof Combobox>) {
+function ComboboxTestHarness({
+  children,
+}: {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return <div ref={setPortalContainer}>{children(portalContainer)}</div>;
+}
+
+function renderComboboxWithPortal(
+  renderChildren: (portalContainer: HTMLDivElement | null) => ReactNode,
+) {
   return render(
+    <ComboboxTestHarness>
+      {(portalContainer) => renderChildren(portalContainer)}
+    </ComboboxTestHarness>,
+  );
+}
+
+function renderSingle(props?: React.ComponentProps<typeof Combobox>) {
+  return renderComboboxWithPortal((portalContainer) => (
     <Combobox {...props}>
       <ComboboxTrigger aria-label="Choix de l option" />
-      <ComboboxContent>
+      <ComboboxContent container={portalContainer}>
         <ComboboxInput placeholder="Rechercher une option" />
         <ComboboxList>
           <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
@@ -44,15 +72,15 @@ function renderSingle(props?: React.ComponentProps<typeof Combobox>) {
           </ComboboxGroup>
         </ComboboxList>
       </ComboboxContent>
-    </Combobox>,
-  );
+    </Combobox>
+  ));
 }
 
 function renderMulti(props?: React.ComponentProps<typeof ComboboxMulti>) {
-  return render(
+  return renderComboboxWithPortal((portalContainer) => (
     <ComboboxMulti {...props}>
       <ComboboxTrigger aria-label="Choix multiple" />
-      <ComboboxContent>
+      <ComboboxContent container={portalContainer}>
         <ComboboxInput placeholder="Rechercher" />
         <ComboboxList>
           <ComboboxEmpty>Aucun resultat</ComboboxEmpty>
@@ -63,8 +91,28 @@ function renderMulti(props?: React.ComponentProps<typeof ComboboxMulti>) {
           </ComboboxGroup>
         </ComboboxList>
       </ComboboxContent>
-    </ComboboxMulti>,
-  );
+    </ComboboxMulti>
+  ));
+}
+
+function getComboboxPortal(container: HTMLElement) {
+  return container.querySelector("[data-slot='combobox-portal']");
+}
+
+function getComboboxContent(container: HTMLElement) {
+  return container.querySelector("[data-slot='combobox-content']");
+}
+
+function getComboboxInput(container: HTMLElement) {
+  return container.querySelector("[data-slot='combobox-input']");
+}
+
+function getComboboxOption(container: HTMLElement, name: string) {
+  return within(container).getByRole("option", { name });
+}
+
+function queryComboboxOption(container: HTMLElement, name: string) {
+  return within(container).queryByRole("option", { name });
 }
 
 describe("Combobox", () => {
@@ -85,26 +133,22 @@ describe("Combobox", () => {
   it("opens, selects an item, and closes in single mode", async () => {
     const onValueChange = vi.fn();
 
-    renderSingle({ onValueChange });
+    const { container } = renderSingle({ onValueChange });
 
     fireEvent.click(
       screen.getByRole("combobox", { name: "Choix de l option" }),
     );
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeTruthy();
+      expect(getComboboxContent(container)).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByText("Banane"));
+    fireEvent.click(getComboboxOption(container, "Banane"));
 
     expect(onValueChange).toHaveBeenCalledWith("banane");
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeNull();
+      expect(getComboboxContent(container)).toBeNull();
     });
 
     expect(
@@ -115,40 +159,36 @@ describe("Combobox", () => {
   it("keeps selected value unchanged when reselecting in single mode", async () => {
     const onValueChange = vi.fn();
 
-    renderSingle({ onValueChange, value: "pomme" });
+    const { container } = renderSingle({ onValueChange, value: "pomme" });
 
     fireEvent.click(
       screen.getByRole("combobox", { name: "Choix de l option" }),
     );
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeTruthy();
+      expect(getComboboxContent(container)).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole("option", { name: "Pomme" }));
+    fireEvent.click(getComboboxOption(container, "Pomme"));
 
     expect(onValueChange).not.toHaveBeenCalled();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeNull();
+      expect(getComboboxContent(container)).toBeNull();
     });
   });
 
   it("supports keyboard navigation and Enter selection", async () => {
     const onValueChange = vi.fn();
 
-    renderSingle({ onValueChange });
+    const { container } = renderSingle({ onValueChange });
 
     const trigger = screen.getByRole("combobox", { name: "Choix de l option" });
 
     fireEvent.click(trigger);
 
     const input = await waitFor(() => {
-      const node = document.querySelector("[data-slot='combobox-input']");
+      const node = getComboboxInput(container);
       if (!node) {
         throw new Error("Combobox input not mounted yet");
       }
@@ -169,16 +209,20 @@ describe("Combobox", () => {
       return (
         <>
           <span data-value={value} />
-          <Combobox onValueChange={setValue} value={value}>
-            <ComboboxTrigger aria-label="Choix controle" />
-            <ComboboxContent>
-              <ComboboxInput placeholder="Rechercher" />
-              <ComboboxList>
-                <ComboboxItem value="pomme">Pomme</ComboboxItem>
-                <ComboboxItem value="banane">Banane</ComboboxItem>
-              </ComboboxList>
-            </ComboboxContent>
-          </Combobox>
+          <ComboboxTestHarness>
+            {(portalContainer) => (
+              <Combobox onValueChange={setValue} value={value}>
+                <ComboboxTrigger aria-label="Choix controle" />
+                <ComboboxContent container={portalContainer}>
+                  <ComboboxInput placeholder="Rechercher" />
+                  <ComboboxList>
+                    <ComboboxItem value="pomme">Pomme</ComboboxItem>
+                    <ComboboxItem value="banane">Banane</ComboboxItem>
+                  </ComboboxList>
+                </ComboboxContent>
+              </Combobox>
+            )}
+          </ComboboxTestHarness>
         </>
       );
     }
@@ -188,10 +232,10 @@ describe("Combobox", () => {
     fireEvent.click(screen.getByRole("combobox", { name: "Choix controle" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Banane")).toBeInTheDocument();
+      expect(queryComboboxOption(container, "Banane")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("Banane"));
+    fireEvent.click(getComboboxOption(container, "Banane"));
 
     await waitFor(() => {
       expect(container.querySelector("[data-value]")).toHaveAttribute(
@@ -208,17 +252,21 @@ describe("Combobox", () => {
       return (
         <>
           <span data-value={value.join(",")} />
-          <ComboboxMulti onValueChange={setValue} value={value}>
-            <ComboboxTrigger aria-label="Choix multiple" />
-            <ComboboxContent>
-              <ComboboxInput placeholder="Rechercher" />
-              <ComboboxList>
-                <ComboboxItem value="pomme">Pomme</ComboboxItem>
-                <ComboboxItem value="banane">Banane</ComboboxItem>
-                <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
-              </ComboboxList>
-            </ComboboxContent>
-          </ComboboxMulti>
+          <ComboboxTestHarness>
+            {(portalContainer) => (
+              <ComboboxMulti onValueChange={setValue} value={value}>
+                <ComboboxTrigger aria-label="Choix multiple" />
+                <ComboboxContent container={portalContainer}>
+                  <ComboboxInput placeholder="Rechercher" />
+                  <ComboboxList>
+                    <ComboboxItem value="pomme">Pomme</ComboboxItem>
+                    <ComboboxItem value="banane">Banane</ComboboxItem>
+                    <ComboboxItem value="kiwi">Kiwi</ComboboxItem>
+                  </ComboboxList>
+                </ComboboxContent>
+              </ComboboxMulti>
+            )}
+          </ComboboxTestHarness>
         </>
       );
     }
@@ -228,24 +276,22 @@ describe("Combobox", () => {
     fireEvent.click(screen.getByRole("combobox", { name: "Choix multiple" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("option", { name: "Pomme" })).toBeInTheDocument();
+      expect(queryComboboxOption(container, "Pomme")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("option", { name: "Pomme" }));
+    fireEvent.click(getComboboxOption(container, "Pomme"));
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeNull();
+      expect(getComboboxContent(container)).toBeNull();
     });
 
     fireEvent.click(screen.getByRole("combobox", { name: "Choix multiple" }));
 
     await waitFor(() => {
-      expect(screen.getByText("Banane")).toBeInTheDocument();
+      expect(queryComboboxOption(container, "Banane")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("Banane"));
+    fireEvent.click(getComboboxOption(container, "Banane"));
 
     await waitFor(() => {
       expect(container.querySelector("[data-value]")).toHaveAttribute(
@@ -262,52 +308,52 @@ describe("Combobox", () => {
   it("keeps selected values unchanged when reselecting in multiple mode", async () => {
     const onValueChange = vi.fn();
 
-    renderMulti({ onValueChange, value: ["pomme"] });
+    const { container } = renderMulti({ onValueChange, value: ["pomme"] });
 
     fireEvent.click(screen.getByRole("combobox", { name: "Choix multiple" }));
 
     await waitFor(() => {
-      expect(screen.getByRole("option", { name: "Pomme" })).toBeInTheDocument();
+      expect(queryComboboxOption(container, "Pomme")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByRole("option", { name: "Pomme" }));
+    fireEvent.click(getComboboxOption(container, "Pomme"));
 
     expect(onValueChange).not.toHaveBeenCalled();
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeNull();
+      expect(getComboboxContent(container)).toBeNull();
     });
   });
 
   it("does not select disabled items", async () => {
     const onValueChange = vi.fn();
 
-    renderSingle({ onValueChange });
+    const { container } = renderSingle({ onValueChange });
 
     fireEvent.click(
       screen.getByRole("combobox", { name: "Choix de l option" }),
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Fraise indisponible")).toBeInTheDocument();
+      expect(
+        queryComboboxOption(container, "Fraise indisponible"),
+      ).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("Fraise indisponible"));
+    fireEvent.click(getComboboxOption(container, "Fraise indisponible"));
 
     expect(onValueChange).not.toHaveBeenCalledWith("fraise");
   });
 
   it("shows empty state when filtering has no match", async () => {
-    renderSingle();
+    const { container } = renderSingle();
 
     fireEvent.click(
       screen.getByRole("combobox", { name: "Choix de l option" }),
     );
 
     const input = await waitFor(() => {
-      const node = document.querySelector("[data-slot='combobox-input']");
+      const node = getComboboxInput(container);
       if (!node) {
         throw new Error("Combobox input not mounted yet");
       }
@@ -329,36 +375,40 @@ describe("Combobox", () => {
     );
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeTruthy();
+      expect(getComboboxContent(container)).toBeTruthy();
     });
 
     const trigger = container.querySelector(
       "[data-slot='combobox-trigger']",
     ) as HTMLElement | null;
-    const content = document.querySelector(
-      "[data-slot='combobox-content']",
-    ) as HTMLElement | null;
-    const item = document.querySelector(
+    const content = getComboboxContent(container) as HTMLElement | null;
+    const item = container.querySelector(
       "[data-slot='combobox-item']",
+    ) as HTMLElement | null;
+    const group = container.querySelector(
+      "[data-slot='combobox-group']",
+    ) as HTMLElement | null;
+    const separator = container.querySelector(
+      "[data-slot='combobox-separator']",
     ) as HTMLElement | null;
 
     expect(container.querySelector("[data-slot='combobox']")).toBeTruthy();
+    expect(getComboboxPortal(container)).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='combobox-input-wrapper']"),
+      container.querySelector("[data-slot='combobox-input-wrapper']"),
     ).toBeTruthy();
-    expect(document.querySelector("[data-slot='combobox-input']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='combobox-list']")).toBeTruthy();
-    expect(document.querySelector("[data-slot='combobox-group']")).toBeTruthy();
+    expect(getComboboxInput(container)).toBeTruthy();
+    expect(container.querySelector("[data-slot='combobox-list']")).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='combobox-separator']"),
+      container.querySelector("[data-slot='combobox-group']"),
     ).toBeTruthy();
+    expect(separator).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='combobox-item-indicator']"),
+      container.querySelector("[data-slot='combobox-item-indicator']"),
     ).toBeTruthy();
 
     expect(trigger?.className ?? "").toContain("border-input");
+    expect(trigger?.className ?? "").toContain("cursor-pointer");
     expect(trigger?.className ?? "").toContain("focus-visible:ring-ring-soft");
     expect(trigger?.className ?? "").not.toContain(
       "focus-visible:ring-ring/50",
@@ -366,11 +416,19 @@ describe("Combobox", () => {
 
     expect(content?.className ?? "").toContain("bg-popover");
     expect(content?.className ?? "").toContain("text-popover-foreground");
+    expect(group?.className ?? "").toContain("[&_[cmdk-group-heading]]:px-2");
+    expect(group?.className ?? "").not.toContain(
+      "**:[[cmdk-group-heading]]:px-2",
+    );
 
+    expect(item?.className ?? "").toContain("cursor-pointer");
     expect(item?.className ?? "").toContain("data-[selected=true]:bg-accent");
     expect(item?.className ?? "").toContain(
       "data-[disabled=true]:pointer-events-none",
     );
+    expect(separator?.className ?? "").toContain("bg-border");
+    expect(separator).toHaveAttribute("role", "presentation");
+    expect(separator).toHaveAttribute("cmdk-separator", "");
   });
 
   it("merges className and supports refs", async () => {
@@ -379,13 +437,16 @@ describe("Combobox", () => {
     const listRef = createRef<HTMLDivElement>();
     const itemRef = createRef<HTMLDivElement>();
 
-    const { container } = render(
+    const { container } = renderComboboxWithPortal((portalContainer) => (
       <Combobox defaultOpen>
         <ComboboxTrigger
           className="declencheur-personnalise"
           ref={triggerRef}
         />
-        <ComboboxContent className="contenu-personnalise">
+        <ComboboxContent
+          className="contenu-personnalise"
+          container={portalContainer}
+        >
           <ComboboxInput
             className="saisie-personnalisee"
             placeholder="Rechercher"
@@ -401,20 +462,18 @@ describe("Combobox", () => {
             </ComboboxItem>
           </ComboboxList>
         </ComboboxContent>
-      </Combobox>,
-    );
+      </Combobox>
+    ));
 
     await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='combobox-content']"),
-      ).toBeTruthy();
+      expect(getComboboxContent(container)).toBeTruthy();
     });
 
     expect(container.querySelector(".declencheur-personnalise")).toBeTruthy();
-    expect(document.querySelector(".contenu-personnalise")).toBeTruthy();
-    expect(document.querySelector(".saisie-personnalisee")).toBeTruthy();
-    expect(document.querySelector(".liste-personnalisee")).toBeTruthy();
-    expect(document.querySelector(".item-personnalise")).toBeTruthy();
+    expect(container.querySelector(".contenu-personnalise")).toBeTruthy();
+    expect(container.querySelector(".saisie-personnalisee")).toBeTruthy();
+    expect(container.querySelector(".liste-personnalisee")).toBeTruthy();
+    expect(container.querySelector(".item-personnalise")).toBeTruthy();
 
     expect(triggerRef.current).toBeInstanceOf(HTMLButtonElement);
     expect(inputRef.current).toBeInstanceOf(HTMLInputElement);
@@ -425,7 +484,15 @@ describe("Combobox", () => {
   it("has no obvious a11y violations", async () => {
     const { container } = renderSingle();
 
-    const results = await axe(container);
+    fireEvent.click(
+      screen.getByRole("combobox", { name: "Choix de l option" }),
+    );
+
+    await waitFor(() => {
+      expect(getComboboxContent(container)).toBeTruthy();
+    });
+
+    const results = await axe(getComboboxPortal(container)!);
 
     expect(results).toHaveNoViolations();
   });

@@ -1,8 +1,11 @@
+import { type ReactNode, useState } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import {
+  Button,
   Popover,
   PopoverAnchor,
   PopoverArrow,
@@ -10,42 +13,86 @@ import {
   PopoverTrigger,
 } from "@fodmap/ui";
 
+import { StoryFrame, type StoryFrameProps } from "./story-frame";
+
+function PopoverAuditFrame({
+  children,
+  ...props
+}: StoryFrameProps & { children: ReactNode }) {
+  return (
+    <div data-popover-audit-root="">
+      <StoryFrame {...props}>{children}</StoryFrame>
+    </div>
+  );
+}
+
+function PopoverStoryCanvas({
+  children,
+  ...props
+}: Omit<StoryFrameProps, "children"> & {
+  children: (portalContainer: HTMLDivElement | null) => ReactNode;
+}) {
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(
+    null,
+  );
+
+  return (
+    <PopoverAuditFrame {...props}>
+      <div className="w-full" ref={setPortalContainer}>
+        {children(portalContainer)}
+      </div>
+    </PopoverAuditFrame>
+  );
+}
+
+const fixedStoryParameters = {
+  controls: { disable: true },
+} as const;
+
+const defaultPlaygroundArgs = {
+  defaultOpen: false,
+  modal: false,
+  onOpenChange: fn(),
+} as const;
+
 const meta = {
   title: "Primitives/Adapter/Popover",
   component: Popover,
-  tags: ["autodocs"],
   argTypes: {
     defaultOpen: {
-      description: "Sets initial open state for uncontrolled mode.",
+      description: "Sets the initial open state in uncontrolled mode.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
     open: {
-      description: "Controls open state in controlled mode.",
+      description: "Controls the open state when managed externally.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "undefined" } },
     },
     modal: {
-      description: "Whether interactions outside should be treated as modal.",
+      description: "Treats outside interaction as modal when true.",
       control: { type: "boolean" },
       table: { defaultValue: { summary: "false" } },
     },
     onOpenChange: {
-      description: "Callback invoked when open state changes.",
+      description: "Callback fired whenever the open state changes.",
     },
     children: {
-      description: "PopoverTrigger and PopoverContent composition.",
+      description: "Anchor, trigger, and content composition.",
       control: false,
       table: { type: { summary: "ReactNode" } },
     },
   },
-  args: {
-    defaultOpen: false,
-    modal: false,
-    onOpenChange: fn(),
-  },
+  args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    layout: "padded",
+    a11y: {
+      test: "error",
+      context: {
+        include: ["[data-popover-audit-root]"],
+      },
+    },
   },
 } satisfies Meta<typeof Popover>;
 
@@ -53,101 +100,206 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: (args) => (
-    <div className="flex min-h-36 items-center justify-center">
-      <Popover {...args}>
-        <PopoverAnchor>Ancre de positionnement</PopoverAnchor>
+function DetailPopover(
+  args: Story["args"],
+  portalContainer: HTMLDivElement | null,
+  options?: {
+    anchored?: boolean;
+    showArrow?: boolean;
+    triggerSlot?: string;
+    useLocalPortal?: boolean;
+  },
+) {
+  const contentProps =
+    options?.useLocalPortal && portalContainer
+      ? { container: portalContainer }
+      : {};
+  const triggerProps = options?.triggerSlot
+    ? { "data-slot": options.triggerSlot }
+    : {};
+
+  return (
+    <Popover {...args}>
+      {options?.anchored ? (
+        <div className="flex flex-col items-start gap-2">
+          <PopoverAnchor className="text-sm text-muted-foreground">
+            Zone de contexte
+          </PopoverAnchor>
+          {options?.triggerSlot ? (
+            <PopoverTrigger asChild>
+              <button
+                className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
+                {...triggerProps}
+                type="button"
+              >
+                Ouvrir les details
+              </button>
+            </PopoverTrigger>
+          ) : (
+            <PopoverTrigger asChild>
+              <Button variant="outline">Ouvrir les details</Button>
+            </PopoverTrigger>
+          )}
+        </div>
+      ) : options?.triggerSlot ? (
         <PopoverTrigger asChild>
           <button
             className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
+            {...triggerProps}
             type="button"
           >
             Ouvrir les details
           </button>
         </PopoverTrigger>
-        <PopoverContent>
-          Portion recommandee : 120 g maximum.
-          <PopoverArrow />
-        </PopoverContent>
-      </Popover>
-    </div>
-  ),
-  play: async ({ canvasElement, args }) => {
-    const canvas = within(canvasElement);
-    const root = canvasElement.querySelector("[data-slot='popover']");
-    const trigger = canvas.getByRole("button", { name: "Ouvrir les details" });
-    const anchor = canvas.getByText("Ancre de positionnement");
+      ) : (
+        <PopoverTrigger asChild>
+          <Button variant="outline">Ouvrir les details</Button>
+        </PopoverTrigger>
+      )}
+      <PopoverContent {...contentProps}>
+        <div className="grid gap-2">
+          <div className="font-medium text-foreground">Portion recommandee</div>
+          <div className="text-sm text-muted-foreground">
+            120 g maximum pour garder une charge digestive stable.
+          </div>
+          <div className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm">
+            Astuce : associez-la a une garniture simple pour limiter les ecarts.
+          </div>
+        </div>
+        {options?.showArrow ? <PopoverArrow /> : null}
+      </PopoverContent>
+    </Popover>
+  );
+}
 
-    await expect(root).toHaveAttribute("data-slot", "popover");
-    await expect(trigger).toHaveAttribute("data-slot", "popover-trigger");
-    await expect(anchor).toHaveAttribute("data-slot", "popover-anchor");
-
-    await userEvent.click(trigger);
-
-    const content = await waitFor(() => {
-      const node = document.body.querySelector("[data-slot='popover-content']");
-      if (!node) {
-        throw new Error("Popover content is not mounted yet.");
+export const Playground: Story = {
+  render: (args) => (
+    <PopoverStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        DetailPopover(args, portalContainer, {
+          anchored: false,
+          showArrow: false,
+        })
       }
-      return node as HTMLElement;
-    });
-
-    const portal = document.body.querySelector("[data-slot='popover-portal']");
-    const arrow = document.body.querySelector(
-      "[data-slot='popover-arrow']",
-    ) as HTMLElement | null;
-
-    await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-    await expect(portal).toHaveAttribute("data-slot", "popover-portal");
-    await expect(content).toHaveAttribute("data-slot", "popover-content");
-
-    await expect(content.className).toContain("bg-popover");
-    await expect(content.className).toContain("text-popover-foreground");
-    await expect(content.className).toContain("data-[state=open]:animate-in");
-    await expect(content.className).toContain(
-      "data-[side=right]:slide-in-from-left-2",
-    );
-
-    await expect(arrow).toHaveAttribute("data-slot", "popover-arrow");
-    const arrowClassName = arrow?.getAttribute("class") ?? "";
-    await expect(arrowClassName).toContain("fill-popover");
-    await expect(arrowClassName).toContain("stroke-border");
-  },
+    </PopoverStoryCanvas>
+  ),
 };
 
-export const DefaultOpen: Story = {
-  args: {
-    defaultOpen: true,
-    onOpenChange: fn(),
-  },
-  render: (args) => (
-    <div className="flex min-h-36 items-center justify-center">
-      <Popover {...args}>
-        <PopoverTrigger asChild>
-          <button
-            className="rounded-(--radius) border border-border bg-card px-3 py-2 text-sm font-medium"
-            type="button"
-          >
-            Informations
-          </button>
-        </PopoverTrigger>
-        <PopoverContent>
-          Valeur energetique affichee immediatement.
-          <PopoverArrow />
-        </PopoverContent>
-      </Popover>
-    </div>
+export const Default: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <PopoverStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        DetailPopover(defaultPlaygroundArgs, portalContainer, {
+          anchored: false,
+          showArrow: false,
+        })
+      }
+    </PopoverStoryCanvas>
+  ),
+};
+
+export const Anchored: Story = {
+  parameters: fixedStoryParameters,
+  render: () => (
+    <PopoverStoryCanvas centeredMinHeight={72} maxWidth="md" surface>
+      {(portalContainer) =>
+        DetailPopover(defaultPlaygroundArgs, portalContainer, {
+          anchored: true,
+          showArrow: true,
+        })
+      }
+    </PopoverStoryCanvas>
   ),
 };
 
 export const DarkMode: Story = {
   ...Default,
-  args: {
-    ...Default.args,
-    onOpenChange: fn(),
-  },
+  parameters: fixedStoryParameters,
   globals: {
     theme: "dark",
+  },
+};
+
+export const InteractionChecks: Story = {
+  args: {
+    ...defaultPlaygroundArgs,
+    onOpenChange: fn(),
+  },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      disable: true,
+    },
+  },
+  render: (args) => (
+    <PopoverStoryCanvas centeredMinHeight={72} maxWidth="md">
+      {(portalContainer) =>
+        DetailPopover(args, portalContainer, {
+          anchored: true,
+          showArrow: true,
+          triggerSlot: "custom-popover-trigger",
+          useLocalPortal: true,
+        })
+      }
+    </PopoverStoryCanvas>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const root = canvasElement.querySelector("[data-slot='popover']");
+    const trigger = canvas.getByRole("button", { name: "Ouvrir les details" });
+    const anchor = canvas.getByText("Zone de contexte");
+
+    await expect(root).toHaveAttribute("data-slot", "popover");
+    await expect(trigger).toHaveAttribute(
+      "data-slot",
+      "custom-popover-trigger",
+    );
+    await expect(
+      canvasElement.querySelector("[data-slot='popover-trigger']"),
+    ).toBeNull();
+    await expect(anchor).toHaveAttribute("data-slot", "popover-anchor");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+    await userEvent.tab();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+
+    const content = await waitFor(() => {
+      const node = canvasElement.querySelector("[data-slot='popover-content']");
+      if (!node) {
+        throw new Error("Popover content is not mounted yet.");
+      }
+
+      return node as HTMLElement;
+    });
+
+    await expect(
+      canvasElement.querySelector("[data-slot='popover-portal']"),
+    ).toBeTruthy();
+    await expect(canvasElement.contains(content)).toBe(true);
+    await expect(content).toHaveAttribute("data-slot", "popover-content");
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+
+    await waitFor(() => {
+      if (!content.contains(document.activeElement)) {
+        throw new Error("Popover focus has not moved inside the content yet.");
+      }
+    });
+
+    await userEvent.keyboard("{Escape}");
+
+    await waitFor(() => {
+      if (canvasElement.querySelector("[data-slot='popover-content']")) {
+        throw new Error("Popover content is still mounted after Escape.");
+      }
+    });
+    await waitFor(() => {
+      if (document.activeElement !== trigger) {
+        throw new Error("Popover trigger has not regained focus yet.");
+      }
+    });
+
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
   },
 };

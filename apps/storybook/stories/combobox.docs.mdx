@@ -1,0 +1,84 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ComboboxStories from "./combobox.stories";
+import { comboboxRecommendedUsageCode } from "./combobox.docs-source";
+
+<Meta of={ComboboxStories} />
+
+<Title />
+<Subtitle>
+  Use Combobox when users need to search before selecting from a larger or more
+  descriptive option set.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={comboboxRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Combobox when scanning the full list would be slow and a text query or quick
+keyboard search materially improves selection.
+
+Avoid Combobox when the list is tiny, non-searchable, or when a standard Select
+already keeps the interaction simpler.
+
+<Canvas of={ComboboxStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to test controlled open state, default value, and modal
+layer behavior.
+
+<Controls of={ComboboxStories.Playground} />
+
+## Behavior variants
+
+Use the multiple variant only when the selected summary stays understandable in
+the trigger and users benefit from reopening the same searchable list.
+
+<Canvas of={ComboboxStories.Multiple} sourceState="none" />
+
+## Composition patterns
+
+Keep the search field, results list, and empty state together as one compact
+selection surface. Use surfaced composition when the control belongs to a
+contained panel.
+
+<Canvas of={ComboboxStories.OnSurface} sourceState="none" />
+
+## Accessibility contract
+
+- the trigger exposes combobox semantics and reflects expanded state
+- the open layer keeps the search input and results list in the same focus flow
+- options remain exposed with `option` semantics and visible labels
+- keyboard users can open, search, navigate, and commit a selection
+- multiple selection still closes predictably after each committed choice
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the Combobox example area, including the open portal content
+- Storybook interaction checks verify portal mounting, open-state semantics, visible search input, selection, and close behavior
+- UI tests cover single and multiple selection flows, controlled state, filtering, disabled items, slot hooks, refs, class contracts, and a11y
+
+What is checked manually:
+
+- keyboard smoke pass for search, arrow navigation, and selection
+- visual pass for trigger summary text, cursor behavior, and long-result wrapping
+
+## Responsive notes
+
+The trigger summary and search results must stay readable at narrow widths. Long
+labels should wrap instead of clipping, and the open list should stay scrollable
+without introducing horizontal overflow.
+
+<Canvas of={ComboboxStories.ResponsiveStress} sourceState="none" />
