@@ -41,8 +41,9 @@ initial value shape.
 
 ## Behavior modes
 
-Single mode keeps one active option. Multiple mode lets users combine filters in
-the same row.
+Single mode keeps at most one active option. Activating the selected item again
+clears the current value. Multiple mode lets users combine filters in the same
+row.
 
 <Canvas of={ToggleGroupStories.Multiple} sourceState="none" />
 
@@ -65,8 +66,9 @@ overrides rather than assuming the default inline layout will adapt gracefully.
 - in `single` mode, items expose radio semantics through `role="radio"` and
   `aria-checked`
 - arrow keys move focus between items without changing the active selection
-- click changes the active item in single mode and toggles membership in
-  multiple mode
+- click changes the active item in single mode, and clicking the active item
+  again clears the selection
+- in `multiple` mode, click toggles membership in the active value set
 - focus styling remains visible on the item surface
 
 ## Slot hooks
@@ -82,7 +84,7 @@ What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the local toggle group audit area
 - Storybook interaction checks verify keyboard focus movement, stable default slot hooks, and single-mode activation
-- UI tests cover single mode, multiple mode, disabled items, orientation metadata, stable default slot hooks, `asChild` slot exceptions, refs, and a11y
+- UI tests cover single mode, single-mode clearing, multiple mode, disabled items, orientation metadata, stable default slot hooks, `asChild` slot exceptions, refs, and a11y
 
 What is checked manually:
 

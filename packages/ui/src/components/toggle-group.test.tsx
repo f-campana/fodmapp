@@ -68,6 +68,38 @@ describe("ToggleGroup", () => {
     expect(optionB).toHaveAttribute("data-state", "on");
   });
 
+  it("allows clearing the active option in single selection mode", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+
+    render(
+      <ToggleGroup
+        type="single"
+        defaultValue="a"
+        aria-label="Preferences"
+        onValueChange={onValueChange}
+      >
+        <ToggleGroupItem value="a" aria-label="Option A">
+          A
+        </ToggleGroupItem>
+        <ToggleGroupItem value="b" aria-label="Option B">
+          B
+        </ToggleGroupItem>
+      </ToggleGroup>,
+    );
+
+    const optionA = screen.getByRole("radio", { name: "Option A" });
+
+    expect(optionA).toHaveAttribute("data-state", "on");
+    expect(optionA).toHaveAttribute("aria-checked", "true");
+
+    await user.click(optionA);
+
+    expect(onValueChange).toHaveBeenLastCalledWith("");
+    expect(optionA).toHaveAttribute("data-state", "off");
+    expect(optionA).toHaveAttribute("aria-checked", "false");
+  });
+
   it("moves focus with arrow keys without changing single selection", async () => {
     const user = userEvent.setup();
 

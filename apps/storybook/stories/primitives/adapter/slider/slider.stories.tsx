@@ -1,4 +1,4 @@
-import { type ComponentProps, type ReactNode, useState } from "react";
+import { type ComponentProps, type ReactNode, useId, useState } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -150,12 +150,15 @@ function SliderFieldState({
   };
 }) {
   const [currentValue, setCurrentValue] = useState(initialValue);
+  const labelId = useId();
 
   return (
     <div className="space-y-4 rounded-(--radius) border border-border bg-card p-4">
       <div className="space-y-1">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-sm font-medium text-foreground" id={labelId}>
+            {label}
+          </p>
           <span className="text-sm font-medium text-foreground">
             {currentValue}%
           </span>
@@ -166,7 +169,7 @@ function SliderFieldState({
         <Slider
           {...sliderArgs}
           {...sliderProps}
-          aria-label={label}
+          aria-labelledby={labelId}
           max={max}
           min={min}
           value={[currentValue]}

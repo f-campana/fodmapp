@@ -22,6 +22,20 @@ describe("Slider", () => {
     expect(thumb).toHaveAttribute("aria-orientation", "horizontal");
   });
 
+  it("supports visible labeling through aria-labelledby", () => {
+    render(
+      <div>
+        <p id="threshold-label">Tolerance threshold</p>
+        <Slider defaultValue={[35]} aria-labelledby="threshold-label" />
+      </div>,
+    );
+
+    const thumb = screen.getByRole("slider", { name: "Tolerance threshold" });
+
+    expect(thumb).toHaveAttribute("aria-labelledby", "threshold-label");
+    expect(thumb).toHaveAttribute("aria-valuenow", "35");
+  });
+
   it("keeps the root slot stable and updates value from keyboard input", async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
