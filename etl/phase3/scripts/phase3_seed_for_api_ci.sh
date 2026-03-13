@@ -31,6 +31,8 @@ run_sql() {
 
 require_file "${REVIEW_CSV}"
 require_file "${PHASE3_SQL_DIR}/phase3_traits_apply.sql"
+require_file "${PHASE3_SQL_DIR}/phase3_safe_harbor_v1_apply.sql"
+require_file "${PHASE3_SQL_DIR}/phase3_safe_harbor_v1_checks.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_rollups_compute.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_rollups_6subtype_checks.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_swap_rules_apply.sql"
@@ -59,6 +61,8 @@ print("[INFO] phase3 review CSV split verified: 11 approve / 1 reject")
 PY
 
 run_sql "${PHASE3_SQL_DIR}/phase3_traits_apply.sql"
+run_sql "${PHASE3_SQL_DIR}/phase3_safe_harbor_v1_apply.sql"
+run_sql "${PHASE3_SQL_DIR}/phase3_safe_harbor_v1_checks.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_rollups_compute.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_rollups_6subtype_checks.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_rules_apply.sql"

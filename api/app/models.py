@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Dict, List, Literal, Optional, Sequence
 from uuid import UUID
 
@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 FoodLevel = Literal["none", "low", "moderate", "high", "unknown"]
 RuleStatus = Literal["active", "draft"]
+SafeHarborCohortCode = Literal["cohort_oil_fat", "cohort_plain_protein", "cohort_egg"]
 ConsentStatus = Literal["active", "revoked", "expired", "superseded", "invalidated"]
 ConsentAction = Literal["grant", "revoke", "update"]
 ConsentLegalBasis = Literal[
@@ -176,6 +177,43 @@ class FoodTraitsResponse(BaseModel):
     texture_profiles: list[TraitLabel]
     cooking_behaviors: list[TraitLabel]
     cuisine_affinities: list[TraitLabel]
+
+
+class SafeHarborFoodItem(BaseModel):
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    preparation_state: Optional[str] = None
+
+
+class SafeHarborCohort(BaseModel):
+    cohort_code: SafeHarborCohortCode
+    label_fr: str
+    label_en: str
+    rationale_fr: str
+    rationale_en: str
+    caveat_fr: str
+    caveat_en: str
+    items: list[SafeHarborFoodItem]
+    total: int
+
+
+class SafeHarborMeta(BaseModel):
+    total_cohorts: int
+    total_foods: int
+    cohort_rule_source_slug: str
+    cohort_rule_version: str
+    data_source_slug: str
+    data_source_name: str
+    data_source_version: Optional[str] = None
+    data_source_published_at: Optional[date] = None
+    attribution: str
+    no_endorsement_notice: str
+
+
+class SafeHarborResponse(BaseModel):
+    cohorts: list[SafeHarborCohort]
+    meta: SafeHarborMeta
 
 
 class SwapItem(BaseModel):
