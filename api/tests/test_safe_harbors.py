@@ -208,6 +208,33 @@ def test_safe_harbor_assignments_require_explicit_measurement_packs(
         assert row["polyols_zero_count"] == 1
 
 
+def test_safe_harbor_checks_allow_zero_assignments_for_reduced_seed(
+    db_url, integration_guard, safe_harbor_schema
+) -> None:
+    checks_sql = SAFE_HARBOR_CHECKS_PATH.read_text(encoding="utf-8")
+
+    try:
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            conn.execute(
+                """
+                DELETE FROM food_safe_harbor_assignments
+                WHERE assignment_version = 'safe_harbor_v1'
+                """
+            )
+            conn.execute(
+                """
+                DELETE FROM food_fodmap_measurements m
+                USING sources s
+                WHERE m.source_id = s.source_id
+                  AND s.source_slug = 'internal_rules_v1'
+                  AND m.notes LIKE 'safe_harbor_v1:composition_zero;%'
+                """
+            )
+            conn.execute(checks_sql)
+    finally:
+        _apply_safe_harbor_contract(db_url)
+
+
 def test_safe_harbor_exclusion_screen(client, integration_guard, safe_harbor_schema) -> None:
     response = client.get("/v0/safe-harbors")
     assert response.status_code == 200
