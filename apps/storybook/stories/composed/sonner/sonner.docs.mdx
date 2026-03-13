@@ -1,0 +1,81 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SonnerStories from "./sonner.stories";
+import { sonnerRecommendedUsageCode } from "./sonner.docs-source";
+
+<Meta of={SonnerStories} />
+
+<Title />
+<Subtitle>
+  Use Sonner when you need the actual toast host, viewport positioning, and
+  live-region contract rather than just the helper methods that trigger a toast.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={sonnerRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Sonner to mount the host once near the app shell, then call the lower-level
+`toast` export when you want direct access to the Sonner API.
+
+Prefer Toast when the helper naming (`success`, `warning`, `promise`, `dismiss`)
+is enough and you do not need to reason about the host itself.
+
+<Canvas of={SonnerStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect host position, close-button visibility, stack
+size, and live-region labelling.
+
+<Controls of={SonnerStories.Playground} />
+
+## Action and promise flows
+
+Use action and cancel buttons for short decisions, and keep promise transitions
+on the host when the workflow should stay on the current page.
+
+<Canvas of={SonnerStories.PromiseWorkflow} sourceState="none" />
+
+## Accessibility contract
+
+- Sonner mounts the live region and exposes `containerAriaLabel` on that host
+- close-button labelling is passed through with `toastOptions.closeButtonAriaLabel`
+- action buttons stay keyboard reachable inside the rendered notification
+- the wrapper keeps a stable `data-slot="sonner"` marker while the viewport is
+  rendered into the portaled Sonner host
+- swipe gestures and hotkey activation are inherited from Sonner, but they are
+  not part of the verified Batch H contract here
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan across the local audit area and the
+  mounted Sonner host
+- Storybook interaction checks verify host mounting, live-region labelling,
+  action callbacks, and close-button dismissal
+- UI tests cover wrapper classes, direct `toast` rendering, action and cancel
+  styling, live-region and close-button labelling, class merging, and a11y on
+  rendered output
+
+What is checked manually:
+
+- visual pass for stacked viewport spacing, close-button alignment, and readable
+  copy in light and dark themes
+- browser review of the host at narrow widths to confirm the viewport stays
+  inside the screen without clipped controls
+
+## Responsive notes
+
+The responsive stress story uses longer operational copy so the real portaled
+viewport can be checked at mobile widths without generic demo content.

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { axe } from "jest-axe";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe("Sonner", () => {
-  it("renders slot marker and semantic toaster classes", () => {
+  it("renders slot marker and semantic toaster classes", async () => {
     const { container } = render(<Sonner />);
 
     const marker = container.querySelector("[data-slot='sonner']");
@@ -25,6 +25,12 @@ describe("Sonner", () => {
     expect(marker?.className ?? "").toContain(
       "[&_[data-sonner-toast]]:border-border",
     );
+
+    toast("Sauvegarde terminee");
+
+    await waitFor(() => {
+      expect(document.body.querySelector("[data-sonner-toaster]")).toBeTruthy();
+    });
   });
 
   it("shows toast content through exported toast function", async () => {
@@ -53,6 +59,30 @@ describe("Sonner", () => {
     expect(cancel.className).toContain("border-border");
   });
 
+  it("passes through viewport and close-button accessibility labels", async () => {
+    render(
+      <Sonner
+        containerAriaLabel="Notifications produit"
+        toastOptions={{ closeButtonAriaLabel: "Fermer la notification" }}
+      />,
+    );
+
+    toast("Analyse terminee", { duration: Number.POSITIVE_INFINITY });
+
+    const liveRegion = screen.getByLabelText(/Notifications produit/i);
+    const closeButton = await screen.findByRole("button", {
+      name: "Fermer la notification",
+    });
+
+    expect(liveRegion).toBeInTheDocument();
+
+    fireEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Analyse terminee")).toBeNull();
+    });
+  });
+
   it("merges className", async () => {
     const { container } = render(<Sonner className="sonner-personnalise" />);
 
@@ -70,13 +100,13 @@ describe("Sonner", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(<Sonner />);
+    render(<Sonner />);
 
     toast("Notification");
 
     await screen.findByText("Notification");
 
-    const results = await axe(container);
+    const results = await axe(document.body);
 
     expect(results).toHaveNoViolations();
   });

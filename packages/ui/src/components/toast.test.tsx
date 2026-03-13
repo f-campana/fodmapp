@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import { axe } from "jest-axe";
 import { afterEach, describe, expect, it } from "vitest";
@@ -11,6 +11,16 @@ afterEach(() => {
 });
 
 describe("Toast helper", () => {
+  it("requires a mounted Sonner host to render notifications", async () => {
+    render(<div />);
+
+    Toast.show("Aucun hote monte");
+
+    await waitFor(() => {
+      expect(screen.queryByText("Aucun hote monte")).toBeNull();
+    });
+  });
+
   it("shows content through Toast.show", async () => {
     render(<Sonner />);
 
@@ -33,6 +43,26 @@ describe("Toast helper", () => {
     await screen.findByText("Attention");
     await screen.findByText("Erreur");
     await screen.findByText("Chargement");
+  });
+
+  it("supports action callbacks through Toast.show options", async () => {
+    const onAction = vi.fn();
+
+    render(<Sonner />);
+
+    Toast.show("Alternative ajoutee au diner", {
+      action: {
+        label: "Voir le plan",
+        onClick: onAction,
+      },
+      duration: Number.POSITIVE_INFINITY,
+    });
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Voir le plan" }),
+    );
+
+    expect(onAction).toHaveBeenCalledTimes(1);
   });
 
   it("supports promise flow", async () => {
@@ -78,13 +108,13 @@ describe("Toast helper", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = render(<Sonner />);
+    render(<Sonner />);
 
     Toast.show("Notification a11y");
 
     await screen.findByText("Notification a11y");
 
-    const results = await axe(container);
+    const results = await axe(document.body);
 
     expect(results).toHaveNoViolations();
   });

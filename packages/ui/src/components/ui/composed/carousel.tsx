@@ -14,6 +14,7 @@ type CarouselApi = NonNullable<UseEmblaCarouselType[1]>;
 type CarouselOptions = Parameters<typeof useEmblaCarousel>[0];
 
 type CarouselPlugins = Parameters<typeof useEmblaCarousel>[1];
+type DataSlotProp = { "data-slot"?: string };
 
 type CarouselContextValue = {
   api: UseEmblaCarouselType[1];
@@ -51,8 +52,12 @@ function Carousel({
   orientation = "horizontal",
   setApi,
   onKeyDownCapture,
+  tabIndex = 0,
+  "data-slot": dataSlot,
   ...props
-}: CarouselProps) {
+}: CarouselProps & DataSlotProp) {
+  void dataSlot;
+
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -144,7 +149,11 @@ function Carousel({
         aria-roledescription="carousel"
         data-slot="carousel"
         role="region"
-        className={cn("relative", className)}
+        tabIndex={tabIndex}
+        className={cn(
+          "relative rounded-(--radius) outline-hidden focus-visible:ring-2 focus-visible:ring-ring-soft",
+          className,
+        )}
         onKeyDownCapture={handleKeyDown}
         {...props}
       >
@@ -162,7 +171,13 @@ function Carousel({
 
 export type CarouselContentProps = React.ComponentProps<"div">;
 
-function CarouselContent({ className, ...props }: CarouselContentProps) {
+function CarouselContent({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CarouselContentProps & DataSlotProp) {
+  void dataSlot;
+
   const { orientation } = useCarousel();
 
   return (
@@ -180,7 +195,13 @@ function CarouselContent({ className, ...props }: CarouselContentProps) {
 
 export type CarouselItemProps = React.ComponentProps<"div">;
 
-function CarouselItem({ className, ...props }: CarouselItemProps) {
+function CarouselItem({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CarouselItemProps & DataSlotProp) {
+  void dataSlot;
+
   const { orientation } = useCarousel();
 
   return (
@@ -206,8 +227,11 @@ function CarouselPrevious({
   size = "icon-sm",
   type = "button",
   variant = "outline",
+  "data-slot": dataSlot,
   ...props
-}: CarouselPreviousProps) {
+}: CarouselPreviousProps & DataSlotProp) {
+  void dataSlot;
+
   const { canScrollPrev, orientation, scrollPrev } = useCarousel();
 
   return (
@@ -268,8 +292,11 @@ function CarouselNext({
   size = "icon-sm",
   type = "button",
   variant = "outline",
+  "data-slot": dataSlot,
   ...props
-}: CarouselNextProps) {
+}: CarouselNextProps & DataSlotProp) {
+  void dataSlot;
+
   const { canScrollNext, orientation, scrollNext } = useCarousel();
 
   return (

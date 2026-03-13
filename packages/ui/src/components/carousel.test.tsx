@@ -42,9 +42,14 @@ beforeEach(() => {
 describe("Carousel", () => {
   function renderCarousel(
     orientation: "horizontal" | "vertical" = "horizontal",
+    props?: React.ComponentProps<typeof Carousel>,
   ) {
     return render(
-      <Carousel orientation={orientation}>
+      <Carousel
+        aria-label="Plan de repas hebdomadaire"
+        orientation={orientation}
+        {...props}
+      >
         <CarouselContent>
           <CarouselItem>Slide 1</CarouselItem>
           <CarouselItem>Slide 2</CarouselItem>
@@ -63,6 +68,8 @@ describe("Carousel", () => {
 
     expect(root).toHaveAttribute("role", "region");
     expect(root).toHaveAttribute("aria-roledescription", "carousel");
+    expect(root).toHaveAttribute("aria-label", "Plan de repas hebdomadaire");
+    expect(root).toHaveAttribute("tabindex", "0");
     expect(
       container.querySelector("[data-slot='carousel-content']"),
     ).toBeTruthy();
@@ -73,6 +80,19 @@ describe("Carousel", () => {
       container.querySelector("[data-slot='carousel-previous']"),
     ).toBeTruthy();
     expect(container.querySelector("[data-slot='carousel-next']")).toBeTruthy();
+  });
+
+  it("provides the embla api through setApi", () => {
+    const setApi = vi.fn();
+
+    renderCarousel("horizontal", { setApi });
+
+    expect(setApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scrollNext: emblaScrollNextMock,
+        scrollPrev: emblaScrollPrevMock,
+      }),
+    );
   });
 
   it("handles previous and next actions", () => {
@@ -106,6 +126,47 @@ describe("Carousel", () => {
     const content = container.querySelector("[data-slot='carousel-content']");
 
     expect(content?.className ?? "").toContain("flex-col");
+  });
+
+  it("keeps default slot hooks stable when consumers pass their own data-slot props", () => {
+    const { container } = render(
+      <Carousel
+        aria-label="Resume hebdomadaire"
+        data-slot="carousel-personnalise"
+      >
+        <CarouselContent data-slot="contenu-personnalise">
+          <CarouselItem data-slot="item-personnalise">Slide 1</CarouselItem>
+        </CarouselContent>
+        <CarouselPrevious data-slot="precedent-personnalise" />
+        <CarouselNext data-slot="suivant-personnalise" />
+      </Carousel>,
+    );
+
+    expect(
+      container.querySelector("[data-slot='carousel-personnalise']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-slot='contenu-personnalise']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-slot='item-personnalise']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-slot='precedent-personnalise']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-slot='suivant-personnalise']"),
+    ).toBeNull();
+
+    expect(container.querySelector("[data-slot='carousel']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='carousel-content']"),
+    ).toBeTruthy();
+    expect(container.querySelector("[data-slot='carousel-item']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='carousel-previous']"),
+    ).toBeTruthy();
+    expect(container.querySelector("[data-slot='carousel-next']")).toBeTruthy();
   });
 
   it("merges className and supports refs", () => {
