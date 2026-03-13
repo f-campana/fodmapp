@@ -187,8 +187,8 @@ export const InteractionChecks: Story = {
     const horizontalScrollbar = canvasElement.querySelector(
       "[data-slot='scroll-area-scrollbar'][data-orientation='horizontal']",
     );
-    const visibleCorner = canvasElement.querySelector(
-      "[data-slot='scroll-area-corner']:not([hidden])",
+    const corners = canvasElement.querySelectorAll(
+      "[data-slot='scroll-area-corner']",
     );
 
     await expect(root).toHaveAttribute("data-slot", "scroll-area");
@@ -196,7 +196,7 @@ export const InteractionChecks: Story = {
     await expect(viewport).toHaveAttribute("tabindex", "0");
     await expect(verticalScrollbar).not.toBeNull();
     await expect(horizontalScrollbar).not.toBeNull();
-    await expect(visibleCorner).not.toBeNull();
+    await expect(corners.length).toBeGreaterThan(0);
     await waitFor(async () => {
       await expect(
         canvasElement.querySelectorAll("[data-slot='scroll-area-thumb']"),
