@@ -1,6 +1,7 @@
 import { createRef, useState } from "react";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { axe } from "jest-axe";
 import { describe, expect, it, vi } from "vitest";
@@ -12,27 +13,35 @@ window.HTMLElement.prototype.releasePointerCapture = vi.fn();
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
 window.HTMLElement.prototype.setPointerCapture = vi.fn();
 
-function getFirstAvailableDayButton() {
-  const dayButtons = Array.from(
+const defaultMonth = new Date(2026, 2, 1);
+
+function formatLocalDate(value: Date) {
+  return [
+    value.getFullYear(),
+    String(value.getMonth() + 1).padStart(2, "0"),
+    String(value.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+function getDayButton(dayNumber: number) {
+  const button = Array.from(
     document.querySelectorAll(
       "[data-slot='date-picker-calendar'] [role='gridcell'] button",
     ),
-  ) as HTMLButtonElement[];
+  ).find((candidate) => candidate.textContent?.trim() === String(dayNumber));
 
-  const firstEnabledButton = dayButtons.find((button) => !button.disabled);
-
-  if (!firstEnabledButton) {
-    throw new Error("No available day button found");
+  if (!button) {
+    throw new Error(`No day button found for day ${dayNumber}.`);
   }
 
-  return firstEnabledButton;
+  return button as HTMLButtonElement;
 }
 
 describe("DatePicker", () => {
   function renderDatePicker(props?: React.ComponentProps<typeof DatePicker>) {
     return render(
       <DatePicker
-        calendarProps={{ defaultMonth: new Date(2026, 2, 1) }}
+        calendarProps={{ defaultMonth, showOutsideDays: false }}
         placeholder="Choisir une date"
         triggerAriaLabel="Date de consultation"
         {...props}
@@ -40,61 +49,130 @@ describe("DatePicker", () => {
     );
   }
 
-  it("renders root and composed slots", async () => {
-    const { container } = renderDatePicker({ defaultOpen: true });
-
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='date-picker-content']"),
-      ).toBeTruthy();
+  it("keeps the root and calendar slots stable and renders composed slots", async () => {
+    const { container } = renderDatePicker({
+      calendarProps: {
+        defaultMonth,
+        showOutsideDays: false,
+        "data-slot": "custom-calendar",
+      },
+      "data-slot": "custom-date-picker",
+      defaultOpen: true,
     });
 
+    const content = await waitFor(() => {
+      const node = document.querySelector("[data-slot='date-picker-content']");
+      if (!node) {
+        throw new Error("DatePicker content not mounted yet.");
+      }
+
+      return node as HTMLElement;
+    });
+    const popoverContent = document.querySelector(
+      "[data-slot='popover-content']",
+    ) as HTMLElement | null;
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+
     expect(container.querySelector("[data-slot='date-picker']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='custom-date-picker']"),
+    ).toBeNull();
     expect(
       container.querySelector("[data-slot='date-picker-trigger']"),
     ).toBeTruthy();
     expect(
-      document.querySelector("[data-slot='date-picker-content']"),
+      container.querySelector("[data-slot='date-picker-icon']"),
     ).toBeTruthy();
+    expect(content).toHaveAttribute("data-slot", "date-picker-content");
+    expect(popoverContent).toBeTruthy();
+    expect(popoverContent?.className ?? "").toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("border-border");
+    expect(content.className).not.toContain("bg-popover");
     expect(
       document.querySelector("[data-slot='date-picker-calendar']"),
     ).toBeTruthy();
-    expect(
-      container.querySelector("[data-slot='date-picker-icon']"),
-    ).toBeTruthy();
+    expect(calendar).toBeTruthy();
+    expect(calendar).toHaveAttribute("data-nav-layout", "after");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar?.className ?? "").toContain("bg-transparent");
+    expect(document.querySelector("[data-slot='custom-calendar']")).toBeNull();
   });
 
-  it("opens and closes with trigger, Escape, and outside click", async () => {
+  it("renders a single popover surface with bounded month navigation", async () => {
+    const user = userEvent.setup();
+
+    renderDatePicker();
+
+    await user.click(
+      screen.getByRole("button", { name: "Date de consultation" }),
+    );
+
+    const popoverContent = await waitFor(() => {
+      const node = document.querySelector(
+        "[data-slot='popover-content']",
+      ) as HTMLElement | null;
+      if (!node) {
+        throw new Error("Popover content not mounted yet.");
+      }
+
+      return node;
+    });
+
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+    const nav = calendar?.querySelector("nav");
+    const previousButton = screen.getByLabelText(/previous month/i);
+    const nextButton = screen.getByLabelText(/next month/i);
+
+    expect(popoverContent.className).toContain("bg-popover");
+    expect(popoverContent.className).toContain("border-border");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar?.className ?? "").toContain("bg-transparent");
+    expect(nav?.className ?? "").toContain("absolute");
+    expect(nav?.contains(previousButton)).toBe(true);
+    expect(nav?.contains(nextButton)).toBe(true);
+    expect(popoverContent.contains(calendar)).toBe(true);
+  });
+
+  it("opens and closes with the trigger, Escape, and outside click", async () => {
+    const user = userEvent.setup();
+
     renderDatePicker();
 
     const trigger = screen.getByRole("button", {
       name: "Date de consultation",
     });
 
-    fireEvent.click(trigger);
+    await user.click(trigger);
 
-    await waitFor(() => {
-      expect(
-        document.querySelector("[data-slot='date-picker-content']"),
-      ).toBeTruthy();
+    const content = await waitFor(() => {
+      const node = document.querySelector(
+        "[data-slot='date-picker-content']",
+      ) as HTMLElement | null;
+      if (!node) {
+        throw new Error("DatePicker content not mounted yet.");
+      }
+
+      return node;
     });
 
-    const content = document.querySelector(
-      "[data-slot='date-picker-content']",
-    ) as HTMLElement | null;
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
 
-    fireEvent.keyDown(content ?? document.body, {
-      key: "Escape",
-      code: "Escape",
-    });
+    fireEvent.keyDown(content, { key: "Escape", code: "Escape" });
 
     await waitFor(() => {
       expect(
         document.querySelector("[data-slot='date-picker-content']"),
       ).toBeNull();
+      expect(trigger).toHaveFocus();
     });
 
-    fireEvent.click(trigger);
+    await user.click(trigger);
 
     await waitFor(() => {
       expect(
@@ -112,11 +190,12 @@ describe("DatePicker", () => {
   });
 
   it("updates uncontrolled value and closes on date selection", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
 
     renderDatePicker({ onValueChange });
 
-    fireEvent.click(
+    await user.click(
       screen.getByRole("button", { name: "Date de consultation" }),
     );
 
@@ -126,7 +205,7 @@ describe("DatePicker", () => {
       ).toBeTruthy();
     });
 
-    fireEvent.click(getFirstAvailableDayButton());
+    await user.click(getDayButton(12));
 
     expect(onValueChange).toHaveBeenCalledTimes(1);
     expect(onValueChange.mock.calls[0]?.[0]).toBeInstanceOf(Date);
@@ -139,16 +218,16 @@ describe("DatePicker", () => {
   });
 
   it("supports controlled value updates via callback", async () => {
+    const user = userEvent.setup();
+
     function ControlledExample() {
       const [value, setValue] = useState<Date | undefined>();
 
       return (
         <>
-          <span
-            data-value={value ? value.toISOString().slice(0, 10) : "empty"}
-          />
+          <span data-value={value ? formatLocalDate(value) : "empty"} />
           <DatePicker
-            calendarProps={{ defaultMonth: new Date(2026, 2, 1) }}
+            calendarProps={{ defaultMonth, showOutsideDays: false }}
             onValueChange={setValue}
             triggerAriaLabel="Date controlee"
             value={value}
@@ -159,7 +238,7 @@ describe("DatePicker", () => {
 
     const { container } = render(<ControlledExample />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Date controlee" }));
+    await user.click(screen.getByRole("button", { name: "Date controlee" }));
 
     await waitFor(() => {
       expect(
@@ -167,43 +246,31 @@ describe("DatePicker", () => {
       ).toBeTruthy();
     });
 
-    fireEvent.click(getFirstAvailableDayButton());
+    await user.click(getDayButton(13));
 
     await waitFor(() => {
-      expect(container.querySelector("[data-value]")).not.toHaveAttribute(
+      expect(container.querySelector("[data-value]")).toHaveAttribute(
         "data-value",
-        "empty",
+        "2026-03-13",
       );
     });
   });
 
-  it("keeps value unchanged when selecting the same date and still closes", async () => {
+  it("keeps the value unchanged when selecting the same date and still closes", async () => {
+    const user = userEvent.setup();
     const onValueChange = vi.fn();
     const selectedDate = new Date(2026, 2, 12);
 
     renderDatePicker({
-      calendarProps: { defaultMonth: new Date(2026, 2, 1) },
       onValueChange,
       value: selectedDate,
     });
 
-    fireEvent.click(
+    await user.click(
       screen.getByRole("button", { name: "Date de consultation" }),
     );
 
-    const selectedButton = await waitFor(() => {
-      const node = document.querySelector(
-        "[data-slot='date-picker-calendar'] [role='gridcell'][aria-selected='true'] button",
-      );
-
-      if (!node) {
-        throw new Error("Selected date button not mounted yet");
-      }
-
-      return node as HTMLElement;
-    });
-
-    fireEvent.click(selectedButton);
+    await user.click(getDayButton(12));
 
     expect(onValueChange).not.toHaveBeenCalled();
 
@@ -215,6 +282,7 @@ describe("DatePicker", () => {
   });
 
   it("applies semantic class contracts", async () => {
+    const user = userEvent.setup();
     const { container } = renderDatePicker();
 
     const trigger = container.querySelector(
@@ -231,7 +299,7 @@ describe("DatePicker", () => {
       "focus-visible:ring-ring/50",
     );
 
-    fireEvent.click(
+    await user.click(
       screen.getByRole("button", { name: "Date de consultation" }),
     );
 
@@ -240,16 +308,32 @@ describe("DatePicker", () => {
         "[data-slot='date-picker-content']",
       ) as HTMLElement | null;
       if (!node) {
-        throw new Error("DatePicker content not mounted yet");
+        throw new Error("DatePicker content not mounted yet.");
       }
+
       return node;
     });
+    const popoverContent = document.querySelector(
+      "[data-slot='popover-content']",
+    ) as HTMLElement | null;
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+    const previousButton = screen.getByLabelText(/previous month/i);
+    const nextButton = screen.getByLabelText(/next month/i);
 
-    expect(content.className).toContain("bg-popover");
     expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).not.toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("border-border");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar).toHaveAttribute("data-nav-layout", "after");
+    expect(previousButton.className).toContain("absolute");
+    expect(nextButton.className).toContain("absolute");
   });
 
-  it("merges className and supports root ref", async () => {
+  it("merges className and supports the root ref", async () => {
     const rootRef = createRef<HTMLDivElement>();
     const { container } = renderDatePicker({
       calendarClassName: "calendrier-personnalise",
@@ -274,10 +358,14 @@ describe("DatePicker", () => {
   });
 
   it("has no obvious a11y violations", async () => {
-    const { container } = renderDatePicker();
+    renderDatePicker({ defaultOpen: true });
 
-    const results = await axe(container);
+    await waitFor(() => {
+      expect(
+        document.querySelector("[data-slot='date-picker-content']"),
+      ).toBeTruthy();
+    });
 
-    expect(results).toHaveNoViolations();
+    expect(await axe(document.body)).toHaveNoViolations();
   });
 });
