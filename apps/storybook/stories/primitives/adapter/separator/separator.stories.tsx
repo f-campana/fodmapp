@@ -103,6 +103,13 @@ function HorizontalSection({ args }: { args?: Story["args"] }) {
 }
 
 function VerticalSection({ args }: { args?: Story["args"] }) {
+  const semanticSeparatorClassName = [
+    "mx-1 h-auto min-h-16 self-stretch w-[2px] bg-border",
+    args?.className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <SeparatorAuditFrame maxWidth="md">
       <div className="rounded-(--radius) border border-border bg-card p-4">
@@ -123,7 +130,7 @@ function VerticalSection({ args }: { args?: Story["args"] }) {
                 Confirm the substitution note before publishing.
               </p>
             </div>
-            <Separator {...args} className={args?.className} />
+            <Separator {...args} className={semanticSeparatorClassName} />
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-semibold text-foreground">Review</p>
               <p className="text-sm leading-5 text-muted-foreground">
