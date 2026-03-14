@@ -14,19 +14,18 @@ import {
 } from "./input-group";
 
 describe("InputGroup", () => {
-  it("renders root and compound slots", () => {
+  it("keeps the root role and compound slot markers stable", () => {
     const { container } = render(
-      <InputGroup>
-        <InputGroupText>https://</InputGroupText>
-        <InputGroupInput placeholder="mon-profil" />
-        <InputGroupAddon>.fodmap.app</InputGroupAddon>
+      <InputGroup data-slot="custom-group" role="presentation">
+        <InputGroupText data-slot="custom-text">https://</InputGroupText>
+        <InputGroupInput data-slot="custom-input" placeholder="mon-profil" />
+        <InputGroupAddon data-slot="custom-addon">.fodmap.app</InputGroupAddon>
       </InputGroup>,
     );
 
-    expect(screen.getByRole("group")).toHaveAttribute(
-      "data-slot",
-      "input-group",
-    );
+    const group = screen.getByRole("group");
+
+    expect(group).toHaveAttribute("data-slot", "input-group");
     expect(
       container.querySelector("[data-slot='input-group-text']"),
     ).toBeTruthy();
@@ -36,6 +35,11 @@ describe("InputGroup", () => {
     expect(
       container.querySelector("[data-slot='input-group-addon']"),
     ).toBeTruthy();
+
+    expect(container.querySelector("[data-slot='custom-group']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-text']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-input']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-addon']")).toBeNull();
   });
 
   it("supports addon and button interaction composition", () => {
@@ -49,9 +53,36 @@ describe("InputGroup", () => {
       </InputGroup>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Valider" }));
+    const button = screen.getByRole("button", { name: "Valider" });
+
+    expect(button.className).toContain("cursor-pointer");
+
+    fireEvent.click(button);
 
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the input flexible while surrounding text truncates first", () => {
+    render(
+      <InputGroup>
+        <InputGroupText>https://</InputGroupText>
+        <InputGroupInput placeholder="journal-clinique-tres-detaille" />
+        <InputGroupAddon>.centre-de-suivi-fodmap.fr</InputGroupAddon>
+      </InputGroup>,
+    );
+
+    const group = screen.getByRole("group");
+    const input = screen.getByPlaceholderText("journal-clinique-tres-detaille");
+    const text = screen.getByText("https://");
+    const addon = screen.getByText(".centre-de-suivi-fodmap.fr");
+
+    expect(group.className).toContain("overflow-hidden");
+    expect(input.className).toContain("min-w-[5.5rem]");
+    expect(input.className).toContain("flex-[1_1_7rem]");
+    expect(text.className).toContain("max-w-[45%]");
+    expect(text.className).toContain("truncate");
+    expect(addon.className).toContain("max-w-[45%]");
+    expect(addon.className).toContain("truncate");
   });
 
   it("applies disabled and invalid contracts", () => {
@@ -77,7 +108,7 @@ describe("InputGroup", () => {
     );
   });
 
-  it("merges className on root and compounds", () => {
+  it("merges className on the root and compounds", () => {
     const { container } = render(
       <InputGroup className="group-personnalise">
         <InputGroupAddon className="addon-personnalise">EUR</InputGroupAddon>
@@ -105,7 +136,7 @@ describe("InputGroup", () => {
     ).toContain("button-personnalise");
   });
 
-  it("forwards refs to root, input, and button", () => {
+  it("forwards refs to the root, input, and button", () => {
     const rootRef = createRef<HTMLDivElement>();
     const inputRef = createRef<HTMLInputElement>();
     const buttonRef = createRef<HTMLButtonElement>();

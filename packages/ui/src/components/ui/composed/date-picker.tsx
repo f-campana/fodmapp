@@ -30,6 +30,7 @@ export interface DatePickerProps extends Omit<
   React.ComponentProps<"div">,
   "defaultValue" | "onChange"
 > {
+  "data-slot"?: string;
   value?: Date;
   defaultValue?: Date;
   onValueChange?: (value: Date | undefined) => void;
@@ -74,8 +75,18 @@ function DatePicker({
     onChange: onValueChange,
   });
 
-  const { className: calendarPropsClassName, ...restCalendarProps } =
-    calendarProps ?? {};
+  const {
+    className: calendarPropsClassName,
+    classNames: calendarPropsClassNames,
+    ...restCalendarProps
+  } = calendarProps ?? {};
+  const mergedCalendarClassNames = {
+    ...calendarPropsClassNames,
+    root: cn(
+      "bg-transparent text-popover-foreground",
+      calendarPropsClassNames?.root,
+    ),
+  } satisfies CalendarProps["classNames"];
 
   const contentId = React.useId();
 
@@ -102,9 +113,9 @@ function DatePicker({
   return (
     <Popover onOpenChange={setOpen} open={open}>
       <div
+        {...props}
         className={cn("w-full", className)}
         data-slot="date-picker"
-        {...props}
       >
         <PopoverTrigger asChild>
           <Button
@@ -147,21 +158,24 @@ function DatePicker({
           sideOffset={4}
         >
           <div
-            className={cn(
-              "bg-popover text-popover-foreground",
-              contentClassName,
-            )}
+            className={cn("text-popover-foreground", contentClassName)}
             data-slot="date-picker-content"
           >
-            <Calendar
-              data-slot="date-picker-calendar"
-              initialFocus
-              mode="single"
-              onSelect={handleSelect}
-              selected={selectedDate}
-              className={cn(calendarPropsClassName, calendarClassName)}
-              {...restCalendarProps}
-            />
+            <div data-slot="date-picker-calendar">
+              <Calendar
+                initialFocus
+                mode="single"
+                onSelect={handleSelect}
+                selected={selectedDate}
+                className={cn(
+                  "rounded-none border-0 bg-transparent shadow-none",
+                  calendarPropsClassName,
+                  calendarClassName,
+                )}
+                classNames={mergedCalendarClassNames}
+                {...restCalendarProps}
+              />
+            </div>
           </div>
         </PopoverContent>
       </div>

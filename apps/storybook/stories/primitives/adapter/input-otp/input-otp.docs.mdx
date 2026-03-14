@@ -1,0 +1,70 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as InputOTPStories from "./input-otp.stories";
+import { inputOtpRecommendedUsageCode } from "./input-otp.docs-source";
+
+<Meta of={InputOTPStories} />
+
+<Title />
+<Subtitle>
+  Use InputOTP when a short verification code should remain a single form value
+  while the visual presentation is split into grouped slots.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={inputOtpRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use InputOTP for short one-time codes that users usually enter in sequence from
+left to right.
+
+Prefer a regular text input when the value is longer, editable in the middle, or
+not naturally read as a fixed-size code.
+
+<Canvas of={InputOTPStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect max length, disabled state, required state, and
+error styling on the grouped slots.
+
+<Controls of={InputOTPStories.Playground} />
+
+## Accessibility contract
+
+- the accessible name comes from a linked label or an explicit `aria-label`
+- focus stays on one hidden input while the visible active slot moves across the
+  grouped layout
+- typing and paste both update the same single string value
+- disabled state keeps the current code visible while preventing interaction
+- error styling is driven by `aria-invalid`
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local input OTP audit area
+- Storybook interaction checks verify linked labeling, stable group and slot
+  hooks, and active-slot progression while typing
+- UI tests cover linked naming, focus progression, paste behavior, stable slot
+  hooks, invalid styling, refs, and a11y
+
+What is checked manually:
+
+- visual pass for slot spacing, separator balance, and dark-theme focus clarity
+- compact-width smoke pass to confirm the grouped layout stays legible without
+  cramped slots
+
+## Responsive notes
+
+Keep the slot count low and preserve visible grouping on compact screens so the
+user can still scan the code in chunks.

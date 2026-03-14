@@ -54,7 +54,7 @@
     },
     "calendar": {
       "category": "composed",
-      "storyFile": "calendar.stories.tsx",
+      "storyFile": "composed/calendar/calendar.stories.tsx",
       "title": "Composed/Calendar"
     },
     "callout": {
@@ -104,7 +104,7 @@
     },
     "date-picker": {
       "category": "composed",
-      "storyFile": "date-picker.stories.tsx",
+      "storyFile": "composed/date-picker/date-picker.stories.tsx",
       "title": "Composed/DatePicker"
     },
     "dialog": {
@@ -134,7 +134,7 @@
     },
     "field": {
       "category": "composed",
-      "storyFile": "field.stories.tsx",
+      "storyFile": "composed/field/field.stories.tsx",
       "title": "Composed/Field"
     },
     "hover-card": {
@@ -149,12 +149,12 @@
     },
     "input-group": {
       "category": "composed",
-      "storyFile": "input-group.stories.tsx",
+      "storyFile": "composed/input-group/input-group.stories.tsx",
       "title": "Composed/InputGroup"
     },
     "input-otp": {
       "category": "adapter",
-      "storyFile": "input-otp.stories.tsx",
+      "storyFile": "primitives/adapter/input-otp/input-otp.stories.tsx",
       "title": "Primitives/Adapter/InputOTP"
     },
     "item": {
