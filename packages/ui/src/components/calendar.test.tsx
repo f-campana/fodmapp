@@ -27,6 +27,7 @@ describe("Calendar", () => {
         data-slot="custom-calendar"
         defaultMonth={defaultMonth}
         mode="single"
+        selected={new Date(2026, 2, 12)}
         showOutsideDays={false}
       />,
     );
@@ -34,6 +35,7 @@ describe("Calendar", () => {
     const root = container.querySelector("[data-slot='calendar']");
     const nav = container.querySelector("nav");
     const dayButton = getDayButton(container, 12);
+    const selectedCell = dayButton.closest("[role='gridcell']");
     const previousButton = screen.getByLabelText(/previous month/i);
     const nextButton = screen.getByLabelText(/next month/i);
 
@@ -44,9 +46,12 @@ describe("Calendar", () => {
     expect(nav?.className ?? "").toContain("absolute");
     expect(nav?.contains(previousButton)).toBe(true);
     expect(nav?.contains(nextButton)).toBe(true);
-    expect(dayButton.className).toContain("aria-selected:bg-primary");
-    expect(dayButton.className).toContain(
-      "aria-selected:text-primary-foreground",
+    expect(dayButton.className).not.toContain("aria-selected:bg-primary");
+    expect(selectedCell?.className ?? "").toContain(
+      "aria-selected:[&>button]:bg-primary",
+    );
+    expect(selectedCell?.className ?? "").toContain(
+      "aria-selected:[&>button]:text-primary-foreground",
     );
   });
 

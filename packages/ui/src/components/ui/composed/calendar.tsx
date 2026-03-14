@@ -30,7 +30,7 @@ function Calendar({
         className,
       )}
       classNames={{
-        root: "bg-card text-card-foreground",
+        root: "bg-card text-card-foreground aria-selected:bg-primary aria-selected:text-primary-foreground",
         months: "flex flex-col gap-4 sm:flex-row sm:gap-6",
         month: "relative space-y-4",
         month_caption: "flex h-7 items-center justify-center px-10 pt-1",
@@ -53,20 +53,18 @@ function Calendar({
         day_button: cn(
           buttonVariants({ variant: "ghost", size: "icon-sm" }),
           "size-9 rounded-(--radius) p-0 font-normal",
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
-          "aria-selected:opacity-100",
         ),
         selected:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground aria-selected:[&>button]:opacity-100",
         today: "text-accent-foreground",
         outside: "text-muted-foreground",
         disabled: "cursor-not-allowed text-muted-foreground opacity-50",
         range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground aria-selected:[&>button]:text-accent-foreground",
+          "aria-selected:[&>button]:bg-accent aria-selected:[&>button]:text-accent-foreground",
         range_start:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
         range_end:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground aria-selected:[&>button]:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
         hidden: "invisible",
         ...classNames,
       }}

@@ -195,6 +195,7 @@ export const InteractionChecks: Story = {
     });
     const nextButton = canvas.getByRole("button", { name: /next month/i });
     const selectedDay = getDayButton(canvasElement, 12);
+    const selectedCell = selectedDay.closest("[role='gridcell']");
     const nextDay = getDayButton(canvasElement, 13);
     const disabledDay = getDayButton(canvasElement, 19);
 
@@ -207,7 +208,12 @@ export const InteractionChecks: Story = {
     await expect(nav?.className ?? "").toContain("absolute");
     await expect(nav?.contains(previousButton)).toBe(true);
     await expect(nav?.contains(nextButton)).toBe(true);
-    await expect(selectedDay.className).toContain("aria-selected:bg-primary");
+    await expect(selectedDay.className).not.toContain(
+      "aria-selected:bg-primary",
+    );
+    await expect(selectedCell?.className ?? "").toContain(
+      "aria-selected:[&>button]:bg-primary",
+    );
     await expect(
       canvasElement.querySelector("[data-day='2026-03-14'][data-today='true']"),
     ).toBeTruthy();
