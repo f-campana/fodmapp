@@ -148,7 +148,7 @@ function MealPlanCarousel({
                 data-slot={dataSlots ? "item-personnalise" : undefined}
                 key={slide.day}
               >
-                <article className="flex h-full min-h-56 flex-col justify-between rounded-(--radius) border border-border bg-card p-5">
+                <article className="flex h-full min-h-56 flex-col justify-between rounded-(--radius) border border-border bg-card p-5 select-none">
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-foreground">
                       {slide.day}

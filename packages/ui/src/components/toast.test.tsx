@@ -48,7 +48,7 @@ describe("Toast helper", () => {
     expect(renderedToast.className).toContain("bg-popover");
   });
 
-  it("supports success, info, warning, error, and loading helpers with type accents", async () => {
+  it("supports success, info, warning, error, and loading helpers with tokenized icon accents", async () => {
     render(<Sonner />);
 
     Toast.success("Succes");
@@ -57,20 +57,41 @@ describe("Toast helper", () => {
     Toast.error("Erreur");
     Toast.loading("Chargement");
 
-    expect((await findToastSurface("Succes")).className).toContain(
-      "border-success",
+    const successToast = await findToastSurface("Succes");
+    const infoToast = await findToastSurface("Information");
+    const warningToast = await findToastSurface("Attention");
+    const errorToast = await findToastSurface("Erreur");
+    const loadingToast = await findToastSurface("Chargement");
+    const loadingSpinner = await waitFor(() => {
+      const node = loadingToast.querySelector(
+        "[data-slot='sonner-loading-icon']",
+      );
+      if (!node) {
+        throw new Error("Loader not mounted yet");
+      }
+
+      return node;
+    });
+
+    expect(successToast.className).toContain("border-border");
+    expect(successToast.className).toContain(
+      "[&_[data-icon]]:border-success/25",
     );
-    expect((await findToastSurface("Information")).className).toContain(
-      "border-info",
+    expect(
+      successToast.querySelector("[data-slot='sonner-success-icon']"),
+    ).toBeTruthy();
+    expect(infoToast.className).toContain("[&_[data-icon]]:border-info/25");
+    expect(warningToast.className).toContain(
+      "[&_[data-icon]]:border-warning/25",
     );
-    expect((await findToastSurface("Attention")).className).toContain(
-      "border-warning",
+    expect(errorToast.className).toContain("[&_[data-icon]]:border-danger/25");
+    expect(loadingSpinner.className).toContain("animate-spin");
+    expect(loadingToast.querySelector(".sonner-loading-wrapper")).toBeNull();
+    expect(loadingToast.className).toContain(
+      "grid-cols-[auto_minmax(0,1fr)_auto_auto]",
     );
-    expect((await findToastSurface("Erreur")).className).toContain(
-      "border-danger",
-    );
-    expect((await findToastSurface("Chargement")).className).toContain(
-      "[&_[data-icon]]:text-muted-foreground",
+    expect(loadingToast.className).toContain(
+      "data-[type=loading]:[&_[data-content]]:self-center",
     );
   });
 
