@@ -112,7 +112,7 @@ function EditorialMediaCard({
             <p className="text-sm leading-5 text-muted-foreground">{caption}</p>
           </div>
           <div className="w-full max-w-lg space-y-2">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm leading-5 text-muted-foreground">
               Constrained parent width keeps the ratio box predictable before
               the image is loaded.
             </p>

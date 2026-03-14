@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, userEvent, within } from "storybook/test";
 
-import { Input, Label } from "@fodmap/ui";
+import { Checkbox, Input, Label } from "@fodmap/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 
@@ -218,16 +218,23 @@ export const DisabledField: Story = {
             disabled and visually dimmed.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <input
+        <div className="flex items-start gap-3">
+          <Checkbox
+            aria-describedby="sms-reminders-hint"
             checked
-            className="peer size-4 rounded border border-input accent-foreground"
             disabled
             id="sms-reminders"
-            readOnly
-            type="checkbox"
           />
-          <Label htmlFor="sms-reminders">SMS reminders</Label>
+          <div className="space-y-1">
+            <Label htmlFor="sms-reminders">SMS reminders</Label>
+            <p
+              className="text-sm leading-5 text-muted-foreground"
+              id="sms-reminders-hint"
+            >
+              Keep the same field association when this option is temporarily
+              unavailable.
+            </p>
+          </div>
         </div>
       </div>
     </LabelAuditFrame>

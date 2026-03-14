@@ -100,10 +100,12 @@ function BodyMountedPortalExample() {
           </p>
           <Portal>
             <div
-              className="pointer-events-none fixed right-6 bottom-6 rounded-(--radius) border border-border bg-card px-3 py-2 text-sm leading-5 text-foreground shadow-lg"
+              className="pointer-events-none fixed inset-x-0 bottom-6 z-10 flex justify-center px-4"
               data-testid="portal-body-content"
             >
-              Mounted in preview body
+              <div className="max-w-xs rounded-(--radius) border border-border bg-card px-3 py-2 text-sm leading-5 text-foreground shadow-lg">
+                Mounted in preview body
+              </div>
             </div>
           </Portal>
         </div>
@@ -170,18 +172,6 @@ function LocalPortalExample({ args }: { args?: Story["args"] }) {
   );
 }
 
-export const Playground: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          "Use the local-container example to compare portalled mounting with inline fallback when `disabled` is toggled.",
-      },
-    },
-  },
-  render: (args) => <LocalPortalExample args={args} />,
-};
-
 export const Default: Story = {
   parameters: {
     ...fixedStoryParameters,
@@ -205,6 +195,18 @@ export const Default: Story = {
       within(source).queryByTestId("portal-body-content"),
     ).toBeNull();
   },
+};
+
+export const Playground: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the local-container example to compare portalled mounting with inline fallback when `disabled` is toggled.",
+      },
+    },
+  },
+  render: (args) => <LocalPortalExample args={args} />,
 };
 
 export const DisabledInline: Story = {

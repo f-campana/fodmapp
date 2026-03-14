@@ -116,19 +116,18 @@ function VerticalSection({ args }: { args?: Story["args"] }) {
               meaningful split between related regions.
             </p>
           </div>
-          <div className="flex items-stretch gap-4">
+          <div className="flex items-stretch gap-3">
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-semibold text-foreground">Plan</p>
               <p className="text-sm leading-5 text-muted-foreground">
-                Confirm the substitution and serving note before publishing.
+                Confirm the substitution note before publishing.
               </p>
             </div>
             <Separator {...args} className={args?.className} />
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-semibold text-foreground">Review</p>
               <p className="text-sm leading-5 text-muted-foreground">
-                Validate that the divider exposes a real accessible separator
-                when the split matters.
+                Expose a real separator only when the split carries meaning.
               </p>
             </div>
           </div>
