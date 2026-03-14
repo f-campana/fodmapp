@@ -5,6 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import {
+  Button,
   Command,
   CommandDialog,
   CommandEmpty,
@@ -40,14 +41,6 @@ const defaultPlaygroundArgs = {
   vimBindings: true,
   onValueChange: fn(),
 } as const;
-
-const triggerClassName = [
-  "inline-flex cursor-pointer items-center justify-center rounded-(--radius)",
-  "border border-outline-border bg-outline px-3 py-2 text-sm font-medium text-outline-foreground",
-  "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-  "hover:bg-outline-hover",
-  "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-].join(" ");
 
 type CommandStoryArgs = ComponentProps<typeof Command>;
 
@@ -142,13 +135,9 @@ function CommandDialogExample() {
 
   return (
     <div className="flex min-h-72 items-center justify-center">
-      <button
-        className={triggerClassName}
-        onClick={() => setOpen(true)}
-        type="button"
-      >
+      <Button variant="outline" onClick={() => setOpen(true)}>
         Ouvrir la palette
-      </button>
+      </Button>
       <CommandDialog
         onOpenChange={setOpen}
         open={open}
@@ -276,6 +265,9 @@ export const InteractionChecks: Story = {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='command']");
     const input = canvas.getByRole("combobox", { name: "Palette clinique" });
+    const journalItem = canvas
+      .getByText("Ouvrir le journal du midi")
+      .closest("[data-slot='command-item']");
     const list = canvasElement.querySelector("[data-slot='command-list']");
     const groups = Array.from(
       canvasElement.querySelectorAll("[data-slot='command-group']"),
@@ -300,6 +292,11 @@ export const InteractionChecks: Story = {
     await expect(
       canvasElement.querySelector("[data-slot='liste-personnalisee']"),
     ).toBeNull();
+
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(async () => {
+      await expect(journalItem).toHaveAttribute("data-selected", "true");
+    });
 
     await userEvent.clear(input);
     await userEvent.type(input, "weekly");

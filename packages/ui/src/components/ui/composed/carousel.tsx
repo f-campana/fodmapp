@@ -159,7 +159,10 @@ function Carousel({
       >
         <div
           ref={carouselRef}
-          className="overflow-hidden"
+          className={cn(
+            "cursor-grab overflow-hidden active:cursor-grabbing",
+            orientation === "horizontal" ? "touch-pan-y" : "h-full touch-pan-x",
+          )}
           data-slot="carousel-viewport"
         >
           {children}
@@ -185,7 +188,7 @@ function CarouselContent({
       data-slot="carousel-content"
       className={cn(
         "flex",
-        orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+        orientation === "horizontal" ? "-ml-4" : "-mt-4 h-full flex-col",
         className,
       )}
       {...props}
@@ -211,7 +214,7 @@ function CarouselItem({
       role="group"
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
+        orientation === "horizontal" ? "pl-4" : "min-h-0 basis-full pt-4",
         className,
       )}
       {...props}

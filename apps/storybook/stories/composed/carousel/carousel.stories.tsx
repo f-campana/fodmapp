@@ -310,6 +310,10 @@ export const InteractionChecks: Story = {
       canvasElement.querySelector("[data-slot='carousel-viewport']"),
     ).toBeTruthy();
     await expect(
+      canvasElement.querySelector("[data-slot='carousel-viewport']")
+        ?.className ?? "",
+    ).toContain("cursor-grab");
+    await expect(
       canvasElement.querySelector("[data-slot='carousel-content']"),
     ).toBeTruthy();
     await expect(

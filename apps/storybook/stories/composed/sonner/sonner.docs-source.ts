@@ -1,10 +1,9 @@
-export const sonnerRecommendedUsageCode = `import { Sonner, toast } from "@fodmap/ui";
+export const sonnerRecommendedUsageCode = `import { Button, Sonner, toast } from "@fodmap/ui";
 
 export function Example() {
   return (
     <>
-      <button
-        type="button"
+      <Button
         onClick={() =>
           toast("Revue hebdomadaire prete", {
             action: {
@@ -17,7 +16,7 @@ export function Example() {
         }
       >
         Afficher la revue
-      </button>
+      </Button>
       <Sonner />
     </>
   );

@@ -35,7 +35,8 @@ than the helper API that triggers messages.
 ## Host relationship
 
 `Toast` does not render UI by itself. A mounted `Sonner` host is required for
-visible output, close controls, and the live region.
+visible output, close controls, the live region, and the tokenized toast
+surface.
 
 ## Props and controls
 
@@ -54,6 +55,8 @@ to dismiss a persistent toast later.
 ## Accessibility contract
 
 - rendered output reuses the mounted Sonner live region
+- the default helper path renders through Sonner's unstyled mode so the toast
+  surface, title, description, and buttons stay on repo tokens
 - helper-provided actions render as real buttons inside the toast surface
 - dismissing by id removes the active toast from the viewport
 - these docs do not treat hover pause, hotkeys, or swipe gestures as part of
@@ -65,11 +68,11 @@ What is checked automatically:
 
 - Storybook runs an accessibility scan across the local audit area and the
   mounted Sonner viewport
-- Storybook interaction checks verify host mounting, action callbacks, and
-  explicit dismissal through the helper
+- Storybook interaction checks verify host mounting, tokenized unstyled output,
+  action callbacks, and explicit dismissal through the helper
 - UI tests cover the required Sonner host, helper variants, action callbacks,
   promise flow, id-based dismissal, compatibility with the lower-level `toast`
-  export, and a11y on rendered output
+  export, tokenized rendered output, and a11y
 
 What is checked manually:
 

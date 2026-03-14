@@ -120,12 +120,34 @@ describe("Carousel", () => {
     expect(emblaScrollNextMock).toHaveBeenCalled();
   });
 
-  it("applies vertical orientation classes", () => {
+  it("supports vertical keyboard navigation", () => {
     const { container } = renderCarousel("vertical");
 
-    const content = container.querySelector("[data-slot='carousel-content']");
+    const root = container.querySelector(
+      "[data-slot='carousel']",
+    ) as HTMLElement;
 
+    root.focus();
+    fireEvent.keyDown(root, { key: "ArrowUp", code: "ArrowUp" });
+    fireEvent.keyDown(root, { key: "ArrowDown", code: "ArrowDown" });
+
+    expect(emblaScrollPrevMock).toHaveBeenCalled();
+    expect(emblaScrollNextMock).toHaveBeenCalled();
+  });
+
+  it("applies viewport and vertical layout classes", () => {
+    const { container } = renderCarousel("vertical");
+
+    const viewport = container.querySelector("[data-slot='carousel-viewport']");
+    const content = container.querySelector("[data-slot='carousel-content']");
+    const item = container.querySelector("[data-slot='carousel-item']");
+
+    expect(viewport?.className ?? "").toContain("cursor-grab");
+    expect(viewport?.className ?? "").toContain("h-full");
+    expect(viewport?.className ?? "").toContain("touch-pan-x");
     expect(content?.className ?? "").toContain("flex-col");
+    expect(content?.className ?? "").toContain("h-full");
+    expect(item?.className ?? "").toContain("basis-full");
   });
 
   it("keeps default slot hooks stable when consumers pass their own data-slot props", () => {

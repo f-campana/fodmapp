@@ -55,6 +55,8 @@ The dialog composition keeps the same command contract inside a modal shell.
   matching
 - groups collapse with their items when they no longer contain a matching result
 - `CommandEmpty` appears only when the current query has no remaining results
+- root-level `onValueChange` receives the selected item value, not the current
+  input text
 
 ## Accessibility contract
 
@@ -70,7 +72,7 @@ What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the local command audit area
 - Storybook interaction checks verify stable slot hooks, value and keyword
-  filtering, empty state rendering, and keyboard selection
+  filtering, empty state rendering, and keyboard navigation
 - UI tests cover dialog labelling, keyboard navigation, disabled items, built-in
   filtering, `shouldFilter={false}`, stable slot hooks, refs, and a11y
 

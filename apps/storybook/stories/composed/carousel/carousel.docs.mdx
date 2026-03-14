@@ -45,6 +45,10 @@ options.
 current snap or subscribe to selection changes without reimplementing the host
 layout.
 
+Vertical carousels still need an explicit height on the root. The viewport and
+content fill that bounded height so each slide can snap cleanly on the vertical
+axis.
+
 <Canvas of={CarouselStories.ControlledApi} sourceState="none" />
 
 ## Accessibility contract
@@ -52,6 +56,8 @@ layout.
 - the root renders as a labelled `region` with `aria-roledescription="carousel"`
 - the carousel root is keyboard reachable and handles arrow keys in the current
   orientation
+- the viewport exposes a grab cursor and touch-axis hint on the draggable
+  surface
 - previous and next controls expose stable button labels
 - slides keep a stable `data-slot` marker plus `aria-roledescription="slide"`
 - default `data-slot` hooks remain stable on the root, viewport, content,
@@ -63,9 +69,11 @@ What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the local carousel audit area
 - Storybook interaction checks verify stable slot hooks, keyboard focus, arrow
-  navigation, and next/previous updates against the active-snap readout
+  navigation, drag-surface cursor treatment, and next/previous updates against
+  the active-snap readout
 - UI tests cover region semantics, button actions, focusable keyboard target,
-  vertical layout classes, `setApi`, stable slot hooks, refs, and a11y
+  vertical arrow navigation, viewport fill classes, `setApi`, stable slot
+  hooks, refs, and a11y
 
 What is checked manually:
 
@@ -78,4 +86,6 @@ What is checked manually:
 
 The default controls sit outside the viewport, so compact layouts should leave
 inline or block padding around the carousel root. The responsive stress story
-keeps that space explicit so controls stay visible at mobile widths.
+keeps that space explicit so controls stay visible at mobile widths, and the
+vertical story keeps a bounded height so slides do not collapse into a long
+stack.

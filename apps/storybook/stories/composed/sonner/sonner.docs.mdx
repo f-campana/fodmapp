@@ -35,7 +35,7 @@ is enough and you do not need to reason about the host itself.
 ## Props and controls
 
 Use the playground to inspect host position, close-button visibility, stack
-size, and live-region labelling.
+size, live-region labelling, and the wrapper's tokenized surface treatment.
 
 <Controls of={SonnerStories.Playground} />
 
@@ -50,6 +50,8 @@ on the host when the workflow should stay on the current page.
 
 - Sonner mounts the live region and exposes `containerAriaLabel` on that host
 - close-button labelling is passed through with `toastOptions.closeButtonAriaLabel`
+- the default wrapper renders notifications through Sonner's unstyled mode, then
+  reapplies tokenized surface, typography, and button classes
 - action buttons stay keyboard reachable inside the rendered notification
 - the wrapper keeps a stable `data-slot="sonner"` marker while the viewport is
   rendered into the portaled Sonner host
@@ -63,10 +65,10 @@ What is checked automatically:
 - Storybook runs an accessibility scan across the local audit area and the
   mounted Sonner host
 - Storybook interaction checks verify host mounting, live-region labelling,
-  action callbacks, and close-button dismissal
-- UI tests cover wrapper classes, direct `toast` rendering, action and cancel
-  styling, live-region and close-button labelling, class merging, and a11y on
-  rendered output
+  tokenized unstyled rendering, action callbacks, and close-button dismissal
+- UI tests cover direct `toast` rendering, tokenized unstyled output, action and
+  cancel button treatment, live-region and close-button labelling, class
+  merging, and a11y on rendered output
 
 What is checked manually:
 

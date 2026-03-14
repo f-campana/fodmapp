@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { Sonner, Toast } from "@fodmap/ui";
+import { Button, Sonner, Toast } from "@fodmap/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 
@@ -31,7 +31,7 @@ const fixedStoryParameters = {
 
 const defaultPlaygroundArgs = {
   position: "bottom-right",
-  richColors: true,
+  richColors: false,
   closeButton: true,
   expand: false,
   visibleToasts: 3,
@@ -47,14 +47,6 @@ const STORY_TOASTER_IDS = {
   interaction: "toast-interaction",
   responsive: "toast-responsive",
 } as const;
-
-const triggerClassName = [
-  "inline-flex cursor-pointer items-center justify-center rounded-(--radius)",
-  "border border-outline-border bg-outline px-3 py-2 text-sm font-medium text-outline-foreground",
-  "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-  "hover:bg-outline-hover",
-  "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-].join(" ");
 
 type ToastStoryArgs = ComponentProps<typeof Sonner>;
 
@@ -92,8 +84,7 @@ function ToastWorkflowExample({
     <div className="space-y-4">
       <div className="rounded-(--radius) border border-border bg-card p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            className={triggerClassName}
+          <Button
             onClick={() => {
               toastIdRef.current = Toast.success(
                 "Alternative enregistree pour le diner",
@@ -103,27 +94,25 @@ function ToastWorkflowExample({
                     onClick: () => setLastAction("voir-plan"),
                   },
                   description:
-                    "Le recapitulatif sans ail reste prioritaire pour les trois prochains repas.",
+                    "Le recapitulatif sans ail reste actif pour les trois prochains repas.",
                   duration: Number.POSITIVE_INFINITY,
                   toasterId,
                 },
               );
             }}
-            type="button"
           >
             Enregistrer la substitution
-          </button>
-          <button
-            className={triggerClassName}
+          </Button>
+          <Button
+            variant="outline"
             onClick={() => {
               if (toastIdRef.current) {
                 Toast.dismiss(toastIdRef.current);
               }
             }}
-            type="button"
           >
             Masquer la notification
-          </button>
+          </Button>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
           Derniere action: {lastAction}
@@ -143,8 +132,7 @@ function PromiseToastExample({
 }) {
   return (
     <div className="rounded-(--radius) border border-border bg-card p-4">
-      <button
-        className={triggerClassName}
+      <Button
         onClick={() => {
           Toast.promise(
             new globalThis.Promise<string>((resolve) => {
@@ -158,10 +146,9 @@ function PromiseToastExample({
             },
           );
         }}
-        type="button"
       >
         Lancer l export
-      </button>
+      </Button>
       <ToastHost args={args} toasterId={toasterId} />
     </div>
   );
@@ -220,9 +207,10 @@ const meta = {
       table: { defaultValue: { summary: "bottom-right" } },
     },
     richColors: {
-      description: "Enables semantic toast colors on the host.",
+      description:
+        "Passes Sonner's semantic flag through without replacing the wrapper's tokenized toast styling.",
       control: { type: "boolean" },
-      table: { defaultValue: { summary: "true" } },
+      table: { defaultValue: { summary: "false" } },
     },
     closeButton: {
       description: "Shows a close button on rendered toasts.",
@@ -354,6 +342,17 @@ export const InteractionChecks: Story = {
       ).toBeTruthy();
     });
 
+    const renderedToast = await waitFor(() => {
+      const node = body
+        .getByText("Alternative enregistree pour le diner")
+        .closest("[data-sonner-toast]");
+      if (!node) {
+        throw new Error("Toast not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+
     await expect(
       canvasElement.querySelector("[data-slot='sonner']"),
     ).toHaveAttribute("data-slot", "sonner");
@@ -363,6 +362,14 @@ export const InteractionChecks: Story = {
     await expect(
       body.getByText("Alternative enregistree pour le diner"),
     ).toBeInTheDocument();
+    await expect(renderedToast).toHaveAttribute("data-styled", "false");
+    await expect(renderedToast).toHaveAttribute("data-rich-colors", "false");
+    await expect(
+      body.getByRole("button", { name: "Voir le plan" }).className,
+    ).toContain("bg-primary");
+    await expect(
+      body.getByRole("button", { name: "Fermer la notification" }).className,
+    ).toContain("border-border");
 
     await userEvent.click(body.getByRole("button", { name: "Voir le plan" }));
 

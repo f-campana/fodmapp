@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { Sonner, toast } from "@fodmap/ui";
+import { Button, Sonner, toast } from "@fodmap/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 
@@ -30,7 +30,7 @@ const fixedStoryParameters = {
 
 const defaultPlaygroundArgs = {
   position: "bottom-right",
-  richColors: true,
+  richColors: false,
   closeButton: true,
   expand: false,
   visibleToasts: 3,
@@ -46,14 +46,6 @@ const STORY_TOASTER_IDS = {
   interaction: "sonner-interaction",
   responsive: "sonner-responsive",
 } as const;
-
-const triggerClassName = [
-  "inline-flex cursor-pointer items-center justify-center rounded-(--radius)",
-  "border border-outline-border bg-outline px-3 py-2 text-sm font-medium text-outline-foreground",
-  "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
-  "hover:bg-outline-hover",
-  "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-].join(" ");
 
 type SonnerStoryArgs = ComponentProps<typeof Sonner>;
 
@@ -89,8 +81,7 @@ function SonnerActionExample({
   return (
     <div className="space-y-4">
       <div className="rounded-(--radius) border border-border bg-card p-4">
-        <button
-          className={triggerClassName}
+        <Button
           onClick={() =>
             toast("Revue hebdomadaire prete", {
               action: {
@@ -98,19 +89,18 @@ function SonnerActionExample({
                 onClick: () => setLastDecision("ouvrir-revue"),
               },
               cancel: {
-                label: "Rappeler plus tard",
+                label: "Plus tard",
                 onClick: () => setLastDecision("rappeler-plus-tard"),
               },
               description:
-                "Le tableau consolide les portions testees et les exceptions recentes avant la reunion du vendredi.",
+                "Les portions testees et exceptions recentes sont pretes pour la revue du vendredi.",
               duration: Number.POSITIVE_INFINITY,
               toasterId,
             })
           }
-          type="button"
         >
           Afficher la revue
-        </button>
+        </Button>
         <p className="mt-3 text-sm text-muted-foreground">
           Derniere decision: {lastDecision}
         </p>
@@ -129,8 +119,7 @@ function SonnerPromiseExample({
 }) {
   return (
     <div className="rounded-(--radius) border border-border bg-card p-4">
-      <button
-        className={triggerClassName}
+      <Button
         onClick={() =>
           toast.promise(
             new globalThis.Promise<string>((resolve) => {
@@ -144,10 +133,9 @@ function SonnerPromiseExample({
             },
           )
         }
-        type="button"
       >
         Envoyer le rapport
-      </button>
+      </Button>
       <SonnerHost args={args} toasterId={toasterId} />
     </div>
   );
@@ -206,9 +194,10 @@ const meta = {
       table: { defaultValue: { summary: "bottom-right" } },
     },
     richColors: {
-      description: "Enables semantic colors on the Sonner host.",
+      description:
+        "Passes Sonner's semantic flag through without replacing the wrapper's tokenized notification styling.",
       control: { type: "boolean" },
-      table: { defaultValue: { summary: "true" } },
+      table: { defaultValue: { summary: "false" } },
     },
     closeButton: {
       description: "Shows a close button on rendered notifications.",
@@ -339,6 +328,17 @@ export const InteractionChecks: Story = {
       ).toBeTruthy();
     });
 
+    const renderedToast = await waitFor(() => {
+      const node = body
+        .getByText("Revue hebdomadaire prete")
+        .closest("[data-sonner-toast]");
+      if (!node) {
+        throw new Error("Notification not mounted yet");
+      }
+
+      return node as HTMLElement;
+    });
+
     await expect(
       canvasElement.querySelector("[data-slot='sonner']"),
     ).toHaveAttribute("data-slot", "sonner");
@@ -348,6 +348,14 @@ export const InteractionChecks: Story = {
     await expect(
       body.getByText("Revue hebdomadaire prete"),
     ).toBeInTheDocument();
+    await expect(renderedToast).toHaveAttribute("data-styled", "false");
+    await expect(renderedToast).toHaveAttribute("data-rich-colors", "false");
+    await expect(
+      body.getByRole("button", { name: "Ouvrir la revue" }).className,
+    ).toContain("bg-primary");
+    await expect(
+      body.getByRole("button", { name: "Plus tard" }).className,
+    ).toContain("border-outline-border");
 
     await userEvent.click(
       body.getByRole("button", { name: "Ouvrir la revue" }),

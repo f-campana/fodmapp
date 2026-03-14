@@ -1,19 +1,18 @@
-export const toastRecommendedUsageCode = `import { Sonner, Toast } from "@fodmap/ui";
+export const toastRecommendedUsageCode = `import { Button, Sonner, Toast } from "@fodmap/ui";
 
 export function Example() {
   return (
     <>
-      <button
-        type="button"
+      <Button
         onClick={() =>
           Toast.success("Alternative enregistree pour le diner", {
             description:
-              "Le recapitulatif sans ail reste prioritaire pour les trois prochains repas.",
+              "Le recapitulatif sans ail reste actif pour les trois prochains repas.",
           })
         }
       >
         Enregistrer la substitution
-      </button>
+      </Button>
       <Sonner />
     </>
   );

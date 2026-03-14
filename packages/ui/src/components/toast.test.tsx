@@ -11,6 +11,20 @@ afterEach(() => {
 });
 
 describe("Toast helper", () => {
+  async function findToastSurface(text: string) {
+    return waitFor(() => {
+      const toastSurface = screen
+        .getByText(text)
+        .closest("[data-sonner-toast]") as HTMLElement | null;
+
+      if (!toastSurface) {
+        throw new Error("Toast surface not mounted yet");
+      }
+
+      return toastSurface;
+    });
+  }
+
   it("requires a mounted Sonner host to render notifications", async () => {
     render(<div />);
 
@@ -27,9 +41,14 @@ describe("Toast helper", () => {
     Toast.show("Notification enregistree");
 
     await screen.findByText("Notification enregistree");
+
+    const renderedToast = await findToastSurface("Notification enregistree");
+
+    expect(renderedToast).toHaveAttribute("data-styled", "false");
+    expect(renderedToast.className).toContain("bg-popover");
   });
 
-  it("supports success, info, warning, error, and loading helpers", async () => {
+  it("supports success, info, warning, error, and loading helpers with type accents", async () => {
     render(<Sonner />);
 
     Toast.success("Succes");
@@ -38,11 +57,21 @@ describe("Toast helper", () => {
     Toast.error("Erreur");
     Toast.loading("Chargement");
 
-    await screen.findByText("Succes");
-    await screen.findByText("Information");
-    await screen.findByText("Attention");
-    await screen.findByText("Erreur");
-    await screen.findByText("Chargement");
+    expect((await findToastSurface("Succes")).className).toContain(
+      "border-success",
+    );
+    expect((await findToastSurface("Information")).className).toContain(
+      "border-info",
+    );
+    expect((await findToastSurface("Attention")).className).toContain(
+      "border-warning",
+    );
+    expect((await findToastSurface("Erreur")).className).toContain(
+      "border-danger",
+    );
+    expect((await findToastSurface("Chargement")).className).toContain(
+      "[&_[data-icon]]:text-muted-foreground",
+    );
   });
 
   it("supports action callbacks through Toast.show options", async () => {
@@ -62,6 +91,9 @@ describe("Toast helper", () => {
       await screen.findByRole("button", { name: "Voir le plan" }),
     );
 
+    expect(
+      screen.getByRole("button", { name: "Voir le plan" }).className,
+    ).toContain("bg-primary");
     expect(onAction).toHaveBeenCalledTimes(1);
   });
 

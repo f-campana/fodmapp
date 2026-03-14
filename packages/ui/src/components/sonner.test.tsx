@@ -10,27 +10,46 @@ afterEach(() => {
 });
 
 describe("Sonner", () => {
-  it("renders slot marker and semantic toaster classes", async () => {
+  async function findToastSurface(text: string) {
+    return waitFor(() => {
+      const toastSurface = screen
+        .getByText(text)
+        .closest("[data-sonner-toast]") as HTMLElement | null;
+
+      if (!toastSurface) {
+        throw new Error("Toast surface not mounted yet");
+      }
+
+      return toastSurface;
+    });
+  }
+
+  it("renders slot marker and tokenized unstyled notifications", async () => {
     const { container } = render(<Sonner />);
 
     const marker = container.querySelector("[data-slot='sonner']");
 
     expect(marker).toBeTruthy();
-    expect(marker?.className ?? "").toContain(
-      "[&_[data-sonner-toast]]:bg-popover",
-    );
-    expect(marker?.className ?? "").toContain(
-      "[&_[data-sonner-toast]]:text-popover-foreground",
-    );
-    expect(marker?.className ?? "").toContain(
-      "[&_[data-sonner-toast]]:border-border",
-    );
 
     toast("Sauvegarde terminee");
 
-    await waitFor(() => {
-      expect(document.body.querySelector("[data-sonner-toaster]")).toBeTruthy();
+    const toaster = await waitFor(() => {
+      const node = document.body.querySelector(
+        "[data-sonner-toaster]",
+      ) as HTMLElement | null;
+      if (!node) {
+        throw new Error("Sonner host not mounted yet");
+      }
+
+      return node;
     });
+    const renderedToast = await findToastSurface("Sauvegarde terminee");
+
+    expect(toaster.className).toContain("[font-family:var(--font-body)]");
+    expect(renderedToast).toHaveAttribute("data-styled", "false");
+    expect(renderedToast).toHaveAttribute("data-rich-colors", "false");
+    expect(renderedToast.className).toContain("bg-popover");
+    expect(renderedToast.className).toContain("rounded-(--radius)");
   });
 
   it("shows toast content through exported toast function", async () => {
@@ -41,22 +60,42 @@ describe("Sonner", () => {
     await screen.findByText("Sauvegarde terminee");
   });
 
-  it("applies semantic classes to action and cancel buttons", async () => {
+  it("applies tokenized classes to action and cancel buttons", async () => {
     const onAction = vi.fn();
     const onCancel = vi.fn();
+    const onSecondaryCancel = vi.fn();
 
     render(<Sonner />);
 
     toast("Confirmer la suppression", {
       action: { label: "Confirmer", onClick: onAction },
-      cancel: { label: "Annuler", onClick: onCancel },
+      cancel: { label: "Annuler la suppression", onClick: onCancel },
     });
 
     const action = await screen.findByRole("button", { name: "Confirmer" });
-    const cancel = await screen.findByRole("button", { name: "Annuler" });
+    const cancel = await screen.findByRole("button", {
+      name: "Annuler la suppression",
+    });
 
     expect(action.className).toContain("bg-primary");
-    expect(cancel.className).toContain("border-border");
+    expect(action.className).toContain("max-w-full");
+    expect(cancel.className).toContain("border-outline-border");
+
+    fireEvent.click(action);
+    expect(onAction).toHaveBeenCalledTimes(1);
+
+    toast("Archiver cette suggestion", {
+      cancel: {
+        label: "Annuler l'archivage",
+        onClick: onSecondaryCancel,
+      },
+      duration: Number.POSITIVE_INFINITY,
+    });
+
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Annuler l'archivage" }),
+    );
+    expect(onSecondaryCancel).toHaveBeenCalledTimes(1);
   });
 
   it("passes through viewport and close-button accessibility labels", async () => {
@@ -75,6 +114,7 @@ describe("Sonner", () => {
     });
 
     expect(liveRegion).toBeInTheDocument();
+    expect(closeButton.className).toContain("border-border");
 
     fireEvent.click(closeButton);
 
@@ -102,7 +142,7 @@ describe("Sonner", () => {
   it("has no obvious a11y violations", async () => {
     render(<Sonner />);
 
-    toast("Notification");
+    toast.success("Notification");
 
     await screen.findByText("Notification");
 
