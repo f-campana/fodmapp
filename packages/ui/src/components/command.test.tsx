@@ -69,7 +69,7 @@ describe("Command", () => {
 
   it("opens and closes CommandDialog with Escape", async () => {
     render(
-      <CommandDialog defaultOpen>
+      <CommandDialog defaultOpen title="Palette clinique">
         <CommandInput placeholder="Rechercher" />
         <CommandList>
           <CommandItem value="profil">Profil</CommandItem>
@@ -84,6 +84,12 @@ describe("Command", () => {
       expect(
         document.querySelector("[data-slot='dialog-content']"),
       ).toBeTruthy();
+      expect(
+        screen.getByRole("combobox", { name: "Palette clinique" }),
+      ).toBeInTheDocument();
+      expect(document.querySelector("[cmdk-label]")).toHaveTextContent(
+        "Palette clinique",
+      );
     });
 
     const dialogContent = document.querySelector(
@@ -174,7 +180,7 @@ describe("Command", () => {
 
   it("shows empty state when there is no match", async () => {
     render(
-      <Command>
+      <Command label="Recherche rapide">
         <CommandInput placeholder="Rechercher" />
         <CommandList>
           <CommandEmpty>Aucun resultat</CommandEmpty>
@@ -189,6 +195,67 @@ describe("Command", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Aucun resultat")).toBeInTheDocument();
+    });
+  });
+
+  it("matches item value and keywords when filtering and hides unrelated groups", async () => {
+    const { container } = render(
+      <Command label="Palette substitutions">
+        <CommandInput placeholder="Rechercher" />
+        <CommandList>
+          <CommandEmpty>Aucun resultat</CommandEmpty>
+          <CommandGroup heading="Journal">
+            <CommandItem value="journal-midi">Journal du midi</CommandItem>
+          </CommandGroup>
+          <CommandGroup heading="Automatisations">
+            <CommandItem keywords={["rapport"]} value="weekly-summary">
+              Revue hebdomadaire
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>,
+    );
+
+    const input = screen.getByPlaceholderText("Rechercher");
+    const groups = Array.from(
+      container.querySelectorAll("[data-slot='command-group']"),
+    );
+
+    fireEvent.change(input, { target: { value: "weekly" } });
+
+    await waitFor(() => {
+      expect(screen.getByText("Revue hebdomadaire")).toBeInTheDocument();
+      expect(groups[0]).toHaveAttribute("hidden");
+      expect(groups[1]).not.toHaveAttribute("hidden");
+    });
+
+    fireEvent.change(input, { target: { value: "rapport" } });
+
+    await waitFor(() => {
+      expect(screen.getByText("Revue hebdomadaire")).toBeInTheDocument();
+      expect(groups[0]).toHaveAttribute("hidden");
+      expect(groups[1]).not.toHaveAttribute("hidden");
+    });
+  });
+
+  it("leaves filtering to the consumer when shouldFilter is false", async () => {
+    render(
+      <Command label="Palette manuelle" shouldFilter={false}>
+        <CommandInput placeholder="Rechercher" />
+        <CommandList>
+          <CommandEmpty>Aucun resultat</CommandEmpty>
+          <CommandItem value="profil">Profil</CommandItem>
+        </CommandList>
+      </Command>,
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Rechercher"), {
+      target: { value: "zzz" },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Profil")).toBeInTheDocument();
+      expect(screen.queryByText("Aucun resultat")).toBeNull();
     });
   });
 
@@ -248,6 +315,37 @@ describe("Command", () => {
     expect(container.querySelector(".raccourci-personnalise")).toBeTruthy();
   });
 
+  it("keeps default slot hooks stable when consumers pass their own data-slot props", () => {
+    const { container } = render(
+      <Command data-slot="commande-personnalisee">
+        <CommandInput
+          data-slot="saisie-personnalisee"
+          placeholder="Rechercher"
+        />
+        <CommandList data-slot="liste-personnalisee">
+          <CommandGroup data-slot="groupe-personnalise" heading="Actions">
+            <CommandItem data-slot="item-personnalise" value="profil">
+              Profil
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator data-slot="separateur-personnalise" />
+        </CommandList>
+      </Command>,
+    );
+
+    expect(
+      container.querySelector("[data-slot='commande-personnalisee']"),
+    ).toBeNull();
+    expect(container.querySelector("[data-slot='command']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='command-input']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='command-list']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='command-group']")).toBeTruthy();
+    expect(container.querySelector("[data-slot='command-item']")).toBeTruthy();
+    expect(
+      container.querySelector("[data-slot='command-separator']"),
+    ).toBeTruthy();
+  });
+
   it("supports refs for command, input, list, and item", () => {
     const commandRef = createRef<HTMLDivElement>();
     const inputRef = createRef<HTMLInputElement>();
@@ -273,7 +371,7 @@ describe("Command", () => {
 
   it("has no obvious a11y violations", async () => {
     const { container } = render(
-      <Command>
+      <Command label="Palette a11y">
         <CommandInput placeholder="Rechercher une action" />
         <CommandList>
           <CommandEmpty>Aucun resultat</CommandEmpty>

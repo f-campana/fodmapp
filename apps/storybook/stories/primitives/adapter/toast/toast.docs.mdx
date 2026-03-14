@@ -1,0 +1,87 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ToastStories from "./toast.stories";
+import { toastRecommendedUsageCode } from "./toast.docs-source";
+
+<Meta of={ToastStories} />
+
+<Title />
+<Subtitle>
+  Use Toast when an action needs lightweight, imperative feedback without
+  leaving the current page context.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={toastRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Toast for short success, warning, error, loading, or promise-driven updates
+after the user completes an action.
+
+Prefer Sonner when you need to reason about the host viewport itself rather
+than the helper API that triggers messages.
+
+<Canvas of={ToastStories.Default} sourceState="none" />
+
+## Host relationship
+
+`Toast` does not render UI by itself. A mounted `Sonner` host is required for
+visible output, close controls, the live region, and the tokenized toast
+surface.
+
+## Props and controls
+
+The playground exposes the Sonner host controls that affect Toast output:
+position, duration, close button, visible stack size, and live-region label.
+
+<Controls of={ToastStories.Playground} />
+
+## Promise and dismiss flows
+
+Use `Toast.promise` for async transitions and keep the returned id when you need
+to dismiss a persistent toast later.
+
+<Canvas of={ToastStories.PromiseFlow} sourceState="none" />
+
+## Accessibility contract
+
+- rendered output reuses the mounted Sonner live region
+- the default helper path renders through Sonner's unstyled mode so the toast
+  surface, title, description, and buttons stay on repo tokens
+- helper-provided actions render as real buttons inside the toast surface
+- dismissing by id removes the active toast from the viewport
+- these docs do not treat hover pause, hotkeys, or swipe gestures as part of
+  the Toast helper contract
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan across the local audit area and the
+  mounted Sonner viewport
+- Storybook interaction checks verify host mounting, tokenized unstyled output,
+  action callbacks, and explicit dismissal through the helper
+- UI tests cover the required Sonner host, helper variants, action callbacks,
+  promise flow, id-based dismissal, compatibility with the lower-level `toast`
+  export, tokenized rendered output, and a11y
+
+What is checked manually:
+
+- visual pass for spacing, close-button placement, and long-copy wrapping in the
+  rendered toast viewport
+- browser review at narrow widths to confirm the notification stays inside the
+  viewport without clipped actions
+
+## Responsive notes
+
+Batch H includes a stress story with longer product copy so the viewport can be
+reviewed at mobile widths without placeholder text.

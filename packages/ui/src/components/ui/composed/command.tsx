@@ -14,9 +14,17 @@ import {
   DialogTitle,
 } from "../adapter/dialog";
 
+type DataSlotProp = { "data-slot"?: string };
+
 export type CommandProps = React.ComponentProps<typeof CommandPrimitive>;
 
-function Command({ className, ...props }: CommandProps) {
+function Command({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <CommandPrimitive
       data-slot="command"
@@ -61,6 +69,7 @@ function CommandDialog({
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <DialogDescription className="sr-only">{description}</DialogDescription>
         <Command
+          label={ariaLabel}
           className={cn(
             "[&_[data-slot=command-input-wrapper]]:h-12",
             "[&_[data-slot=command-item]]:px-2 [&_[data-slot=command-item]]:py-3",
@@ -79,7 +88,13 @@ export type CommandInputProps = React.ComponentProps<
   typeof CommandPrimitive.Input
 >;
 
-function CommandInput({ className, ...props }: CommandInputProps) {
+function CommandInput({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandInputProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <div
       data-slot="command-input-wrapper"
@@ -118,7 +133,13 @@ export type CommandListProps = React.ComponentProps<
   typeof CommandPrimitive.List
 >;
 
-function CommandList({ className, ...props }: CommandListProps) {
+function CommandList({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandListProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <CommandPrimitive.List
       data-slot="command-list"
@@ -132,7 +153,13 @@ export type CommandEmptyProps = React.ComponentProps<
   typeof CommandPrimitive.Empty
 >;
 
-function CommandEmpty({ className, ...props }: CommandEmptyProps) {
+function CommandEmpty({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandEmptyProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
@@ -146,7 +173,14 @@ export type CommandGroupProps = React.ComponentProps<
   typeof CommandPrimitive.Group
 >;
 
-function CommandGroup({ className, heading, ...props }: CommandGroupProps) {
+function CommandGroup({
+  className,
+  heading,
+  "data-slot": dataSlot,
+  ...props
+}: CommandGroupProps & DataSlotProp) {
+  void dataSlot;
+
   const headingNode = heading ? (
     <span data-slot="command-group-heading">{heading}</span>
   ) : undefined;
@@ -169,7 +203,13 @@ export type CommandItemProps = React.ComponentProps<
   typeof CommandPrimitive.Item
 >;
 
-function CommandItem({ className, ...props }: CommandItemProps) {
+function CommandItem({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandItemProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <CommandPrimitive.Item
       data-slot="command-item"
@@ -189,7 +229,13 @@ export type CommandSeparatorProps = React.ComponentProps<
   typeof CommandPrimitive.Separator
 >;
 
-function CommandSeparator({ className, ...props }: CommandSeparatorProps) {
+function CommandSeparator({
+  className,
+  "data-slot": dataSlot,
+  ...props
+}: CommandSeparatorProps & DataSlotProp) {
+  void dataSlot;
+
   return (
     <CommandPrimitive.Separator
       data-slot="command-separator"

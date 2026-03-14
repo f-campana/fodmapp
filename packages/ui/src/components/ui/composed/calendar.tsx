@@ -7,37 +7,42 @@ import { DayPicker } from "react-day-picker";
 import { cn } from "../../../lib/cn";
 import { buttonVariants } from "../foundation/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  "data-slot"?: string;
+};
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
   components,
+  navLayout = "after",
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
-      data-slot="calendar"
+      navLayout={navLayout}
       showOutsideDays={showOutsideDays}
+      {...props}
+      data-slot="calendar"
       className={cn(
         "w-fit rounded-(--radius) border border-border p-3",
         className,
       )}
       classNames={{
-        root: "bg-card text-card-foreground",
+        root: "bg-card text-card-foreground aria-selected:bg-primary aria-selected:text-primary-foreground",
         months: "flex flex-col gap-4 sm:flex-row sm:gap-6",
-        month: "space-y-4",
-        month_caption: "relative flex items-center justify-center pt-1",
+        month: "relative space-y-4",
+        month_caption: "flex h-7 items-center justify-center px-10 pt-1",
         caption_label: "text-sm font-semibold",
-        nav: "flex items-center gap-1",
+        nav: "absolute top-1 inset-x-0 h-7",
         button_previous: cn(
           buttonVariants({ variant: "outline", size: "icon-sm" }),
-          "absolute left-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
+          "absolute top-0 left-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
         ),
         button_next: cn(
           buttonVariants({ variant: "outline", size: "icon-sm" }),
-          "absolute right-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
+          "absolute top-0 right-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
         ),
         month_grid: "w-full border-collapse",
         weekdays: "flex",
@@ -48,20 +53,18 @@ function Calendar({
         day_button: cn(
           buttonVariants({ variant: "ghost", size: "icon-sm" }),
           "size-9 rounded-(--radius) p-0 font-normal",
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
-          "aria-selected:opacity-100",
         ),
         selected:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground aria-selected:[&>button]:opacity-100",
         today: "text-accent-foreground",
         outside: "text-muted-foreground",
         disabled: "cursor-not-allowed text-muted-foreground opacity-50",
         range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
+          "aria-selected:[&>button]:bg-accent aria-selected:[&>button]:text-accent-foreground",
         range_start:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
         range_end:
-          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
         hidden: "invisible",
         ...classNames,
       }}
@@ -96,7 +99,6 @@ function Calendar({
         },
         ...components,
       }}
-      {...props}
     />
   );
 }

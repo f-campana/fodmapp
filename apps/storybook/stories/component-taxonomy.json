@@ -54,7 +54,7 @@
     },
     "calendar": {
       "category": "composed",
-      "storyFile": "calendar.stories.tsx",
+      "storyFile": "composed/calendar/calendar.stories.tsx",
       "title": "Composed/Calendar"
     },
     "callout": {
@@ -69,7 +69,7 @@
     },
     "carousel": {
       "category": "composed",
-      "storyFile": "carousel.stories.tsx",
+      "storyFile": "composed/carousel/carousel.stories.tsx",
       "title": "Composed/Carousel"
     },
     "checkbox": {
@@ -94,7 +94,7 @@
     },
     "command": {
       "category": "composed",
-      "storyFile": "command.stories.tsx",
+      "storyFile": "composed/command/command.stories.tsx",
       "title": "Composed/Command"
     },
     "context-menu": {
@@ -104,7 +104,7 @@
     },
     "date-picker": {
       "category": "composed",
-      "storyFile": "date-picker.stories.tsx",
+      "storyFile": "composed/date-picker/date-picker.stories.tsx",
       "title": "Composed/DatePicker"
     },
     "dialog": {
@@ -134,7 +134,7 @@
     },
     "field": {
       "category": "composed",
-      "storyFile": "field.stories.tsx",
+      "storyFile": "composed/field/field.stories.tsx",
       "title": "Composed/Field"
     },
     "hover-card": {
@@ -149,12 +149,12 @@
     },
     "input-group": {
       "category": "composed",
-      "storyFile": "input-group.stories.tsx",
+      "storyFile": "composed/input-group/input-group.stories.tsx",
       "title": "Composed/InputGroup"
     },
     "input-otp": {
       "category": "adapter",
-      "storyFile": "input-otp.stories.tsx",
+      "storyFile": "primitives/adapter/input-otp/input-otp.stories.tsx",
       "title": "Primitives/Adapter/InputOTP"
     },
     "item": {
@@ -254,7 +254,7 @@
     },
     "sonner": {
       "category": "adapter",
-      "storyFile": "sonner.stories.tsx",
+      "storyFile": "composed/sonner/sonner.stories.tsx",
       "title": "Primitives/Adapter/Sonner"
     },
     "spinner": {
@@ -289,7 +289,7 @@
     },
     "toast": {
       "category": "composed",
-      "storyFile": "toast.stories.tsx",
+      "storyFile": "primitives/adapter/toast/toast.stories.tsx",
       "title": "Composed/Toast"
     },
     "toggle": {

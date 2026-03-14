@@ -1,0 +1,91 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CarouselStories from "./carousel.stories";
+import { carouselRecommendedUsageCode } from "./carousel.docs-source";
+
+<Meta of={CarouselStories} />
+
+<Title />
+<Subtitle>
+  Use Carousel for bounded, card-like sequences where adjacent content should
+  snap predictably rather than scroll as a free-form list.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={carouselRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Carousel for tightly curated sequences such as meal plans, compact reports,
+or card stacks that benefit from previous and next controls.
+
+Prefer ScrollArea when users need continuous scrolling instead of snap-based
+navigation.
+
+<Canvas of={CarouselStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect accessible labelling, orientation, and Embla
+options.
+
+<Controls of={CarouselStories.Playground} />
+
+## Snapping and API contract
+
+`setApi` exposes the underlying Embla instance so surrounding UI can read the
+current snap or subscribe to selection changes without reimplementing the host
+layout.
+
+Vertical carousels still need an explicit height on the root. The viewport and
+content fill that bounded height so each slide can snap cleanly on the vertical
+axis.
+
+<Canvas of={CarouselStories.ControlledApi} sourceState="none" />
+
+## Accessibility contract
+
+- the root renders as a labelled `region` with `aria-roledescription="carousel"`
+- the carousel root is keyboard reachable and handles arrow keys in the current
+  orientation
+- the viewport exposes a grab cursor and touch-axis hint on the draggable
+  surface
+- previous and next controls expose stable button labels
+- slides keep a stable `data-slot` marker plus `aria-roledescription="slide"`
+- default `data-slot` hooks remain stable on the root, viewport, content,
+  slides, and controls
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local carousel audit area
+- Storybook interaction checks verify stable slot hooks, keyboard focus, arrow
+  navigation, drag-surface cursor treatment, and next/previous updates against
+  the active-snap readout
+- UI tests cover region semantics, button actions, focusable keyboard target,
+  vertical arrow navigation, viewport fill classes, `setApi`, stable slot
+  hooks, refs, and a11y
+
+What is checked manually:
+
+- visual pass for card clipping, control visibility, and spacing at 320, 390,
+  768, and 1024 widths
+- keyboard smoke pass to confirm the focused root and button controls remain
+  usable in both orientations
+
+## Responsive notes
+
+The default controls sit outside the viewport, so compact layouts should leave
+inline or block padding around the carousel root. The responsive stress story
+keeps that space explicit so controls stay visible at mobile widths, and the
+vertical story keeps a bounded height so slides do not collapse into a long
+stack.

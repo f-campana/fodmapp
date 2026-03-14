@@ -1,0 +1,75 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as FieldStories from "./field.stories";
+import { fieldRecommendedUsageCode } from "./field.docs-source";
+
+<Meta of={FieldStories} />
+
+<Title />
+<Subtitle>
+  Use Field as a structural wrapper around one form control when you need a
+  linked label plus optional hint and error text.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={fieldRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Field when one control needs consistent label, hint, and error semantics
+without retyping the same `aria-describedby` wiring.
+
+Use native `fieldset` and `legend` around several `Field` instances when the
+question itself is grouped.
+
+<Canvas of={FieldStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect the label, hint, error, and required marker on a
+single wrapped control.
+
+<Controls of={FieldStories.Playground} />
+
+## Composition notes
+
+Field does not replace native grouping elements. It augments one control child
+by linking the label, helper text, and error text to that child.
+
+## Accessibility contract
+
+- the visible label is linked to the wrapped control
+- helper text and error text are appended to `aria-describedby`
+- providing an error also sets `aria-invalid`
+- the component expects exactly one wrapped control with an id available on the
+  field or the child
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local field audit area
+- Storybook interaction checks verify label linkage, described-by merging,
+  invalid semantics, and the required marker
+- UI tests cover label linkage, described-by merging, required marker behavior,
+  id requirements, and a11y
+
+What is checked manually:
+
+- visual pass for fieldset, legend, label, hint, and error spacing in light and
+  dark themes
+- compact-width smoke pass to confirm long label, hint, and error copy remain
+  readable
+
+## Responsive notes
+
+Allow label, hint, and error copy to wrap naturally on narrow widths, and keep
+the wrapped control full width so the structural relationship stays obvious.
