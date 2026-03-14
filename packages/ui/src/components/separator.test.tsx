@@ -19,7 +19,10 @@ describe("Separator", () => {
   it("supports vertical orientation", () => {
     render(<Separator decorative={false} orientation="vertical" />);
 
-    expect(screen.getByRole("separator").className).toContain("w-px");
+    const separator = screen.getByRole("separator");
+
+    expect(separator).toHaveAttribute("aria-orientation", "vertical");
+    expect(separator.className).toContain("w-px");
   });
 
   it("merges className", () => {

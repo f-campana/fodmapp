@@ -8,31 +8,44 @@ import { describe, expect, it } from "vitest";
 import { AspectRatio } from "./aspect-ratio";
 
 describe("AspectRatio", () => {
-  it("renders wrapped content and data-slot", () => {
+  it("renders wrapped content and stable slot hook", () => {
     render(
       <AspectRatio ratio={16 / 9}>
-        <img alt="Repas équilibré" src="https://example.com/repas.jpg" />
+        <img alt="Recipe cover" src="https://example.com/recipe.jpg" />
       </AspectRatio>,
     );
 
-    const image = screen.getByRole("img", { name: "Repas équilibré" });
+    const image = screen.getByRole("img", { name: "Recipe cover" });
+    const root = image.closest("[data-slot='aspect-ratio']");
+
     expect(image).toBeInTheDocument();
-    expect(image.closest("[data-slot='aspect-ratio']")).toHaveAttribute(
-      "data-slot",
-      "aspect-ratio",
-    );
+    expect(root).toHaveAttribute("data-slot", "aspect-ratio");
   });
 
-  it("merges className", () => {
+  it("applies the ratio-derived sizing wrapper from the radix primitive", () => {
     render(
-      <AspectRatio ratio={1} className="mon-ratio">
-        <img alt="Bol" src="https://example.com/bol.jpg" />
+      <AspectRatio ratio={1}>
+        <img alt="Square thumbnail" src="https://example.com/square.jpg" />
       </AspectRatio>,
     );
 
     expect(
       screen
-        .getByRole("img", { name: "Bol" })
+        .getByRole("img", { name: "Square thumbnail" })
+        .closest("[data-radix-aspect-ratio-wrapper]"),
+    ).toHaveStyle({ paddingBottom: "100%" });
+  });
+
+  it("merges className", () => {
+    render(
+      <AspectRatio ratio={1} className="mon-ratio">
+        <img alt="Bowl" src="https://example.com/bowl.jpg" />
+      </AspectRatio>,
+    );
+
+    expect(
+      screen
+        .getByRole("img", { name: "Bowl" })
         .closest("[data-slot='aspect-ratio']")?.className,
     ).toContain("mon-ratio");
   });
@@ -42,7 +55,7 @@ describe("AspectRatio", () => {
 
     render(
       <AspectRatio ref={ref} ratio={1}>
-        <img alt="Assiette" src="https://example.com/assiette.jpg" />
+        <img alt="Plate" src="https://example.com/plate.jpg" />
       </AspectRatio>,
     );
 
@@ -52,7 +65,7 @@ describe("AspectRatio", () => {
   it("has no obvious a11y violations", async () => {
     const { container } = render(
       <AspectRatio ratio={4 / 3}>
-        <img alt="Recette" src="https://example.com/recette.jpg" />
+        <img alt="Recipe" src="https://example.com/recipe-card.jpg" />
       </AspectRatio>,
     );
 
