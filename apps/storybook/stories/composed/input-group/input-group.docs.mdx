@@ -52,7 +52,9 @@ What is checked automatically:
 
 - Storybook runs an accessibility scan scoped to the local input group audit area
 - Storybook interaction checks verify stable root, input, and button slots plus
-  button interaction inside the same grouped control
+  button interaction and cursor treatment inside the same grouped control
+- Storybook responsive checks verify the compact-width harness keeps the input
+  usable while long leading and trailing content truncates first
 - UI tests cover stable slot hooks, addon and button composition, invalid and
   disabled semantics, refs, and a11y
 
@@ -64,5 +66,6 @@ What is checked manually:
 
 ## Responsive notes
 
-Keep leading and trailing content concise on compact layouts, and let the input
-remain the flexible region so the grouped border does not split or overflow.
+Keep leading and trailing content concise on compact layouts, and let those
+affixes truncate before the input collapses so the grouped border does not
+split or overflow.

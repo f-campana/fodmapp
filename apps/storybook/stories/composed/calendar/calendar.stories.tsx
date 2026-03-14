@@ -186,18 +186,27 @@ export const InteractionChecks: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const root = canvasElement.querySelector("[data-slot='calendar']");
+    const nav = canvasElement.querySelector("nav");
     const selectedDateReadout = canvasElement.querySelector(
       "[data-selected-date]",
     );
+    const previousButton = canvas.getByRole("button", {
+      name: /previous month/i,
+    });
+    const nextButton = canvas.getByRole("button", { name: /next month/i });
     const selectedDay = getDayButton(canvasElement, 12);
     const nextDay = getDayButton(canvasElement, 13);
     const disabledDay = getDayButton(canvasElement, 19);
 
     await expect(root).toHaveAttribute("data-slot", "calendar");
+    await expect(root).toHaveAttribute("data-nav-layout", "after");
     await expect(
       canvasElement.querySelector("[data-slot='custom-calendar']"),
     ).toBeNull();
     await expect(root?.className ?? "").toContain("border-border");
+    await expect(nav?.className ?? "").toContain("absolute");
+    await expect(nav?.contains(previousButton)).toBe(true);
+    await expect(nav?.contains(nextButton)).toBe(true);
     await expect(selectedDay.className).toContain("aria-selected:bg-primary");
     await expect(
       canvasElement.querySelector("[data-day='2026-03-14'][data-today='true']"),

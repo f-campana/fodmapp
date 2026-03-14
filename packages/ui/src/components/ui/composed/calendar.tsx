@@ -16,10 +16,12 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   components,
+  navLayout = "after",
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
+      navLayout={navLayout}
       showOutsideDays={showOutsideDays}
       {...props}
       data-slot="calendar"
@@ -30,17 +32,17 @@ function Calendar({
       classNames={{
         root: "bg-card text-card-foreground",
         months: "flex flex-col gap-4 sm:flex-row sm:gap-6",
-        month: "space-y-4",
-        month_caption: "relative flex items-center justify-center pt-1",
+        month: "relative space-y-4",
+        month_caption: "flex h-7 items-center justify-center px-10 pt-1",
         caption_label: "text-sm font-semibold",
-        nav: "flex items-center gap-1",
+        nav: "absolute top-1 inset-x-0 h-7",
         button_previous: cn(
           buttonVariants({ variant: "outline", size: "icon-sm" }),
-          "absolute left-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
+          "absolute top-0 left-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
         ),
         button_next: cn(
           buttonVariants({ variant: "outline", size: "icon-sm" }),
-          "absolute right-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
+          "absolute top-0 right-1 size-7 bg-background p-0 text-muted-foreground hover:text-foreground",
         ),
         month_grid: "w-full border-collapse",
         weekdays: "flex",

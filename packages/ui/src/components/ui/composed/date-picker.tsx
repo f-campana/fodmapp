@@ -75,8 +75,18 @@ function DatePicker({
     onChange: onValueChange,
   });
 
-  const { className: calendarPropsClassName, ...restCalendarProps } =
-    calendarProps ?? {};
+  const {
+    className: calendarPropsClassName,
+    classNames: calendarPropsClassNames,
+    ...restCalendarProps
+  } = calendarProps ?? {};
+  const mergedCalendarClassNames = {
+    ...calendarPropsClassNames,
+    root: cn(
+      "bg-transparent text-popover-foreground",
+      calendarPropsClassNames?.root,
+    ),
+  } satisfies CalendarProps["classNames"];
 
   const contentId = React.useId();
 
@@ -148,10 +158,7 @@ function DatePicker({
           sideOffset={4}
         >
           <div
-            className={cn(
-              "bg-popover text-popover-foreground",
-              contentClassName,
-            )}
+            className={cn("text-popover-foreground", contentClassName)}
             data-slot="date-picker-content"
           >
             <div data-slot="date-picker-calendar">
@@ -160,7 +167,12 @@ function DatePicker({
                 mode="single"
                 onSelect={handleSelect}
                 selected={selectedDate}
-                className={cn(calendarPropsClassName, calendarClassName)}
+                className={cn(
+                  "rounded-none border-0 bg-transparent shadow-none",
+                  calendarPropsClassName,
+                  calendarClassName,
+                )}
+                classNames={mergedCalendarClassNames}
                 {...restCalendarProps}
               />
             </div>

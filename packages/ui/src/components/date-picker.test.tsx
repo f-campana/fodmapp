@@ -68,6 +68,12 @@ describe("DatePicker", () => {
 
       return node as HTMLElement;
     });
+    const popoverContent = document.querySelector(
+      "[data-slot='popover-content']",
+    ) as HTMLElement | null;
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
 
     expect(container.querySelector("[data-slot='date-picker']")).toBeTruthy();
     expect(
@@ -80,15 +86,57 @@ describe("DatePicker", () => {
       container.querySelector("[data-slot='date-picker-icon']"),
     ).toBeTruthy();
     expect(content).toHaveAttribute("data-slot", "date-picker-content");
+    expect(popoverContent).toBeTruthy();
+    expect(popoverContent?.className ?? "").toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("border-border");
+    expect(content.className).not.toContain("bg-popover");
     expect(
       document.querySelector("[data-slot='date-picker-calendar']"),
     ).toBeTruthy();
-    expect(
-      document.querySelector(
-        "[data-slot='date-picker-calendar'] [data-slot='calendar']",
-      ),
-    ).toBeTruthy();
+    expect(calendar).toBeTruthy();
+    expect(calendar).toHaveAttribute("data-nav-layout", "after");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar?.className ?? "").toContain("bg-transparent");
     expect(document.querySelector("[data-slot='custom-calendar']")).toBeNull();
+  });
+
+  it("renders a single popover surface with bounded month navigation", async () => {
+    const user = userEvent.setup();
+
+    renderDatePicker();
+
+    await user.click(
+      screen.getByRole("button", { name: "Date de consultation" }),
+    );
+
+    const popoverContent = await waitFor(() => {
+      const node = document.querySelector(
+        "[data-slot='popover-content']",
+      ) as HTMLElement | null;
+      if (!node) {
+        throw new Error("Popover content not mounted yet.");
+      }
+
+      return node;
+    });
+
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+    const nav = calendar?.querySelector("nav");
+    const previousButton = screen.getByLabelText(/previous month/i);
+    const nextButton = screen.getByLabelText(/next month/i);
+
+    expect(popoverContent.className).toContain("bg-popover");
+    expect(popoverContent.className).toContain("border-border");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar?.className ?? "").toContain("bg-transparent");
+    expect(nav?.className ?? "").toContain("absolute");
+    expect(nav?.contains(previousButton)).toBe(true);
+    expect(nav?.contains(nextButton)).toBe(true);
+    expect(popoverContent.contains(calendar)).toBe(true);
   });
 
   it("opens and closes with the trigger, Escape, and outside click", async () => {
@@ -265,9 +313,24 @@ describe("DatePicker", () => {
 
       return node;
     });
+    const popoverContent = document.querySelector(
+      "[data-slot='popover-content']",
+    ) as HTMLElement | null;
+    const calendar = document.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+    const previousButton = screen.getByLabelText(/previous month/i);
+    const nextButton = screen.getByLabelText(/next month/i);
 
-    expect(content.className).toContain("bg-popover");
     expect(content.className).toContain("text-popover-foreground");
+    expect(content.className).not.toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("bg-popover");
+    expect(popoverContent?.className ?? "").toContain("border-border");
+    expect(calendar?.className ?? "").toContain("border-0");
+    expect(calendar?.className ?? "").toContain("rounded-none");
+    expect(calendar).toHaveAttribute("data-nav-layout", "after");
+    expect(previousButton.className).toContain("absolute");
+    expect(nextButton.className).toContain("absolute");
   });
 
   it("merges className and supports the root ref", async () => {

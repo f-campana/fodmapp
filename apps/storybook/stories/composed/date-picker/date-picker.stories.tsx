@@ -73,6 +73,23 @@ function getDayButton(dayNumber: number) {
   return button as HTMLButtonElement;
 }
 
+function getMonthNavigationButton(direction: "next" | "previous") {
+  const button = Array.from(
+    document.querySelectorAll("[data-slot='date-picker-calendar'] button"),
+  ).find((candidate) =>
+    candidate
+      .getAttribute("aria-label")
+      ?.toLowerCase()
+      .includes(direction === "previous" ? "previous month" : "next month"),
+  );
+
+  if (!button) {
+    throw new Error(`No ${direction} month button found.`);
+  }
+
+  return button as HTMLButtonElement;
+}
+
 function getDatePickerFieldKey(args?: DatePickerStoryArgs) {
   return [
     args?.disabled ?? defaultPlaygroundArgs.disabled,
@@ -253,6 +270,15 @@ export const InteractionChecks: Story = {
 
     await userEvent.click(trigger);
 
+    const popover = await waitFor(() => {
+      const node = document.body.querySelector("[data-slot='popover-content']");
+      if (!node) {
+        throw new Error("DatePicker popover is not mounted yet.");
+      }
+
+      return node as HTMLElement;
+    });
+
     const content = await waitFor(() => {
       const node = document.body.querySelector(
         "[data-slot='date-picker-content']",
@@ -263,10 +289,26 @@ export const InteractionChecks: Story = {
 
       return node as HTMLElement;
     });
+    const calendar = document.body.querySelector(
+      "[data-slot='date-picker-calendar'] [data-slot='calendar']",
+    ) as HTMLElement | null;
+    const nav = calendar?.querySelector("nav");
+    const previousButton = getMonthNavigationButton("previous");
+    const nextButton = getMonthNavigationButton("next");
+    const popoverRect = popover.getBoundingClientRect();
+    const calendarRect = calendar?.getBoundingClientRect();
+    const previousRect = previousButton.getBoundingClientRect();
+    const nextRect = nextButton.getBoundingClientRect();
+
+    if (!calendar) {
+      throw new Error("DatePicker calendar is not mounted yet.");
+    }
 
     await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-    await expect(content.className).toContain("bg-popover");
+    await expect(popover.className).toContain("bg-popover");
+    await expect(popover.className).toContain("border-border");
     await expect(content.className).toContain("text-popover-foreground");
+    await expect(content.className).not.toContain("bg-popover");
     await expect(canvasElement.contains(content)).toBe(false);
     await expect(
       document.body.querySelector("[data-slot='date-picker-calendar']"),
@@ -274,6 +316,32 @@ export const InteractionChecks: Story = {
     await expect(
       document.body.querySelector("[data-slot='custom-calendar']"),
     ).toBeNull();
+    await expect(calendar).toHaveAttribute("data-nav-layout", "after");
+    await expect(calendar.className).toContain("border-0");
+    await expect(calendar.className).toContain("rounded-none");
+    await expect(calendar.className).toContain("bg-transparent");
+    await expect(nav?.className ?? "").toContain("absolute");
+
+    if (!calendarRect) {
+      throw new Error("DatePicker calendar has no measurable bounds.");
+    }
+
+    if (Math.abs(popoverRect.width - calendarRect.width) > 2) {
+      throw new Error(
+        "DatePicker popover and calendar should render as one surface.",
+      );
+    }
+
+    if (
+      previousRect.left < calendarRect.left ||
+      previousRect.right > calendarRect.right ||
+      nextRect.left < calendarRect.left ||
+      nextRect.right > calendarRect.right
+    ) {
+      throw new Error(
+        "DatePicker month navigation escaped the calendar bounds.",
+      );
+    }
 
     await userEvent.click(getDayButton(12));
 

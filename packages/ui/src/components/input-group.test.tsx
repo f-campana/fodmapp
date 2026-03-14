@@ -53,9 +53,36 @@ describe("InputGroup", () => {
       </InputGroup>,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Valider" }));
+    const button = screen.getByRole("button", { name: "Valider" });
+
+    expect(button.className).toContain("cursor-pointer");
+
+    fireEvent.click(button);
 
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the input flexible while surrounding text truncates first", () => {
+    render(
+      <InputGroup>
+        <InputGroupText>https://</InputGroupText>
+        <InputGroupInput placeholder="journal-clinique-tres-detaille" />
+        <InputGroupAddon>.centre-de-suivi-fodmap.fr</InputGroupAddon>
+      </InputGroup>,
+    );
+
+    const group = screen.getByRole("group");
+    const input = screen.getByPlaceholderText("journal-clinique-tres-detaille");
+    const text = screen.getByText("https://");
+    const addon = screen.getByText(".centre-de-suivi-fodmap.fr");
+
+    expect(group.className).toContain("overflow-hidden");
+    expect(input.className).toContain("min-w-[5.5rem]");
+    expect(input.className).toContain("flex-[1_1_7rem]");
+    expect(text.className).toContain("max-w-[45%]");
+    expect(text.className).toContain("truncate");
+    expect(addon.className).toContain("max-w-[45%]");
+    expect(addon.className).toContain("truncate");
   });
 
   it("applies disabled and invalid contracts", () => {

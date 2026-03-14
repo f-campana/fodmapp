@@ -66,6 +66,30 @@ describe("Field", () => {
     expect(input).not.toHaveAttribute("aria-invalid", "true");
   });
 
+  it("uses the form-scale typography contract for label, hint, and error text", () => {
+    render(
+      <Field
+        error="Valeur requise"
+        hint="En grammes"
+        id="quantity"
+        label="Quantite"
+      >
+        <Input />
+      </Field>,
+    );
+
+    const label = screen.getByText("Quantite");
+    const hint = screen.getByText("En grammes");
+    const error = screen.getByText("Valeur requise");
+
+    expect(label.className).toContain("text-sm");
+    expect(label.className).not.toContain("tracking-wide");
+    expect(hint.className).toContain("text-sm");
+    expect(hint.className).not.toContain("text-xs");
+    expect(error.className).toContain("text-sm");
+    expect(error.className).not.toContain("text-xs");
+  });
+
   it("requires an explicit id on the field or the wrapped control", () => {
     expect(() =>
       render(

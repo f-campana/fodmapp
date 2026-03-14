@@ -333,19 +333,43 @@ export const ResponsiveStress: Story = {
   },
   render: () => (
     <InputOTPAuditFrame maxWidth="sm">
-      <InputOTPField
-        args={{
-          ...defaultPlaygroundArgs,
-          defaultValue: "120340",
-          onChange: fn(),
-        }}
-        description="Keep the grouped slots and the supporting copy readable when the verification help text needs to explain a fallback delivery path on compact screens."
-        key={getInputOTPFieldKey({
-          ...defaultPlaygroundArgs,
-          defaultValue: "120340",
-          onChange: fn(),
-        })}
-      />
+      <div className="w-full max-w-[15rem] sm:max-w-[17rem]">
+        <InputOTPField
+          args={{
+            ...defaultPlaygroundArgs,
+            defaultValue: "120340",
+            onChange: fn(),
+          }}
+          description="Keep the grouped slots and the supporting copy readable when the verification help text needs to explain a fallback delivery path on compact screens."
+          key={getInputOTPFieldKey({
+            ...defaultPlaygroundArgs,
+            defaultValue: "120340",
+            onChange: fn(),
+          })}
+        />
+      </div>
     </InputOTPAuditFrame>
   ),
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector(
+      "[data-slot='input-otp']",
+    ) as HTMLDivElement | null;
+
+    if (!root) {
+      throw new Error("InputOTP root is missing.");
+    }
+
+    const slots = Array.from(
+      canvasElement.querySelectorAll("[data-slot='input-otp-slot']"),
+    ) as HTMLDivElement[];
+
+    await waitFor(() => {
+      if (root.scrollWidth > root.clientWidth) {
+        throw new Error("InputOTP overflows its compact stress harness.");
+      }
+    });
+
+    await expect(slots[0]).toHaveTextContent("1");
+    await expect(slots[5]).toHaveTextContent("0");
+  },
 };

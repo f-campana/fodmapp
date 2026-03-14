@@ -226,7 +226,9 @@ export const InteractionChecks: Story = {
     ).toBeNull();
 
     await expect(group.className).toContain("border-input");
+    await expect(group.className).toContain("overflow-hidden");
     await expect(group.className).toContain("focus-within:ring-ring-soft");
+    await expect(button.className).toContain("cursor-pointer");
     await expect(button.className).toContain("focus-visible:ring-ring-soft");
 
     await userEvent.click(input);
@@ -248,13 +250,15 @@ export const ResponsiveStress: Story = {
   render: () => (
     <InputGroupAuditFrame maxWidth="sm">
       <div className="space-y-3">
-        <URLInputGroup
-          args={{
-            ...defaultPlaygroundArgs,
-            placeholder: "journal-clinique-tres-detaille",
-          }}
-          addonLabel=".centre-de-suivi-fodmap.fr"
-        />
+        <div className="w-full max-w-[16rem]">
+          <URLInputGroup
+            args={{
+              ...defaultPlaygroundArgs,
+              placeholder: "journal-clinique-tres-detaille",
+            }}
+            addonLabel=".centre-de-suivi-fodmap.fr"
+          />
+        </div>
         <p className="text-sm text-muted-foreground">
           Keep borders, seams, and long supporting text coherent when the
           leading and trailing content grows on compact widths.
@@ -262,4 +266,34 @@ export const ResponsiveStress: Story = {
       </div>
     </InputGroupAuditFrame>
   ),
+  play: async ({ canvasElement }) => {
+    const group = canvasElement.querySelector(
+      "[data-slot='input-group']",
+    ) as HTMLDivElement | null;
+    const input = canvasElement.querySelector(
+      "[data-slot='input-group-input']",
+    ) as HTMLInputElement | null;
+
+    if (!group || !input) {
+      throw new Error("Responsive input group nodes are missing.");
+    }
+
+    const groupRect = group.getBoundingClientRect();
+    const inputRect = input.getBoundingClientRect();
+
+    await expect(group.scrollWidth).toBeLessThanOrEqual(group.clientWidth);
+    await expect(input.className).toContain("min-w-[5.5rem]");
+
+    if (inputRect.width < 72) {
+      throw new Error(
+        "InputGroup input collapsed below the compact-width threshold.",
+      );
+    }
+
+    if (groupRect.width > 260) {
+      throw new Error(
+        "Responsive stress harness is wider than the compact-width target.",
+      );
+    }
+  },
 };

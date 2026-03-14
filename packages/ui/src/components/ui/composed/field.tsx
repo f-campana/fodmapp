@@ -74,10 +74,7 @@ export function Field({
     <div data-slot="field" className={cn("grid gap-1.5", className)}>
       <label
         htmlFor={controlId}
-        className={cn(
-          "text-sm font-semibold tracking-wide text-foreground",
-          labelClassName,
-        )}
+        className={cn("text-sm font-semibold text-foreground", labelClassName)}
       >
         {label}
         {required ? (
@@ -86,14 +83,14 @@ export function Field({
       </label>
       {control}
       {hint ? (
-        <p id={hintId} className="text-xs text-muted-foreground">
+        <p id={hintId} className="text-sm text-muted-foreground">
           {hint}
         </p>
       ) : null}
       {error ? (
         <p
           id={errorId}
-          className="text-xs font-medium text-validation-error-text"
+          className="text-sm font-medium text-validation-error-text"
         >
           {error}
         </p>

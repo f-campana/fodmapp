@@ -21,7 +21,7 @@ function getDayButton(container: HTMLElement, dayNumber: number) {
 }
 
 describe("Calendar", () => {
-  it("keeps the root slot stable and exposes semantic day classes", () => {
+  it("keeps the root slot stable and uses bounded month navigation by default", () => {
     const { container } = render(
       <Calendar
         data-slot="custom-calendar"
@@ -32,11 +32,18 @@ describe("Calendar", () => {
     );
 
     const root = container.querySelector("[data-slot='calendar']");
+    const nav = container.querySelector("nav");
     const dayButton = getDayButton(container, 12);
+    const previousButton = screen.getByLabelText(/previous month/i);
+    const nextButton = screen.getByLabelText(/next month/i);
 
     expect(root).toHaveAttribute("data-slot", "calendar");
+    expect(root).toHaveAttribute("data-nav-layout", "after");
     expect(container.querySelector("[data-slot='custom-calendar']")).toBeNull();
     expect(root?.className ?? "").toContain("border-border");
+    expect(nav?.className ?? "").toContain("absolute");
+    expect(nav?.contains(previousButton)).toBe(true);
+    expect(nav?.contains(nextButton)).toBe(true);
     expect(dayButton.className).toContain("aria-selected:bg-primary");
     expect(dayButton.className).toContain(
       "aria-selected:text-primary-foreground",

@@ -106,6 +106,34 @@ describe("InputOTP", () => {
     expect(onChange).toHaveBeenLastCalledWith("987654");
   });
 
+  it("hydrates defaultValue without emitting a controlled or uncontrolled warning", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    try {
+      renderOTP({ defaultValue: "120340" });
+
+      const input = screen.getByRole("textbox", { name: "Code OTP" });
+
+      await waitFor(() => {
+        expect(input).toHaveValue("120340");
+      });
+
+      expect(getSlots().map((slot) => slot.textContent?.trim())).toEqual([
+        "1",
+        "2",
+        "0",
+        "3",
+        "4",
+        "0",
+      ]);
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it("updates a controlled value through the change callback", () => {
     const onChange = vi.fn();
 
@@ -229,6 +257,14 @@ describe("InputOTP", () => {
     );
     expect(slot?.className ?? "").toContain(
       "data-[active=true]:ring-validation-error-ring-soft",
+    );
+    expect(slot?.className ?? "").toContain("size-9");
+    expect(slot?.className ?? "").toContain("sm:size-10");
+    expect(separator?.querySelector("svg")?.className.baseVal ?? "").toContain(
+      "size-3",
+    );
+    expect(separator?.querySelector("svg")?.className.baseVal ?? "").toContain(
+      "sm:size-4",
     );
   });
 
