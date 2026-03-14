@@ -1,0 +1,90 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CommandStories from "./command.stories";
+import { commandRecommendedUsageCode } from "./command.docs-source";
+
+<Meta of={CommandStories} />
+
+<Title />
+<Subtitle>
+  Use Command for searchable action lists or lightweight command palettes where
+  keyboard selection is part of the primary workflow.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={commandRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Command when users need to filter a short action inventory, jump to a known
+task, or trigger a compact workflow from the keyboard.
+
+Prefer Combobox when the result must become a form value rather than an
+immediate action.
+
+<Canvas of={CommandStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect combobox labelling, built-in filtering, pointer
+selection, and keyboard looping.
+
+<Controls of={CommandStories.Playground} />
+
+## Composition patterns
+
+Use short action copy, visible group headings, and optional shortcuts so the
+surface stays readable before the list wraps on smaller screens.
+
+The dialog composition keeps the same command contract inside a modal shell.
+
+<Canvas of={CommandStories.DialogPalette} sourceState="none" />
+
+## Search and grouping contract
+
+- built-in filtering stays on unless `shouldFilter={false}`
+- with filtering enabled, item `value` and optional `keywords` participate in
+  matching
+- groups collapse with their items when they no longer contain a matching result
+- `CommandEmpty` appears only when the current query has no remaining results
+- root-level `onValueChange` receives the selected item value, not the current
+  input text
+
+## Accessibility contract
+
+- the `label` prop names the combobox for assistive technology
+- arrow keys move selection and `Enter` activates the current item
+- `CommandDialog` links the dialog title to the internal command combobox
+- stable default `data-slot` hooks remain intact on root, input, list, groups,
+  items, and shortcuts
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local command audit area
+- Storybook interaction checks verify stable slot hooks, value and keyword
+  filtering, empty state rendering, and keyboard navigation
+- UI tests cover dialog labelling, keyboard navigation, disabled items, built-in
+  filtering, `shouldFilter={false}`, stable slot hooks, refs, and a11y
+
+What is checked manually:
+
+- visual pass for grouped spacing, text wrapping, and shortcut alignment on the
+  default surface and dialog palette
+- keyboard smoke pass on narrow widths to confirm the input and selected item
+  remain readable without clipped copy
+
+## Responsive notes
+
+Keep action labels concise and let the shortcut token sit in its own trailing
+column. The compact stress story checks that long copy still wraps cleanly
+without horizontal clipping.

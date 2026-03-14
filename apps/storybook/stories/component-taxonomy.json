@@ -69,7 +69,7 @@
     },
     "carousel": {
       "category": "composed",
-      "storyFile": "carousel.stories.tsx",
+      "storyFile": "composed/carousel/carousel.stories.tsx",
       "title": "Composed/Carousel"
     },
     "checkbox": {
@@ -94,7 +94,7 @@
     },
     "command": {
       "category": "composed",
-      "storyFile": "command.stories.tsx",
+      "storyFile": "composed/command/command.stories.tsx",
       "title": "Composed/Command"
     },
     "context-menu": {
@@ -254,7 +254,7 @@
     },
     "sonner": {
       "category": "adapter",
-      "storyFile": "sonner.stories.tsx",
+      "storyFile": "composed/sonner/sonner.stories.tsx",
       "title": "Primitives/Adapter/Sonner"
     },
     "spinner": {
@@ -289,7 +289,7 @@
     },
     "toast": {
       "category": "composed",
-      "storyFile": "toast.stories.tsx",
+      "storyFile": "primitives/adapter/toast/toast.stories.tsx",
       "title": "Composed/Toast"
     },
     "toggle": {
