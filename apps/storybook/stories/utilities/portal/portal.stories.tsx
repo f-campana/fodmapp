@@ -51,11 +51,20 @@ const meta = {
   args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    docs: {
+      description: {
+        component:
+          "Portal mounts children into `document.body` by default inside the preview iframe. Pass a local container only when the destination must stay inside a specific region of the same screen.",
+      },
+    },
     layout: "padded",
     a11y: {
       test: "error",
       context: {
-        include: ["[data-portal-audit-root]"],
+        include: [
+          "[data-portal-audit-root]",
+          "[data-testid='portal-body-content']",
+        ],
       },
     },
   },
@@ -65,38 +74,96 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+function BodyMountedPortalExample() {
+  return (
+    <PortalAuditFrame maxWidth="md">
+      <div className="space-y-4 rounded-(--radius) border border-border bg-card p-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Default target
+          </p>
+          <h3 className="text-sm font-semibold text-foreground">
+            Mounted to the preview body
+          </h3>
+          <p className="text-sm leading-5 text-muted-foreground">
+            Use the default body mount for overlays, toasts, or floating layers
+            that should escape the local layout container.
+          </p>
+        </div>
+        <div
+          className="rounded-(--radius) border border-dashed border-border p-3"
+          data-testid="portal-body-source"
+        >
+          <p className="text-sm leading-5 text-muted-foreground">
+            The portal is declared in this card, but its content should appear
+            as a floating layer elsewhere in the preview.
+          </p>
+          <Portal>
+            <div
+              className="pointer-events-none fixed right-6 bottom-6 rounded-(--radius) border border-border bg-card px-3 py-2 text-sm leading-5 text-foreground shadow-lg"
+              data-testid="portal-body-content"
+            >
+              Mounted in preview body
+            </div>
+          </Portal>
+        </div>
+      </div>
+    </PortalAuditFrame>
+  );
+}
+
 function LocalPortalExample({ args }: { args?: Story["args"] }) {
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
 
   return (
-    <PortalAuditFrame maxWidth="md">
-      <div className="grid gap-4 rounded-(--radius) border border-border bg-card p-4">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">Source region</p>
-          <div
-            className="rounded-(--radius) border border-dashed border-border p-3"
-            data-testid="portal-inline-host"
-          >
-            <p className="text-sm text-muted-foreground">
-              The portal is declared here.
-            </p>
-            <Portal container={container} disabled={args?.disabled}>
-              <div
-                className="mt-3 rounded-(--radius) border border-border bg-background p-3 text-sm text-foreground shadow-xs"
-                data-testid="portal-content"
-              >
-                Mounted through Portal
-              </div>
-            </Portal>
-          </div>
+    <PortalAuditFrame maxWidth="xl">
+      <div className="space-y-4 rounded-(--radius) border border-border bg-card p-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Local container
+          </p>
+          <p className="text-sm leading-5 text-muted-foreground">
+            Pass a container only when the mounted content must stay inside a
+            specific region instead of escaping to the preview body.
+          </p>
         </div>
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">Local target</p>
-          <div
-            className="min-h-20 rounded-(--radius) border border-border bg-muted/40 p-3"
-            data-testid="portal-target"
-            ref={setContainer}
-          />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">
+              Source region
+            </p>
+            <div
+              className="rounded-(--radius) border border-dashed border-border p-3"
+              data-testid="portal-inline-host"
+            >
+              <p className="text-sm leading-5 text-muted-foreground">
+                The portal is declared here.
+              </p>
+              <Portal container={container} disabled={args?.disabled}>
+                <div
+                  className="mt-3 rounded-(--radius) border border-border bg-background px-3 py-2 text-sm leading-5 text-foreground shadow-xs"
+                  data-testid="portal-content"
+                >
+                  Mounted through local container
+                </div>
+              </Portal>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-foreground">
+              Local target
+            </p>
+            <div
+              className="min-h-24 rounded-(--radius) border border-border bg-muted/40 p-3"
+              data-testid="portal-target"
+              ref={setContainer}
+            >
+              <p className="text-sm leading-5 text-muted-foreground">
+                This region receives the portalled content when local mounting
+                is enabled.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </PortalAuditFrame>
@@ -104,19 +171,39 @@ function LocalPortalExample({ args }: { args?: Story["args"] }) {
 }
 
 export const Playground: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use the local-container example to compare portalled mounting with inline fallback when `disabled` is toggled.",
+      },
+    },
+  },
   render: (args) => <LocalPortalExample args={args} />,
 };
 
 export const Default: Story = {
-  parameters: fixedStoryParameters,
-  render: () => <LocalPortalExample args={defaultPlaygroundArgs} />,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story:
+          "Default body mount inside the preview iframe, independent from the source card.",
+      },
+    },
+  },
+  render: () => <BodyMountedPortalExample />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const target = canvas.getByTestId("portal-target");
+    const source = canvas.getByTestId("portal-body-source");
+    const previewBody = canvasElement.ownerDocument.body;
 
     await expect(
-      await within(target).findByText("Mounted through Portal"),
-    ).toBeInTheDocument();
+      await within(previewBody).findByTestId("portal-body-content"),
+    ).toHaveTextContent("Mounted in preview body");
+    await expect(
+      within(source).queryByTestId("portal-body-content"),
+    ).toBeNull();
   },
 };
 
@@ -125,7 +212,15 @@ export const DisabledInline: Story = {
     ...defaultPlaygroundArgs,
     disabled: true,
   },
-  parameters: fixedStoryParameters,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story:
+          "Disabled portal rendering keeps the content inline instead of moving it into the target container.",
+      },
+    },
+  },
   render: (args) => <LocalPortalExample args={args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -133,10 +228,10 @@ export const DisabledInline: Story = {
     const target = canvas.getByTestId("portal-target");
 
     await expect(
-      await within(inlineHost).findByText("Mounted through Portal"),
+      await within(inlineHost).findByText("Mounted through local container"),
     ).toBeInTheDocument();
     await expect(
-      within(target).queryByText("Mounted through Portal"),
+      within(target).queryByText("Mounted through local container"),
     ).toBeNull();
   },
 };

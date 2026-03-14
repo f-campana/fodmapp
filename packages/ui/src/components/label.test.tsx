@@ -26,7 +26,7 @@ describe("Label", () => {
     expect(checkbox).toBeChecked();
   });
 
-  it("renders data-slot and merges className", () => {
+  it("renders data-slot, keeps the disabled-peer contract, and merges className", () => {
     render(
       <Label htmlFor="nom" className="mon-label">
         Name
@@ -35,6 +35,8 @@ describe("Label", () => {
 
     const label = screen.getByText("Name");
     expect(label).toHaveAttribute("data-slot", "label");
+    expect(label.className).toContain("peer-disabled:cursor-not-allowed");
+    expect(label.className).toContain("peer-disabled:opacity-50");
     expect(label.className).toContain("mon-label");
   });
 

@@ -53,6 +53,12 @@ const meta = {
   args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    docs: {
+      description: {
+        component:
+          "Decorative separators should stay hidden from assistive technologies. Only switch to semantic separators when the divider represents real structure between related regions.",
+      },
+    },
     layout: "padded",
     a11y: {
       test: "error",
@@ -67,47 +73,104 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function SeparatorExample({ args }: { args?: Story["args"] }) {
-  const orientation = args?.orientation ?? defaultPlaygroundArgs.orientation;
-  const separatorClassName = [
-    args?.className,
-    orientation === "horizontal" ? "my-4" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  if (orientation === "vertical") {
-    return (
-      <SeparatorAuditFrame centeredMinHeight={72} maxWidth="sm">
-        <div className="inline-flex h-20 items-center gap-4 rounded-(--radius) border border-border bg-card p-4">
-          <span className="text-sm text-foreground">Plan</span>
-          <Separator {...args} className={separatorClassName} />
-          <span className="text-sm text-foreground">Review</span>
-        </div>
-      </SeparatorAuditFrame>
-    );
-  }
-
+function HorizontalSection({ args }: { args?: Story["args"] }) {
   return (
     <SeparatorAuditFrame maxWidth="md">
-      <div className="rounded-(--radius) border border-border bg-card p-4">
-        <p className="text-sm font-medium text-foreground">Ingredients</p>
-        <Separator {...args} className={separatorClassName} />
-        <p className="text-sm text-muted-foreground">
-          Decorative separators split nearby content without adding a landmark.
+      <div className="space-y-4 rounded-(--radius) border border-border bg-card p-4">
+        <div className="space-y-1">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Decorative divider
+          </p>
+          <h3 className="text-sm font-semibold text-foreground">
+            Preparation notes
+          </h3>
+          <p className="text-sm leading-5 text-muted-foreground">
+            Decorative separators help scan nearby content without adding a
+            semantic landmark.
+          </p>
+        </div>
+        <Separator
+          {...args}
+          className={[args?.className, "my-1"].filter(Boolean).join(" ")}
+        />
+        <p className="text-sm leading-5 text-muted-foreground">
+          Keep this mode purely visual when the surrounding heading hierarchy
+          already conveys the structure.
         </p>
       </div>
     </SeparatorAuditFrame>
   );
 }
 
+function VerticalSection({ args }: { args?: Story["args"] }) {
+  return (
+    <SeparatorAuditFrame maxWidth="md">
+      <div className="rounded-(--radius) border border-border bg-card p-4">
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Semantic divider
+            </p>
+            <p className="text-sm leading-5 text-muted-foreground">
+              Use a non-decorative vertical separator only when it represents a
+              meaningful split between related regions.
+            </p>
+          </div>
+          <div className="flex items-stretch gap-4">
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-sm font-semibold text-foreground">Plan</p>
+              <p className="text-sm leading-5 text-muted-foreground">
+                Confirm the substitution and serving note before publishing.
+              </p>
+            </div>
+            <Separator {...args} className={args?.className} />
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-sm font-semibold text-foreground">Review</p>
+              <p className="text-sm leading-5 text-muted-foreground">
+                Validate that the divider exposes a real accessible separator
+                when the split matters.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SeparatorAuditFrame>
+  );
+}
+
+function SeparatorExample({ args }: { args?: Story["args"] }) {
+  const orientation = args?.orientation ?? defaultPlaygroundArgs.orientation;
+
+  return orientation === "vertical" ? (
+    <VerticalSection args={args} />
+  ) : (
+    <HorizontalSection args={args} />
+  );
+}
+
 export const Playground: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Adjust orientation and decorative mode in a realistic layout instead of an isolated divider sample.",
+      },
+    },
+  },
   render: (args) => <SeparatorExample args={args} />,
 };
 
 export const Default: Story = {
-  parameters: fixedStoryParameters,
-  render: () => <SeparatorExample args={defaultPlaygroundArgs} />,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story:
+          "Default decorative horizontal divider inside a content section.",
+      },
+    },
+  },
+  render: () => <HorizontalSection args={defaultPlaygroundArgs} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -121,8 +184,16 @@ export const SemanticVertical: Story = {
     decorative: false,
     orientation: "vertical",
   },
-  parameters: fixedStoryParameters,
-  render: (args) => <SeparatorExample args={args} />,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story:
+          "Vertical semantic divider for a real structural split between adjacent regions.",
+      },
+    },
+  },
+  render: (args) => <VerticalSection args={args} />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const separator = canvas.getByRole("separator");

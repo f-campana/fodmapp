@@ -29,8 +29,9 @@ const defaultPlaygroundArgs = {
 const avatarImageSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
     <rect width="96" height="96" fill="#f1e4d7" />
-    <circle cx="48" cy="36" r="18" fill="#d2a679" />
-    <path d="M18 88c4-18 18-28 30-28s26 10 30 28" fill="#8b5e3c" />
+    <circle cx="48" cy="32" r="18" fill="#d2a679" />
+    <path d="M16 84c6-16 18-24 32-24s26 8 32 24" fill="#8b5e3c" />
+    <path d="M26 25c4-8 11-14 22-14 12 0 22 7 26 18-4-2-9-3-14-3-13 0-24 5-34 13z" fill="#6f472b" />
   </svg>
 `)}`;
 
@@ -52,6 +53,12 @@ const meta = {
   args: defaultPlaygroundArgs,
   parameters: {
     controls: { expanded: true },
+    docs: {
+      description: {
+        component:
+          "Avatar provides the circular media slot and fallback container. The surrounding layout still decides how identity details, status copy, and loading states are presented.",
+      },
+    },
     layout: "padded",
     a11y: {
       test: "error",
@@ -66,7 +73,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function AvatarProfile({
+function CareTeamRow({
   args,
   description,
   withImage,
@@ -76,17 +83,26 @@ function AvatarProfile({
   withImage: boolean;
 }) {
   return (
-    <AvatarAuditFrame centeredMinHeight={72} maxWidth="sm">
-      <div className="flex items-center gap-4 rounded-(--radius) border border-border bg-card p-4">
-        <Avatar {...args}>
-          {withImage ? (
-            <AvatarImage alt="Camille profile photo" src={avatarImageSrc} />
-          ) : null}
-          <AvatarFallback>CF</AvatarFallback>
-        </Avatar>
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-foreground">Camille Fabre</p>
-          <p className="text-sm text-muted-foreground">{description}</p>
+    <AvatarAuditFrame maxWidth="md">
+      <div className="rounded-(--radius) border border-border bg-card p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Avatar {...args}>
+            {withImage ? (
+              <AvatarImage alt="Camille profile photo" src={avatarImageSrc} />
+            ) : null}
+            <AvatarFallback>CF</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 space-y-1">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Care plan owner
+            </p>
+            <p className="text-sm font-semibold text-foreground">
+              Camille Fabre
+            </p>
+            <p className="text-sm leading-5 text-muted-foreground">
+              {description}
+            </p>
+          </div>
         </div>
       </div>
     </AvatarAuditFrame>
@@ -94,21 +110,36 @@ function AvatarProfile({
 }
 
 export const Playground: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Resize the avatar while keeping the same profile-row context so the identity layout stays readable.",
+      },
+    },
+  },
   render: (args) => (
-    <AvatarProfile
+    <CareTeamRow
       args={args}
-      description="Use a loaded image when identity is known and stable."
+      description="Use the loaded image path when identity is known and the profile photo is available."
       withImage
     />
   ),
 };
 
 export const Default: Story = {
-  parameters: fixedStoryParameters,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story: "Default loaded-image state inside a responsive profile row.",
+      },
+    },
+  },
   render: () => (
-    <AvatarProfile
+    <CareTeamRow
       args={defaultPlaygroundArgs}
-      description="The fallback stays in place as a readable backup, but the default story proves the loaded-image path."
+      description="A profile photo can replace the fallback while the row keeps the surrounding person details readable on narrow and wide layouts."
       withImage
     />
   ),
@@ -127,11 +158,19 @@ export const Default: Story = {
 };
 
 export const Fallback: Story = {
-  parameters: fixedStoryParameters,
+  parameters: {
+    ...fixedStoryParameters,
+    docs: {
+      description: {
+        story:
+          "Fallback initials stay readable when the image has not loaded or no photo exists for the record.",
+      },
+    },
+  },
   render: () => (
-    <AvatarProfile
+    <CareTeamRow
       args={defaultPlaygroundArgs}
-      description="Fallback text should stay legible when no image source is available yet."
+      description="Fallback initials remain the visible identity cue while the record is pending a profile image or the image source is unavailable."
       withImage={false}
     />
   ),
