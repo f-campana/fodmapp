@@ -87,6 +87,12 @@ const buttonVariants = cva(
   },
 );
 
+type ButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    "data-slot"?: string;
+  };
+
 // React 19: ref is a regular prop — forwardRef is no longer needed.
 // React.ComponentProps<"button"> includes ref.
 
@@ -96,17 +102,15 @@ function Button({
   size = "default",
   asChild = false,
   type = "button",
+  "data-slot": dataSlot,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
       {...props}
-      data-slot="button"
+      data-slot={dataSlot ?? "button"}
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}

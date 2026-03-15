@@ -56,7 +56,7 @@ describe("Button", () => {
     expect(button).toHaveAttribute("data-size", "sm");
   });
 
-  it("keeps internal data hooks stable when consumer props collide", () => {
+  it("allows consumer data-slot overrides while keeping variant and size stable", () => {
     render(
       <Button
         data-size="custom-size"
@@ -68,7 +68,7 @@ describe("Button", () => {
     );
 
     const button = screen.getByRole("button", { name: "Stable" });
-    expect(button).toHaveAttribute("data-slot", "button");
+    expect(button).toHaveAttribute("data-slot", "custom-slot");
     expect(button).toHaveAttribute("data-variant", "default");
     expect(button).toHaveAttribute("data-size", "default");
   });
@@ -291,7 +291,7 @@ describe("Button", () => {
     );
   });
 
-  it("keeps stable data hooks on asChild content when consumer props collide", () => {
+  it("allows asChild data-slot overrides while keeping variant and size stable", () => {
     render(
       <Button
         asChild
@@ -306,7 +306,7 @@ describe("Button", () => {
     );
 
     const link = screen.getByRole("link", { name: "Voir le plan" });
-    expect(link).toHaveAttribute("data-slot", "button");
+    expect(link).toHaveAttribute("data-slot", "custom-slot");
     expect(link).toHaveAttribute("data-variant", "secondary");
     expect(link).toHaveAttribute("data-size", "lg");
   });
