@@ -7,16 +7,24 @@ import { cn } from "../../../lib/cn";
 const alertVariants = cva(
   [
     "relative w-full rounded-(--radius) border px-4 py-3 text-sm",
-    "grid has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:items-start has-[>svg]:gap-x-3",
-    "[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:translate-y-0.5",
+    "grid has-[>svg]:grid-cols-[auto_minmax(0,1fr)] has-[>svg]:grid-rows-[auto_auto] has-[>svg]:items-start has-[>svg]:gap-x-3",
+    "[&>svg]:row-span-2 [&>svg]:row-start-1 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:translate-y-0.5",
+    "[&>svg~[data-slot=alert-title]]:col-start-2 [&>svg~[data-slot=alert-title]]:row-start-1",
+    "[&>svg~[data-slot=alert-description]]:col-start-2 [&>svg~[data-slot=alert-description]]:row-start-2",
   ].join(" "),
   {
     variants: {
       variant: {
-        default:
-          "border-border bg-card text-card-foreground [&>svg]:text-foreground",
-        destructive:
-          "border-destructive bg-destructive text-destructive-foreground [&>svg]:text-destructive-foreground",
+        default: [
+          "border-info/25 bg-info/10 text-foreground",
+          "[&>svg]:text-info",
+          "[&>[data-slot=alert-title]]:text-info",
+        ].join(" "),
+        destructive: [
+          "border-destructive/35 bg-destructive/10 text-foreground",
+          "[&>svg]:text-destructive",
+          "[&>[data-slot=alert-title]]:text-destructive",
+        ].join(" "),
       },
     },
     defaultVariants: {
@@ -54,7 +62,10 @@ function AlertTitle({
     <h5
       {...props}
       data-slot="alert-title"
-      className={cn("mb-1 leading-none font-medium tracking-tight", className)}
+      className={cn(
+        "mb-1 min-w-0 leading-5 font-medium tracking-tight",
+        className,
+      )}
     >
       {children}
     </h5>
@@ -69,7 +80,10 @@ function AlertDescription({
     <div
       {...props}
       data-slot="alert-description"
-      className={cn("text-sm leading-relaxed [&_p]:leading-relaxed", className)}
+      className={cn(
+        "min-w-0 text-sm leading-relaxed [&_p]:leading-relaxed",
+        className,
+      )}
     />
   );
 }

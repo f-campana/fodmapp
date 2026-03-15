@@ -23,6 +23,11 @@ describe("Alert", () => {
 
     expect(alert).toHaveAttribute("data-slot", "alert");
     expect(alert).toHaveAttribute("data-variant", "default");
+    expect(alert.className).toContain(
+      "[&>svg~[data-slot=alert-description]]:col-start-2",
+    );
+    expect(alert.className).toContain("bg-info/10");
+    expect(alert.className).toContain("[&>[data-slot=alert-title]]:text-info");
     expect(container.querySelector("[data-slot='custom-alert']")).toBeNull();
     expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
     expect(
@@ -31,6 +36,9 @@ describe("Alert", () => {
     expect(screen.getByText("Information importante")).toHaveAttribute(
       "data-slot",
       "alert-title",
+    );
+    expect(screen.getByText("Information importante").className).toContain(
+      "leading-5",
     );
     expect(screen.getByText("Mise a jour terminee.")).toHaveAttribute(
       "data-slot",
@@ -49,8 +57,11 @@ describe("Alert", () => {
     const alert = screen.getByRole("alert");
     expect(alert).toHaveAttribute("data-variant", "destructive");
     expect(alert.className).toContain("border-destructive");
-    expect(alert.className).toContain("bg-destructive");
-    expect(alert.className).toContain("text-destructive-foreground");
+    expect(alert.className).toContain("bg-destructive/10");
+    expect(alert.className).toContain("text-foreground");
+    expect(alert.className).toContain(
+      "[&>[data-slot=alert-title]]:text-destructive",
+    );
   });
 
   it("forwards ref to root element", () => {

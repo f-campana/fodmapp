@@ -47,6 +47,7 @@ describe("Card", () => {
       "data-slot",
       "card-title",
     );
+    expect(screen.getByText("Galette salée").className).toContain("leading-5");
     expect(screen.getByText("Version compatible FODMAP.")).toHaveAttribute(
       "data-slot",
       "card-description",

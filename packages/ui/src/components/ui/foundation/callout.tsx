@@ -9,15 +9,31 @@ const calloutVariants = cva(
   {
     variants: {
       variant: {
-        info: "border-info bg-info text-info-foreground",
+        info: [
+          "border-info/25 bg-info/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-info",
+          "[&>[data-slot=callout-title]]:text-info",
+        ].join(" "),
         caution: [
-          "border-warning bg-background text-foreground",
+          "border-warning/30 bg-warning/10 text-foreground",
           "[&>[data-slot=callout-icon]]:text-warning",
           "[&>[data-slot=callout-title]]:text-warning",
         ].join(" "),
-        warning: "border-warning bg-warning text-warning-foreground",
-        danger: "border-danger bg-danger text-danger-foreground",
-        tip: "border-success bg-success text-success-foreground",
+        warning: [
+          "border-warning/35 bg-warning/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-warning",
+          "[&>[data-slot=callout-title]]:text-warning",
+        ].join(" "),
+        danger: [
+          "border-danger/35 bg-danger/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-danger",
+          "[&>[data-slot=callout-title]]:text-danger",
+        ].join(" "),
+        tip: [
+          "border-success/35 bg-success/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-success",
+          "[&>[data-slot=callout-title]]:text-success",
+        ].join(" "),
       },
     },
     defaultVariants: {
@@ -63,7 +79,7 @@ function CalloutTitle({ className, children, ...props }: CalloutTitleProps) {
       {...props}
       data-slot="callout-title"
       className={cn(
-        "col-start-2 min-w-0 leading-none font-semibold text-current",
+        "col-start-2 min-w-0 leading-5 font-semibold text-current",
         className,
       )}
     >

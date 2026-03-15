@@ -39,7 +39,7 @@ function ReviewAlert({ variant }: AlertStoryArgs) {
     <Alert variant={variant}>
       <Icon aria-hidden="true" />
       <AlertTitle>
-        {isDestructive ? "Activation blocked" : "Review ready"}
+        {isDestructive ? "Activation blocked" : "Review packet ready"}
       </AlertTitle>
       <AlertDescription>
         {isDestructive
@@ -102,10 +102,14 @@ export const Default: Story = {
 
     await expect(alert).toHaveAttribute("data-slot", "alert");
     await expect(alert).toHaveAttribute("data-variant", "default");
-    await expect(canvas.getByText("Review ready")).toHaveAttribute(
+    await expect(alert.className).toContain("bg-info/10");
+    await expect(canvas.getByText("Review packet ready")).toHaveAttribute(
       "data-slot",
       "alert-title",
     );
+    if (alert.scrollWidth > alert.clientWidth) {
+      throw new Error("Alert content overflowed instead of wrapping.");
+    }
     await expect(
       canvas.getByText(
         "Draft materialization and rescoring finished. Human review can now update the CSV before activation.",
@@ -127,9 +131,15 @@ export const Destructive: Story = {
 
     await expect(alert).toHaveAttribute("data-variant", "destructive");
     await expect(alert.className).toContain("border-destructive");
+    await expect(alert.className).toContain("bg-destructive/10");
     await expect(canvas.getByText("Activation blocked")).toHaveAttribute(
       "data-slot",
       "alert-title",
     );
+    if (alert.scrollWidth > alert.clientWidth) {
+      throw new Error(
+        "Destructive alert content overflowed instead of wrapping.",
+      );
+    }
   },
 };

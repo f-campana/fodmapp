@@ -32,6 +32,7 @@ describe("Callout", () => {
       "data-slot",
       "callout-title",
     );
+    expect(screen.getByText("Information").className).toContain("leading-5");
     expect(screen.getByText("Donnee utile pour avancer.")).toHaveAttribute(
       "data-slot",
       "callout-description",
@@ -45,7 +46,7 @@ describe("Callout", () => {
   });
 
   it("supports all custom variants", () => {
-    render(
+    const { container } = render(
       <>
         <Callout variant="info">Information</Callout>
         <Callout variant="caution">Prudence</Callout>
@@ -60,6 +61,10 @@ describe("Callout", () => {
     expect(screen.getByText("Avertissement")).toBeInTheDocument();
     expect(screen.getByText("Risque")).toBeInTheDocument();
     expect(screen.getByText("Astuce")).toBeInTheDocument();
+    expect(container.innerHTML).toContain("bg-info/10");
+    expect(container.innerHTML).toContain("bg-warning/10");
+    expect(container.innerHTML).toContain("bg-danger/10");
+    expect(container.innerHTML).toContain("bg-success/10");
   });
 
   it("applies caution accent contract", () => {
@@ -72,7 +77,8 @@ describe("Callout", () => {
 
     const root = screen.getByText("Attention").closest("[data-slot='callout']");
     expect(root?.className).toContain("border-warning");
-    expect(root?.className).toContain("bg-background");
+    expect(root?.className).toContain("bg-warning/10");
+    expect(root?.className).toContain("text-foreground");
   });
 
   it("forwards ref to the root element", () => {

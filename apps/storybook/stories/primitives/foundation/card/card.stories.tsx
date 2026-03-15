@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
 import {
+  Badge,
   Card,
   CardAction,
   CardContent,
@@ -32,38 +33,73 @@ const fixedStoryParameters = {
 
 function RecipeReviewCard({
   action,
+  actionTone,
   footer,
   title,
 }: {
   action: string;
+  actionTone: "outline" | "secondary";
   footer: string;
   title: string;
 }) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>
-          Breakfast swap reviewed for the low-FODMAP starter plan.
-        </CardDescription>
-        <CardAction>{action}</CardAction>
+      <CardHeader className="gap-x-4 gap-y-3">
+        <div className="space-y-1">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>
+            Breakfast swap reviewed for the low-FODMAP starter plan.
+          </CardDescription>
+        </div>
+        <CardAction>
+          <Badge variant={actionTone}>{action}</Badge>
+        </CardAction>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="space-y-4">
+        <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
             Coconut yogurt replaced the dairy version while preserving the same
             topping sequence and prep flow.
           </p>
-          <ul className="list-disc space-y-1 pl-4 text-sm text-foreground">
-            <li>Portion: 125 g</li>
-            <li>Confidence: reviewed against current scoring snapshot</li>
-            <li>Next check: after the next ingredient refresh batch</li>
-          </ul>
+          <dl className="grid gap-3 sm:grid-cols-3">
+            <div className="space-y-1 rounded-lg bg-muted/40 px-3 py-2">
+              <dt className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+                Portion
+              </dt>
+              <dd className="text-sm font-medium text-foreground">125 g</dd>
+            </div>
+            <div className="space-y-1 rounded-lg bg-muted/40 px-3 py-2">
+              <dt className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+                Confidence
+              </dt>
+              <dd className="text-sm font-medium text-foreground">
+                Current snapshot
+              </dd>
+            </div>
+            <div className="space-y-1 rounded-lg bg-muted/40 px-3 py-2">
+              <dt className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+                Next check
+              </dt>
+              <dd className="text-sm font-medium text-foreground">
+                Next ingredient batch
+              </dd>
+            </div>
+          </dl>
         </div>
       </CardContent>
-      <CardFooter className="justify-between gap-3 text-sm text-muted-foreground">
-        <span>{footer}</span>
-        <span>Owner: Foundation QA</span>
+      <CardFooter className="flex-wrap justify-between gap-x-4 gap-y-3 border-t border-border/70 pt-4 text-sm text-muted-foreground">
+        <div className="space-y-1">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase">
+            Updated
+          </p>
+          <p>{footer}</p>
+        </div>
+        <div className="space-y-1 text-left sm:text-right">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase">
+            Owner
+          </p>
+          <p>Foundation QA</p>
+        </div>
       </CardFooter>
     </Card>
   );
@@ -94,26 +130,28 @@ export const Default: Story = {
     <CardAuditFrame maxWidth="md">
       <RecipeReviewCard
         action="Ready"
+        actionTone="outline"
         footer="Updated 2 hours ago"
-        title="Blueberry yogurt bowl"
+        title="Blueberry yogurt bowl review summary"
       />
     </CardAuditFrame>
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const root = canvas
-      .getByText("Blueberry yogurt bowl")
+      .getByText("Blueberry yogurt bowl review summary")
       .closest("[data-slot='card']");
 
     await expect(root).toBeTruthy();
-    await expect(canvas.getByText("Blueberry yogurt bowl")).toHaveAttribute(
-      "data-slot",
-      "card-title",
-    );
-    await expect(canvas.getByText("Ready")).toHaveAttribute(
-      "data-slot",
-      "card-action",
-    );
+    await expect(
+      canvas.getByText("Blueberry yogurt bowl review summary"),
+    ).toHaveAttribute("data-slot", "card-title");
+    await expect(
+      canvas.getByText("Ready").closest("[data-slot='card-action']"),
+    ).toHaveAttribute("data-slot", "card-action");
+    if ((root?.scrollWidth ?? 0) > (root?.clientWidth ?? 0)) {
+      throw new Error("Card content overflowed instead of wrapping.");
+    }
   },
 };
 
@@ -123,9 +161,27 @@ export const ReviewSummary: Story = {
     <CardAuditFrame maxWidth="md">
       <RecipeReviewCard
         action="4 items"
+        actionTone="secondary"
         footer="Shared with the review CSV"
-        title="Phase 3 activation checklist"
+        title="Phase 3 activation checklist and approval notes"
       />
     </CardAuditFrame>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const root = canvas
+      .getByText("Phase 3 activation checklist and approval notes")
+      .closest("[data-slot='card']");
+
+    await expect(root).toBeTruthy();
+    await expect(
+      canvas.getByText("Phase 3 activation checklist and approval notes"),
+    ).toHaveAttribute("data-slot", "card-title");
+    await expect(
+      canvas.getByText("4 items").closest("[data-slot='card-action']"),
+    ).toHaveAttribute("data-slot", "card-action");
+    if ((root?.scrollWidth ?? 0) > (root?.clientWidth ?? 0)) {
+      throw new Error("Review summary card overflowed instead of wrapping.");
+    }
+  },
 };

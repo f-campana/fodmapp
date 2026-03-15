@@ -58,8 +58,8 @@ function GuidanceCallout({ variant }: CalloutStoryArgs) {
         </CalloutIcon>
         <CalloutTitle>
           {variant === "caution"
-            ? "Portion caution"
-            : "Why this swap stays gentle"}
+            ? "Portion caution for breakfast review"
+            : "Why this swap stays gentle for breakfast service"}
         </CalloutTitle>
         <CalloutDescription>
           {variant === "caution"
@@ -120,14 +120,17 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const root = canvas
-      .getByText("Why this swap stays gentle")
+      .getByText("Why this swap stays gentle for breakfast service")
       .closest("[data-slot='callout']");
 
     await expect(root).toHaveAttribute("data-variant", "info");
     await expect(canvas.queryByRole("alert")).toBeNull();
     await expect(
-      canvas.getByText("Why this swap stays gentle"),
+      canvas.getByText("Why this swap stays gentle for breakfast service"),
     ).toHaveAttribute("data-slot", "callout-title");
+    if ((root?.scrollWidth ?? 0) > (root?.clientWidth ?? 0)) {
+      throw new Error("Callout content overflowed instead of wrapping.");
+    }
   },
 };
 
@@ -141,15 +144,23 @@ export const Caution: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const root = canvas
-      .getByText("Portion caution")
+      .getByText("Portion caution for breakfast review")
       .closest("[data-slot='callout']");
 
     await expect(root).toHaveAttribute("data-variant", "caution");
     await expect(root?.className ?? "").toContain("border-warning");
     await expect(
+      canvas.getByText("Portion caution for breakfast review"),
+    ).toHaveAttribute("data-slot", "callout-title");
+    await expect(
       canvas.getByText(
         "This serving size only stays conservative when the batch keeps the yogurt at 125 g or less per meal.",
       ),
     ).toHaveAttribute("data-slot", "callout-description");
+    if ((root?.scrollWidth ?? 0) > (root?.clientWidth ?? 0)) {
+      throw new Error(
+        "Caution callout content overflowed instead of wrapping.",
+      );
+    }
   },
 };
