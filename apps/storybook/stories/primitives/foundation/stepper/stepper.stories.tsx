@@ -142,7 +142,7 @@ export const ResponsiveStress: Story = {
   },
   render: () => (
     <StepperAuditFrame maxWidth="sm" surface>
-      <ReviewStepper orientation="vertical" />
+      <ReviewStepper orientation="horizontal" />
     </StepperAuditFrame>
   ),
 };

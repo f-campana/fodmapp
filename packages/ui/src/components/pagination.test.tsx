@@ -46,6 +46,7 @@ describe("Pagination", () => {
       "data-slot",
       "pagination-content",
     );
+    expect(screen.getByRole("list").className).toContain("list-none");
     expect(active).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Précédent" })).toHaveAttribute(
       "data-slot",

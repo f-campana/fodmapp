@@ -32,7 +32,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Spinner provides a compact status indicator with an accessible label. The surrounding region still owns busy state, progress detail, and completion messaging.",
+          "Spinner is decorative by default. Pass `announce` when the spinner itself should create a status live region; otherwise let the surrounding region own busy state, progress detail, and completion messaging.",
       },
     },
     a11y: {
@@ -49,16 +49,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function LoadingPanel({
+  announce = false,
   label,
   size = "default",
 }: {
+  announce?: boolean;
   label: string;
   size?: "sm" | "default" | "lg";
 }) {
   return (
     <div className="rounded-(--radius) border border-border bg-card p-4">
       <div className="flex items-center gap-3">
-        <Spinner label={label} size={size} />
+        <Spinner announce={announce} label={label} size={size} />
         <div className="space-y-1">
           <p className="text-sm font-medium text-foreground">
             Export in progress
@@ -103,7 +105,7 @@ export const InteractionChecks: Story = {
   },
   render: () => (
     <SpinnerAuditFrame maxWidth="sm">
-      <LoadingPanel label="Synchronisation en cours" />
+      <LoadingPanel announce label="Synchronisation en cours" />
     </SpinnerAuditFrame>
   ),
   play: async ({ canvasElement }) => {

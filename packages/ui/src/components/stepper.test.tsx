@@ -40,12 +40,21 @@ describe("Stepper", () => {
       .closest("[data-slot='stepper-step']");
     expect(step).toHaveAttribute("data-status", "current");
     expect(step).toHaveAttribute("aria-current", "step");
+    expect(step).toHaveAttribute("aria-describedby");
 
     expect(
       screen
         .getByText("Ingrédients ajoutés")
         .closest("[data-slot='stepper-description']"),
     ).toBeTruthy();
+    expect(screen.getByText("Étape terminée")).toHaveAttribute(
+      "data-slot",
+      "stepper-status",
+    );
+    expect(screen.getByText("Étape en cours")).toHaveAttribute(
+      "data-slot",
+      "stepper-status",
+    );
   });
 
   it("supports vertical orientation", () => {
@@ -117,6 +126,10 @@ describe("Stepper", () => {
     expect(
       screen.getByText("Activation").closest("[data-slot='stepper-step']"),
     ).not.toHaveAttribute("aria-current");
+    expect(screen.getByText("Étape à venir")).toHaveAttribute(
+      "data-slot",
+      "stepper-status",
+    );
   });
 
   it("has no obvious a11y violations", async () => {

@@ -37,6 +37,7 @@ describe("Breadcrumb", () => {
       "data-slot",
       "breadcrumb-list",
     );
+    expect(screen.getByRole("list").className).toContain("list-none");
     expect(screen.getByText("Accueil")).toHaveAttribute(
       "data-slot",
       "breadcrumb-link",

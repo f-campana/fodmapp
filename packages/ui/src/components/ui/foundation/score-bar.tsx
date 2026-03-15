@@ -58,7 +58,7 @@ function ScoreBar({
   return (
     <div
       data-slot="score-bar"
-      role="progressbar"
+      role="meter"
       aria-valuemin={0}
       aria-valuemax={1}
       aria-valuenow={Number(normalizedValue.toFixed(2))}

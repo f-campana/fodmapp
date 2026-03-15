@@ -101,10 +101,10 @@ export const InteractionChecks: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const progress = canvas.getByRole("progressbar", { name: "Safety score" });
-    const fill = progress.querySelector("[data-slot='score-bar-fill']");
+    const meter = canvas.getByRole("meter", { name: "Safety score" });
+    const fill = meter.querySelector("[data-slot='score-bar-fill']");
 
-    await expect(progress).toHaveAttribute("aria-valuenow", "1");
+    await expect(meter).toHaveAttribute("aria-valuenow", "1");
     await expect(fill).toHaveAttribute("data-status", "success");
   },
 };

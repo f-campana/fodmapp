@@ -45,7 +45,7 @@ workflow permissions.
 ## Accessibility contract
 
 - the root remains an ordered list of steps and separators
-- the current item exposes `aria-current="step"`
+- each step includes hidden status text; the current item also exposes `aria-current="step"`
 - separators stay presentational and hidden from assistive technologies
 - labels and descriptions remain plain content inside each list item
 
@@ -59,12 +59,12 @@ What is checked automatically:
 
 What is checked manually:
 
-- review for horizontal readability on desktop widths
-- review for vertical readability on compact widths where labels and descriptions wrap
+- review for horizontal readability on desktop and compact widths
+- review for the vertical fallback when the parent layout intentionally switches orientation
 
 ## Responsive notes
 
-On compact surfaces, prefer a vertical stepper instead of forcing a dense
-horizontal line of wrapped labels.
+Keep compact horizontal labels short. When product copy no longer fits cleanly,
+switch the parent layout to the existing vertical orientation.
 
 <Canvas of={StepperStories.ResponsiveStress} sourceState="none" />

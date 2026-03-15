@@ -3,6 +3,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../../lib/cn";
+import { VisuallyHidden } from "../utilities/visually-hidden";
 
 const stepperVariants = cva("m-0 flex w-full list-none gap-3 p-0", {
   variants: {
@@ -83,18 +84,41 @@ export interface StepperStepProps
   step: React.ReactNode;
 }
 
+function getStepStatusLabel(status: NonNullable<StepperStepProps["status"]>) {
+  switch (status) {
+    case "completed":
+      return "Étape terminée";
+    case "current":
+      return "Étape en cours";
+    case "skipped":
+      return "Étape ignorée";
+    case "upcoming":
+    default:
+      return "Étape à venir";
+  }
+}
+
+function getResolvedStepStatus(status: StepperStepProps["status"]) {
+  return status ?? "upcoming";
+}
+
 function StepperStep({
   className,
   status = "upcoming",
   step,
   children,
+  "aria-describedby": ariaDescribedBy,
   ...props
 }: StepperStepProps) {
+  const statusId = React.useId();
+  const describedBy = [ariaDescribedBy, statusId].filter(Boolean).join(" ");
+
   return (
     <li
       data-slot="stepper-step"
       data-status={status}
       aria-current={status === "current" ? "step" : undefined}
+      aria-describedby={describedBy || undefined}
       className={cn(stepperStepVariants({ status }), className)}
       {...props}
     >
@@ -104,7 +128,12 @@ function StepperStep({
       >
         {step}
       </span>
-      <div className="min-w-0 space-y-1">{children}</div>
+      <div className="min-w-0 space-y-1">
+        <VisuallyHidden id={statusId} data-slot="stepper-status">
+          {getStepStatusLabel(getResolvedStepStatus(status))}
+        </VisuallyHidden>
+        {children}
+      </div>
     </li>
   );
 }

@@ -6,29 +6,45 @@ import { describe, expect, it } from "vitest";
 import { Spinner } from "./spinner";
 
 describe("Spinner", () => {
-  it("renders status semantics with the default accessible label", () => {
-    render(<Spinner />);
+  it("is decorative by default", () => {
+    const { container } = render(<Spinner />);
+
+    const spinner = container.querySelector("[data-slot='spinner']");
+    expect(spinner).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("supports size variants", () => {
+    const { container } = render(<Spinner size="lg" label="Chargement long" />);
+    const spinner = container.querySelector("[data-slot='spinner']");
+
+    expect(spinner).toHaveAttribute("data-size", "lg");
+    expect(spinner?.className).toContain("size-6");
+  });
+
+  it("merges className", () => {
+    const { container } = render(<Spinner className="mon-spinner" />);
+    expect(
+      container.querySelector("[data-slot='spinner']")?.className,
+    ).toContain("mon-spinner");
+  });
+
+  it("announces status semantics only when requested", () => {
+    render(<Spinner announce label="Chargement" />);
 
     const status = screen.getByRole("status", { name: "Chargement" });
     expect(status).toHaveAttribute("data-slot", "spinner");
     expect(status).toHaveAttribute("aria-live", "polite");
   });
 
-  it("supports size variants", () => {
-    render(<Spinner size="lg" label="Chargement long" />);
-    const status = screen.getByRole("status");
-
-    expect(status).toHaveAttribute("data-size", "lg");
-    expect(status.className).toContain("size-6");
-  });
-
-  it("merges className", () => {
-    render(<Spinner className="mon-spinner" />);
-    expect(screen.getByRole("status").className).toContain("mon-spinner");
-  });
-
   it("allows the label and live-region politeness to be customized", () => {
-    render(<Spinner aria-live="assertive" label="Synchronisation en cours" />);
+    render(
+      <Spinner
+        announce
+        aria-live="assertive"
+        label="Synchronisation en cours"
+      />,
+    );
 
     expect(
       screen.getByRole("status", { name: "Synchronisation en cours" }),
