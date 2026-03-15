@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-13
+Last reviewed: 2026-03-15
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,7 +15,8 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                       | Branch                                    | Status             | Scope                                                                                                            | Notes / blockers                                                    |
 | ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`                                            | `main`                                    | active (protected) | Main integration worktree only                                                                                   | Must remain clean.                                                  |
-| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-foundation-inputs-batch-j`      | `codex/ui-foundation-inputs-batch-j`      | active             | Batch J foundation input/action hardening for `button`, `button-group`, `input`, `native-select`, and `textarea` | In progress.                                                        |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/vercel-domains-docs`               | `codex/vercel-domains-docs`               | merged             | Vercel domain routing docs + Storybook access wording updates                                                    | Merged via PR #225; worktree removed.                               |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-foundation-inputs-batch-j`      | `codex/ui-foundation-inputs-batch-j`      | active             | Batch J foundation input/action hardening for `button`, `button-group`, `input`, `native-select`, and `textarea` | PR #226 open; quality gate passed, awaiting merge.                  |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-light-primitives-batch-i`       | `codex/ui-light-primitives-batch-i`       | active             | Batch I light-touch primitive and utility story/test cleanup                                                     | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/ui-feedback-composites-batch-h`    | `codex/ui-feedback-composites-batch-h`    | active             | Batch H feedback/composite hardening for `command`, `toast`, `sonner`, and `carousel`                            | In progress.                                                        |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/symptoms-tracking-v1-prd`          | `codex/symptoms-tracking-v1-prd`          | active             | Symptoms Tracking V1 PRD covering web/mobile scope and tracking-lane boundaries                                  | Drafting product scope and non-goals.                               |

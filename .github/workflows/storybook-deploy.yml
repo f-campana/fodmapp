@@ -109,7 +109,8 @@ jobs:
           {
             echo "## Storybook Production Deployment"
             echo
-            echo "- URL: ${PRODUCTION_URL}"
+            echo "- URL (canonical): https://ui.fodmapp.fr"
+            echo "- URL (deployment): ${PRODUCTION_URL}"
             echo "- Commit: \`${COMMIT_SHA}\`"
-            echo "- Access mode: Vercel Authentication."
+            echo "- Access mode: Public."
           } >> "$GITHUB_STEP_SUMMARY"
