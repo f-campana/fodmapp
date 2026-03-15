@@ -4,26 +4,39 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../../lib/cn";
 
+// Keep these semantic foreground utilities in the distributed stylesheet contract.
+const foregroundContractClasses =
+  "text-info-foreground text-warning-foreground text-danger-foreground";
+void foregroundContractClasses;
+
 const calloutVariants = cva(
   "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-1 rounded-xl border p-4 text-sm",
   {
     variants: {
       variant: {
         info: [
-          "border-info/25 bg-info/10 text-info-foreground",
-          "[&>[data-slot=callout-description]]:text-foreground",
+          "border-info/25 bg-info/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-info",
+          "[&>[data-slot=callout-title]]:text-info",
+          "[&_strong]:text-info-foreground",
         ].join(" "),
         caution: [
-          "border-warning/30 bg-warning/10 text-warning-foreground",
-          "[&>[data-slot=callout-description]]:text-foreground",
+          "border-warning/30 bg-warning/8 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-warning",
+          "[&>[data-slot=callout-title]]:text-warning",
+          "[&_strong]:text-warning-foreground",
         ].join(" "),
         warning: [
-          "border-warning/35 bg-warning/10 text-warning-foreground",
-          "[&>[data-slot=callout-description]]:text-foreground",
+          "border-warning/35 bg-warning/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-warning",
+          "[&>[data-slot=callout-title]]:text-warning",
+          "[&_strong]:text-warning-foreground",
         ].join(" "),
         danger: [
-          "border-danger/35 bg-danger/10 text-danger-foreground",
-          "[&>[data-slot=callout-description]]:text-foreground",
+          "border-danger/35 bg-danger/10 text-foreground",
+          "[&>[data-slot=callout-icon]]:text-danger",
+          "[&>[data-slot=callout-title]]:text-danger",
+          "[&_strong]:text-danger-foreground",
         ].join(" "),
         tip: [
           "border-success/35 bg-success/10 text-foreground",

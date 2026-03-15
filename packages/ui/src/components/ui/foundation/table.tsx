@@ -6,7 +6,12 @@ export type TableProps = React.ComponentProps<"table">;
 
 function Table({ className, ...props }: TableProps) {
   return (
-    <div data-slot="table" className="relative w-full overflow-x-auto">
+    <div
+      data-slot="table"
+      className="relative w-full overflow-x-auto"
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- the scroll wrapper must be keyboard focusable for accessible horizontal scrolling
+      tabIndex={0}
+    >
       <table
         {...props}
         className={cn("min-w-full caption-bottom text-sm", className)}

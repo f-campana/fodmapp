@@ -53,6 +53,7 @@ describe("Table", () => {
     expect(table).toHaveClass("min-w-full");
     expect(wrapper).toBeTruthy();
     expect(wrapper?.className ?? "").toContain("overflow-x-auto");
+    expect(wrapper).toHaveAttribute("tabindex", "0");
     expect(screen.getAllByRole("rowgroup")).toHaveLength(3);
     expect(screen.getAllByRole("row")).toHaveLength(3);
     expect(

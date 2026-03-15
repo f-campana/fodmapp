@@ -16,8 +16,9 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: [
-          "border-info/25 bg-info/10 text-info-foreground",
-          "[&>[data-slot=alert-description]]:text-foreground",
+          "border-info/25 bg-info/10 text-foreground",
+          "[&>svg]:text-info",
+          "[&_strong]:text-info-foreground",
         ].join(" "),
         destructive:
           "border-destructive-subtle-border bg-destructive-subtle text-destructive-subtle-foreground [&>svg]:text-destructive-subtle-foreground",

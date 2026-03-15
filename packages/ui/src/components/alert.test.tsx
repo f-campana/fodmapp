@@ -27,7 +27,8 @@ describe("Alert", () => {
       "[&>svg~[data-slot=alert-description]]:col-start-2",
     );
     expect(alert.className).toContain("bg-info/10");
-    expect(alert.className).toContain("text-info-foreground");
+    expect(alert.className).toContain("text-foreground");
+    expect(alert.className).toContain("[&>svg]:text-info");
     expect(container.querySelector("[data-slot='custom-alert']")).toBeNull();
     expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
     expect(

@@ -47,7 +47,7 @@ function GuidanceCallout({ variant }: CalloutStoryArgs) {
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <h2 className="text-sm font-semibold text-foreground">Recipe notes</h2>
+        <p className="text-sm font-semibold text-foreground">Recipe notes</p>
         <p className="text-sm text-muted-foreground">
           Keep the supporting guidance close to the content it explains.
         </p>
