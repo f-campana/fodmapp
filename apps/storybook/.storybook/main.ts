@@ -18,6 +18,8 @@ const config: StorybookConfig = {
     options: {},
   },
 
+  staticDirs: ["../public"],
+
   async viteFinal(baseConfig) {
     return mergeConfig(baseConfig, {
       resolve: {
