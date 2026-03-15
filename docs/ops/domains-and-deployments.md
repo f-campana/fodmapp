@@ -7,6 +7,7 @@ Last reviewed: 2026-03-15
 - `fodmapp.fr`: marketing front door (`apps/marketing`)
 - `app.fodmapp.fr`: product app (`apps/app`)
 - `ui.fodmapp.fr`: design system / Storybook (`apps/storybook`)
+- `research.fodmapp.fr`: research / reporting site (`apps/research`)
 
 ## Vercel projects
 
@@ -15,6 +16,7 @@ Recommended Vercel project split:
 - `fodmapp-marketing` → `apps/marketing` (Astro)
 - `fodmapp-app` → `apps/app` (Next.js)
 - `fodmapp-ui` → `apps/storybook` (Storybook)
+- `fodmapp-research` → `apps/research` (Astro)
 
 Notes:
 
@@ -42,6 +44,12 @@ UI / Storybook (`ui.fodmapp.fr`):
 
 - `ui.fodmapp.fr` is owned by the `fodmapp-ui` project.
 - Redirect legacy project domains (for example `fodmap-storybook-internal.vercel.app`) to `ui.fodmapp.fr`.
+
+Research (`research.fodmapp.fr`):
+
+1. Create/import a Vercel project with root directory `apps/research`.
+2. Leave Node.js version as **Default** (do not pin).
+3. Add domain `research.fodmapp.fr`.
 
 ## DNS authority
 
