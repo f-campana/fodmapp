@@ -1,0 +1,70 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as BreadcrumbStories from "./breadcrumb.stories";
+import { breadcrumbRecommendedUsageCode } from "./breadcrumb.docs-source";
+
+<Meta of={BreadcrumbStories} />
+
+<Title />
+<Subtitle>
+  Use Breadcrumb for page-location context. It exposes the navigation landmark
+  and current-page marker, but the surrounding layout still decides when to
+  truncate or collapse the trail.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={breadcrumbRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Breadcrumb when users need to understand where the current page sits inside
+an information hierarchy.
+
+Avoid it for single-level pages or for in-flow step guidance. Step status belongs
+to `Stepper`, not `Breadcrumb`.
+
+<Canvas of={BreadcrumbStories.Default} sourceState="none" />
+
+## Composition patterns
+
+Collapsed trails should stay honest. `BreadcrumbEllipsis` only indicates hidden
+levels; it does not provide navigation on its own.
+
+Use link items for navigable ancestors and `BreadcrumbPage` for the current page
+only.
+
+<Canvas of={BreadcrumbStories.CollapsedTrail} sourceState="none" />
+
+## Accessibility contract
+
+- the root renders a `navigation` landmark with an accessible label
+- the trail stays an ordered list of items and separators
+- the current page exposes `aria-current="page"` without pretending to be an interactive link
+- collapsed-level hints announce that intermediate levels are hidden
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the breadcrumb audit area
+- interaction checks verify the landmark, ordered-list structure, current-page semantics, and collapsed-level hint
+- UI tests cover slot stability, `asChild` links, current-page semantics, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for wrapping and truncation in dense layouts
+- review for long labels remaining readable without clipped text at narrow widths
+
+## Responsive notes
+
+On compact surfaces, prefer truncating the current page or collapsing
+intermediate levels instead of letting the whole trail clip.
+
+<Canvas of={BreadcrumbStories.ResponsiveStress} sourceState="none" />

@@ -12,7 +12,7 @@ import {
 } from "./stepper";
 
 describe("Stepper", () => {
-  it("renders root and step compounds", () => {
+  it("renders current, completed, and descriptive step content", () => {
     render(
       <Stepper orientation="horizontal">
         <StepperStep status="completed" step="1">
@@ -39,6 +39,7 @@ describe("Stepper", () => {
       .getByText("Recette")
       .closest("[data-slot='stepper-step']");
     expect(step).toHaveAttribute("data-status", "current");
+    expect(step).toHaveAttribute("aria-current", "step");
 
     expect(
       screen
@@ -61,7 +62,7 @@ describe("Stepper", () => {
     expect(root?.className).toContain("flex-col");
   });
 
-  it("merges className", () => {
+  it("merges className on the root", () => {
     render(
       <Stepper className="mon-stepper">
         <StepperStep step="1">
@@ -95,6 +96,27 @@ describe("Stepper", () => {
 
     expect(separator).toHaveAttribute("role", "presentation");
     expect(separator).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("does not mark non-current steps as current", () => {
+    render(
+      <Stepper>
+        <StepperStep status="completed" step="1">
+          <StepperLabel>Préparation</StepperLabel>
+        </StepperStep>
+        <StepperSeparator />
+        <StepperStep status="upcoming" step="2">
+          <StepperLabel>Activation</StepperLabel>
+        </StepperStep>
+      </Stepper>,
+    );
+
+    expect(
+      screen.getByText("Préparation").closest("[data-slot='stepper-step']"),
+    ).not.toHaveAttribute("aria-current");
+    expect(
+      screen.getByText("Activation").closest("[data-slot='stepper-step']"),
+    ).not.toHaveAttribute("aria-current");
   });
 
   it("has no obvious a11y violations", async () => {

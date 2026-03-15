@@ -67,7 +67,7 @@ function ScoreBar({
       className={cn("grid w-full gap-1.5", className)}
       {...props}
     >
-      {label ? (
+      {hasVisibleLabel ? (
         <div
           id={labelId}
           data-slot="score-bar-label"

@@ -38,6 +38,7 @@ function Spinner({
       data-size={size}
       role="status"
       aria-live="polite"
+      aria-label={label}
       className={cn(spinnerVariants({ size }), className)}
       {...props}
     >

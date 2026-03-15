@@ -94,6 +94,7 @@ function StepperStep({
     <li
       data-slot="stepper-step"
       data-status={status}
+      aria-current={status === "current" ? "step" : undefined}
       className={cn(stepperStepVariants({ status }), className)}
       {...props}
     >

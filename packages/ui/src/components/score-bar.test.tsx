@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { ScoreBar } from "./score-bar";
 
 describe("ScoreBar", () => {
-  it("renders progressbar semantics", () => {
+  it("renders progressbar semantics with a visible label", () => {
     render(<ScoreBar value={0.42} label="Score FODMAP" />);
 
     const progress = screen.getByRole("progressbar");
@@ -14,6 +14,7 @@ describe("ScoreBar", () => {
     expect(progress).toHaveAttribute("aria-valuemin", "0");
     expect(progress).toHaveAttribute("aria-valuemax", "1");
     expect(progress).toHaveAttribute("aria-valuenow", "0.42");
+    expect(progress).toHaveAttribute("aria-labelledby");
   });
 
   it("maps thresholds to status classes", () => {
@@ -52,6 +53,26 @@ describe("ScoreBar", () => {
     expect(screen.getByRole("progressbar")).toHaveAttribute(
       "aria-valuenow",
       "1",
+    );
+  });
+
+  it("renders numeric visible labels without dropping them", () => {
+    render(<ScoreBar value={0.58} label={0} />);
+
+    const progress = screen.getByRole("progressbar");
+    expect(screen.getByText("0")).toHaveAttribute(
+      "data-slot",
+      "score-bar-label",
+    );
+    expect(progress).toHaveAttribute("aria-labelledby");
+  });
+
+  it("uses aria-label when no visible label is rendered", () => {
+    render(<ScoreBar value={0.51} aria-label="Score de sécurité" />);
+
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-label",
+      "Score de sécurité",
     );
   });
 
