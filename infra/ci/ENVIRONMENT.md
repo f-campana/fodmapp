@@ -83,8 +83,8 @@ Storybook deploy security notes:
 
 - Storybook deploy runs only on `push` to `main` (no PR preview lane).
 - Secret access is gated by GitHub environment approval (`vercel-production`).
-- Internal-only access enforcement is managed in Vercel project settings:
-  - Vercel Authentication
+- Storybook access policy is managed in Vercel project settings:
+  - Public
 
 Cutover execution note (`2026-03-04`):
 

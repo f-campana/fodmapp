@@ -1,0 +1,71 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as PaginationStories from "./pagination.stories";
+import { paginationRecommendedUsageCode } from "./pagination.docs-source";
+
+<Meta of={PaginationStories} />
+
+<Title />
+<Subtitle>
+  Use Pagination when the surrounding product surface already owns page state or
+  routing. The component only renders the navigation structure, current-page
+  marker, and optional disabled link treatment.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={paginationRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Pagination for list or table views where users need to move between
+discrete result pages.
+
+Avoid it when the surface loads continuously or when a "load more" pattern is a
+better fit.
+
+<Canvas of={PaginationStories.Default} sourceState="none" />
+
+## Behavior notes
+
+`Pagination` does not own URL changes, data fetching, or scroll restoration.
+Those concerns stay with the parent route or controller.
+
+Disabled previous and next controls only block interaction and remove the tab
+stop. They do not infer page state on their own.
+
+<Canvas of={PaginationStories.FirstPage} sourceState="none" />
+<Canvas of={PaginationStories.TruncatedRange} sourceState="none" />
+
+## Accessibility contract
+
+- the root exposes a labeled `navigation` landmark
+- the current page uses `aria-current="page"`
+- disabled controls expose `aria-disabled="true"` and are removed from tab order
+- ellipsis items only indicate hidden ranges; they do not become interactive links
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the pagination audit area
+- interaction checks verify navigation semantics, current-page marking, and disabled previous behavior
+- UI tests cover active state, disabled controls, `asChild` links, ref forwarding, and a11y
+
+What is checked manually:
+
+- review for wrapping and focus visibility on narrow surfaces
+- check that disabled controls stay visually distinct without implying routing ownership
+
+## Responsive notes
+
+Allow the page links to wrap on narrow widths instead of clipping the previous
+and next controls.
+
+<Canvas of={PaginationStories.ResponsiveStress} sourceState="none" />

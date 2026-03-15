@@ -1,0 +1,61 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CardStories from "./card.stories";
+import { cardRecommendedUsageCode } from "./card.docs-source";
+
+<Meta of={CardStories} />
+
+<Title />
+<Subtitle>
+  Use Card as a neutral surface for grouped content, summary metadata, and a
+  small amount of supporting action context.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={cardRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Card when several related details belong together visually but do not need
+table semantics or a stronger alert-like message treatment.
+
+Prefer simpler block layout when a border and grouped surface do not add
+meaning.
+
+<Canvas of={CardStories.Default} sourceState="none" />
+
+## Composition notes
+
+Keep the header concise, reserve `CardAction` for short status or utility
+content, and move heavier detail into `CardContent`.
+
+If footer metadata matters, separate it from the body so it scans as supporting
+context rather than the main message.
+
+<Canvas of={CardStories.ReviewSummary} sourceState="none" />
+
+## Accessibility contract
+
+- Card is a structural surface and does not add landmark semantics by itself
+- title, description, action, content, and footer remain plain composition slots
+- interactive elements inside the card must provide their own semantics
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local card audit area
+- Storybook interaction checks verify the visible card examples and slot hooks
+- UI tests cover stable slot hooks, ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for header/action balance, content density, and footer separation
+- compact-width pass to confirm metadata wraps without collapsing the layout

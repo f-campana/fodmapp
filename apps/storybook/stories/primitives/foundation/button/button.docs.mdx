@@ -1,0 +1,61 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ButtonStories from "./button.stories";
+import {
+  buttonAsChildUsageCode,
+  buttonRecommendedUsageCode,
+} from "./button.docs-source";
+
+<Meta of={ButtonStories} />
+
+<Title />
+<Subtitle>
+  Use Button for a single clear action. Keep one primary action per area and
+  switch to link semantics only when the user is navigating.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={buttonRecommendedUsageCode} language="tsx" />
+
+<Canvas of={ButtonStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={ButtonStories.Playground} />
+
+## `asChild` usage
+
+Use `asChild` only when the underlying element already has the right semantics,
+such as an anchor for navigation.
+
+<Source code={buttonAsChildUsageCode} language="tsx" />
+
+<Canvas of={ButtonStories.AsChildLink} sourceState="none" />
+
+## Accessibility contract
+
+- the default element is a native `button`
+- the default `type` is `button`, not `submit`
+- disabled state is native `disabled`, not a custom loading pattern
+- icons and loading affordances are regular children, not a built-in API
+
+## Validation
+
+What is checked automatically:
+
+- UI tests cover the default slot marker, consumer `data-slot` overrides,
+  variant and size data attributes, disabled behavior, and `asChild` rendering
+- Storybook runs an accessibility scan scoped to the local button audit area
+
+What is checked manually:
+
+- visual pass for focus rings, disabled contrast, and size variants in light and
+  dark themes

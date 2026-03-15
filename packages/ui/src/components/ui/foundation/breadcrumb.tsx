@@ -3,7 +3,6 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "../../../lib/cn";
-import { VisuallyHidden } from "../utilities/visually-hidden";
 
 function Breadcrumb({
   className,
@@ -25,7 +24,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground",
+        "m-0 flex min-w-0 list-none flex-wrap items-center gap-1.5 p-0 text-sm text-muted-foreground",
         className,
       )}
       {...props}
@@ -37,7 +36,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1.5", className)}
+      className={cn("inline-flex min-w-0 items-center gap-1.5", className)}
       {...props}
     />
   );
@@ -71,7 +70,6 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="breadcrumb-page"
-      role="link"
       aria-current="page"
       className={cn("font-normal text-foreground", className)}
       {...props}
@@ -99,20 +97,20 @@ function BreadcrumbSeparator({
 
 function BreadcrumbEllipsis({
   className,
+  "aria-label": ariaLabel = "Niveaux intermédiaires masqués",
   ...props
 }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="breadcrumb-ellipsis"
-      role="presentation"
-      aria-hidden="true"
+      aria-label={ariaLabel}
       className={cn(
         "inline-flex size-7 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground",
         className,
       )}
       {...props}
     >
-      …<VisuallyHidden>Plus</VisuallyHidden>
+      …
     </span>
   );
 }

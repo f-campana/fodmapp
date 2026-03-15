@@ -5,6 +5,7 @@ import { cn } from "../../../lib/cn";
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input
+      {...props}
       data-slot="input"
       type={type}
       className={cn(
@@ -18,7 +19,6 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "md:text-sm",
         className,
       )}
-      {...props}
     />
   );
 }
