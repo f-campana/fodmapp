@@ -1,0 +1,16 @@
+export const buttonGroupRecommendedUsageCode = [
+  'import { Button, ButtonGroup } from "@fodmap/ui";',
+  "",
+  "export function PlanNavigationActions() {",
+  "  return (",
+  '    <div className="flex flex-wrap items-center gap-3">',
+  '      <ButtonGroup aria-label="Plan navigation">',
+  '        <Button variant="outline">Previous day</Button>',
+  '        <Button variant="outline">Today</Button>',
+  '        <Button variant="outline">Next day</Button>',
+  "      </ButtonGroup>",
+  "      <Button>Save changes</Button>",
+  "    </div>",
+  "  );",
+  "}",
+].join("\n");

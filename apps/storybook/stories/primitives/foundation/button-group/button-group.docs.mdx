@@ -1,0 +1,51 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ButtonGroupStories from "./button-group.stories";
+import { buttonGroupRecommendedUsageCode } from "./button-group.docs-source";
+
+<Meta of={ButtonGroupStories} />
+
+<Title />
+<Subtitle>
+  Use ButtonGroup for related peer actions that should read as one grouped
+  control surface. Keep a primary confirm or save action outside the group.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={buttonGroupRecommendedUsageCode} language="tsx" />
+
+<Canvas of={ButtonGroupStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={ButtonGroupStories.Playground} />
+
+## When to group
+
+- group actions only when they are peers in the same decision or navigation step
+- keep a higher-priority submit or save button separate so the hierarchy stays clear
+
+## Accessibility contract
+
+- the container stays a native `group` and should have an accessible label
+- child buttons keep their own semantics; the group only expresses the relationship
+- vertical orientation is the deliberate compact-width fallback when horizontal space gets tight
+
+## Validation
+
+What is checked automatically:
+
+- UI tests cover stable slot hooks, orientation seams, ref forwarding, and a11y
+- Storybook runs an accessibility scan scoped to the local button group audit area
+
+What is checked manually:
+
+- visual pass for grouped seams, equal-weight action styling, and narrow-width vertical layout

@@ -1,0 +1,51 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as InputStories from "./input.stories";
+import { inputRecommendedUsageCode } from "./input.docs-source";
+
+<Meta of={InputStories} />
+
+<Title />
+<Subtitle>
+  Use Input for a single-line native text field. Pair it with a visible label
+  and treat placeholder text as secondary guidance only.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={inputRecommendedUsageCode} language="tsx" />
+
+<Canvas of={InputStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={InputStories.Playground} />
+
+## Accessibility contract
+
+- the component is a native `input`
+- `aria-invalid` affects semantics and styling only; validation logic stays
+  outside the component
+- the component exposes one stable `data-slot` hook for layout and styling
+- labels, helper text, and error copy should come from surrounding markup or a
+  higher-level field wrapper
+
+## Validation
+
+What is checked automatically:
+
+- UI tests cover label association, stable slot hooks, invalid styling, refs,
+  disabled state, and a11y
+- Storybook runs an accessibility scan scoped to the local input audit area
+
+What is checked manually:
+
+- visual pass for field text, realistic placeholder hints, helper copy, and
+  focus rings at compact widths in light and dark themes

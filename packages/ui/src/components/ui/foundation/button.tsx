@@ -22,7 +22,7 @@ const buttonVariants = cva(
     "aria-invalid:border-validation-error-border aria-invalid:ring-2",
     "aria-invalid:ring-validation-error-ring-soft",
     // Disabled
-    "disabled:pointer-events-none disabled:opacity-50",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     // Cursor — native <button> doesn't show pointer; our convention adds it
     "cursor-pointer",
     // SVG children — auto-size unless explicit class, prevent pointer capture
@@ -87,6 +87,12 @@ const buttonVariants = cva(
   },
 );
 
+type ButtonProps = React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    "data-slot"?: string;
+  };
+
 // React 19: ref is a regular prop — forwardRef is no longer needed.
 // React.ComponentProps<"button"> includes ref.
 
@@ -96,21 +102,19 @@ function Button({
   size = "default",
   asChild = false,
   type = "button",
+  "data-slot": dataSlot,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) {
   const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
-      data-slot="button"
+      {...props}
+      data-slot={dataSlot ?? "button"}
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       type={asChild ? undefined : type}
-      {...props}
     />
   );
 }

@@ -7,6 +7,7 @@ export type TextareaProps = React.ComponentProps<"textarea">;
 function Textarea({ className, ...props }: TextareaProps) {
   return (
     <textarea
+      {...props}
       data-slot="textarea"
       className={cn(
         "flex min-h-24 w-full rounded-(--radius) border border-input bg-background px-3 py-2 text-base shadow-sm",
@@ -18,7 +19,6 @@ function Textarea({ className, ...props }: TextareaProps) {
         "md:text-sm",
         className,
       )}
-      {...props}
     />
   );
 }

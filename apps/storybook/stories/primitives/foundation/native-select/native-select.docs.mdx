@@ -1,0 +1,61 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as NativeSelectStories from "./native-select.stories";
+import { nativeSelectRecommendedUsageCode } from "./native-select.docs-source";
+
+<Meta of={NativeSelectStories} />
+
+<Title />
+<Subtitle>
+  Use NativeSelect when a short option list can stay browser-native. Reach for a
+  richer select or combobox only when search, grouping, or custom list behavior
+  is required.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={nativeSelectRecommendedUsageCode} language="tsx" />
+
+<Canvas of={NativeSelectStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={NativeSelectStories.Playground} />
+
+## Native behavior
+
+- browser-native presentation varies across Chromium, Firefox, and Safari
+- the indicator arrow remains browser-owned, so placement can differ across engines
+- this component does not emulate a combobox popup or custom option rendering
+- use the adapter `Select` or the composed `Combobox` when richer interaction is
+  part of the contract
+
+## Accessibility contract
+
+- the control remains a native `select`
+- `aria-invalid` affects semantics and styling only
+- labels and helper text come from surrounding markup
+- the component exposes one stable `data-slot` hook for layout and styling
+
+## Validation
+
+What is checked automatically:
+
+- UI tests cover label association, stable slot hooks, invalid and disabled
+  states, refs, and a11y
+- Storybook runs an accessibility scan scoped to the local native select audit
+  area
+
+What is checked manually:
+
+- visual pass for browser-native affordances, readable selected text, and focus
+  rings at compact widths in light and dark themes
+- accept browser-specific indicator placement as long as the selected text stays
+  readable and the arrow does not crowd the rounded edge

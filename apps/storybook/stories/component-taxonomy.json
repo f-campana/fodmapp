@@ -44,12 +44,12 @@
     },
     "button": {
       "category": "foundation",
-      "storyFile": "button.stories.tsx",
+      "storyFile": "primitives/foundation/button/button.stories.tsx",
       "title": "Primitives/Foundation/Button"
     },
     "button-group": {
       "category": "foundation",
-      "storyFile": "button-group.stories.tsx",
+      "storyFile": "primitives/foundation/button-group/button-group.stories.tsx",
       "title": "Primitives/Foundation/ButtonGroup"
     },
     "calendar": {
@@ -144,7 +144,7 @@
     },
     "input": {
       "category": "foundation",
-      "storyFile": "input.stories.tsx",
+      "storyFile": "primitives/foundation/input/input.stories.tsx",
       "title": "Primitives/Foundation/Input"
     },
     "input-group": {
@@ -179,7 +179,7 @@
     },
     "native-select": {
       "category": "foundation",
-      "storyFile": "native-select.stories.tsx",
+      "storyFile": "primitives/foundation/native-select/native-select.stories.tsx",
       "title": "Primitives/Foundation/NativeSelect"
     },
     "navigation-menu": {
@@ -284,7 +284,7 @@
     },
     "textarea": {
       "category": "foundation",
-      "storyFile": "textarea.stories.tsx",
+      "storyFile": "primitives/foundation/textarea/textarea.stories.tsx",
       "title": "Primitives/Foundation/Textarea"
     },
     "toast": {
