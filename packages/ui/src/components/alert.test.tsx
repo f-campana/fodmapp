@@ -27,7 +27,7 @@ describe("Alert", () => {
       "[&>svg~[data-slot=alert-description]]:col-start-2",
     );
     expect(alert.className).toContain("bg-info/10");
-    expect(alert.className).toContain("[&>[data-slot=alert-title]]:text-info");
+    expect(alert.className).toContain("text-info-foreground");
     expect(container.querySelector("[data-slot='custom-alert']")).toBeNull();
     expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
     expect(
@@ -56,12 +56,9 @@ describe("Alert", () => {
     render(<Alert variant="destructive">Erreur critique</Alert>);
     const alert = screen.getByRole("alert");
     expect(alert).toHaveAttribute("data-variant", "destructive");
-    expect(alert.className).toContain("border-destructive");
-    expect(alert.className).toContain("bg-destructive/10");
-    expect(alert.className).toContain("text-foreground");
-    expect(alert.className).toContain(
-      "[&>[data-slot=alert-title]]:text-destructive",
-    );
+    expect(alert.className).toContain("border-destructive-subtle-border");
+    expect(alert.className).toContain("bg-destructive-subtle");
+    expect(alert.className).toContain("text-destructive-subtle-foreground");
   });
 
   it("forwards ref to root element", () => {

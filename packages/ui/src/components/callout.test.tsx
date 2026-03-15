@@ -78,7 +78,7 @@ describe("Callout", () => {
     const root = screen.getByText("Attention").closest("[data-slot='callout']");
     expect(root?.className).toContain("border-warning");
     expect(root?.className).toContain("bg-warning/10");
-    expect(root?.className).toContain("text-foreground");
+    expect(root?.className).toContain("text-warning-foreground");
   });
 
   it("forwards ref to the root element", () => {

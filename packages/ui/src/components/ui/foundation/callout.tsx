@@ -10,24 +10,20 @@ const calloutVariants = cva(
     variants: {
       variant: {
         info: [
-          "border-info/25 bg-info/10 text-foreground",
-          "[&>[data-slot=callout-icon]]:text-info",
-          "[&>[data-slot=callout-title]]:text-info",
+          "border-info/25 bg-info/10 text-info-foreground",
+          "[&>[data-slot=callout-description]]:text-foreground",
         ].join(" "),
         caution: [
-          "border-warning/30 bg-warning/10 text-foreground",
-          "[&>[data-slot=callout-icon]]:text-warning",
-          "[&>[data-slot=callout-title]]:text-warning",
+          "border-warning/30 bg-warning/10 text-warning-foreground",
+          "[&>[data-slot=callout-description]]:text-foreground",
         ].join(" "),
         warning: [
-          "border-warning/35 bg-warning/10 text-foreground",
-          "[&>[data-slot=callout-icon]]:text-warning",
-          "[&>[data-slot=callout-title]]:text-warning",
+          "border-warning/35 bg-warning/10 text-warning-foreground",
+          "[&>[data-slot=callout-description]]:text-foreground",
         ].join(" "),
         danger: [
-          "border-danger/35 bg-danger/10 text-foreground",
-          "[&>[data-slot=callout-icon]]:text-danger",
-          "[&>[data-slot=callout-title]]:text-danger",
+          "border-danger/35 bg-danger/10 text-danger-foreground",
+          "[&>[data-slot=callout-description]]:text-foreground",
         ].join(" "),
         tip: [
           "border-success/35 bg-success/10 text-foreground",

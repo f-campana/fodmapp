@@ -16,15 +16,11 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: [
-          "border-info/25 bg-info/10 text-foreground",
-          "[&>svg]:text-info",
-          "[&>[data-slot=alert-title]]:text-info",
+          "border-info/25 bg-info/10 text-info-foreground",
+          "[&>[data-slot=alert-description]]:text-foreground",
         ].join(" "),
-        destructive: [
-          "border-destructive/35 bg-destructive/10 text-foreground",
-          "[&>svg]:text-destructive",
-          "[&>[data-slot=alert-title]]:text-destructive",
-        ].join(" "),
+        destructive:
+          "border-destructive-subtle-border bg-destructive-subtle text-destructive-subtle-foreground [&>svg]:text-destructive-subtle-foreground",
       },
     },
     defaultVariants: {

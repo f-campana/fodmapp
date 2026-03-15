@@ -130,8 +130,8 @@ export const Destructive: Story = {
     const alert = canvas.getByRole("alert");
 
     await expect(alert).toHaveAttribute("data-variant", "destructive");
-    await expect(alert.className).toContain("border-destructive");
-    await expect(alert.className).toContain("bg-destructive/10");
+    await expect(alert.className).toContain("border-destructive-subtle-border");
+    await expect(alert.className).toContain("bg-destructive-subtle");
     await expect(canvas.getByText("Activation blocked")).toHaveAttribute(
       "data-slot",
       "alert-title",
