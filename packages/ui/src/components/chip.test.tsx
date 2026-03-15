@@ -17,6 +17,16 @@ describe("Chip", () => {
     expect(root).toHaveAttribute("data-removable", "false");
     expect(root).toHaveAttribute("role", "group");
     expect(trigger).toHaveAttribute("data-slot", "chip-trigger");
+    expect(trigger).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("exposes selected state on the trigger", () => {
+    render(<Chip selected>Tolere</Chip>);
+
+    expect(screen.getByRole("button", { name: "Tolere" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("fires onSelect on trigger click", () => {

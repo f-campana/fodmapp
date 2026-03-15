@@ -140,6 +140,7 @@ function Chip({
       <button
         type="button"
         data-slot="chip-trigger"
+        aria-pressed={selected}
         disabled={disabled}
         className={cn(chipTriggerVariants({ variant, selected }))}
         onClick={() => onSelect?.()}

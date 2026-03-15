@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { Dot } from "./dot";
 
 describe("Dot", () => {
-  it("renders default unknown variant", () => {
+  it("renders default unknown variant with its accessible label", () => {
     render(<Dot />);
 
     const dot = screen.getByText("FODMAP inconnu").closest("[data-slot='dot']");
@@ -37,6 +37,9 @@ describe("Dot", () => {
     render(<Dot variant="low" label="Compatible" />);
 
     expect(screen.getByText("Compatible")).toBeInTheDocument();
+    expect(
+      screen.getByText("Compatible").closest("[data-slot='dot']"),
+    ).toHaveAttribute("data-variant", "low");
   });
 
   it("merges className", () => {

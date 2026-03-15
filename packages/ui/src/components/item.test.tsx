@@ -52,6 +52,10 @@ describe("Item", () => {
     expect(
       screen.getByText("Pomme verte").closest("[data-slot='item-group']"),
     ).toBeTruthy();
+    expect(screen.getByRole("separator")).toHaveAttribute(
+      "data-slot",
+      "item-separator",
+    );
   });
 
   it("supports asChild rendering", () => {

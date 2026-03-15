@@ -34,7 +34,7 @@
     },
     "badge": {
       "category": "foundation",
-      "storyFile": "badge.stories.tsx",
+      "storyFile": "primitives/foundation/badge/badge.stories.tsx",
       "title": "Primitives/Foundation/Badge"
     },
     "breadcrumb": {
@@ -79,7 +79,7 @@
     },
     "chip": {
       "category": "foundation",
-      "storyFile": "chip.stories.tsx",
+      "storyFile": "primitives/foundation/chip/chip.stories.tsx",
       "title": "Primitives/Foundation/Chip"
     },
     "collapsible": {
@@ -114,7 +114,7 @@
     },
     "dot": {
       "category": "foundation",
-      "storyFile": "dot.stories.tsx",
+      "storyFile": "primitives/foundation/dot/dot.stories.tsx",
       "title": "Primitives/Foundation/Dot"
     },
     "drawer": {
@@ -159,12 +159,12 @@
     },
     "item": {
       "category": "foundation",
-      "storyFile": "item.stories.tsx",
+      "storyFile": "primitives/foundation/item/item.stories.tsx",
       "title": "Primitives/Foundation/Item"
     },
     "kbd": {
       "category": "foundation",
-      "storyFile": "kbd.stories.tsx",
+      "storyFile": "primitives/foundation/kbd/kbd.stories.tsx",
       "title": "Primitives/Foundation/Kbd"
     },
     "label": {
@@ -309,7 +309,7 @@
     },
     "typography": {
       "category": "foundation",
-      "storyFile": "typography.stories.tsx",
+      "storyFile": "primitives/foundation/typography/typography.stories.tsx",
       "title": "Primitives/Foundation/Typography"
     },
     "visually-hidden": {
