@@ -28,14 +28,14 @@ This repo is a pnpm workspace (monorepo). Create one Vercel project per app, and
 Marketing (`fodmapp.fr`):
 
 1. Create/import a Vercel project with root directory `apps/marketing`.
-2. Set Node.js version to `22.x` (aligns with repo engine contract).
+2. Leave Node.js version as **Default** (do not pin).
 3. Add domain `fodmapp.fr` and set it as the primary domain.
 4. Add `www.fodmapp.fr` and redirect it to `fodmapp.fr` (use `308` once you are confident it is permanent).
 
 App (`app.fodmapp.fr`):
 
 1. Create/import a Vercel project with root directory `apps/app`.
-2. Set Node.js version to `22.x`.
+2. Leave Node.js version as **Default** (do not pin).
 3. Add domain `app.fodmapp.fr`.
 
 UI / Storybook (`ui.fodmapp.fr`):
