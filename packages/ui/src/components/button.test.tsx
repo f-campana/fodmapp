@@ -56,6 +56,23 @@ describe("Button", () => {
     expect(button).toHaveAttribute("data-size", "sm");
   });
 
+  it("allows consumer data-slot overrides while keeping variant and size stable", () => {
+    render(
+      <Button
+        data-size="custom-size"
+        data-slot="custom-slot"
+        data-variant="custom-variant"
+      >
+        Stable
+      </Button>,
+    );
+
+    const button = screen.getByRole("button", { name: "Stable" });
+    expect(button).toHaveAttribute("data-slot", "custom-slot");
+    expect(button).toHaveAttribute("data-variant", "default");
+    expect(button).toHaveAttribute("data-size", "default");
+  });
+
   // -------------------------------------------------------------------------
   // Interaction
   // -------------------------------------------------------------------------
@@ -76,6 +93,14 @@ describe("Button", () => {
     );
     screen.getByRole("button", { name: "Indisponible" }).click();
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("uses explicit disabled cursor treatment", () => {
+    render(<Button disabled>Indisponible</Button>);
+
+    expect(
+      screen.getByRole("button", { name: "Indisponible" }).className,
+    ).toContain("disabled:cursor-not-allowed");
   });
 
   // -------------------------------------------------------------------------
@@ -264,6 +289,26 @@ describe("Button", () => {
       "data-slot",
       "button",
     );
+  });
+
+  it("allows asChild data-slot overrides while keeping variant and size stable", () => {
+    render(
+      <Button
+        asChild
+        data-size="custom-size"
+        data-slot="custom-slot"
+        data-variant="custom-variant"
+        size="lg"
+        variant="secondary"
+      >
+        <a href="/plan">Voir le plan</a>
+      </Button>,
+    );
+
+    const link = screen.getByRole("link", { name: "Voir le plan" });
+    expect(link).toHaveAttribute("data-slot", "custom-slot");
+    expect(link).toHaveAttribute("data-variant", "secondary");
+    expect(link).toHaveAttribute("data-size", "lg");
   });
 
   // -------------------------------------------------------------------------

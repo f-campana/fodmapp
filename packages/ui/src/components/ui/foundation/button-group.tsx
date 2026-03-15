@@ -46,11 +46,11 @@ function ButtonGroup({
 }: ButtonGroupProps) {
   return (
     <div
+      {...props}
       data-slot="button-group"
       data-orientation={orientation}
       role={role}
       className={cn(buttonGroupVariants({ orientation }), className)}
-      {...props}
     />
   );
 }

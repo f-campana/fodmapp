@@ -8,17 +8,33 @@ import { describe, expect, it, vi } from "vitest";
 import { NativeSelect } from "./native-select";
 
 describe("NativeSelect", () => {
-  it("renders combobox role and data-slot", () => {
+  it("renders with native label association and data-slot", () => {
     render(
-      <NativeSelect defaultValue="carotte" aria-label="Légume">
-        <option value="carotte">Carotte</option>
-        <option value="courgette">Courgette</option>
-      </NativeSelect>,
+      <>
+        <label htmlFor="vegetable-select">Légume</label>
+        <NativeSelect defaultValue="carotte" id="vegetable-select">
+          <option value="carotte">Carotte</option>
+          <option value="courgette">Courgette</option>
+        </NativeSelect>
+      </>,
     );
 
     const select = screen.getByRole("combobox", { name: "Légume" });
     expect(select).toHaveAttribute("data-slot", "native-select");
     expect(select).toHaveValue("carotte");
+  });
+
+  it("keeps the internal data-slot stable when consumer props collide", () => {
+    render(
+      <NativeSelect aria-label="Choix" data-slot="custom-select">
+        <option value="a">A</option>
+      </NativeSelect>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Choix" })).toHaveAttribute(
+      "data-slot",
+      "native-select",
+    );
   });
 
   it("fires onChange", () => {
@@ -52,6 +68,42 @@ describe("NativeSelect", () => {
     expect(select.className).toContain(
       "aria-invalid:ring-validation-error-ring-soft",
     );
+  });
+
+  it("uses mobile-readable text sizing by default", () => {
+    render(
+      <NativeSelect aria-label="Céréale">
+        <option value="riz">Riz</option>
+      </NativeSelect>,
+    );
+
+    const select = screen.getByRole("combobox", { name: "Céréale" });
+    expect(select.className).toContain("text-base");
+    expect(select.className).toContain("md:text-sm");
+  });
+
+  it("reserves trailing padding for the browser-owned indicator", () => {
+    render(
+      <NativeSelect aria-label="Grain">
+        <option value="riz">Riz</option>
+      </NativeSelect>,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Grain" }).className).toContain(
+      "pr-9",
+    );
+  });
+
+  it("applies disabled cursor treatment", () => {
+    render(
+      <NativeSelect aria-label="Désactivé" disabled>
+        <option value="riz">Riz</option>
+      </NativeSelect>,
+    );
+
+    const select = screen.getByRole("combobox", { name: "Désactivé" });
+    expect(select).toBeDisabled();
+    expect(select.className).toContain("disabled:cursor-not-allowed");
   });
 
   it("forwards ref to select element", () => {
