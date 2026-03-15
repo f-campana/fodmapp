@@ -8,8 +8,14 @@ import { describe, expect, it } from "vitest";
 import { Input } from "./input";
 
 describe("Input", () => {
-  it("renders and supports placeholder", () => {
-    render(<Input aria-label="Recherche" placeholder="Rechercher" />);
+  it("renders with native label association and placeholder", () => {
+    render(
+      <>
+        <label htmlFor="ingredient-search">Recherche</label>
+        <Input id="ingredient-search" placeholder="Rechercher" />
+      </>,
+    );
+
     expect(
       screen.getByRole("textbox", { name: "Recherche" }),
     ).toBeInTheDocument();
@@ -28,6 +34,23 @@ describe("Input", () => {
     );
   });
 
+  it("keeps the internal data-slot stable when consumer props collide", () => {
+    render(<Input aria-label="Mot-clé" data-slot="custom-input" />);
+
+    expect(screen.getByRole("textbox", { name: "Mot-clé" })).toHaveAttribute(
+      "data-slot",
+      "input",
+    );
+  });
+
+  it("applies disabled cursor treatment without removing semantics", () => {
+    render(<Input aria-label="Nom" disabled />);
+
+    const input = screen.getByRole("textbox", { name: "Nom" });
+    expect(input).toBeDisabled();
+    expect(input.className).toContain("disabled:cursor-not-allowed");
+  });
+
   it("forwards ref to the underlying input element", () => {
     const ref = createRef<HTMLInputElement>();
     render(<Input ref={ref} aria-label="Recherche" />);
@@ -39,6 +62,14 @@ describe("Input", () => {
     expect(screen.getByRole("textbox", { name: "Mot-clé" })).toHaveAttribute(
       "data-slot",
       "input",
+    );
+  });
+
+  it("merges consumer className", () => {
+    render(<Input aria-label="Email" className="custom-input" />);
+
+    expect(screen.getByRole("textbox", { name: "Email" }).className).toContain(
+      "custom-input",
     );
   });
 

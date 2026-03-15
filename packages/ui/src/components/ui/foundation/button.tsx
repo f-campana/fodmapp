@@ -22,7 +22,7 @@ const buttonVariants = cva(
     "aria-invalid:border-validation-error-border aria-invalid:ring-2",
     "aria-invalid:ring-validation-error-ring-soft",
     // Disabled
-    "disabled:pointer-events-none disabled:opacity-50",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     // Cursor — native <button> doesn't show pointer; our convention adds it
     "cursor-pointer",
     // SVG children — auto-size unless explicit class, prevent pointer capture
@@ -105,12 +105,12 @@ function Button({
 
   return (
     <Comp
+      {...props}
       data-slot="button"
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
       type={asChild ? undefined : type}
-      {...props}
     />
   );
 }
