@@ -193,7 +193,7 @@ Secrets contract:
 Security contract:
 
 - production deploy lane requires `vercel-production` environment approval before secret access
-- deployment access policy remains enforced in Vercel project settings (Vercel Authentication)
+- deployment access policy is managed in Vercel project settings (Public)
 
 UX contract:
 
