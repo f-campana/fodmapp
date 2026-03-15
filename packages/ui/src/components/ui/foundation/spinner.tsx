@@ -23,21 +23,36 @@ const spinnerVariants = cva(
 
 export interface SpinnerProps
   extends React.ComponentProps<"span">, VariantProps<typeof spinnerVariants> {
+  announce?: boolean;
   label?: string;
 }
 
 function Spinner({
+  announce = false,
   className,
   size = "default",
   label = "Chargement",
+  role,
+  "aria-hidden": ariaHidden,
+  "aria-label": ariaLabel,
+  "aria-live": ariaLive,
   ...props
 }: SpinnerProps) {
+  const shouldAnnounce =
+    announce || role === "status" || ariaLive !== undefined;
+  const resolvedRole = shouldAnnounce ? (role ?? "status") : role;
+  const resolvedAriaHidden = shouldAnnounce ? ariaHidden : (ariaHidden ?? true);
+  const resolvedAriaLabel = shouldAnnounce ? (ariaLabel ?? label) : ariaLabel;
+  const resolvedAriaLive = shouldAnnounce ? (ariaLive ?? "polite") : ariaLive;
+
   return (
     <span
       data-slot="spinner"
       data-size={size}
-      role="status"
-      aria-live="polite"
+      role={resolvedRole}
+      aria-hidden={resolvedAriaHidden}
+      aria-live={resolvedAriaLive}
+      aria-label={resolvedAriaLabel}
       className={cn(spinnerVariants({ size }), className)}
       {...props}
     >
@@ -62,7 +77,9 @@ function Spinner({
           strokeLinecap="round"
         />
       </svg>
-      <VisuallyHidden>{label}</VisuallyHidden>
+      {shouldAnnounce && !resolvedAriaHidden ? (
+        <VisuallyHidden>{resolvedAriaLabel ?? label}</VisuallyHidden>
+      ) : null}
     </span>
   );
 }

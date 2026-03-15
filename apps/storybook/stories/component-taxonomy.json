@@ -39,7 +39,7 @@
     },
     "breadcrumb": {
       "category": "foundation",
-      "storyFile": "breadcrumb.stories.tsx",
+      "storyFile": "primitives/foundation/breadcrumb/breadcrumb.stories.tsx",
       "title": "Primitives/Foundation/Breadcrumb"
     },
     "button": {
@@ -189,7 +189,7 @@
     },
     "pagination": {
       "category": "foundation",
-      "storyFile": "pagination.stories.tsx",
+      "storyFile": "primitives/foundation/pagination/pagination.stories.tsx",
       "title": "Primitives/Foundation/Pagination"
     },
     "popover": {
@@ -219,7 +219,7 @@
     },
     "score-bar": {
       "category": "foundation",
-      "storyFile": "score-bar.stories.tsx",
+      "storyFile": "primitives/foundation/score-bar/score-bar.stories.tsx",
       "title": "Primitives/Foundation/ScoreBar"
     },
     "scroll-area": {
@@ -244,7 +244,7 @@
     },
     "skeleton": {
       "category": "foundation",
-      "storyFile": "skeleton.stories.tsx",
+      "storyFile": "primitives/foundation/skeleton/skeleton.stories.tsx",
       "title": "Primitives/Foundation/Skeleton"
     },
     "slider": {
@@ -259,12 +259,12 @@
     },
     "spinner": {
       "category": "foundation",
-      "storyFile": "spinner.stories.tsx",
+      "storyFile": "primitives/foundation/spinner/spinner.stories.tsx",
       "title": "Primitives/Foundation/Spinner"
     },
     "stepper": {
       "category": "foundation",
-      "storyFile": "stepper.stories.tsx",
+      "storyFile": "primitives/foundation/stepper/stepper.stories.tsx",
       "title": "Primitives/Foundation/Stepper"
     },
     "switch": {

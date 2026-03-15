@@ -1,0 +1,70 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ScoreBarStories from "./score-bar.stories";
+import { scoreBarRecommendedUsageCode } from "./score-bar.docs-source";
+
+<Meta of={ScoreBarStories} />
+
+<Title />
+<Subtitle>
+  Use ScoreBar for a compact 0..1 status signal. The component renders the bar
+  and optional label, while nearby copy should explain the score and show a
+  precise value when users need one.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={scoreBarRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use ScoreBar when the product already has a defined score model and users only
+need a quick status read inside a larger summary.
+
+Avoid it when users need a fully explained chart, a history view, or a precise
+standalone measurement with no surrounding context.
+
+<Canvas of={ScoreBarStories.Default} sourceState="none" />
+
+## Threshold meaning
+
+`ScoreBar` clamps incoming values to the 0..1 range and maps fill color as
+follows:
+
+- below `0.5`: danger
+- `0.5` through `0.7`: warning
+- above `0.7`: success
+
+<Canvas of={ScoreBarStories.Thresholds} sourceState="none" />
+
+## Accessibility contract
+
+- the root exposes `meter` semantics with the normalized value
+- a visible label is used for `aria-labelledby`; otherwise provide an `aria-label`
+- the component does not render a visible numeric value on its own
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the score-bar audit area
+- interaction checks verify value clamping and threshold mapping
+- UI tests cover label wiring, threshold changes, clamping, numeric labels, and a11y
+
+What is checked manually:
+
+- review for label and nearby value readability on narrow surfaces
+- review for threshold contrast in both themes
+
+## Responsive notes
+
+Keep the visible score text near the bar on compact widths so users do not have
+to infer the numeric value from color alone.
+
+<Canvas of={ScoreBarStories.ResponsiveStress} sourceState="none" />
