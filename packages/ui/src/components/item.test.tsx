@@ -41,6 +41,7 @@ describe("Item", () => {
       "data-slot",
       "item-title",
     );
+    expect(screen.getByText("Pomme verte").tagName).toBe("DIV");
     expect(screen.getByText("2 portions")).toHaveAttribute(
       "data-slot",
       "item-actions",
@@ -52,6 +53,10 @@ describe("Item", () => {
     expect(
       screen.getByText("Pomme verte").closest("[data-slot='item-group']"),
     ).toBeTruthy();
+    expect(screen.getByRole("separator")).toHaveAttribute(
+      "data-slot",
+      "item-separator",
+    );
   });
 
   it("supports asChild rendering", () => {

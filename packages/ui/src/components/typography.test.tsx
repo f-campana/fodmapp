@@ -33,6 +33,7 @@ describe("Typography", () => {
     expect(screen.getByText("Titre 2").tagName).toBe("H2");
     expect(screen.getByText("Titre 3").tagName).toBe("H3");
     expect(screen.getByText("Titre 4").tagName).toBe("H4");
+    expect(screen.getByText("Titre 4")).toHaveAttribute("data-variant", "h4");
     expect(screen.getByText("Citation").tagName).toBe("BLOCKQUOTE");
     expect(screen.getByText("const x = 1;").tagName).toBe("CODE");
     expect(screen.getByText("Texte principal").tagName).toBe("P");

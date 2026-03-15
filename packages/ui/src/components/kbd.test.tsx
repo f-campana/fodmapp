@@ -23,6 +23,7 @@ describe("Kbd", () => {
 
     const group = screen.getByText("Cmd").closest("[data-slot='kbd-group']");
     expect(group).toBeTruthy();
+    expect(group?.className).toContain("inline-flex");
   });
 
   it("merges className", () => {

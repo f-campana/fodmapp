@@ -69,7 +69,6 @@ const requiredSelectors = [
   ".text-ghost-foreground",
   ".hover\\:bg-ghost-hover:hover",
   ".bg-destructive",
-  ".hover\\:bg-destructive-hover:hover",
   ".aria-invalid\\:border-validation-error-border",
   ".aria-invalid\\:ring-validation-error-ring-soft",
   ".bg-destructive-subtle",
