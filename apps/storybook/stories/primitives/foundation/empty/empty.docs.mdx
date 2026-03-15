@@ -1,0 +1,59 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as EmptyStories from "./empty.stories";
+import { emptyRecommendedUsageCode } from "./empty.docs-source";
+
+<Meta of={EmptyStories} />
+
+<Title />
+<Subtitle>
+  Use Empty when a product surface is working correctly but currently has no
+  content to show.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={emptyRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Empty for first-run states, cleared filters, or legitimately empty datasets
+where the user can recover by taking the next obvious step.
+
+Do not use Empty for loading or failure states. Loading needs progress feedback,
+and errors need explicit problem and recovery messaging.
+
+<Canvas of={EmptyStories.Default} sourceState="none" />
+
+## Composition notes
+
+Keep the title short, the description specific, and the primary next step
+obvious. Secondary actions are optional when users need a nearby escape hatch.
+
+<Canvas of={EmptyStories.FilteredResults} sourceState="none" />
+
+## Accessibility contract
+
+- title and description stay plain text content inside one centered container
+- actions remain ordinary buttons or links supplied by the caller
+- wrapped copy should stay readable without collapsing the icon or actions
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local empty-state audit area
+- Storybook interaction checks verify the visible product examples
+- UI tests cover stable slot hooks, refs, class merging, and a11y
+
+What is checked manually:
+
+- visual pass to confirm the examples read as complete product states rather
+  than placeholders
+- narrow-width pass for action wrapping and copy spacing

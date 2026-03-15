@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../../lib/cn";
 
 const calloutVariants = cva(
-  "grid grid-cols-[auto_1fr] items-start gap-x-3 gap-y-1 rounded-xl border p-4 text-sm",
+  "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-1 rounded-xl border p-4 text-sm",
   {
     variants: {
       variant: {
@@ -32,10 +32,10 @@ export interface CalloutProps
 function Callout({ className, variant = "info", ...props }: CalloutProps) {
   return (
     <div
+      {...props}
       data-slot="callout"
       data-variant={variant}
       className={cn(calloutVariants({ variant }), className)}
-      {...props}
     />
   );
 }
@@ -45,12 +45,12 @@ export type CalloutIconProps = React.ComponentProps<"div">;
 function CalloutIcon({ className, ...props }: CalloutIconProps) {
   return (
     <div
+      {...props}
       data-slot="callout-icon"
       className={cn(
-        "row-span-2 mt-0.5 inline-flex size-5 items-center justify-center text-current",
+        "row-span-2 mt-0.5 inline-flex size-5 shrink-0 items-center justify-center text-current",
         className,
       )}
-      {...props}
     />
   );
 }
@@ -60,12 +60,12 @@ export type CalloutTitleProps = React.ComponentProps<"h5">;
 function CalloutTitle({ className, children, ...props }: CalloutTitleProps) {
   return (
     <h5
+      {...props}
       data-slot="callout-title"
       className={cn(
-        "col-start-2 leading-none font-semibold text-current",
+        "col-start-2 min-w-0 leading-none font-semibold text-current",
         className,
       )}
-      {...props}
     >
       {children}
     </h5>
@@ -81,9 +81,12 @@ function CalloutDescription({
 }: CalloutDescriptionProps) {
   return (
     <p
-      data-slot="callout-description"
-      className={cn("col-start-2 text-sm leading-6 text-current", className)}
       {...props}
+      data-slot="callout-description"
+      className={cn(
+        "col-start-2 min-w-0 text-sm leading-6 text-current",
+        className,
+      )}
     >
       {children}
     </p>

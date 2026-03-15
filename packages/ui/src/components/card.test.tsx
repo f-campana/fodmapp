@@ -16,16 +16,20 @@ import {
 } from "./card";
 
 describe("Card", () => {
-  it("renders composed card parts", () => {
-    render(
+  it("renders composed card parts with stable slot hooks", () => {
+    const { container } = render(
       <Card>
-        <CardHeader>
-          <CardTitle>Galette salée</CardTitle>
-          <CardDescription>Version compatible FODMAP.</CardDescription>
-          <CardAction>12 min</CardAction>
+        <CardHeader data-slot="custom-header">
+          <CardTitle data-slot="custom-title">Galette salée</CardTitle>
+          <CardDescription data-slot="custom-description">
+            Version compatible FODMAP.
+          </CardDescription>
+          <CardAction data-slot="custom-action">12 min</CardAction>
         </CardHeader>
-        <CardContent>Ingrédients disponibles.</CardContent>
-        <CardFooter>Recette</CardFooter>
+        <CardContent data-slot="custom-content">
+          Ingrédients disponibles.
+        </CardContent>
+        <CardFooter data-slot="custom-footer">Recette</CardFooter>
       </Card>,
     );
 
@@ -34,54 +38,48 @@ describe("Card", () => {
     expect(screen.getByText("12 min")).toBeInTheDocument();
     expect(screen.getByText("Ingrédients disponibles.")).toBeInTheDocument();
     expect(screen.getByText("Recette")).toBeInTheDocument();
+
+    expect(screen.getByText("Galette salée").parentElement).toHaveAttribute(
+      "data-slot",
+      "card-header",
+    );
+    expect(screen.getByText("Galette salée")).toHaveAttribute(
+      "data-slot",
+      "card-title",
+    );
+    expect(screen.getByText("Version compatible FODMAP.")).toHaveAttribute(
+      "data-slot",
+      "card-description",
+    );
+    expect(screen.getByText("12 min")).toHaveAttribute(
+      "data-slot",
+      "card-action",
+    );
+    expect(screen.getByText("Ingrédients disponibles.")).toHaveAttribute(
+      "data-slot",
+      "card-content",
+    );
+    expect(screen.getByText("Recette")).toHaveAttribute(
+      "data-slot",
+      "card-footer",
+    );
+    expect(
+      screen.getByText("Galette salée").closest("[data-slot='card']"),
+    ).toBeTruthy();
+    expect(container.querySelector("[data-slot='custom-header']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
+    expect(
+      container.querySelector("[data-slot='custom-description']"),
+    ).toBeNull();
+    expect(container.querySelector("[data-slot='custom-action']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-content']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-footer']")).toBeNull();
   });
 
   it("forwards ref to the card root element", () => {
     const ref = createRef<HTMLDivElement>();
     render(<Card ref={ref}>Résumé</Card>);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
-  });
-
-  it("exposes data-slot attributes for card compounds", () => {
-    render(
-      <Card>
-        <CardHeader>
-          <CardTitle>Titre</CardTitle>
-          <CardDescription>Description</CardDescription>
-          <CardAction>Action</CardAction>
-        </CardHeader>
-        <CardContent>Corps</CardContent>
-        <CardFooter>Pied</CardFooter>
-      </Card>,
-    );
-
-    expect(screen.getByText("Titre").parentElement).toHaveAttribute(
-      "data-slot",
-      "card-header",
-    );
-    expect(screen.getByText("Titre")).toHaveAttribute(
-      "data-slot",
-      "card-title",
-    );
-    expect(screen.getByText("Description")).toHaveAttribute(
-      "data-slot",
-      "card-description",
-    );
-    expect(screen.getByText("Action")).toHaveAttribute(
-      "data-slot",
-      "card-action",
-    );
-    expect(screen.getByText("Corps")).toHaveAttribute(
-      "data-slot",
-      "card-content",
-    );
-    expect(screen.getByText("Pied")).toHaveAttribute(
-      "data-slot",
-      "card-footer",
-    );
-    expect(
-      screen.getByText("Titre").closest("[data-slot='card']"),
-    ).toBeTruthy();
   });
 
   it("has no obvious a11y violations", async () => {

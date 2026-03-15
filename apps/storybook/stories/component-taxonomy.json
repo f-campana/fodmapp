@@ -19,7 +19,7 @@
     },
     "alert": {
       "category": "foundation",
-      "storyFile": "alert.stories.tsx",
+      "storyFile": "primitives/foundation/alert/alert.stories.tsx",
       "title": "Primitives/Foundation/Alert"
     },
     "aspect-ratio": {
@@ -59,12 +59,12 @@
     },
     "callout": {
       "category": "foundation",
-      "storyFile": "callout.stories.tsx",
+      "storyFile": "primitives/foundation/callout/callout.stories.tsx",
       "title": "Primitives/Foundation/Callout"
     },
     "card": {
       "category": "foundation",
-      "storyFile": "card.stories.tsx",
+      "storyFile": "primitives/foundation/card/card.stories.tsx",
       "title": "Primitives/Foundation/Card"
     },
     "carousel": {
@@ -129,7 +129,7 @@
     },
     "empty": {
       "category": "foundation",
-      "storyFile": "empty.stories.tsx",
+      "storyFile": "primitives/foundation/empty/empty.stories.tsx",
       "title": "Primitives/Foundation/Empty"
     },
     "field": {
@@ -274,7 +274,7 @@
     },
     "table": {
       "category": "foundation",
-      "storyFile": "table.stories.tsx",
+      "storyFile": "primitives/foundation/table/table.stories.tsx",
       "title": "Primitives/Foundation/Table"
     },
     "tabs": {

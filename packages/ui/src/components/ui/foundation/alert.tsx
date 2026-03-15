@@ -8,7 +8,7 @@ const alertVariants = cva(
   [
     "relative w-full rounded-(--radius) border px-4 py-3 text-sm",
     "grid has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:items-start has-[>svg]:gap-x-3",
-    "[&>svg]:size-4 [&>svg]:translate-y-0.5",
+    "[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:translate-y-0.5",
   ].join(" "),
   {
     variants: {
@@ -36,11 +36,11 @@ function Alert({
 }: AlertProps) {
   return (
     <div
+      {...props}
       data-slot="alert"
       data-variant={variant}
       role={role}
       className={cn(alertVariants({ variant }), className)}
-      {...props}
     />
   );
 }
@@ -52,9 +52,9 @@ function AlertTitle({
 }: React.ComponentProps<"h5">) {
   return (
     <h5
+      {...props}
       data-slot="alert-title"
       className={cn("mb-1 leading-none font-medium tracking-tight", className)}
-      {...props}
     >
       {children}
     </h5>
@@ -67,9 +67,9 @@ function AlertDescription({
 }: React.ComponentProps<"div">) {
   return (
     <div
+      {...props}
       data-slot="alert-description"
       className={cn("text-sm leading-relaxed [&_p]:leading-relaxed", className)}
-      {...props}
     />
   );
 }
