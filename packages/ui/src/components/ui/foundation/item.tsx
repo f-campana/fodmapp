@@ -71,17 +71,17 @@ function ItemContent({ className, ...props }: ItemContentProps) {
   );
 }
 
-export type ItemTitleProps = React.ComponentProps<"h4">;
+export type ItemTitleProps = React.ComponentProps<"div">;
 
 function ItemTitle({ className, children, ...props }: ItemTitleProps) {
   return (
-    <h4
+    <div
       data-slot="item-title"
-      className={cn("truncate text-sm font-medium text-foreground", className)}
+      className={cn("text-sm leading-5 font-medium text-foreground", className)}
       {...props}
     >
       {children}
-    </h4>
+    </div>
   );
 }
 

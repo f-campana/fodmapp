@@ -82,11 +82,12 @@ export const Default: Story = {
           </h3>
         </div>
         <div className="flex items-center gap-3">
-          <Dot variant="low" />
+          <Dot aria-hidden="true" variant="low" />
           <div className="space-y-1">
             <p className="text-sm font-medium text-foreground">Faible FODMAP</p>
             <p className="text-sm leading-5 text-muted-foreground">
-              The label beside the dot carries the main meaning in the list row.
+              The visible label carries the meaning, so the dot stays out of the
+              accessibility tree in this row.
             </p>
           </div>
         </div>

@@ -1,6 +1,12 @@
+import {
+  type ComponentProps,
+  type ReactNode,
+  useEffect,
+  useState,
+} from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import type { ReactNode } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
 import { Chip } from "@fodmap/ui";
@@ -103,8 +109,9 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+type ChipExampleArgs = Partial<ComponentProps<typeof Chip>>;
 
-function FilterChipCard({ args }: { args?: Story["args"] }) {
+function FilterChipCard({ args }: { args?: ChipExampleArgs }) {
   return (
     <div className="space-y-4 rounded-(--radius) border border-border bg-card p-4">
       <div className="space-y-1">
@@ -127,6 +134,38 @@ function FilterChipCard({ args }: { args?: Story["args"] }) {
   );
 }
 
+function InteractiveFilterChipCard({ args }: { args?: ChipExampleArgs }) {
+  const {
+    selected = false,
+    removable = false,
+    onSelect,
+    onRemove,
+    ...restArgs
+  } = args ?? {};
+  const [pressed, setPressed] = useState(selected);
+
+  useEffect(() => {
+    setPressed(selected);
+  }, [selected]);
+
+  return (
+    <FilterChipCard
+      args={{
+        ...restArgs,
+        removable,
+        selected: pressed,
+        onSelect: () => {
+          setPressed((current) => !current);
+          onSelect?.();
+        },
+        onRemove: () => {
+          onRemove?.();
+        },
+      }}
+    />
+  );
+}
+
 export const Playground: Story = {
   parameters: {
     docs: {
@@ -138,7 +177,7 @@ export const Playground: Story = {
   },
   render: (args) => (
     <ChipAuditFrame maxWidth="md">
-      <FilterChipCard args={args} />
+      <InteractiveFilterChipCard args={args} />
     </ChipAuditFrame>
   ),
 };
@@ -160,7 +199,7 @@ export const Default: Story = {
   },
   render: (args) => (
     <ChipAuditFrame maxWidth="md">
-      <FilterChipCard args={args} />
+      <InteractiveFilterChipCard args={args} />
     </ChipAuditFrame>
   ),
   play: async ({ canvasElement, args }) => {
@@ -169,7 +208,7 @@ export const Default: Story = {
 
     await userEvent.click(trigger);
 
-    await expect(trigger).toHaveAttribute("aria-pressed", "false");
+    await expect(trigger).toHaveAttribute("aria-pressed", "true");
     await expect(args.onSelect).toHaveBeenCalledTimes(1);
   },
 };
@@ -194,7 +233,7 @@ export const Removable: Story = {
   },
   render: (args) => (
     <ChipAuditFrame maxWidth="md">
-      <FilterChipCard args={args} />
+      <InteractiveFilterChipCard args={args} />
     </ChipAuditFrame>
   ),
   play: async ({ canvasElement, args }) => {
