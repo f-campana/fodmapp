@@ -1,0 +1,70 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as StepperStories from "./stepper.stories";
+import { stepperRecommendedUsageCode } from "./stepper.docs-source";
+
+<Meta of={StepperStories} />
+
+<Title />
+<Subtitle>
+  Use Stepper to show a presentational sequence of statuses. It does not
+  implement wizard rules, step activation, validation, or navigation behavior by
+  itself.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={stepperRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Stepper when users need a quick view of what is complete, current, or still
+upcoming in a multi-step process.
+
+Avoid it when the surface needs real workflow state management, branching
+logic, or embedded step controls.
+
+<Canvas of={StepperStories.Default} sourceState="none" />
+
+## Orientation and status
+
+Choose the orientation in the parent layout. The component only renders the
+visual sequence and current-step marker.
+
+`completed`, `current`, `upcoming`, and `skipped` are presentation states, not
+workflow permissions.
+
+<Canvas of={StepperStories.Vertical} sourceState="none" />
+
+## Accessibility contract
+
+- the root remains an ordered list of steps and separators
+- each step includes hidden status text; the current item also exposes `aria-current="step"`
+- separators stay presentational and hidden from assistive technologies
+- labels and descriptions remain plain content inside each list item
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the stepper audit area
+- interaction checks verify orientation, current-step semantics, and separator presentation
+- UI tests cover current-step marking, vertical layout, separator semantics, class merging, and a11y
+
+What is checked manually:
+
+- review for horizontal readability on desktop and compact widths
+- review for the vertical fallback when the parent layout intentionally switches orientation
+
+## Responsive notes
+
+Keep compact horizontal labels short. When product copy no longer fits cleanly,
+switch the parent layout to the existing vertical orientation.
+
+<Canvas of={StepperStories.ResponsiveStress} sourceState="none" />

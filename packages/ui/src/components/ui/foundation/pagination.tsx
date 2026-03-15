@@ -5,7 +5,6 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
 import { cn } from "../../../lib/cn";
-import { VisuallyHidden } from "../utilities/visually-hidden";
 
 function Pagination({
   className,
@@ -30,7 +29,10 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-1", className)}
+      className={cn(
+        "m-0 flex list-none flex-row flex-wrap items-center justify-center gap-1 p-0",
+        className,
+      )}
       {...props}
     />
   );
@@ -51,8 +53,8 @@ const paginationLinkVariants = cva(
     "inline-flex h-8 min-w-8 items-center justify-center rounded-(--radius) border border-transparent px-2 text-sm font-medium whitespace-nowrap select-none",
     "transition-all duration-(--transition-duration-interactive) ease-(--transition-timing-interactive)",
     "outline-hidden focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring-soft",
-    "disabled:pointer-events-none disabled:opacity-50",
     "cursor-pointer",
+    "data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-default data-[disabled=true]:opacity-50",
   ].join(" "),
   {
     variants: {
@@ -69,24 +71,43 @@ const paginationLinkVariants = cva(
 
 export interface PaginationLinkProps extends React.ComponentProps<"a"> {
   asChild?: boolean;
+  disabled?: boolean;
   isActive?: boolean;
 }
 
 function PaginationLink({
   className,
   asChild = false,
+  disabled = false,
   isActive = false,
+  onClick,
+  tabIndex,
+  "aria-disabled": ariaDisabled,
   ...props
 }: PaginationLinkProps) {
   const Comp = asChild ? Slot : "a";
+  const isDisabled =
+    disabled || ariaDisabled === true || ariaDisabled === "true";
   const linkProps = asChild ? props : { href: props.href ?? "#", ...props };
 
   return (
     <Comp
       aria-current={isActive ? "page" : undefined}
+      aria-disabled={isDisabled || undefined}
       data-slot="pagination-link"
       data-active={isActive ? "true" : "false"}
+      data-disabled={isDisabled ? "true" : "false"}
       className={cn(paginationLinkVariants({ active: isActive }), className)}
+      onClick={(event) => {
+        if (isDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
+        onClick?.(event);
+      }}
+      tabIndex={isDisabled ? (tabIndex ?? -1) : tabIndex}
       {...linkProps}
     />
   );
@@ -128,20 +149,20 @@ function PaginationNext({
 
 function PaginationEllipsis({
   className,
+  "aria-label": ariaLabel = "Pages intermédiaires masquées",
   ...props
 }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="pagination-ellipsis"
-      role="presentation"
-      aria-hidden="true"
+      aria-label={ariaLabel}
       className={cn(
         "inline-flex size-8 items-center justify-center text-muted-foreground",
         className,
       )}
       {...props}
     >
-      …<VisuallyHidden>Plus de pages</VisuallyHidden>
+      …
     </span>
   );
 }

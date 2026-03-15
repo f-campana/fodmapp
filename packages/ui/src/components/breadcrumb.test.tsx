@@ -16,7 +16,7 @@ import {
 } from "./breadcrumb";
 
 describe("Breadcrumb", () => {
-  it("renders navigation semantics with default label", () => {
+  it("renders ordered navigation semantics with the current page marked", () => {
     render(
       <Breadcrumb>
         <BreadcrumbList>
@@ -33,6 +33,11 @@ describe("Breadcrumb", () => {
 
     const nav = screen.getByRole("navigation", { name: "Fil d'Ariane" });
     expect(nav).toHaveAttribute("data-slot", "breadcrumb");
+    expect(screen.getByRole("list")).toHaveAttribute(
+      "data-slot",
+      "breadcrumb-list",
+    );
+    expect(screen.getByRole("list").className).toContain("list-none");
     expect(screen.getByText("Accueil")).toHaveAttribute(
       "data-slot",
       "breadcrumb-link",
@@ -41,11 +46,14 @@ describe("Breadcrumb", () => {
       "aria-current",
       "page",
     );
+    expect(
+      screen.queryByRole("link", { name: "Recettes" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("supports asChild links", () => {
+  it("supports a custom landmark label and asChild links", () => {
     render(
-      <Breadcrumb>
+      <Breadcrumb aria-label="Chemin de navigation">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -56,12 +64,15 @@ describe("Breadcrumb", () => {
       </Breadcrumb>,
     );
 
+    expect(
+      screen.getByRole("navigation", { name: "Chemin de navigation" }),
+    ).toBeInTheDocument();
     const link = screen.getByRole("link", { name: "Profil" });
     expect(link).toHaveAttribute("href", "/profil");
     expect(link).toHaveAttribute("data-slot", "breadcrumb-link");
   });
 
-  it("renders separator and ellipsis presentation slots", () => {
+  it("renders separator and collapsed-level hints", () => {
     render(
       <Breadcrumb>
         <BreadcrumbList>
@@ -80,7 +91,9 @@ describe("Breadcrumb", () => {
       "data-slot",
       "breadcrumb-separator",
     );
-    expect(screen.getByText("Plus")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("Niveaux intermédiaires masqués"),
+    ).toHaveAttribute("data-slot", "breadcrumb-ellipsis");
   });
 
   it("forwards ref to nav element", () => {

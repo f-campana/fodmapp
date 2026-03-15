@@ -6,25 +6,49 @@ import { describe, expect, it } from "vitest";
 import { Spinner } from "./spinner";
 
 describe("Spinner", () => {
-  it("renders status role, default label, and data-slot", () => {
-    render(<Spinner />);
+  it("is decorative by default", () => {
+    const { container } = render(<Spinner />);
 
-    const status = screen.getByRole("status");
-    expect(status).toHaveAttribute("data-slot", "spinner");
-    expect(screen.getByText("Chargement")).toBeInTheDocument();
+    const spinner = container.querySelector("[data-slot='spinner']");
+    expect(spinner).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
   it("supports size variants", () => {
-    render(<Spinner size="lg" label="Chargement long" />);
-    const status = screen.getByRole("status");
+    const { container } = render(<Spinner size="lg" label="Chargement long" />);
+    const spinner = container.querySelector("[data-slot='spinner']");
 
-    expect(status).toHaveAttribute("data-size", "lg");
-    expect(status.className).toContain("size-6");
+    expect(spinner).toHaveAttribute("data-size", "lg");
+    expect(spinner?.className).toContain("size-6");
   });
 
   it("merges className", () => {
-    render(<Spinner className="mon-spinner" />);
-    expect(screen.getByRole("status").className).toContain("mon-spinner");
+    const { container } = render(<Spinner className="mon-spinner" />);
+    expect(
+      container.querySelector("[data-slot='spinner']")?.className,
+    ).toContain("mon-spinner");
+  });
+
+  it("announces status semantics only when requested", () => {
+    render(<Spinner announce label="Chargement" />);
+
+    const status = screen.getByRole("status", { name: "Chargement" });
+    expect(status).toHaveAttribute("data-slot", "spinner");
+    expect(status).toHaveAttribute("aria-live", "polite");
+  });
+
+  it("allows the label and live-region politeness to be customized", () => {
+    render(
+      <Spinner
+        announce
+        aria-live="assertive"
+        label="Synchronisation en cours"
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", { name: "Synchronisation en cours" }),
+    ).toHaveAttribute("aria-live", "assertive");
   });
 
   it("has no obvious a11y violations", async () => {
