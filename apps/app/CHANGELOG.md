@@ -1,5 +1,13 @@
 # @fodmap/app
 
+## 0.1.27
+
+### Patch Changes
+
+- Updated dependencies [[`13e0cb8`](https://github.com/f-campana/fodmapp/commit/13e0cb8bbcf31bcb53dda1edc73e2898831f6e4e), [`0a7f8fa`](https://github.com/f-campana/fodmapp/commit/0a7f8faa21cdcd0e69f2ddd7b57c01fb7050845a), [`6f0857e`](https://github.com/f-campana/fodmapp/commit/6f0857e89e7a713eebc8c0479272fc40b54e57f9), [`0ecfdc2`](https://github.com/f-campana/fodmapp/commit/0ecfdc2806da4445f7ef69b9119ab2ec60aef026), [`3b13957`](https://github.com/f-campana/fodmapp/commit/3b13957832be7d9637caa21f5d4e474bc9b2dc4d), [`c8564dd`](https://github.com/f-campana/fodmapp/commit/c8564dd2c7e251274775102796b6ee158b1c4975), [`56df81f`](https://github.com/f-campana/fodmapp/commit/56df81fd689fc54901da45d8d8dbc748ce3265f0), [`1e7289e`](https://github.com/f-campana/fodmapp/commit/1e7289eed1de289a0f4729ad88eacee24dd1f6f6), [`978dd90`](https://github.com/f-campana/fodmapp/commit/978dd9028e4c14a016fdbd4f70beccf6f63637d3), [`4ad9a9d`](https://github.com/f-campana/fodmapp/commit/4ad9a9db356322e8bd4bd8a080cbae9645d796ba), [`c23babd`](https://github.com/f-campana/fodmapp/commit/c23babdd8dab58d8dc07698eace0f575defb6230)]:
+  - @fodmap/ui@3.13.3
+  - @fodmap/types@0.1.2
+
 ## 0.1.26
 
 ### Patch Changes
