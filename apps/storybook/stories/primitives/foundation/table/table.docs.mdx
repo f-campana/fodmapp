@@ -1,0 +1,64 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as TableStories from "./table.stories";
+import { tableRecommendedUsageCode } from "./table.docs-source";
+
+<Meta of={TableStories} />
+
+<Title />
+<Subtitle>
+  Use Table when users need to compare several rows and columns with real table
+  semantics.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={tableRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Table when comparison matters more than card-like storytelling, for example
+review queues, ingredient substitutions, or status dashboards that users scan by
+column.
+
+This component does not transform rows into stacked mobile cards. Its responsive
+contract is horizontal overflow inside the wrapper.
+
+<Canvas of={TableStories.Default} sourceState="none" />
+
+## Responsive notes
+
+Keep columns meaningful and readable. On narrow widths, allow horizontal scroll
+instead of pretending the table became a different component.
+
+<Canvas of={TableStories.ResponsiveStress} sourceState="none" />
+
+## Accessibility contract
+
+- native `table`, `thead`, `tbody`, `tfoot`, `tr`, `th`, `td`, and `caption`
+  semantics are preserved
+- `TableHead` defaults to column header scope
+- the wrapper provides horizontal overflow when the table is wider than the
+  available space
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local table audit area
+- Storybook interaction checks verify caption naming, row groups, header scope,
+  and overflow behavior on the visible stories
+- UI tests cover stable slot hooks, semantic sections, footer composition,
+  ref forwarding, and a11y
+
+What is checked manually:
+
+- visual pass for readable columns and sensible overflow treatment at compact
+  widths
+- light and dark theme pass to confirm borders and captions stay legible

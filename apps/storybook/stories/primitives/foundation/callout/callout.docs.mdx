@@ -1,0 +1,68 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as CalloutStories from "./callout.stories";
+import { calloutRecommendedUsageCode } from "./callout.docs-source";
+
+<Meta of={CalloutStories} />
+
+<Title />
+<Subtitle>
+  Use Callout for persistent guidance, editorial emphasis, or explanatory notes
+  that belong to the surrounding content.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={calloutRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Callout when the message adds context but should not announce itself as an
+urgent status change.
+
+Prefer `Alert` when the current page state changed and the user needs immediate
+inline feedback.
+
+<Canvas of={CalloutStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect the supported emphasis variants while keeping the
+same editorial composition.
+
+<Controls of={CalloutStories.Playground} />
+
+## Composition notes
+
+Keep the icon, title, and description tightly related. A callout should read as
+supporting guidance, not as a full-page banner or blocking warning surface.
+
+<Canvas of={CalloutStories.Caution} sourceState="none" />
+
+## Accessibility contract
+
+- the component is structural content, not a live region
+- icon, title, and description remain plain content slots in the same block
+- long copy should wrap in the text column without clipping the icon
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local callout audit area
+- Storybook interaction checks verify the visible info and caution examples
+- UI tests cover stable slot hooks, variants, caution accents, refs, class
+  merging, and a11y
+
+What is checked manually:
+
+- visual pass to confirm callouts read as supporting guidance rather than
+  interchangeable alerts
+- narrow-width pass for icon alignment and wrapped copy

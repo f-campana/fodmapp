@@ -1,0 +1,74 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as AlertStories from "./alert.stories";
+import { alertRecommendedUsageCode } from "./alert.docs-source";
+
+<Meta of={AlertStories} />
+
+<Title />
+<Subtitle>
+  Use Alert for inline messaging that should be announced immediately inside the
+  current page flow.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={alertRecommendedUsageCode} language="tsx" />
+
+## When to use
+
+Use Alert when the message changes the user&apos;s next step right now, for
+example manual review readiness, blocked activation, or validation outcomes that
+need prompt attention.
+
+Do not use Alert for blocking confirmations or overlays. Use `AlertDialog` or
+another modal surface when the page must stop and ask for a decision.
+
+<Canvas of={AlertStories.Default} sourceState="none" />
+
+## Props and controls
+
+Use the playground to inspect the supported visual variants for the same inline
+message structure.
+
+<Controls of={AlertStories.Playground} />
+
+## Composition notes
+
+`AlertTitle` and `AlertDescription` are optional. If you include a leading icon,
+render it as a direct child SVG so the built-in spacing rules apply.
+
+<Canvas of={AlertStories.Destructive} sourceState="none" />
+
+## Accessibility contract
+
+- the root defaults to `role="alert"`
+- callers may pass a different role when a quieter announcement is intentional
+- title and description remain plain content slots inside the same live region
+
+## Validation
+
+What is checked automatically:
+
+- Storybook runs an accessibility scan scoped to the local alert audit area
+- Storybook interaction checks verify inline alert role, variant styling, and
+  slot markers on the visible stories
+- UI tests cover stable slot hooks, role override behavior, variants, refs, and
+  a11y
+
+What is checked manually:
+
+- visual pass for icon alignment, heading spacing, and copy wrapping in light
+  and dark themes
+
+## Related guidance
+
+Use `Callout` for editorial guidance or persistent explanatory notes that should
+not announce themselves as urgent live-region content.

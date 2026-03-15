@@ -1,3 +1,5 @@
+import { createRef } from "react";
+
 import { render, screen } from "@testing-library/react";
 
 import { axe } from "jest-axe";
@@ -11,12 +13,14 @@ import {
 } from "./callout";
 
 describe("Callout", () => {
-  it("renders root and compounds with data-slot", () => {
-    render(
-      <Callout variant="info">
-        <CalloutIcon>i</CalloutIcon>
-        <CalloutTitle>Information</CalloutTitle>
-        <CalloutDescription>Donnée utile pour avancer.</CalloutDescription>
+  it("keeps root and compound slot hooks stable", () => {
+    const { container } = render(
+      <Callout data-slot="custom-callout" variant="info">
+        <CalloutIcon data-slot="custom-icon">i</CalloutIcon>
+        <CalloutTitle data-slot="custom-title">Information</CalloutTitle>
+        <CalloutDescription data-slot="custom-description">
+          Donnee utile pour avancer.
+        </CalloutDescription>
       </Callout>,
     );
 
@@ -28,14 +32,21 @@ describe("Callout", () => {
       "data-slot",
       "callout-title",
     );
-    expect(screen.getByText("Donnée utile pour avancer.")).toHaveAttribute(
+    expect(screen.getByText("Information").className).toContain("leading-5");
+    expect(screen.getByText("Donnee utile pour avancer.")).toHaveAttribute(
       "data-slot",
       "callout-description",
     );
+    expect(container.querySelector("[data-slot='custom-callout']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-icon']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
+    expect(
+      container.querySelector("[data-slot='custom-description']"),
+    ).toBeNull();
   });
 
   it("supports all custom variants", () => {
-    render(
+    const { container } = render(
       <>
         <Callout variant="info">Information</Callout>
         <Callout variant="caution">Prudence</Callout>
@@ -50,6 +61,10 @@ describe("Callout", () => {
     expect(screen.getByText("Avertissement")).toBeInTheDocument();
     expect(screen.getByText("Risque")).toBeInTheDocument();
     expect(screen.getByText("Astuce")).toBeInTheDocument();
+    expect(container.innerHTML).toContain("bg-info/10");
+    expect(container.innerHTML).toContain("bg-warning/10");
+    expect(container.innerHTML).toContain("bg-danger/10");
+    expect(container.innerHTML).toContain("bg-success/10");
   });
 
   it("applies caution accent contract", () => {
@@ -62,7 +77,20 @@ describe("Callout", () => {
 
     const root = screen.getByText("Attention").closest("[data-slot='callout']");
     expect(root?.className).toContain("border-warning");
-    expect(root?.className).toContain("bg-background");
+    expect(root?.className).toContain("bg-warning/8");
+    expect(root?.className).toContain("text-foreground");
+    expect(root?.className).toContain(
+      "[&>[data-slot=callout-title]]:text-warning",
+    );
+  });
+
+  it("forwards ref to the root element", () => {
+    const ref = createRef<HTMLDivElement>();
+
+    render(<Callout ref={ref}>Note editoriale</Callout>);
+
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveAttribute("data-slot", "callout");
   });
 
   it("merges className", () => {

@@ -15,13 +15,15 @@ import {
 } from "./empty";
 
 describe("Empty", () => {
-  it("renders root and compound slots", () => {
-    render(
-      <Empty>
-        <EmptyIcon>◌</EmptyIcon>
-        <EmptyTitle>Aucun résultat</EmptyTitle>
-        <EmptyDescription>Essayez un autre filtre.</EmptyDescription>
-        <EmptyActions>
+  it("keeps root and compound slot hooks stable", () => {
+    const { container } = render(
+      <Empty data-slot="custom-empty">
+        <EmptyIcon data-slot="custom-icon">◌</EmptyIcon>
+        <EmptyTitle data-slot="custom-title">Aucun résultat</EmptyTitle>
+        <EmptyDescription data-slot="custom-description">
+          Essayez un autre filtre.
+        </EmptyDescription>
+        <EmptyActions data-slot="custom-actions">
           <Button>Réinitialiser</Button>
         </EmptyActions>
       </Empty>,
@@ -42,6 +44,13 @@ describe("Empty", () => {
     expect(
       screen.getByText("Réinitialiser").closest("[data-slot='empty-actions']"),
     ).toBeTruthy();
+    expect(container.querySelector("[data-slot='custom-empty']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-icon']")).toBeNull();
+    expect(container.querySelector("[data-slot='custom-title']")).toBeNull();
+    expect(
+      container.querySelector("[data-slot='custom-description']"),
+    ).toBeNull();
+    expect(container.querySelector("[data-slot='custom-actions']")).toBeNull();
   });
 
   it("forwards ref to root element", () => {
