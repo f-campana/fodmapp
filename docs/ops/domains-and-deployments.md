@@ -7,7 +7,11 @@ Last reviewed: 2026-03-15
 - `fodmapp.fr`: marketing front door (`apps/marketing`)
 - `app.fodmapp.fr`: product app (`apps/app`)
 - `ui.fodmapp.fr`: design system / Storybook (`apps/storybook`)
-- `research.fodmapp.fr`: research / reporting site (`apps/research`)
+- `lab.fodmapp.fr`: research / reporting site (`apps/research`)
+
+## Staging domain map
+
+- `staging.app.fodmapp.fr`: staging app (branch domain → `staging` on `fodmapp-app`)
 
 ## Vercel projects
 
@@ -45,11 +49,12 @@ UI / Storybook (`ui.fodmapp.fr`):
 - `ui.fodmapp.fr` is owned by the `fodmapp-ui` project.
 - Redirect legacy project domains (for example `fodmap-storybook-internal.vercel.app`) to `ui.fodmapp.fr`.
 
-Research (`research.fodmapp.fr`):
+Research (`lab.fodmapp.fr`):
 
 1. Create/import a Vercel project with root directory `apps/research`.
 2. Leave Node.js version as **Default** (do not pin).
-3. Add domain `research.fodmapp.fr`.
+3. Add domain `lab.fodmapp.fr` and set it as the primary domain.
+4. Add `research.fodmapp.fr` as a redirect alias to `lab.fodmapp.fr` (use `308` when you are confident it is permanent).
 
 ## DNS authority
 
@@ -64,4 +69,4 @@ All DNS records and domain routing should be managed in Vercel.
 
 ## Access policy notes
 
-- Storybook is intentionally **public** (no auth). If you want it public-but-not-indexed, add `noindex` (header or `robots.txt`) as a follow-up.
+- Storybook is intentionally **public** (no auth) but is set to **noindex** (`robots.txt` + meta tags).
