@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui";
+} from "@fodmap/ui/server";
 
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";

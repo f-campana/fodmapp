@@ -36,6 +36,23 @@ export default defineConfig([
       ],
     },
   },
+  {
+    files: ["apps/app/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@fodmap/ui",
+              message:
+                "Use @fodmap/ui/server or @fodmap/ui/client inside apps/app.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   ...markdownConfig.map((config) => ({
     ...config,
     files: ["apps/storybook/stories/**/*.{md,mdx}"],
