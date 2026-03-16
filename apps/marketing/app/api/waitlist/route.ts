@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+
 import { neon } from "@neondatabase/serverless";
 
 import { sendWaitlistConfirmationEmail } from "../../../src/lib/email";
@@ -15,6 +16,8 @@ type ErrorResult = {
 type WaitlistResponse = SuccessResult | ErrorResult;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* eslint-disable no-console */
 
 export const dynamic = "force-dynamic";
 
