@@ -2,6 +2,9 @@
 
 :root {
   color-scheme: light;
+  --font-body:
+    var(--fd-base-typography-font-family-body), "Source Sans 3", Arial,
+    sans-serif;
 }
 
 body {
@@ -9,5 +12,20 @@ body {
   min-height: 100vh;
   background: var(--fd-semantic-color-background-canvas);
   color: var(--fd-semantic-color-text-primary);
-  font-family: var(--fd-semantic-typography-font-family-body);
+  font-family: var(--font-body);
+}
+
+body,
+html {
+  color-scheme: light;
+  background: var(--fd-semantic-color-background-canvas);
+}
+
+::selection {
+  background: color-mix(
+    in oklch,
+    var(--fd-semantic-color-action-primary-bg) 35%,
+    transparent
+  );
+  color: var(--fd-semantic-color-text-primary);
 }

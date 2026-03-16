@@ -126,6 +126,9 @@ importers:
       '@fodmapp/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
+      '@fodmapp/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@neondatabase/serverless':
         specifier: ^0.10.3
         version: 0.10.4
