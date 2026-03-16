@@ -2,30 +2,55 @@
 
 Status: Implemented
 Audience: Contributor or engineer; Product or design collaborator
-Scope: Current app scaffold scope, runtime integrations, and zero-credential behavior contract.
+Scope: Current live app slice, runtime integrations, local validation, and zero-credential behavior contract.
 Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/README.md](../../docs/README.md)
-Last reviewed: 2026-03-08
+Last reviewed: 2026-03-16
 
-Architecture-first Next.js scaffold for the product app.
+Next.js product app for the first live web slice.
 
 ## Current Scope
 
-1. Minimal public route (`/`) and gated-area placeholder route (`/espace`).
-2. FR-first copy with EN-ready dictionary structure.
-3. `@fodmapp/ui` component consumption.
-4. `@fodmapp/types` contract consumption (compile-time only).
-5. Env-gated cross-cutting seams:
+1. Public routes:
+   - `/`
+   - `/aliments`
+   - `/aliments/[slug]`
+   - `/decouvrir`
+   - `/espace`
+2. FR-first product copy with EN-ready field support from the API contract.
+3. Server-rendered public read flows for:
+   - food search
+   - food detail
+   - swap results
+   - safe-harbor browse
+4. Typed public API client consumption from `@fodmapp/types`.
+5. `@fodmapp/ui/server` and `@fodmapp/ui/client` consumption for App Router-safe rendering.
+6. Env-gated cross-cutting seams:
    - auth (`Clerk`) runtime adapter
    - monitoring (`Sentry`) runtime adapter
    - analytics (`Plausible`) runtime adapter
    - consent (`Axeptio`) deferred no-op adapter
-6. Route smoke tests for `/` and `/espace`.
+7. Product route tests covering:
+   - search results and no-match states
+   - detail pages with swaps
+   - zero-swap recovery to `/decouvrir`
+   - safe-harbor browse states
 
 ## Out Of Scope
 
-1. Business logic and data-fetch flows.
-2. Full production auth flows and consent policy orchestration.
-3. ETL, SQL schema, or API runtime behavior changes.
+1. Full production auth flows and consent policy orchestration.
+2. Write operations or account-backed product features beyond the existing `/me/*` consent surface.
+3. Additional API endpoints or ETL/schema changes.
+4. Food subtypes/traits panels and broader personalization features.
+
+## Local Validation
+
+Use the local validation runbook for install, seed, API startup, frontend startup, and manual route checks:
+
+- [`docs/frontend/local-app-validation.md`](../../docs/frontend/local-app-validation.md)
+
+Important runtime note:
+
+- `NEXT_PUBLIC_API_BASE_URL` must be an absolute API origin for server-rendered app routes (for example `http://localhost:8000`).
 
 ## Runtime Integration Matrix
 
@@ -42,4 +67,5 @@ Architecture-first Next.js scaffold for the product app.
 2. Adapters switch to `disabled` or `deferred-noop` modes by default.
 3. Plausible script injection requires consent gate (`NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED=true`) until Axeptio runtime activation.
 4. Manual consent override is hard-disabled in production even if `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED=true`.
-5. `/` and `/espace` remain renderable without provider accounts or paid subscriptions.
+5. Public routes remain renderable without provider accounts or paid subscriptions.
+6. If `NEXT_PUBLIC_API_BASE_URL` is missing, public read routes must degrade to handled error or empty states rather than crash.
