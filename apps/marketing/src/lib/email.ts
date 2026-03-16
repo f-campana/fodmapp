@@ -4,7 +4,9 @@ import { Resend } from "resend";
 
 type EmailResult = { ok: true } | { ok: false; error: unknown };
 
-const from = process.env.RESEND_FROM_EMAIL ?? "noreply@fodmapp.fr";
+const from =
+  (process.env.RESEND_FROM_EMAIL ?? "noreply@fodmapp.fr").trim() ||
+  "noreply@fodmapp.fr";
 
 export async function sendWaitlistConfirmationEmail(
   email: string,

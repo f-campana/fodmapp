@@ -15,7 +15,29 @@ type ErrorResult = {
 
 type WaitlistResponse = SuccessResult | ErrorResult;
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function isBasicEmailFormat(email: string): boolean {
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 0 || atIndex !== email.lastIndexOf("@")) {
+    return false;
+  }
+
+  const local = email.slice(0, atIndex);
+  const domain = email.slice(atIndex + 1);
+  if (!local || !domain) {
+    return false;
+  }
+
+  if (
+    domain.length < 3 ||
+    !domain.includes(".") ||
+    domain.startsWith(".") ||
+    domain.endsWith(".")
+  ) {
+    return false;
+  }
+
+  return local !== "." && !local.includes("..") && !domain.includes("..");
+}
 
 /* eslint-disable no-console */
 
@@ -42,7 +64,7 @@ export async function POST(
   }
 
   const email = rawEmail.trim().toLowerCase();
-  if (!emailRegex.test(email)) {
+  if (!isBasicEmailFormat(email)) {
     return NextResponse.json({ ok: false, code: "invalid_email" } as const, {
       status: 400,
     });
@@ -75,9 +97,7 @@ export async function POST(
           "Failed to send confirmation email",
           emailResult.error ?? "unknown error",
         );
-        return NextResponse.json({ ok: false, code: "server_error" } as const, {
-          status: 500,
-        });
+        // Best-effort delivery: signup is already persisted.
       }
     }
 
