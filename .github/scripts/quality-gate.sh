@@ -80,6 +80,112 @@ run_cmd() {
   return 1
 }
 
+run_cmd_parallel() {
+  if [[ "$#" -eq 0 ]]; then
+    return 0
+  fi
+
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+
+  local -a pids=()
+  local -a labels=()
+  local -a status_files=()
+  local -a log_files=()
+  local task
+  local index=0
+
+  for task in "$@"; do
+    local label="${task%%::*}"
+    local command="${task#*::}"
+
+    if [[ "$label" == "$command" ]]; then
+      echo "[FAIL] malformed parallel task: $task" >&2
+      rm -rf "$temp_dir"
+      return 1
+    fi
+
+    local log_file="${temp_dir}/task-${index}.log"
+    local status_file="${temp_dir}/task-${index}.status"
+
+    labels[index]="$label"
+    log_files[index]="$log_file"
+    status_files[index]="$status_file"
+
+    echo "[RUN] $label"
+    (
+      bash -lc "$command"
+      local command_status=$?
+      echo "$command_status" > "$status_file"
+    ) >"$log_file" 2>&1 &
+    pids[index]=$!
+    ((index += 1))
+  done
+
+  local fail=0
+  local i
+  for ((i = 0; i < index; i += 1)); do
+    if ! wait "${pids[i]}"; then
+      :
+    fi
+
+    local status=1
+    if [[ -f "${status_files[i]}" ]]; then
+      read -r status < "${status_files[i]}"
+    fi
+
+    if [[ "$status" == "0" ]]; then
+      echo "[OK] ${labels[i]}"
+    else
+      echo "[FAIL] ${labels[i]}" >&2
+      if [[ -f "${log_files[i]}" ]]; then
+        cat "${log_files[i]}" >&2
+      fi
+      fail=1
+    fi
+  done
+
+  rm -rf "$temp_dir"
+  return "$fail"
+}
+
+resolve_quality_gate_scope() {
+  local scope_output
+  scope_output="$(mktemp)"
+
+  GITHUB_EVENT_NAME="${GITHUB_EVENT_NAME:-push}" \
+  BASE_SHA="${BASE_SHA:-}" \
+  HEAD_SHA="${HEAD_SHA:-}" \
+  GITHUB_OUTPUT="$scope_output" \
+  node .github/scripts/detect-ci-scope.mjs
+
+  quality_scope_design_tokens="${quality_scope_design_tokens:-true}"
+  quality_scope_ui_foundation="${quality_scope_ui_foundation:-true}"
+  quality_scope_app_scaffold="${quality_scope_app_scaffold:-true}"
+  quality_scope_content_scaffolds="${quality_scope_content_scaffolds:-true}"
+
+  while IFS="=" read -r key value; do
+    case "$key" in
+      design_tokens)
+        quality_scope_design_tokens="$value"
+        ;;
+      ui_foundation)
+        quality_scope_ui_foundation="$value"
+        ;;
+      app_scaffold)
+        quality_scope_app_scaffold="$value"
+        ;;
+      content_scaffolds)
+        quality_scope_content_scaffolds="$value"
+        ;;
+    esac
+  done <"$scope_output"
+
+  rm -f "$scope_output"
+
+  echo "[INFO] Full scope: design_tokens=${quality_scope_design_tokens} ui_foundation=${quality_scope_ui_foundation} app_scaffold=${quality_scope_app_scaffold} content_scaffolds=${quality_scope_content_scaffolds}"
+}
+
 for f in "${required_files[@]}"; do
   if [[ ! -f "$f" ]]; then
     echo "[FAIL] missing required file: $f" >&2
@@ -116,34 +222,48 @@ if [[ "$run_full" == "true" ]]; then
     exit 1
   fi
 
-  run_cmd "format check" pnpm format:check
-  run_cmd "UI package build for lint imports" pnpm exec turbo run build --filter=@fodmapp/ui
-  run_cmd "Reporting package build for lint imports" pnpm exec turbo run build --filter=@fodmapp/reporting
-  run_cmd "lint (CI)" pnpm lint:ci
-  run_cmd "python lint (CI)" pnpm python:ci
-  run_cmd "changeset checker unit tests" pnpm changeset:ci:test
-  run_cmd "changeset full-repository lint" pnpm changeset:ci:lint:all
-  run_cmd "changeset coverage check" pnpm changeset:ci:status:strict
-  run_cmd "CI scope tests" pnpm ci:scope:test
-  run_cmd "changeset scope detector tests" node --test .github/scripts/detect-changeset-pr-scope.test.mjs
-  run_cmd "docs hygiene audit unit tests" node --test .github/scripts/docs-hygiene-audit.test.mjs
-  run_cmd "openapi check" pnpm --filter @fodmapp/types openapi:check
-  run_cmd "design token check" pnpm tokens:check
-  run_cmd "tailwind style check" pnpm tailwind:styles:check
-  run_cmd "UI package build" pnpm ui:build
-  run_cmd "UI package style check" pnpm ui:styles:check
-  run_cmd "UI package typecheck" pnpm ui:typecheck
-  run_cmd "UI package tests" pnpm ui:test
-  run_cmd "Storybook typecheck" pnpm exec turbo run typecheck --filter=@fodmapp/storybook
-  run_cmd "Storybook build" pnpm storybook:build
-  run_cmd "Storybook tests" pnpm storybook:test
-  run_cmd "App tests" pnpm app:test
-  run_cmd "App typecheck" pnpm app:typecheck
-  run_cmd "App build" pnpm app:build
-  run_cmd "Marketing typecheck" pnpm marketing:typecheck
-  run_cmd "Marketing build" pnpm marketing:build
-  run_cmd "Research typecheck" pnpm research:typecheck
-  run_cmd "Research build" pnpm research:build
+  quality_scope_design_tokens="true"
+  quality_scope_ui_foundation="true"
+  quality_scope_app_scaffold="true"
+  quality_scope_content_scaffolds="true"
+  resolve_quality_gate_scope
+
+  full_gate_tasks=(
+    "format check::pnpm format:check"
+    "lint (CI)::pnpm lint:ci"
+    "python lint (CI)::pnpm python:ci"
+    "changeset checker unit tests::pnpm changeset:ci:test"
+    "changeset full-repository lint::pnpm changeset:ci:lint:all"
+    "changeset coverage check::pnpm changeset:ci:status:strict"
+    "CI scope tests::pnpm ci:scope:test"
+    "changeset scope detector tests::node --test .github/scripts/detect-changeset-pr-scope.test.mjs"
+    "docs hygiene audit unit tests::node --test .github/scripts/docs-hygiene-audit.test.mjs"
+    "openapi check::pnpm --filter @fodmapp/types openapi:check"
+    "design token check::pnpm tokens:check"
+    "tailwind style check::pnpm tailwind:styles:check"
+  )
+
+  if [[ "$quality_scope_ui_foundation" == "true" ]]; then
+    full_gate_tasks+=(
+      "ui scope (foundation)::pnpm exec turbo run build --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm exec turbo run build typecheck test --filter=@fodmapp/ui && pnpm ui:styles:check && pnpm exec turbo run typecheck storybook:build storybook:test --filter=@fodmapp/storybook"
+    )
+  fi
+
+  if [[ "$quality_scope_app_scaffold" == "true" ]]; then
+    full_gate_tasks+=(
+      "app scope::pnpm exec turbo run test typecheck build --filter=@fodmapp/app"
+    )
+  fi
+
+  if [[ "$quality_scope_content_scaffolds" == "true" ]]; then
+    full_gate_tasks+=(
+      "content scope::pnpm exec turbo run typecheck build --filter=@fodmapp/marketing --filter=@fodmapp/research"
+    )
+  fi
+
+  if ! run_cmd_parallel "${full_gate_tasks[@]}"; then
+    exit 1
+  fi
 
   echo "[OK] full quality suite passed"
 fi
