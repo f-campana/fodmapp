@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+/* eslint-disable no-console */
+
 type EmailResult = { ok: true } | { ok: false; error: unknown };
 
 const from = process.env.RESEND_FROM_EMAIL ?? "noreply@fodmapp.fr";
