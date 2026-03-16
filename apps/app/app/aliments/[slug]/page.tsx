@@ -14,23 +14,7 @@ import { Chip } from "@fodmapp/ui/chip";
 import { ScoreBar } from "@fodmapp/ui/score-bar";
 
 import { getFoodDetail, getFoodRollup, getSwaps } from "../../../lib/api";
-
-function levelLabel(level?: string | null): string {
-  switch (level) {
-    case "none":
-      return "Aucun";
-    case "low":
-      return "Faible";
-    case "moderate":
-      return "Modéré";
-    case "high":
-      return "Élevé";
-    case "unknown":
-      return "Inconnu";
-    default:
-      return "Non calculé";
-  }
-}
+import { formatFoodLevel } from "../../../lib/format";
 
 function formatTimestamp(value: string): string {
   return new Date(value).toLocaleString("fr-FR", {
@@ -86,16 +70,6 @@ export default async function AlimentDetailPage({
           <CardTitle>Identité</CardTitle>
           <CardDescription>{food.food_slug}</CardDescription>
         </CardHeader>
-        <CardContent className="product-page__stack">
-          {food.preparation_state ? (
-            <p className="product-page__note">
-              Préparation: {food.preparation_state}
-            </p>
-          ) : null}
-          {food.status ? (
-            <p className="product-page__note">Statut: {food.status}</p>
-          ) : null}
-        </CardContent>
       </Card>
 
       {rollupResult.ok ? (
@@ -110,7 +84,7 @@ export default async function AlimentDetailPage({
           <CardContent className="product-page__stack">
             <div className="product-page__inline">
               <Badge variant="outline">
-                Niveau: {levelLabel(rollupResult.data.overall_level)}
+                Niveau: {formatFoodLevel(rollupResult.data.overall_level)}
               </Badge>
               <Badge variant="outline">
                 Couverture: {rollupResult.data.known_subtypes_count}/6
@@ -168,7 +142,7 @@ export default async function AlimentDetailPage({
               <CardContent className="product-page__stack">
                 <div className="product-page__inline">
                   <Badge variant="outline">
-                    Niveau cible: {levelLabel(item.to_overall_level)}
+                    Niveau cible: {formatFoodLevel(item.to_overall_level)}
                   </Badge>
                   {item.coverage_ratio < 0.5 ? (
                     <Chip>Données partielles</Chip>

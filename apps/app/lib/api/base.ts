@@ -33,6 +33,8 @@ export function buildApiUrl(
     return `${base}${normalizedPath}`;
   }
 
+  // Server-rendered routes must use an absolute API origin because `window` is
+  // unavailable when resolving relative URLs on the server.
   if (typeof window === "undefined") {
     return null;
   }

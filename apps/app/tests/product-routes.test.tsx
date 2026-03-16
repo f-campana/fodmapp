@@ -181,6 +181,8 @@ describe("product routes", () => {
         food_slug: "phase2-ail-cru",
         canonical_name_fr: "Ail cru",
         canonical_name_en: "Raw garlic",
+        preparation_state: "unknown",
+        status: "draft",
       },
     });
     mockedGetFoodRollup.mockResolvedValue({
@@ -213,6 +215,10 @@ describe("product routes", () => {
 
     expect(html).toContain("Pas de substitut documenté pour le moment");
     expect(html).toContain('href="/decouvrir"');
+    expect(html).not.toContain("Préparation:");
+    expect(html).not.toContain("Statut:");
+    expect(html).not.toContain("unknown");
+    expect(html).not.toContain("draft");
   });
 
   it("renders swaps while showing a rollup-unavailable state", async () => {

@@ -10,27 +10,11 @@ import {
 } from "@fodmapp/ui/card";
 
 import { searchFoods } from "../../lib/api";
+import { formatFoodLevel } from "../../lib/format";
 import SearchForm from "./SearchForm";
 
 function normalizeSearchQuery(raw: string | string[] | undefined): string {
   return Array.isArray(raw) ? (raw[0]?.trim() ?? "") : (raw?.trim() ?? "");
-}
-
-function levelLabel(level?: string | null): string {
-  switch (level) {
-    case "none":
-      return "Aucun";
-    case "low":
-      return "Faible";
-    case "moderate":
-      return "Modéré";
-    case "high":
-      return "Élevé";
-    case "unknown":
-      return "Inconnu";
-    default:
-      return "Non calculé";
-  }
 }
 
 export default async function AlimentsPage({
@@ -110,7 +94,7 @@ export default async function AlimentsPage({
                   </Link>
                 </CardTitle>
                 <CardDescription>
-                  Niveau global: {levelLabel(item.overall_level)}
+                  Niveau global: {formatFoodLevel(item.overall_level)}
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -77,10 +77,12 @@ Use this index when you know you need documentation, but do not yet know which s
   boundaries.
 - [`docs/frontend/design-foundations/README.md`](./frontend/design-foundations/README.md):
   canonical cross-cutting design-system rules that do not belong in Storybook component docs.
+- [`docs/frontend/local-app-validation.md`](./frontend/local-app-validation.md): local install,
+  API startup, frontend startup, and manual validation runbook for the live app slice.
 - [`docs/frontend/storybook-component-taxonomy-contract.md`](./frontend/storybook-component-taxonomy-contract.md):
   component taxonomy contract.
-- [`apps/app/README.md`](../apps/app/README.md): current app scaffold scope and runtime
-  boundaries.
+- [`apps/app/README.md`](../apps/app/README.md): current app slice scope, runtime boundaries, and
+  validation entry points.
 - [`packages/ui/README.md`](../packages/ui/README.md): shared UI contract and exports.
 - [`apps/mobile-prototype/README.md`](../apps/mobile-prototype/README.md): speed-first mobile
   prototype scope.
