@@ -57,13 +57,13 @@ The taxonomy checker must enforce:
 Run locally:
 
 ```bash
-pnpm --filter @fodmap/storybook stories:taxonomy:check
+pnpm --filter @fodmapp/storybook stories:taxonomy:check
 ```
 
-`@fodmap/storybook` typecheck includes taxonomy validation:
+`@fodmapp/storybook` typecheck includes taxonomy validation:
 
 ```bash
-pnpm --filter @fodmap/storybook typecheck
+pnpm --filter @fodmapp/storybook typecheck
 ```
 
 ## Story ID Compatibility

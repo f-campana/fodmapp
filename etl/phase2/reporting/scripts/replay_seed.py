@@ -74,7 +74,7 @@ def _db_env_from_url(db_url: str):
     user = parsed.username or os.getenv("PGUSER") or "postgres"
     host = parsed.hostname or os.getenv("PGHOST") or "localhost"
     port = str(parsed.port or os.getenv("PGPORT") or "5432")
-    db_name = (parsed.path or "/").lstrip("/") or "fodmap_api_ci"
+    db_name = (parsed.path or "/").lstrip("/") or "fodmapp_api_ci"
     return {
         "PGUSER": user,
         "PGHOST": host,

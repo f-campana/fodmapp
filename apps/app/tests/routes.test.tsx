@@ -25,7 +25,7 @@ describe("apps/app scaffold routes", () => {
     expect(html).toContain(
       "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",
     );
-    expect(html).toContain("fodmap-api@v0");
+    expect(html).toContain("fodmapp-api@v0");
     expect(html).toContain("Mode minimal / Mode consenti");
     expect(html).toContain(
       "Partager un récapitulatif avec votre professionnel",

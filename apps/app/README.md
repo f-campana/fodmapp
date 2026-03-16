@@ -1,4 +1,4 @@
-# @fodmap/app
+# @fodmapp/app
 
 Status: Implemented
 Audience: Contributor or engineer; Product or design collaborator
@@ -12,8 +12,8 @@ Architecture-first Next.js scaffold for the product app.
 
 1. Minimal public route (`/`) and gated-area placeholder route (`/espace`).
 2. FR-first copy with EN-ready dictionary structure.
-3. `@fodmap/ui` component consumption.
-4. `@fodmap/types` contract consumption (compile-time only).
+3. `@fodmapp/ui` component consumption.
+4. `@fodmapp/types` contract consumption (compile-time only).
 5. Env-gated cross-cutting seams:
    - auth (`Clerk`) runtime adapter
    - monitoring (`Sentry`) runtime adapter

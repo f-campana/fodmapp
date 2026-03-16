@@ -1,4 +1,4 @@
-import { nativeTokens } from "@fodmap/design-tokens/native";
+import { nativeTokens } from "@fodmapp/design-tokens/native";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const base = nativeTokens.base as any;

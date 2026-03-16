@@ -1,4 +1,4 @@
-# @fodmap/ui
+# @fodmapp/ui
 
 Shared React UI foundation for the FODMAP platform.
 
@@ -9,12 +9,12 @@ Shared React UI foundation for the FODMAP platform.
 - Hooks: `useControllableState`, `useMediaQuery`, `useMobile`, `useDebounce`, `useCopyToClipboard`, `useLocale`
 - Functions: `toast`
 - Utility: `cn`
-- Stylesheet: `@fodmap/ui/styles.css`
+- Stylesheet: `@fodmapp/ui/styles.css`
 
 ## Build
 
 ```bash
-pnpm --filter @fodmap/ui build
+pnpm --filter @fodmapp/ui build
 ```
 
 Outputs:
@@ -26,9 +26,9 @@ Outputs:
 ## Quality checks
 
 ```bash
-pnpm --filter @fodmap/ui typecheck
-pnpm --filter @fodmap/ui test
-pnpm --filter @fodmap/ui styles:check
+pnpm --filter @fodmapp/ui typecheck
+pnpm --filter @fodmapp/ui test
+pnpm --filter @fodmapp/ui styles:check
 ```
 
 ## Theme contract
@@ -39,7 +39,7 @@ The stylesheet consumes shared design tokens and supports:
 - forced light mode with `data-theme="light"`
 - forced dark mode with `data-theme="dark"`
 
-`@fodmap/ui/styles.css` is a component contract stylesheet only.
+`@fodmapp/ui/styles.css` is a component contract stylesheet only.
 Storybook-only utility classes must not be required or shipped by this package.
 
 ## Component API notes

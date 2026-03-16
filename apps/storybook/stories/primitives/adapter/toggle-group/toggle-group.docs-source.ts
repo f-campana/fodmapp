@@ -1,7 +1,7 @@
 export const toggleGroupRecommendedUsageCode = `import {
   ToggleGroup,
   ToggleGroupItem,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

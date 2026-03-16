@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, fn, within } from "storybook/test";
 
-import { Button } from "@fodmap/ui";
+import { Button } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

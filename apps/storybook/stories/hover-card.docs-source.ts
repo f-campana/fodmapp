@@ -3,7 +3,7 @@ export const hoverCardRecommendedUsageCode = `import {
   HoverCardArrow,
   HoverCardContent,
   HoverCardTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

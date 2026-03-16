@@ -1,4 +1,4 @@
-import tokens from "@fodmap/design-tokens";
+import tokens from "@fodmapp/design-tokens";
 
 import {
   asRecord,

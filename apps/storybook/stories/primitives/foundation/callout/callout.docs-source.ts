@@ -3,7 +3,7 @@ export const calloutRecommendedUsageCode = `import {
   CalloutDescription,
   CalloutIcon,
   CalloutTitle,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

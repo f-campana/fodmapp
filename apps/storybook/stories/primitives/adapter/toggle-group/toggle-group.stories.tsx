@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { ToggleGroup, ToggleGroupItem } from "@fodmap/ui";
+import { ToggleGroup, ToggleGroupItem } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

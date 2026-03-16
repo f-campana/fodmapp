@@ -3,7 +3,7 @@ export const tabsRecommendedUsageCode = `import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

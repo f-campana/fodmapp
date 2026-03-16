@@ -189,19 +189,19 @@ jobs:
       - name: Render scientific baseline artifacts (smoke)
         run: |
           # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
-          pnpm --filter @fodmap/reporting render:scientific -- \
+          pnpm --filter @fodmapp/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Render public dashboard baseline artifact (smoke)
         run: |
-          pnpm --filter @fodmap/reporting render:dashboard -- \
+          pnpm --filter @fodmapp/reporting render:dashboard -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Compare render outputs against committed baseline
         run: |
-          pnpm --filter @fodmap/reporting render:compare -- \
+          pnpm --filter @fodmapp/reporting render:compare -- \
             --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
             --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
             --mode semantic \
@@ -314,19 +314,19 @@ jobs:
       - name: Render scientific baseline artifacts (full lane)
         run: |
           # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
-          pnpm --filter @fodmap/reporting render:scientific -- \
+          pnpm --filter @fodmapp/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Render public dashboard baseline artifact (full lane)
         run: |
-          pnpm --filter @fodmap/reporting render:dashboard -- \
+          pnpm --filter @fodmapp/reporting render:dashboard -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Render baseline compare
         run: |
-          pnpm --filter @fodmap/reporting render:compare -- \
+          pnpm --filter @fodmapp/reporting render:compare -- \
             --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
             --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
             --mode semantic \
@@ -615,17 +615,17 @@ jobs:
       - name: Re-render run outputs for render drift verification
         run: |
           # Intentional non-Turbo exception: render CLIs consume run-id artifacts outside package outputs.
-          pnpm --filter @fodmap/reporting render:scientific -- \
+          pnpm --filter @fodmapp/reporting render:scientific -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-dir etl/phase2/reporting/out/runs/${{ github.run_id }}/scientific \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
-          pnpm --filter @fodmap/reporting render:dashboard -- \
+          pnpm --filter @fodmapp/reporting render:dashboard -- \
             --input etl/phase2/reporting/out/runs/${{ github.run_id }}/run.json \
             --out-file etl/phase2/reporting/out/runs/${{ github.run_id }}/public/phase2_dashboard.html \
             --manifest-out etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json
       - name: Verify refreshed render baseline matches generated run
         run: |
-          pnpm --filter @fodmap/reporting render:compare -- \
+          pnpm --filter @fodmapp/reporting render:compare -- \
             --current-manifest etl/phase2/reporting/out/runs/${{ github.run_id }}/render-baseline-manifest.v1.json \
             --baseline-manifest etl/phase2/reporting/contracts/baselines/render/v1/render-baseline-manifest.v1.json \
             --mode semantic \

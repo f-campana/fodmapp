@@ -1,5 +1,5 @@
 {
-  "name": "@fodmap/ui",
+  "name": "@fodmapp/ui",
   "private": true,
   "version": "3.13.2",
   "type": "module",
@@ -57,7 +57,7 @@
     "vaul": "^1.1.2"
   },
   "dependencies": {
-    "@fodmap/tailwind-config": "workspace:*",
+    "@fodmapp/tailwind-config": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

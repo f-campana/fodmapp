@@ -1,5 +1,5 @@
 {
-  "name": "@fodmap/storybook",
+  "name": "@fodmapp/storybook",
   "private": true,
   "version": "0.1.26",
   "type": "module",
@@ -20,9 +20,9 @@
     "storybook:dev": "storybook dev -p 6006 --ci"
   },
   "dependencies": {
-    "@fodmap/design-tokens": "workspace:*",
-    "@fodmap/reporting": "workspace:*",
-    "@fodmap/ui": "workspace:*",
+    "@fodmapp/design-tokens": "workspace:*",
+    "@fodmapp/reporting": "workspace:*",
+    "@fodmapp/ui": "workspace:*",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

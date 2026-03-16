@@ -10,7 +10,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Label, Switch } from "@fodmap/ui";
+import { Label, Switch } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

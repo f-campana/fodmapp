@@ -641,7 +641,7 @@ Human stop gate (mandatory before apply):
 
 ## 3.2b.1 CI Seeded Integration Pipeline
 
-CI integration tests now execute against a fully seeded DB profile (`fodmap_api_ci`) in this order:
+CI integration tests now execute against a fully seeded DB profile (`fodmapp_api_ci`) in this order:
 
 1. Fetch pinned CIQUAL files with checksum verification:
    - `etl/ciqual/fetch_ciqual_data.sh`

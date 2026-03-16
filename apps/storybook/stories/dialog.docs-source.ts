@@ -9,7 +9,7 @@ export const dialogRecommendedUsageCode = `import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

@@ -18,7 +18,7 @@ const outputPath = path.resolve(
 
 const args = [
   "--filter",
-  "@fodmap/ui",
+  "@fodmapp/ui",
   "exec",
   "tailwindcss",
   "-i",

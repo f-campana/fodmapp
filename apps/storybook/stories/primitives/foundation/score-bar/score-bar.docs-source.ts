@@ -1,4 +1,4 @@
-export const scoreBarRecommendedUsageCode = `import { ScoreBar } from "@fodmap/ui";
+export const scoreBarRecommendedUsageCode = `import { ScoreBar } from "@fodmapp/ui";
 
 export function SafetyScoreSummary() {
   return (

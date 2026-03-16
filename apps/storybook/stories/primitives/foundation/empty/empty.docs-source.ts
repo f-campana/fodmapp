@@ -3,7 +3,7 @@ export const emptyRecommendedUsageCode = `import {
   EmptyActions,
   EmptyDescription,
   EmptyTitle,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

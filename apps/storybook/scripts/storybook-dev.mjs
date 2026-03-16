@@ -75,7 +75,7 @@ if (isAgentationEnabled) {
   // Keep generated design-token artifacts hot while Storybook is running locally.
   upstreamWatchProcess = runProcess(
     pnpmCmd,
-    ["exec", "turbo", "watch", "build", "--filter=@fodmap/design-tokens"],
+    ["exec", "turbo", "watch", "build", "--filter=@fodmapp/design-tokens"],
     repoRootCwd,
   );
 }

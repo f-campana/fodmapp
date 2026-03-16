@@ -1,5 +1,5 @@
 export const buttonGroupRecommendedUsageCode = [
-  'import { Button, ButtonGroup } from "@fodmap/ui";',
+  'import { Button, ButtonGroup } from "@fodmapp/ui";',
   "",
   "export function PlanNavigationActions() {",
   "  return (",

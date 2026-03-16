@@ -5,7 +5,7 @@ export const paginationRecommendedUsageCode = `import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function ResultsPagination() {
   return (

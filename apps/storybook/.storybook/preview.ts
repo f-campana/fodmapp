@@ -6,7 +6,7 @@ import { Agentation, type AgentationProps } from "agentation";
 
 import "./preview.generated.css";
 
-import { tokens } from "@fodmap/design-tokens";
+import { tokens } from "@fodmapp/design-tokens";
 
 type PreviewTheme = "light" | "dark";
 type ThemeMode = "system" | PreviewTheme;

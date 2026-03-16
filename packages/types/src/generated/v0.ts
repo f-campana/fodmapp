@@ -302,7 +302,7 @@ export interface components {
     HealthResponse: {
       /** @enum {string} */
       status: "ok";
-      /** @example fodmap-api */
+      /** @example fodmapp-api */
       service: string;
       /** @example v0 */
       version: string;

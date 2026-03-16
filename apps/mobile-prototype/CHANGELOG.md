@@ -1,4 +1,4 @@
-# @fodmap/mobile-prototype
+# @fodmapp/mobile-prototype
 
 ## 0.3.4
 

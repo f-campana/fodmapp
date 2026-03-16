@@ -3,7 +3,7 @@ export const tooltipRecommendedUsageCode = `import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

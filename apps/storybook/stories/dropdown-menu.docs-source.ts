@@ -6,7 +6,7 @@ export const dropdownMenuRecommendedUsageCode = `import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

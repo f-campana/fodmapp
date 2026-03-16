@@ -8,7 +8,7 @@ export const alertDialogRecommendedUsageCode = `import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

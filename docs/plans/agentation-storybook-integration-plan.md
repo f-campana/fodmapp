@@ -6,21 +6,21 @@ Branch: `codex/ui-agentation-storybook-plan`
 
 ## 1. Goal
 
-Introduce an opt-in Agentation feedback loop for Storybook UI refinement so we can capture exact element-level issues and accelerate small iterative fixes on `@fodmap/ui` components.
+Introduce an opt-in Agentation feedback loop for Storybook UI refinement so we can capture exact element-level issues and accelerate small iterative fixes on `@fodmapp/ui` components.
 
 ## 2. Why now
 
 Current local state supports this workflow:
 
-- `@fodmap/ui` has broad component coverage and a mature test surface.
-- `@fodmap/storybook` has broad story coverage and is already part of CI (`storybook:build` + `storybook:test`).
+- `@fodmapp/ui` has broad component coverage and a mature test surface.
+- `@fodmapp/storybook` has broad story coverage and is already part of CI (`storybook:build` + `storybook:test`).
 - UI work is now in refinement mode (small visual/interaction issues), where structured annotation improves handoff precision.
 
 ## 3. Research Findings
 
 ### 3.1 Repository fit
 
-- `apps/storybook` is React 19 + Storybook 10 and already imports `@fodmap/ui/styles.css` from `.storybook/preview.ts`.
+- `apps/storybook` is React 19 + Storybook 10 and already imports `@fodmapp/ui/styles.css` from `.storybook/preview.ts`.
 - Storybook currently uses a11y addon and Playwright-backed runner in CI.
 - Integration should stay in `apps/storybook` only; `packages/ui` runtime package should remain free of review tooling.
 
@@ -91,7 +91,7 @@ Implement **Storybook-only, opt-in, no-MCP** integration first.
 
 - Agentation disabled by default in all Storybook environments.
 - Enable only when explicitly requested in local session:
-  - Example: `STORYBOOK_ENABLE_AGENTATION=true pnpm --filter @fodmap/storybook storybook`
+  - Example: `STORYBOOK_ENABLE_AGENTATION=true pnpm --filter @fodmapp/storybook storybook`
 - If endpoint is unset, component remains local-only (clipboard/localStorage flow).
 
 ### 5.3 Optional MCP path (Phase 2)
@@ -105,9 +105,9 @@ Implement **Storybook-only, opt-in, no-MCP** integration first.
 
 Run after implementation:
 
-1. `pnpm --filter @fodmap/storybook storybook:typecheck`
-2. `pnpm --filter @fodmap/storybook storybook:build`
-3. `pnpm --filter @fodmap/storybook storybook:test`
+1. `pnpm --filter @fodmapp/storybook storybook:typecheck`
+2. `pnpm --filter @fodmapp/storybook storybook:build`
+3. `pnpm --filter @fodmapp/storybook storybook:test`
 4. Manual smoke:
    - Storybook starts with Agentation disabled by default.
    - Setting `STORYBOOK_ENABLE_AGENTATION=true` shows toolbar.

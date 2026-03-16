@@ -2,7 +2,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "f-campana/Fodmap"
+      "repo": "f-campana/fodmapp"
     }
   ],
   "commit": false,

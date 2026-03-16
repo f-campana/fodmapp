@@ -65,7 +65,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, userEvent, within } from "storybook/test";
 
-import { Component } from "@fodmap/ui";
+import { Component } from "@fodmapp/ui";
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 
 function ComponentAuditFrame({

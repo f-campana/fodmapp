@@ -1,4 +1,4 @@
-# @fodmap/reporting
+# @fodmapp/reporting
 
 ## 0.1.8
 

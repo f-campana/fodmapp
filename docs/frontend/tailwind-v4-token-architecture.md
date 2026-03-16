@@ -44,7 +44,7 @@ Contents:
 
 - generated `shared-styles.css` with:
   - `@import "tailwindcss";`
-  - token CSS import from `@fodmap/design-tokens`
+  - token CSS import from `@fodmapp/design-tokens`
   - semantic runtime alias block (`@layer base`)
   - semantic Tailwind slot block (`@theme inline`)
 - source-of-truth mapping in `src/semantic-slot-map.mjs`
@@ -54,8 +54,8 @@ Rules:
 - thin adapter only
 - avoid duplicating token values here
 - regenerate/check via:
-  - `pnpm --filter @fodmap/tailwind-config styles:generate`
-  - `pnpm --filter @fodmap/tailwind-config styles:check`
+  - `pnpm --filter @fodmapp/tailwind-config styles:generate`
+  - `pnpm --filter @fodmapp/tailwind-config styles:check`
 
 ## `packages/ui`
 

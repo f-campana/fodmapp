@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import type { ReactNode } from "react";
 
-import { Dot } from "@fodmap/ui";
+import { Dot } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

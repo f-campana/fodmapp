@@ -11,7 +11,7 @@ import {
   PopoverArrow,
   PopoverContent,
   PopoverTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

@@ -8,7 +8,7 @@ export const drawerRecommendedUsageCode = `import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

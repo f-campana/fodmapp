@@ -7,7 +7,7 @@ export const comboboxRecommendedUsageCode = `import {
   ComboboxItem,
   ComboboxList,
   ComboboxTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

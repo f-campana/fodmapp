@@ -6,7 +6,7 @@ import {
   parseReportingRun,
   renderDashboardFragment,
   type ReportingRun,
-} from "@fodmap/reporting";
+} from "@fodmapp/reporting";
 
 const REPO_ROOT = resolve(
   fileURLToPath(new URL("../../../../", import.meta.url)),

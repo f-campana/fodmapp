@@ -501,7 +501,7 @@ export function runChangesetCoverageCheck() {
     process.env.CHANGESET_EXEMPT_LABEL || "changeset-exempt"
   ).trim();
   const exemptPackages = parseCsvSet(
-    process.env.CHANGESET_EXEMPT_PACKAGES || "@fodmap/mobile-prototype",
+    process.env.CHANGESET_EXEMPT_PACKAGES || "@fodmapp/mobile-prototype",
   );
   const prLabels = readPrLabels();
   const hasExemptLabel = Boolean(exemptLabel) && prLabels.has(exemptLabel);

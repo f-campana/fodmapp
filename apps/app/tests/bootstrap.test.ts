@@ -68,7 +68,7 @@ describe("cross-cutting runtime adapters", () => {
   });
 
   it("switches consent bootstrap to API-backed mode when /v0 base URL is provided", () => {
-    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmapp.example");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID", "axeptio-client");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_COOKIES_VERSION", "v1");

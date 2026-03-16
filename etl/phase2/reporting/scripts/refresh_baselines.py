@@ -190,7 +190,7 @@ def _run_renderer(
     scientific_cmd = [
         "pnpm",
         "--filter",
-        "@fodmap/reporting",
+        "@fodmapp/reporting",
         "render:scientific",
         "--",
         "--input",
@@ -203,7 +203,7 @@ def _run_renderer(
     dashboard_cmd = [
         "pnpm",
         "--filter",
-        "@fodmap/reporting",
+        "@fodmapp/reporting",
         "render:dashboard",
         "--",
         "--input",

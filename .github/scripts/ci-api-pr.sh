@@ -4,10 +4,10 @@ set -euo pipefail
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-api_db_url="${API_DB_URL:-postgresql://postgres:postgres@localhost:5432/fodmap_api_ci}"
+api_db_url="${API_DB_URL:-postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci}"
 admin_db_url="${ADMIN_DB_URL:-postgresql://postgres:postgres@localhost:5432/postgres}"
 replay_db_url="${REPLAY_DB_URL:-$api_db_url}"
-replay_db="${REPLAY_DB:-fodmap_api_ci}"
+replay_db="${REPLAY_DB:-fodmapp_api_ci}"
 pguser_name="${PGUSER:-postgres}"
 pghost_name="${PGHOST:-localhost}"
 pgport_name="${PGPORT:-5432}"

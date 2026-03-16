@@ -6,7 +6,7 @@ export const selectRecommendedUsageCode = `import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

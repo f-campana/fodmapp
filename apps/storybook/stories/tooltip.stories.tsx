@@ -9,7 +9,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 
