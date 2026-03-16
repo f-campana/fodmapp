@@ -1,0 +1,50 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as VisuallyHiddenStories from "./visually-hidden.stories";
+import { visuallyHiddenRecommendedUsageCode } from "./visually-hidden.docs-source";
+
+<Meta of={VisuallyHiddenStories} />
+
+<Title />
+<Subtitle>
+  Use VisuallyHidden for assistive-only naming or description when the visible
+  interface should stay compact.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={visuallyHiddenRecommendedUsageCode} language="tsx" />
+
+<Canvas of={VisuallyHiddenStories.Default} sourceState="none" />
+
+## When to use
+
+Use VisuallyHidden to clarify an existing visible control, icon, or region for
+assistive technology.
+
+Avoid it as a substitute for all visible context or for hidden content that no
+visible control actually needs.
+
+## Accessibility contract
+
+- the hidden text still participates in naming and description
+- the visual UI must remain understandable for sighted users without relying on
+  the hidden copy alone
+- the primitive keeps a stable slot hook for regression checks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies accessible naming for the icon-only button example
+
+What is checked manually:
+
+- review the actual control name in browser accessibility tooling when the
+  hidden text changes

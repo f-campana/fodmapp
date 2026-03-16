@@ -1,0 +1,48 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SpinnerStories from "./spinner.stories";
+import { spinnerRecommendedUsageCode } from "./spinner.docs-source";
+
+<Meta of={SpinnerStories} />
+
+<Title />
+<Subtitle>
+  Use Spinner for compact loading feedback when motion is helpful, and only
+  enable self-announcement when the spinner itself should expose status.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={spinnerRecommendedUsageCode} language="tsx" />
+
+<Canvas of={SpinnerStories.Default} sourceState="none" />
+
+## When to use
+
+Use Spinner for short-running background work, inline action states, or compact
+loading affordances inside an already-labelled region.
+
+Avoid it as the only loading explanation when the task needs richer progress or
+completion detail.
+
+## Accessibility contract
+
+- Spinner is decorative by default
+- `announce` promotes the primitive to a polite status live region
+- nearby copy should still explain what is happening in product terms
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies default decorative rendering and announced status behavior
+
+What is checked manually:
+
+- visual pass for motion restraint, inline alignment, and readable nearby copy

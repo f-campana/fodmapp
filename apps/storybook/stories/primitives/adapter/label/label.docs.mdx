@@ -1,0 +1,53 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as LabelStories from "./label.stories";
+import { labelRecommendedUsageCode } from "./label.docs-source";
+
+<Meta of={LabelStories} />
+
+<Title />
+<Subtitle>
+  Use Label for visible form copy that stays explicitly associated with the
+  control id it names.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={labelRecommendedUsageCode} language="tsx" />
+
+<Canvas of={LabelStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={LabelStories.Playground} />
+
+## When to use
+
+Use Label whenever a form control needs visible naming in the same local field
+context.
+
+Avoid using placeholder text as the only field name.
+
+## Accessibility contract
+
+- association comes from `htmlFor` and the target control id
+- Label provides visible naming only; required, invalid, and disabled semantics
+  still come from the field and control
+- the root keeps a stable slot hook for automation and styling
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies click-to-focus association and the disabled-field case
+
+What is checked manually:
+
+- visual pass for field rhythm, helper-copy alignment, and readable label copy

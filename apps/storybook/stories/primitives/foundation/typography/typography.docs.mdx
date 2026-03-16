@@ -1,0 +1,54 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as TypographyStories from "./typography.stories";
+import { typographyRecommendedUsageCode } from "./typography.docs-source";
+
+<Meta of={TypographyStories} />
+
+<Title />
+<Subtitle>
+  Use Typography for shared text presets and element mapping when product copy
+  should stay consistent across surfaces.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={typographyRecommendedUsageCode} language="tsx" />
+
+<Canvas of={TypographyStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={TypographyStories.Playground} />
+
+## When to use
+
+Use Typography when the design system should own the text preset while the
+screen still decides the surrounding composition.
+
+Use `asChild` only when the child element already has the right semantic role.
+
+## Accessibility contract
+
+- each variant maps to a preset and default element, but the child element owns
+  semantics in `asChild` mode
+- Typography does not add document outline logic beyond the rendered element
+- the root keeps a stable slot hook and preset variant marker
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies preset rendering and the `asChild` link edge case
+
+What is checked manually:
+
+- visual pass for reading rhythm, contrast, and preset hierarchy in editorial
+  stacks

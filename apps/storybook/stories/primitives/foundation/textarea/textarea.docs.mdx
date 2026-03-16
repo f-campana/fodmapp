@@ -1,0 +1,55 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as TextareaStories from "./textarea.stories";
+import { textareaRecommendedUsageCode } from "./textarea.docs-source";
+
+<Meta of={TextareaStories} />
+
+<Title />
+<Subtitle>
+  Use Textarea for multi-line text entry when the user needs more room than a
+  single-line input provides.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={textareaRecommendedUsageCode} language="tsx" />
+
+<Canvas of={TextareaStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={TextareaStories.Playground} />
+
+## When to use
+
+Use Textarea for notes, summaries, or freeform explanations that need visible
+multi-line editing.
+
+Avoid claiming autosize or validation logic that belongs to the surrounding
+field system.
+
+## Accessibility contract
+
+- the primitive remains a native `textarea`
+- `aria-invalid` affects semantics and styling only
+- visible labels, helper text, and error copy should come from the surrounding
+  field markup
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies invalid, disabled, and responsive multiline states
+
+What is checked manually:
+
+- visual pass for line height, field depth, and readable wrapping at mobile
+  widths

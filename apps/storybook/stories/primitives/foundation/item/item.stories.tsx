@@ -33,7 +33,6 @@ const fixedStoryParameters = {
 const meta = {
   title: "Primitives/Foundation/Item",
   component: Item,
-  tags: ["autodocs"],
   argTypes: {
     asChild: {
       control: false,

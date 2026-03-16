@@ -30,7 +30,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Foundation/Badge",
   component: Badge,
-  tags: ["autodocs"],
   argTypes: {
     variant: {
       description: "Chooses the visual tone for a read-only status label.",

@@ -1,0 +1,53 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SeparatorStories from "./separator.stories";
+import { separatorRecommendedUsageCode } from "./separator.docs-source";
+
+<Meta of={SeparatorStories} />
+
+<Title />
+<Subtitle>
+  Use Separator to divide nearby content visually, and expose semantic
+  separation only when the divider itself carries structure.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={separatorRecommendedUsageCode} language="tsx" />
+
+<Canvas of={SeparatorStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={SeparatorStories.Playground} />
+
+## When to use
+
+Use decorative separators for simple visual rhythm between related blocks.
+
+Use non-decorative separators only when the split represents real structure
+between neighboring regions.
+
+## Accessibility contract
+
+- `decorative` hides separator semantics from assistive technologies
+- semantic separators expose the correct orientation when they represent
+  structure
+- the root keeps a stable slot hook in both modes
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies horizontal decorative and vertical semantic cases
+
+What is checked manually:
+
+- visual pass for stroke clarity, inset spacing, and vertical alignment

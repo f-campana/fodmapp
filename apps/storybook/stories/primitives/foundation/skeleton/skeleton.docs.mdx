@@ -1,0 +1,48 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as SkeletonStories from "./skeleton.stories";
+import { skeletonRecommendedUsageCode } from "./skeleton.docs-source";
+
+<Meta of={SkeletonStories} />
+
+<Title />
+<Subtitle>
+  Use Skeleton as a decorative placeholder while the surrounding region owns the
+  real loading announcement and completion messaging.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={skeletonRecommendedUsageCode} language="tsx" />
+
+<Canvas of={SkeletonStories.Default} sourceState="none" />
+
+## When to use
+
+Use Skeleton when the final layout shape matters and a lightweight placeholder
+helps users anticipate the loaded content.
+
+Avoid it as the only loading communication when the surrounding region needs a
+spoken status.
+
+## Accessibility contract
+
+- Skeleton is decorative and should remain `aria-hidden`
+- the parent region should own `aria-busy` or loading copy when users need
+  broader status feedback
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies decorative rendering and `aria-hidden` behavior
+
+What is checked manually:
+
+- visual pass for placeholder rhythm, shimmer restraint, and layout stability

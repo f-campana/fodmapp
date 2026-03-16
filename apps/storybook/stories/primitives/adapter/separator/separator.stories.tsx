@@ -30,7 +30,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Adapter/Separator",
   component: Separator,
-  tags: ["autodocs"],
   argTypes: {
     orientation: {
       description: "Sets the separator direction.",

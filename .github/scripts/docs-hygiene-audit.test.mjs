@@ -144,7 +144,7 @@ test("managed canon docs missing metadata are reported", () => {
 
 test("archive mismatch is reported for archived status outside docs/archive", () => {
   const report = analyzeRepo({
-    "apps/storybook/stories/foundations/FOUNDATIONS_REVIEW_FINDINGS.md": [
+    "docs/reviews/FOUNDATIONS_REVIEW_FINDINGS.md": [
       "# Findings",
       "",
       "Status: archived (resolved/mitigated)",

@@ -1,0 +1,55 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ChipStories from "./chip.stories";
+import { chipRecommendedUsageCode } from "./chip.docs-source";
+
+<Meta of={ChipStories} />
+
+<Title />
+<Subtitle>
+  Use Chip for an interactive filter or token with one primary pressed state and
+  an optional separate remove affordance.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={chipRecommendedUsageCode} language="tsx" />
+
+<Canvas of={ChipStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={ChipStories.Playground} />
+
+## When to use
+
+Use Chip when people need to toggle, review, or dismiss an active token inside
+the same toolbar or filter surface.
+
+Use Badge instead when the token is read-only status.
+
+## Accessibility contract
+
+- the primary chip trigger exposes pressed state through button semantics
+- removable chips add a second dedicated remove button with its own label
+- selection and removal are separate contracts and should stay visually distinct
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies pressed, removable, and disabled states in one filter-card
+  context
+- interaction checks cover trigger/remove callbacks and stable slot markers
+
+What is checked manually:
+
+- visual pass for chip spacing, removable affordance clarity, and pressed-state
+  contrast

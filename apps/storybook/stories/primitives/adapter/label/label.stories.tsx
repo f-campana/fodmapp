@@ -32,7 +32,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Adapter/Label",
   component: Label,
-  tags: ["autodocs"],
   argTypes: {
     htmlFor: {
       description: "Associates the label with a form control id.",
