@@ -1,4 +1,4 @@
-export const progressRecommendedUsageCode = `import { Progress } from "@fodmap/ui/progress";
+export const progressRecommendedUsageCode = `import { Progress } from "@fodmapp/ui/progress";
 
 export function Example() {
   return (

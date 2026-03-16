@@ -1,4 +1,4 @@
-# @fodmap/types
+# @fodmapp/types
 
 Generated TypeScript types for the v0 API contract.
 
@@ -9,13 +9,13 @@ Source of truth:
 Generate:
 
 ```bash
-pnpm --filter @fodmap/types openapi:generate
+pnpm --filter @fodmapp/types openapi:generate
 ```
 
 Check generated file is up to date:
 
 ```bash
-pnpm --filter @fodmap/types openapi:check
+pnpm --filter @fodmapp/types openapi:check
 ```
 
 This package should remain generated-only for API schema types.

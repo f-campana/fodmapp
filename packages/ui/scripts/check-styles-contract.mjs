@@ -201,7 +201,7 @@ const sourceChecks = [
   {
     pattern: /\bReact\.forwardRef\b/,
     message:
-      "React.forwardRef is forbidden in @fodmap/ui (use React 19 ref-as-prop pattern).",
+      "React.forwardRef is forbidden in @fodmapp/ui (use React 19 ref-as-prop pattern).",
   },
   {
     pattern: /\.displayName\s*=/,

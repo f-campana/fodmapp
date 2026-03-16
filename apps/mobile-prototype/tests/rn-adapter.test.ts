@@ -4,7 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { nativeTokens } from "@fodmap/design-tokens/native";
+import { nativeTokens } from "@fodmapp/design-tokens/native";
 
 const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), "../../..");

@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Badge } from "@fodmap/ui/badge";
-import { Button } from "@fodmap/ui/button";
+import { Badge } from "@fodmapp/ui/badge";
+import { Button } from "@fodmapp/ui/button";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui/card";
+} from "@fodmapp/ui/card";
 
 import {
   CONSENT_API_CONFIRM_TEXT,

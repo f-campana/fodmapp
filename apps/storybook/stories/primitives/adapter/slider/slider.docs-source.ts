@@ -1,4 +1,4 @@
-export const sliderRecommendedUsageCode = `import { Slider } from "@fodmap/ui/slider";
+export const sliderRecommendedUsageCode = `import { Slider } from "@fodmapp/ui/slider";
 
 export function Example() {
   return (

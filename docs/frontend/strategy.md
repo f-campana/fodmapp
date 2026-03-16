@@ -28,7 +28,7 @@ Enable frontend delivery in parallel with data-engine work, without changing API
 
 2. Package conventions:
 
-- `@fodmap/ui` export strategy
+- `@fodmapp/ui` export strategy
 - token package contracts
 - shared Tailwind CSS contract
 

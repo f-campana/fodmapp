@@ -1,8 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 
-import baseConfig from "@fodmap/eslint-config";
-import markdownConfig from "@fodmap/eslint-config/markdown";
-import nextConfig from "@fodmap/eslint-config/next";
+import baseConfig from "@fodmapp/eslint-config";
+import markdownConfig from "@fodmapp/eslint-config/markdown";
+import nextConfig from "@fodmapp/eslint-config/next";
 
 export default defineConfig([
   globalIgnores([
@@ -31,6 +31,23 @@ export default defineConfig([
             "^\\.\\/\\.next\\/types\\/",
             "^astro:",
             "^\\.\\/preview\\.generated\\.css$",
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["apps/app/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@fodmapp/ui",
+              message:
+                "Use @fodmapp/ui/server or @fodmapp/ui/client inside apps/app.",
+            },
           ],
         },
       ],

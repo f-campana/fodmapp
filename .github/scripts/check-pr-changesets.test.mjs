@@ -11,7 +11,7 @@ import {
 } from "./check-pr-changesets.mjs";
 
 const exemptLabel = "changeset-exempt";
-const exemptPackages = new Set(["@fodmap/mobile-prototype"]);
+const exemptPackages = new Set(["@fodmapp/mobile-prototype"]);
 
 function evaluate({
   changedFiles,
@@ -34,7 +34,7 @@ function evaluate({
 
 test("package changed + valid changeset file passes", () => {
   const parsed = parseChangesetFrontmatter(
-    ["---", '"@fodmap/design-tokens": patch', "---", "release note", ""].join(
+    ["---", '"@fodmapp/design-tokens": patch', "---", "release note", ""].join(
       "\n",
     ),
     ".changeset/design-tokens.md",
@@ -45,7 +45,7 @@ test("package changed + valid changeset file passes", () => {
       "packages/design-tokens/src/tokens/base/color.json",
       ".changeset/design-tokens.md",
     ],
-    changedPackageNames: ["@fodmap/design-tokens"],
+    changedPackageNames: ["@fodmapp/design-tokens"],
     changesetPackageNames: [...parsed],
   });
 
@@ -55,21 +55,21 @@ test("package changed + valid changeset file passes", () => {
 test("package changed + no matching changeset fails", () => {
   const result = evaluate({
     changedFiles: ["packages/design-tokens/src/index.ts"],
-    changedPackageNames: ["@fodmap/design-tokens"],
+    changedPackageNames: ["@fodmapp/design-tokens"],
     changesetPackageNames: [],
   });
 
   assert.equal(result.ok, false);
   assert.match(
     result.errors[0],
-    /Missing changeset coverage for: @fodmap\/design-tokens/,
+    /Missing changeset coverage for: @fodmapp\/design-tokens/,
   );
 });
 
 test("allowlisted package + exemption label passes without changeset", () => {
   const result = evaluate({
     changedFiles: ["packages/mobile-prototype/src/index.ts"],
-    changedPackageNames: ["@fodmap/mobile-prototype"],
+    changedPackageNames: ["@fodmapp/mobile-prototype"],
     changesetPackageNames: [],
     hasExemptLabel: true,
   });
@@ -105,7 +105,7 @@ test("malformed changeset frontmatter fails with file-specific message", () => {
       parseChangesetFrontmatter(
         [
           "---",
-          "@fodmap/design-tokens patch",
+          "@fodmapp/design-tokens patch",
           "---",
           "broken frontmatter",
           "",
@@ -130,8 +130,8 @@ test("root releasable file changed without changeset passes", () => {
 test("exemption label misuse fails when no allowlisted package is touched", () => {
   const result = evaluate({
     changedFiles: ["packages/design-tokens/src/index.ts"],
-    changedPackageNames: ["@fodmap/design-tokens"],
-    changesetPackageNames: ["@fodmap/design-tokens"],
+    changedPackageNames: ["@fodmapp/design-tokens"],
+    changesetPackageNames: ["@fodmapp/design-tokens"],
     hasExemptLabel: true,
   });
 
@@ -144,10 +144,10 @@ test("exemption label misuse fails when no allowlisted package is touched", () =
 
 test("unknown/non-workspace changeset package is detected with source file", () => {
   const packageSources = new Map([
-    ["fodmap-platform", new Set([".changeset/invalid-root.md"])],
-    ["@fodmap/design-tokens", new Set([".changeset/valid.md"])],
+    ["fodmapp-platform", new Set([".changeset/invalid-root.md"])],
+    ["@fodmapp/design-tokens", new Set([".changeset/valid.md"])],
   ]);
-  const workspacePackageNames = new Set(["@fodmap/design-tokens"]);
+  const workspacePackageNames = new Set(["@fodmapp/design-tokens"]);
 
   const unknown = findUnknownChangesetPackages(
     packageSources,
@@ -156,7 +156,7 @@ test("unknown/non-workspace changeset package is detected with source file", () 
 
   assert.deepEqual(unknown, [
     {
-      packageName: "fodmap-platform",
+      packageName: "fodmapp-platform",
       sourceFiles: [".changeset/invalid-root.md"],
     },
   ]);
@@ -166,14 +166,14 @@ test("root-only change would pass coverage but unknown changed changeset package
   const coverage = evaluate({
     changedFiles: ["package.json"],
     changedPackageNames: [],
-    changesetPackageNames: ["fodmap-platform"],
+    changesetPackageNames: ["fodmapp-platform"],
   });
   assert.equal(coverage.ok, true);
 
   const unknown = findUnknownChangesetPackages(
-    new Map([["fodmap-platform", new Set([".changeset/invalid-root.md"])]]),
-    new Set(["@fodmap/design-tokens"]),
+    new Map([["fodmapp-platform", new Set([".changeset/invalid-root.md"])]]),
+    new Set(["@fodmapp/design-tokens"]),
   );
   assert.equal(unknown.length, 1);
-  assert.equal(unknown[0].packageName, "fodmap-platform");
+  assert.equal(unknown[0].packageName, "fodmapp-platform");
 });

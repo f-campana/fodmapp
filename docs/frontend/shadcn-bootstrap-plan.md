@@ -33,7 +33,7 @@ Use shadcn/ui to accelerate initial component delivery, then progressively speci
 
 ## Exit Criteria
 
-- `@fodmap/ui` build/typecheck/test green.
+- `@fodmapp/ui` build/typecheck/test green.
 - Storybook build and interaction checks green.
 - Component docs exist for all primitives.
 - No ETL/schema/API behavior changes in same PR.

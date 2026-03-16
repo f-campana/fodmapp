@@ -18,6 +18,6 @@ def get_settings() -> Settings:
     default_db_url = f"postgresql://{user}@localhost:5432/fodmap_test"
     return Settings(
         api_db_url=os.getenv("API_DB_URL", default_db_url),
-        api_name=os.getenv("API_NAME", "fodmap-api"),
+        api_name=os.getenv("API_NAME", "fodmapp-api"),
         api_version=os.getenv("API_VERSION", "v0"),
     )

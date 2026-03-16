@@ -1,5 +1,5 @@
-export const sheetRecommendedUsageCode = `import { Button } from "@fodmap/ui/button";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@fodmap/ui/sheet";
+export const sheetRecommendedUsageCode = `import { Button } from "@fodmapp/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@fodmapp/ui/sheet";
 
 export function Example() {
   return (

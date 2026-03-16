@@ -19,7 +19,7 @@ describe("InputGroup", () => {
       <InputGroup data-slot="custom-group" role="presentation">
         <InputGroupText data-slot="custom-text">https://</InputGroupText>
         <InputGroupInput data-slot="custom-input" placeholder="mon-profil" />
-        <InputGroupAddon data-slot="custom-addon">.fodmap.app</InputGroupAddon>
+        <InputGroupAddon data-slot="custom-addon">.fodmapp.app</InputGroupAddon>
       </InputGroup>,
     );
 
@@ -67,14 +67,14 @@ describe("InputGroup", () => {
       <InputGroup>
         <InputGroupText>https://</InputGroupText>
         <InputGroupInput placeholder="journal-clinique-tres-detaille" />
-        <InputGroupAddon>.centre-de-suivi-fodmap.fr</InputGroupAddon>
+        <InputGroupAddon>.centre-de-suivi-fodmapp.fr</InputGroupAddon>
       </InputGroup>,
     );
 
     const group = screen.getByRole("group");
     const input = screen.getByPlaceholderText("journal-clinique-tres-detaille");
     const text = screen.getByText("https://");
-    const addon = screen.getByText(".centre-de-suivi-fodmap.fr");
+    const addon = screen.getByText(".centre-de-suivi-fodmapp.fr");
 
     expect(group.className).toContain("overflow-hidden");
     expect(input.className).toContain("min-w-[5.5rem]");

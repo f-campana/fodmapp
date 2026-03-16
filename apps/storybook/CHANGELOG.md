@@ -1,4 +1,4 @@
-# @fodmap/storybook
+# @fodmapp/storybook
 
 ## Unreleased
 

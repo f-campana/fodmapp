@@ -1,4 +1,4 @@
-# @fodmap/tailwind-config
+# @fodmapp/tailwind-config
 
 ## 0.2.5
 

@@ -1,4 +1,4 @@
-export const resizableRecommendedUsageCode = `import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@fodmap/ui/resizable";
+export const resizableRecommendedUsageCode = `import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@fodmapp/ui/resizable";
 
 export function Example() {
   return (

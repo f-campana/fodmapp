@@ -1,4 +1,4 @@
-export const tabsRecommendedUsageCode = `import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fodmap/ui/tabs";
+export const tabsRecommendedUsageCode = `import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fodmapp/ui/tabs";
 
 export function Example() {
   return (

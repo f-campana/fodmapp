@@ -1,5 +1,5 @@
-export const checkboxRecommendedUsageCode = `import { Checkbox } from "@fodmap/ui/checkbox";
-import { Label } from "@fodmap/ui/label";
+export const checkboxRecommendedUsageCode = `import { Checkbox } from "@fodmapp/ui/checkbox";
+import { Label } from "@fodmapp/ui/label";
 
 export function Example() {
   return (

@@ -1,4 +1,4 @@
-# @fodmap/ui
+# @fodmapp/ui
 
 Shared React UI foundation for the FODMAP platform.
 
@@ -8,13 +8,13 @@ Shared React UI foundation for the FODMAP platform.
 - Utilities: `VisuallyHidden`, `Portal`
 - Hooks: `useControllableState`, `useMediaQuery`, `useMobile`, `useDebounce`, `useCopyToClipboard`, `useLocale`
 - Functions: `toast`
-- Utility: `cn` via `@fodmap/ui/cn`
-- Stylesheets: `@fodmap/ui/app.css`, `@fodmap/ui/full.css`
+- Utility: `cn` via `@fodmapp/ui/cn`
+- Stylesheets: `@fodmapp/ui/app.css`, `@fodmapp/ui/full.css`
 
 ## Build
 
 ```bash
-pnpm --filter @fodmap/ui build
+pnpm --filter @fodmapp/ui build
 ```
 
 Outputs:
@@ -27,9 +27,9 @@ Outputs:
 ## Quality checks
 
 ```bash
-pnpm --filter @fodmap/ui typecheck
-pnpm --filter @fodmap/ui test
-pnpm --filter @fodmap/ui styles:check
+pnpm --filter @fodmapp/ui typecheck
+pnpm --filter @fodmapp/ui test
+pnpm --filter @fodmapp/ui styles:check
 ```
 
 ## Theme contract
@@ -40,8 +40,8 @@ The stylesheet consumes shared design tokens and supports:
 - forced light mode with `data-theme="light"`
 - forced dark mode with `data-theme="dark"`
 
-`@fodmap/ui/app.css` is the app-focused stylesheet for the current Next app surface.
-`@fodmap/ui/full.css` is the full component contract stylesheet used by Storybook.
+`@fodmapp/ui/app.css` is the app-focused stylesheet for the current Next app surface.
+`@fodmapp/ui/full.css` is the full component contract stylesheet used by Storybook.
 Storybook-only utility classes must not be required or shipped by this package.
 
 ## Component API notes

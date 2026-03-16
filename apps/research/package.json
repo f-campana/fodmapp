@@ -1,19 +1,19 @@
 {
-  "name": "@fodmap/research",
+  "name": "@fodmapp/research",
   "private": true,
   "version": "0.1.23",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "pnpm --filter @fodmap/reporting build && astro build",
+    "build": "pnpm --filter @fodmapp/reporting build && astro build",
     "preview": "astro preview",
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@fodmap/content-config": "workspace:*",
-    "@fodmap/design-tokens": "workspace:*",
-    "@fodmap/reporting": "workspace:*",
-    "@fodmap/ui": "workspace:*",
+    "@fodmapp/content-config": "workspace:*",
+    "@fodmapp/design-tokens": "workspace:*",
+    "@fodmapp/reporting": "workspace:*",
+    "@fodmapp/ui": "workspace:*",
     "astro": "5.17.3"
   },
   "devDependencies": {

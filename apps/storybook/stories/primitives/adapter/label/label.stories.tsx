@@ -3,9 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, userEvent, within } from "storybook/test";
 
-import { Checkbox } from "@fodmap/ui/checkbox";
-import { Input } from "@fodmap/ui/input";
-import { Label } from "@fodmap/ui/label";
+import { Checkbox } from "@fodmapp/ui/checkbox";
+import { Input } from "@fodmapp/ui/input";
+import { Label } from "@fodmapp/ui/label";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

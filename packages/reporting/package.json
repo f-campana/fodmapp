@@ -1,5 +1,5 @@
 {
-  "name": "@fodmap/reporting",
+  "name": "@fodmapp/reporting",
   "private": true,
   "version": "0.1.8",
   "type": "module",
@@ -45,7 +45,7 @@
     "render:compare": "tsx src/cli/compare-render-baseline.ts"
   },
   "dependencies": {
-    "@fodmap/design-tokens": "workspace:*"
+    "@fodmapp/design-tokens": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "25.5.0",

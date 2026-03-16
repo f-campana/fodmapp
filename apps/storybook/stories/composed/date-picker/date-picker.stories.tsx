@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
-import { DatePicker } from "@fodmap/ui/date-picker";
+import { DatePicker } from "@fodmapp/ui/date-picker";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

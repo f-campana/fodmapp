@@ -1,4 +1,4 @@
-export const carouselRecommendedUsageCode = `import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@fodmap/ui/carousel";
+export const carouselRecommendedUsageCode = `import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@fodmapp/ui/carousel";
 
 export function Example() {
   return (

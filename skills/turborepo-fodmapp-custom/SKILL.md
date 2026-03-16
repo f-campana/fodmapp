@@ -1,18 +1,18 @@
 ---
-name: turborepo-fodmap-custom
+name: turborepo-fodmapp-custom
 description: |
-  Fodmap-specific Turborepo execution overlay. Use this when working in the
-  Fodmap repository on turbo.json, monorepo scripts, CI workflows, or any change
-  that must also honor Fodmap collaboration, safety, and Phase 3 data contracts.
+  Fodmapp-specific Turborepo execution overlay. Use this when working in the
+  Fodmapp repository on turbo.json, monorepo scripts, CI workflows, or any change
+  that must also honor Fodmapp collaboration, safety, and Phase 3 data contracts.
 ---
 
-# Turborepo Fodmap Custom
+# Turborepo Fodmapp Custom
 
 Use this skill as policy composition:
 
 1. Official Turborepo guidance
 2. Large-repo scale patterns
-3. Fodmap repository contract and reporting rules
+3. Fodmapp repository contract and reporting rules
 
 ## Required Load Order
 
@@ -30,7 +30,7 @@ Use this skill as policy composition:
    - Turborepo-only change
    - Turborepo plus domain contract impact (swap/scoring/activation/API)
 2. Apply Turborepo baseline and scale pattern that matches repo style.
-3. Enforce Fodmap collaboration and safety rules from references.
+3. Enforce Fodmapp collaboration and safety rules from references.
 4. If Phase 3 data surfaces are touched, enforce all Phase 3 contracts.
 5. Before merge readiness, execute quality gate and report results.
 

@@ -1,5 +1,5 @@
-export const cardRecommendedUsageCode = `import { Badge } from "@fodmap/ui/badge";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@fodmap/ui/card";
+export const cardRecommendedUsageCode = `import { Badge } from "@fodmapp/ui/badge";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@fodmapp/ui/card";
 
 export function Example() {
   return (

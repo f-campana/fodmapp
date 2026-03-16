@@ -1,4 +1,4 @@
-# @fodmap/ui
+# @fodmapp/ui
 
 ## 3.13.2
 

@@ -1,20 +1,20 @@
 {
-  "name": "@fodmap/app",
+  "name": "@fodmapp/app",
   "private": true,
   "version": "0.1.26",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @fodmap/ui build && next dev",
-    "build": "pnpm --filter @fodmap/ui build && next build",
-    "analyze": "pnpm --filter @fodmap/ui build && ANALYZE=true next build --webpack",
+    "dev": "pnpm --filter @fodmapp/ui build && next dev",
+    "build": "pnpm --filter @fodmapp/ui build && next build",
+    "analyze": "pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
     "start": "next start",
     "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "@clerk/nextjs": "6.39.0",
-    "@fodmap/types": "workspace:*",
-    "@fodmap/ui": "workspace:*",
+    "@fodmapp/types": "workspace:*",
+    "@fodmapp/ui": "workspace:*",
     "@sentry/nextjs": "10.43.0",
     "next": "16.1.6",
     "react": "19.2.4",

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
-import { AspectRatio } from "@fodmap/ui/aspect-ratio";
+import { AspectRatio } from "@fodmapp/ui/aspect-ratio";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

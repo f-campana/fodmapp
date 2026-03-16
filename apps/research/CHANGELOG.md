@@ -1,4 +1,4 @@
-# @fodmap/research
+# @fodmapp/research
 
 ## 0.1.23
 

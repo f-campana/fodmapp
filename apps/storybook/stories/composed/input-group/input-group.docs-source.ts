@@ -1,4 +1,4 @@
-export const inputGroupRecommendedUsageCode = `import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@fodmap/ui/input-group";
+export const inputGroupRecommendedUsageCode = `import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@fodmapp/ui/input-group";
 
 export function Example() {
   return (

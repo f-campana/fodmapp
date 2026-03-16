@@ -1,4 +1,4 @@
-# @fodmap/design-tokens
+# @fodmapp/design-tokens
 
 Canonical design token source for FODMAP frontend packages.
 
@@ -54,8 +54,8 @@ Generation fails with the exact token path when validation errors are found.
 ## Commands
 
 ```bash
-pnpm --filter @fodmap/design-tokens tokens:generate
-pnpm --filter @fodmap/design-tokens tokens:check
+pnpm --filter @fodmapp/design-tokens tokens:generate
+pnpm --filter @fodmapp/design-tokens tokens:check
 ```
 
 `tokens:check` regenerates outputs and fails if `src/generated` is stale.

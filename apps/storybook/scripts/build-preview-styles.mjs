@@ -18,7 +18,7 @@ const outputPath = path.resolve(
 
 const uiStylesBuild = spawnSync(
   pnpmCmd,
-  ["--filter", "@fodmap/ui", "build:styles"],
+  ["--filter", "@fodmapp/ui", "build:styles"],
   {
     cwd: repoRootCwd,
     env: process.env,
@@ -32,7 +32,7 @@ if (uiStylesBuild.status !== 0) {
 
 const args = [
   "--filter",
-  "@fodmap/ui",
+  "@fodmapp/ui",
   "exec",
   "tailwindcss",
   "-i",

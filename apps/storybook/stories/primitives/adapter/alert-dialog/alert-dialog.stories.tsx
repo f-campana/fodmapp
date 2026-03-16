@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@fodmap/ui/alert-dialog";
+} from "@fodmapp/ui/alert-dialog";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

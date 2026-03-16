@@ -11,7 +11,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, userEvent, within } from "storybook/test";
 
-import { Textarea } from "@fodmap/ui/textarea";
+import { Textarea } from "@fodmapp/ui/textarea";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

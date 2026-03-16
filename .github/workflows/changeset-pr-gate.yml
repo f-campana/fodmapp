@@ -53,7 +53,7 @@ jobs:
           PR_AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
           CHANGESET_EXEMPT_LABEL: changeset-exempt
-          CHANGESET_EXEMPT_PACKAGES: "@fodmap/mobile-prototype"
+          CHANGESET_EXEMPT_PACKAGES: "@fodmapp/mobile-prototype"
         run: node .github/scripts/check-pr-changesets.mjs
 
       - name: Mark gate as satisfied for out-of-scope changes

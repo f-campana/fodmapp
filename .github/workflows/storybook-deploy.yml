@@ -62,7 +62,7 @@ jobs:
 
       - name: Build Storybook static output (production)
         run: |
-          pnpm exec turbo run storybook:build --filter=@fodmap/storybook
+          pnpm exec turbo run storybook:build --filter=@fodmapp/storybook
 
       - name: Prepare Vercel prebuilt output (production)
         run: |

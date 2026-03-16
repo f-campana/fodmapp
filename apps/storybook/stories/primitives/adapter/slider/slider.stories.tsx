@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Slider } from "@fodmap/ui/slider";
+import { Slider } from "@fodmapp/ui/slider";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

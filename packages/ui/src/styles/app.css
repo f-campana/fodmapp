@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap");
-@import "@fodmap/tailwind-config/shared-styles.css";
+@import "@fodmapp/tailwind-config/shared-styles.css";
 @source "../components/ui/foundation/badge.tsx";
 @source "../components/ui/foundation/button.tsx";
 @source "../components/ui/foundation/card.tsx";

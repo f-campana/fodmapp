@@ -8,7 +8,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@fodmap/ui/accordion";
+} from "@fodmapp/ui/accordion";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

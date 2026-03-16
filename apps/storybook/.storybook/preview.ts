@@ -4,11 +4,11 @@ import type { Preview } from "@storybook/react-vite";
 
 import { Agentation, type AgentationProps } from "agentation";
 
-import "@fodmap/ui/full.css";
+import "@fodmapp/ui/full.css";
 
 import "./preview.generated.css";
 
-import { tokens } from "@fodmap/design-tokens";
+import { tokens } from "@fodmapp/design-tokens";
 
 type PreviewTheme = "light" | "dark";
 type ThemeMode = "system" | PreviewTheme;

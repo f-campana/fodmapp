@@ -21,7 +21,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "@fodmap/ui/menubar";
+} from "@fodmapp/ui/menubar";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

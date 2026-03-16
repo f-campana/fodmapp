@@ -13,7 +13,7 @@ pnpm install
 ## Run on iPhone (Expo Go)
 
 ```bash
-pnpm --filter @fodmap/mobile-prototype start -- --clear
+pnpm --filter @fodmapp/mobile-prototype start -- --clear
 ```
 
 1. Install **Expo Go** on iPhone.
@@ -23,7 +23,7 @@ pnpm --filter @fodmap/mobile-prototype start -- --clear
 If LAN connection is unstable:
 
 ```bash
-pnpm --filter @fodmap/mobile-prototype start -- --tunnel
+pnpm --filter @fodmapp/mobile-prototype start -- --tunnel
 ```
 
 ## What is implemented
@@ -45,7 +45,7 @@ pnpm --filter @fodmap/mobile-prototype start -- --tunnel
 ## Prototype tests
 
 ```bash
-pnpm --filter @fodmap/mobile-prototype test
+pnpm --filter @fodmapp/mobile-prototype test
 ```
 
 Current tests validate repository filtering and onboarding storage serialization.

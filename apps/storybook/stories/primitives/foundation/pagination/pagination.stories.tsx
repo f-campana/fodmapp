@@ -11,7 +11,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@fodmap/ui/pagination";
+} from "@fodmapp/ui/pagination";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

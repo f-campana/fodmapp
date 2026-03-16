@@ -35,9 +35,9 @@ Out-of-scope:
 
 Exit criteria:
 
-1. `pnpm --filter @fodmap/app test` passes.
-2. `pnpm --filter @fodmap/app typecheck` passes.
-3. `pnpm --filter @fodmap/app build` passes.
+1. `pnpm --filter @fodmapp/app test` passes.
+2. `pnpm --filter @fodmapp/app typecheck` passes.
+3. `pnpm --filter @fodmapp/app build` passes.
 4. No consent bypass path enabling analytics before consent state is explicitly valid.
 
 ## 2) PR Sequence Mapped To Locked Decisions

@@ -1,4 +1,4 @@
-# @fodmap/app
+# @fodmapp/app
 
 ## 0.1.26
 

@@ -1,4 +1,4 @@
-export const alertRecommendedUsageCode = `import { Alert, AlertDescription, AlertTitle } from "@fodmap/ui/alert";
+export const alertRecommendedUsageCode = `import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 
 export function Example() {
   return (

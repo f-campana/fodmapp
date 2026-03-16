@@ -1,4 +1,4 @@
-# @fodmap/types
+# @fodmapp/types
 
 ## 0.1.1
 

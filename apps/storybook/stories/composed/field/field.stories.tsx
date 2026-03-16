@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, within } from "storybook/test";
 
-import { Field } from "@fodmap/ui/field";
-import { Input } from "@fodmap/ui/input";
+import { Field } from "@fodmapp/ui/field";
+import { Input } from "@fodmapp/ui/input";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

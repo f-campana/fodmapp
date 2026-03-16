@@ -1,6 +1,6 @@
 export const calendarRecommendedUsageCode = `import { useState } from "react";
 
-import { Calendar } from "@fodmap/ui/calendar";
+import { Calendar } from "@fodmapp/ui/calendar";
 
 export function Example() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();

@@ -25,7 +25,7 @@ Output as a PR-ready spec document and implementation checklist.
 ## Prompt 2: UI Primitive Engineer
 
 ```text
-Build shared primitives in @fodmap/ui using shadcn/ui patterns and CVA.
+Build shared primitives in @fodmapp/ui using shadcn/ui patterns and CVA.
 
 Initial components:
 - Button
@@ -50,7 +50,7 @@ Deliver:
 ## Prompt 3: Storybook And Test Engineer
 
 ```text
-Set up Storybook app for @fodmap/ui and implement test coverage.
+Set up Storybook app for @fodmapp/ui and implement test coverage.
 
 Requirements:
 - stories for all primitives
@@ -89,7 +89,7 @@ Deliver:
 ## Prompt 5: Page/Block Composer
 
 ```text
-Compose reusable blocks and page shells with mocked data using @fodmap/ui.
+Compose reusable blocks and page shells with mocked data using @fodmapp/ui.
 
 Requirements:
 - mobile and desktop quality

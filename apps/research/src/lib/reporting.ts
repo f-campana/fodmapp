@@ -2,9 +2,9 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import type { ReportingRun } from "@fodmap/reporting/contracts";
-import { renderDashboardFragment } from "@fodmap/reporting/dashboard";
-import { parseReportingRun } from "@fodmap/reporting/validate";
+import type { ReportingRun } from "@fodmapp/reporting/contracts";
+import { renderDashboardFragment } from "@fodmapp/reporting/dashboard";
+import { parseReportingRun } from "@fodmapp/reporting/validate";
 
 const REPO_ROOT = resolve(
   fileURLToPath(new URL("../../../../", import.meta.url)),

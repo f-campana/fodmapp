@@ -2,10 +2,10 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import "@fodmap/reporting/styles.css";
+import "@fodmapp/reporting/styles.css";
 
-import { renderDashboardFragment } from "@fodmap/reporting/dashboard";
-import { parseReportingRun } from "@fodmap/reporting/validate";
+import { renderDashboardFragment } from "@fodmapp/reporting/dashboard";
+import { parseReportingRun } from "@fodmapp/reporting/validate";
 
 import baselineRun from "../../../../etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json";
 

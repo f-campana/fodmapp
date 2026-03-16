@@ -65,7 +65,7 @@ Local CI parity command from repository root:
 ```
 
 Defaults assume local Postgres is available at
-`postgresql://postgres:postgres@localhost:5432/fodmap_api_ci`.
+`postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci`.
 
 ## OpenAPI
 

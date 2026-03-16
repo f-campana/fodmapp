@@ -1,4 +1,4 @@
-@import "@fodmap/design-tokens/css";
+@import "@fodmapp/design-tokens/css";
 
 .fd-reporting-root {
   --fd-reporting-color-canvas: var(
