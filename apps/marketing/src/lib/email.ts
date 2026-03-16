@@ -18,17 +18,21 @@ export async function sendWaitlistConfirmationEmail(
   }
 
   const resend = new Resend(resendApiKey);
-  const result = await resend.emails.send({
-    from,
-    to: email,
-    subject: "Bienvenue sur la liste d'attente FODMAPP",
-    text: "Merci de ton inscription. On te préviendra dès que FODMAPP sera disponible.",
-    html: "<p>Merci de ton inscription. On te préviendra dès que FODMAPP sera disponible.</p>",
-  });
+  try {
+    const result = await resend.emails.send({
+      from,
+      to: email,
+      subject: "Bienvenue sur la liste d'attente FODMAPP",
+      text: "Merci de ton inscription. On te préviendra dès que FODMAPP sera disponible.",
+      html: "<p>Merci de ton inscription. On te préviendra dès que FODMAPP sera disponible.</p>",
+    });
 
-  if (result.error) {
-    return { ok: false, error: result.error };
+    if (result.error) {
+      return { ok: false, error: result.error };
+    }
+
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error };
   }
-
-  return { ok: true };
 }

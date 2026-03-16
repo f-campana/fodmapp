@@ -15,6 +15,34 @@ type ErrorResult = {
 
 type WaitlistResponse = SuccessResult | ErrorResult;
 
+function isBasicEmailFormat(email: string): boolean {
+  if (/\s/.test(email)) {
+    return false;
+  }
+
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 0 || atIndex !== email.lastIndexOf("@")) {
+    return false;
+  }
+
+  const local = email.slice(0, atIndex);
+  const domain = email.slice(atIndex + 1);
+  if (!local || !domain) {
+    return false;
+  }
+
+  if (
+    domain.length < 3 ||
+    !domain.includes(".") ||
+    domain.startsWith(".") ||
+    domain.endsWith(".")
+  ) {
+    return false;
+  }
+
+  return local !== "." && !local.includes("..") && !domain.includes("..");
+}
+
 /* eslint-disable no-console */
 
 export const dynamic = "force-dynamic";
@@ -94,28 +122,4 @@ function extractEmail(body: unknown): string | null {
     return null;
   }
   return maybeEmail;
-}
-
-function isBasicEmailFormat(email: string): boolean {
-  const atIndex = email.indexOf("@");
-  if (atIndex <= 0 || atIndex !== email.lastIndexOf("@")) {
-    return false;
-  }
-
-  const local = email.slice(0, atIndex);
-  const domain = email.slice(atIndex + 1);
-  if (!local || !domain) {
-    return false;
-  }
-
-  if (
-    domain.length < 3 ||
-    !domain.includes(".") ||
-    domain.startsWith(".") ||
-    domain.endsWith(".")
-  ) {
-    return false;
-  }
-
-  return local !== "." && !local.includes("..") && !domain.includes("..");
 }
