@@ -51,6 +51,75 @@ def _slug_without_rollup(db_conn) -> Optional[str]:
     return row["food_slug"] if row else None
 
 
+def _search_query_with_mixed_rollup_results(db_conn) -> Optional[str]:
+    row = db_conn.execute(
+        """
+        WITH tokenized AS (
+          SELECT
+            LOWER(SPLIT_PART(f.food_slug, '-', 1)) AS token,
+            EXISTS (
+              SELECT 1
+              FROM v_phase3_rollups_latest_full v
+              WHERE v.food_id = f.food_id
+            ) AS has_rollup
+          FROM foods f
+        )
+        SELECT token
+        FROM tokenized
+        WHERE token <> ''
+        GROUP BY token
+        HAVING SUM(CASE WHEN has_rollup THEN 1 ELSE 0 END) > 0
+           AND SUM(CASE WHEN NOT has_rollup THEN 1 ELSE 0 END) > 0
+        ORDER BY token
+        LIMIT 1
+        """
+    ).fetchone()
+    return row["token"] if row else None
+
+
+def _search_query_without_rollup_results(db_conn) -> Optional[str]:
+    row = db_conn.execute(
+        """
+        WITH tokenized AS (
+          SELECT
+            LOWER(SPLIT_PART(f.food_slug, '-', 1)) AS token,
+            EXISTS (
+              SELECT 1
+              FROM v_phase3_rollups_latest_full v
+              WHERE v.food_id = f.food_id
+            ) AS has_rollup
+          FROM foods f
+        )
+        SELECT token
+        FROM tokenized
+        WHERE token <> ''
+        GROUP BY token
+        HAVING SUM(CASE WHEN has_rollup THEN 1 ELSE 0 END) = 0
+           AND COUNT(*) > 1
+        ORDER BY token
+        LIMIT 1
+        """
+    ).fetchone()
+    return row["token"] if row else None
+
+
+def _search_relevance_bucket(query: str, item: dict) -> int:
+    query_normalized = query.lower()
+    slug = (item.get("food_slug") or "").lower()
+    canonical_fr = (item.get("canonical_name_fr") or "").lower()
+    canonical_en = (item.get("canonical_name_en") or "").lower()
+
+    if slug == query_normalized:
+        return 0
+    if slug.startswith(query_normalized):
+        return 1
+    if canonical_fr.startswith(query_normalized):
+        return 2
+    if canonical_en.startswith(query_normalized):
+        return 3
+    return 4
+
+
 def _rollup_food_subtypes_count(db_conn, food_slug: str) -> int:
     row = db_conn.execute(
         """
@@ -134,6 +203,62 @@ def test_search_foods(client, db_conn, integration_guard) -> None:
     assert first["food_slug"]
     assert first["canonical_name_fr"]
     assert first["canonical_name_en"]
+
+
+def test_search_foods_prioritizes_computed_rollups(client, db_conn, integration_guard) -> None:
+    query = _search_query_with_mixed_rollup_results(db_conn)
+    if query is None:
+        pytest.skip("no mixed rollup dataset available for search ordering regression")
+
+    response = client.get("/v0/foods", params={"q": query, "limit": 20})
+    assert response.status_code == 200
+
+    payload = response.json()
+    items = payload["items"]
+    assert payload["total"] == len(items)
+    assert items, "search should return rows with mixed rollup coverage"
+
+    first_with_rollup = next(
+        (
+            idx
+            for idx, item in enumerate(items)
+            if item["overall_level"] is not None and item["coverage_ratio"] is not None
+        ),
+        None,
+    )
+    first_without_rollup = next(
+        (idx for idx, item in enumerate(items) if item["overall_level"] is None or item["coverage_ratio"] is None),
+        None,
+    )
+    assert first_with_rollup is not None and first_without_rollup is not None
+    assert first_with_rollup < first_without_rollup
+
+
+def test_search_foods_without_rollup_results_keep_stable_slug_order(client, db_conn, integration_guard) -> None:
+    query = _search_query_without_rollup_results(db_conn)
+    if query is None:
+        pytest.skip("no no-rollup-only search token available for ordering stability check")
+
+    response = client.get("/v0/foods", params={"q": query, "limit": 50})
+    assert response.status_code == 200
+
+    payload = response.json()
+    items = payload["items"]
+    assert payload["total"] == len(items)
+    assert items, "query should return at least two rows"
+    assert all(item["overall_level"] is None or item["coverage_ratio"] is None for item in items)
+
+    expected = sorted(
+        items,
+        key=lambda item: (
+            _search_relevance_bucket(query, item),
+            1,
+            -1 if item["coverage_ratio"] is None else -item["coverage_ratio"],
+            item["rollup_computed_at"] or "",
+            item["food_slug"],
+        ),
+    )
+    assert [item["food_slug"] for item in expected] == [item["food_slug"] for item in items]
 
 
 def test_search_foods_empty_result(client, integration_guard) -> None:
