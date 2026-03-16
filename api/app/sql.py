@@ -97,6 +97,12 @@ ORDER BY
     WHEN COALESCE(f.canonical_name_en, '') ILIKE %(prefix_pattern)s THEN 3
     ELSE 4
   END,
+  CASE
+    WHEN r.overall_level IS NOT NULL AND r.coverage_ratio IS NOT NULL THEN 0
+    ELSE 1
+  END,
+  COALESCE(r.coverage_ratio, -1) DESC,
+  r.computed_at DESC NULLS LAST,
   f.food_slug ASC
 LIMIT %(limit)s
 """
