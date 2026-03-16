@@ -1,0 +1,55 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as AspectRatioStories from "./aspect-ratio.stories";
+import { aspectRatioRecommendedUsageCode } from "./aspect-ratio.docs-source";
+
+<Meta of={AspectRatioStories} />
+
+<Title />
+<Subtitle>
+  Use AspectRatio to reserve predictable media space inside a container that
+  already owns the width and visual framing.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={aspectRatioRecommendedUsageCode} language="tsx" />
+
+<Canvas of={AspectRatioStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={AspectRatioStories.Playground} />
+
+## When to use
+
+Use AspectRatio when image or video loading should not shift the surrounding
+layout.
+
+Avoid it when the parent container does not have a meaningful width yet or when
+the child content should size itself naturally.
+
+## Accessibility contract
+
+- the primitive only reserves layout space; accessible naming still comes from
+  the child media content
+- the root keeps a stable `data-slot` hook for layout and regression checks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies the reserved box inside the local audit frame
+- interaction checks cover the root slot marker and rendered media presence
+
+What is checked manually:
+
+- visual pass for cropping, border radius, and constrained-parent behavior at
+  compact widths

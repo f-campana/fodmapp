@@ -38,7 +38,6 @@ const avatarImageSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`
 const meta = {
   title: "Primitives/Adapter/Avatar",
   component: Avatar,
-  tags: ["autodocs"],
   argTypes: {
     className: {
       description: "Additional classes merged with the avatar root.",

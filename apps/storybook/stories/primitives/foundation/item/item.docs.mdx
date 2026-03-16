@@ -1,0 +1,49 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as ItemStories from "./item.stories";
+import { itemRecommendedUsageCode } from "./item.docs-source";
+
+<Meta of={ItemStories} />
+
+<Title />
+<Subtitle>
+  Use Item as a low-level row shell for media, content, and actions when a
+  higher-level list or link pattern already owns the semantics.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={itemRecommendedUsageCode} language="tsx" />
+
+<Canvas of={ItemStories.Default} sourceState="none" />
+
+## When to use
+
+Use Item for structured rows inside result lists, summary cards, or compact
+review surfaces.
+
+Avoid it when the row itself needs stronger domain semantics that should come
+from a more opinionated component.
+
+## Accessibility contract
+
+- Item does not add list, link, or button semantics on its own
+- `asChild` transfers layout classes to the child element while that child owns
+  the semantic role
+- slot hooks stay stable on the root, content, title, description, and actions
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies the default row layout and the `asChild` link edge case
+
+What is checked manually:
+
+- visual pass for row spacing, media alignment, and trailing-action legibility

@@ -1,0 +1,48 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as KbdStories from "./kbd.stories";
+import { kbdRecommendedUsageCode } from "./kbd.docs-source";
+
+<Meta of={KbdStories} />
+
+<Title />
+<Subtitle>
+  Use Kbd to document keyboard input in product copy. It does not register or
+  implement the shortcut itself.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={kbdRecommendedUsageCode} language="tsx" />
+
+<Canvas of={KbdStories.Default} sourceState="none" />
+
+## When to use
+
+Use Kbd when the interface needs to teach or remind users about an existing
+keyboard interaction.
+
+Avoid it as decorative typography or as a substitute for the actual command
+implementation.
+
+## Accessibility contract
+
+- the primitive renders semantic `<kbd>` content for keyboard input notation
+- grouped shortcuts should still read clearly in surrounding sentence copy
+- the group wrapper keeps a stable slot hook when multiple keys are shown
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies both single-key and grouped-shortcut rendering
+
+What is checked manually:
+
+- visual pass for inline readability and balanced spacing inside support copy

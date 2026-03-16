@@ -25,7 +25,6 @@ const fixedStoryParameters = {
 const meta = {
   title: "Primitives/Foundation/Kbd",
   component: Kbd,
-  tags: ["autodocs"],
   argTypes: {
     children: {
       control: false,

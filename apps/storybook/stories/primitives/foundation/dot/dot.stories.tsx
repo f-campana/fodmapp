@@ -24,7 +24,6 @@ const fixedStoryParameters = {
 const meta = {
   title: "Primitives/Foundation/Dot",
   component: Dot,
-  tags: ["autodocs"],
   argTypes: {
     variant: {
       control: false,

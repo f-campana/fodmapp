@@ -25,7 +25,7 @@ const fixedStoryParameters = {
 const meta = {
   title: "Primitives/Foundation/Skeleton",
   component: Skeleton,
-  tags: ["autodocs", "batch-l"],
+  tags: ["batch-l"],
   parameters: {
     controls: { expanded: true },
     layout: "padded",

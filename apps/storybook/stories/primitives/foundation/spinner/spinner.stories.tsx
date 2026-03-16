@@ -25,7 +25,7 @@ const fixedStoryParameters = {
 const meta = {
   title: "Primitives/Foundation/Spinner",
   component: Spinner,
-  tags: ["autodocs", "batch-l"],
+  tags: ["batch-l"],
   parameters: {
     controls: { expanded: true },
     layout: "padded",

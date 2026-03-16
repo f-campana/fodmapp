@@ -1,0 +1,47 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as DotStories from "./dot.stories";
+import { dotRecommendedUsageCode } from "./dot.docs-source";
+
+<Meta of={DotStories} />
+
+<Title />
+<Subtitle>
+  Use Dot for a minimal visual status marker when nearby copy already explains
+  what the signal means.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={dotRecommendedUsageCode} language="tsx" />
+
+<Canvas of={DotStories.Default} sourceState="none" />
+
+## When to use
+
+Use Dot for compact state indicators inside dense rows, legends, or support
+copy where a full badge would add too much weight.
+
+Avoid it when the meaning would be ambiguous without surrounding text.
+
+## Accessibility contract
+
+- Dot should be paired with visible or assistive text when it carries meaning
+- size and color are visual only unless the surrounding content explains them
+- the root keeps a stable slot hook for regression checks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies the default rendering and custom accessible label case
+
+What is checked manually:
+
+- visual pass for size clarity and contrast when used inline with text

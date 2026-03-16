@@ -25,6 +25,14 @@ import { nativeSelectRecommendedUsageCode } from "./native-select.docs-source";
 
 <Canvas of={NativeSelectStories.Default} sourceState="none" />
 
+## When to use
+
+Use NativeSelect when a short option list can stay browser-native and users do
+not need search, grouping logic beyond native optgroups, or a custom popup
+surface.
+
+Use Select or Combobox when richer interaction is part of the real contract.
+
 ## Props and controls
 
 <Controls of={NativeSelectStories.Playground} />
