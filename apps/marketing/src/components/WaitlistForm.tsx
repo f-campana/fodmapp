@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 
 import { Button } from "@fodmapp/ui/button";
 import { Input } from "@fodmapp/ui/input";
@@ -62,6 +62,10 @@ export function WaitlistForm() {
     }
   };
 
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    void handleSubmit(event);
+  };
+
   if (status === "success") {
     return (
       <p
@@ -74,7 +78,7 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={(event) => void handleSubmit(event)} className="grid gap-4">
+    <form onSubmit={onSubmit} className="grid gap-4">
       <label htmlFor="waitlist-email" className="marketing-label">
         {landingCopy.waitlist.emailLabel}
       </label>
@@ -85,7 +89,9 @@ export function WaitlistForm() {
         inputMode="email"
         autoComplete="email"
         value={email}
-        onChange={(event) => setEmail(event.currentTarget.value)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          setEmail(event.currentTarget.value)
+        }
         placeholder="prenom.nom@exemple.com"
         aria-invalid={status === "error" && error ? "true" : "false"}
         required
