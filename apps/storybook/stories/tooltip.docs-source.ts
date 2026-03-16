@@ -1,9 +1,4 @@
-export const tooltipRecommendedUsageCode = `import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@fodmapp/ui";
+export const tooltipRecommendedUsageCode = `import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@fodmapp/ui/tooltip";
 
 export function Example() {
   return (

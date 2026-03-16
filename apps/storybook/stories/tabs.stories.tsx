@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fodmapp/ui";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fodmapp/ui/tabs";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

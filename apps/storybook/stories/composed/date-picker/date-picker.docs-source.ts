@@ -1,6 +1,6 @@
 export const datePickerRecommendedUsageCode = `import { useState } from "react";
 
-import { DatePicker } from "@fodmapp/ui";
+import { DatePicker } from "@fodmapp/ui/date-picker";
 
 export function Example() {
   const [value, setValue] = useState<Date | undefined>();

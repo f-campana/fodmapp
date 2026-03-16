@@ -1,15 +1,5 @@
-export const dialogRecommendedUsageCode = `import {
-  Button,
-  Dialog,
-  DialogBody,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@fodmapp/ui";
+export const dialogRecommendedUsageCode = `import { Button } from "@fodmapp/ui/button";
+import { Dialog, DialogBody, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@fodmapp/ui/dialog";
 
 export function Example() {
   return (

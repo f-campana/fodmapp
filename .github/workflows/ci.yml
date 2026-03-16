@@ -41,9 +41,10 @@ jobs:
           install-command: "pnpm install --frozen-lockfile"
           enable-turbo-cache: "false"
 
-      - name: Build UI package for lint imports
+      - name: Build dist-backed workspace packages for lint imports
         run: |
           pnpm exec turbo run build --filter=@fodmapp/ui
+          pnpm exec turbo run build --filter=@fodmapp/reporting
 
       - name: Run JavaScript lint
         run: |

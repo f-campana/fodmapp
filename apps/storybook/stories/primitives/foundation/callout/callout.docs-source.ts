@@ -1,9 +1,4 @@
-export const calloutRecommendedUsageCode = `import {
-  Callout,
-  CalloutDescription,
-  CalloutIcon,
-  CalloutTitle,
-} from "@fodmapp/ui";
+export const calloutRecommendedUsageCode = `import { Callout, CalloutDescription, CalloutIcon, CalloutTitle } from "@fodmapp/ui/callout";
 
 export function Example() {
   return (

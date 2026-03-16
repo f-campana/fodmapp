@@ -3,8 +3,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
+import { Badge } from "@fodmapp/ui/badge";
 import {
-  Badge,
   Card,
   CardAction,
   CardContent,
@@ -12,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/card";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

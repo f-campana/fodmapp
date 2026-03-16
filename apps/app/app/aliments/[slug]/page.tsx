@@ -1,19 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
+import { Badge } from "@fodmapp/ui/badge";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Badge,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  Chip,
-  ScoreBar,
-} from "@fodmapp/ui/server";
+} from "@fodmapp/ui/card";
+import { Chip } from "@fodmapp/ui/chip";
+import { ScoreBar } from "@fodmapp/ui/score-bar";
 
 import { getFoodDetail, getFoodRollup, getSwaps } from "../../../lib/api";
 

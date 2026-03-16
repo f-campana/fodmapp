@@ -27,7 +27,7 @@ import {
   ContextMenuSubContent,
   ContextMenuSubTrigger,
   ContextMenuTrigger,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/context-menu";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

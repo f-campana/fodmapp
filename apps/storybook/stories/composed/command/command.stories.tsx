@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { Button } from "@fodmapp/ui/button";
 import {
-  Button,
   Command,
   CommandDialog,
   CommandEmpty,
@@ -14,7 +14,7 @@ import {
   CommandItem,
   CommandList,
   CommandShortcut,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/command";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

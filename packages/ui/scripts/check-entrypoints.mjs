@@ -8,13 +8,15 @@ const rootDir = path.resolve(
 );
 
 for (const relativePath of [
-  "dist/server.js",
-  "dist/server.d.ts",
-  "dist/client.js",
-  "dist/client.d.ts",
+  "dist/app.css",
+  "dist/full.css",
+  "dist/cn.js",
+  "dist/cn.d.ts",
+  "dist/button.js",
+  "dist/button.d.ts",
 ]) {
   await access(path.join(rootDir, relativePath));
 }
 
-await import("@fodmapp/ui/server");
-await import("@fodmapp/ui/client");
+await import("@fodmapp/ui/cn");
+await import("@fodmapp/ui/button");

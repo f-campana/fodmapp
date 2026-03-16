@@ -1,10 +1,4 @@
-export const stepperRecommendedUsageCode = `import {
-  Stepper,
-  StepperDescription,
-  StepperLabel,
-  StepperSeparator,
-  StepperStep,
-} from "@fodmapp/ui";
+export const stepperRecommendedUsageCode = `import { Stepper, StepperDescription, StepperLabel, StepperSeparator, StepperStep } from "@fodmapp/ui/stepper";
 
 export function ReviewStatusStepper() {
   return (

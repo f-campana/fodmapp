@@ -1,4 +1,4 @@
-export const nativeSelectRecommendedUsageCode = `import { NativeSelect } from "@fodmapp/ui";
+export const nativeSelectRecommendedUsageCode = `import { NativeSelect } from "@fodmapp/ui/native-select";
 
 export function Example() {
   return (

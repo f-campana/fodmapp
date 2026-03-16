@@ -1,4 +1,4 @@
-export const scrollAreaRecommendedUsageCode = `import { ScrollArea } from "@fodmapp/ui";
+export const scrollAreaRecommendedUsageCode = `import { ScrollArea } from "@fodmapp/ui/scroll-area";
 
 export function Example() {
   return (

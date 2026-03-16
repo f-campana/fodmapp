@@ -11,7 +11,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/navigation-menu";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

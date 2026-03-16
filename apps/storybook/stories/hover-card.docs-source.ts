@@ -1,9 +1,4 @@
-export const hoverCardRecommendedUsageCode = `import {
-  HoverCard,
-  HoverCardArrow,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@fodmapp/ui";
+export const hoverCardRecommendedUsageCode = `import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@fodmapp/ui/hover-card";
 
 export function Example() {
   return (

@@ -1,11 +1,4 @@
-export const navigationMenuRecommendedUsageCode = `import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@fodmapp/ui";
+export const navigationMenuRecommendedUsageCode = `import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@fodmapp/ui/navigation-menu";
 
 export function Example() {
   return (

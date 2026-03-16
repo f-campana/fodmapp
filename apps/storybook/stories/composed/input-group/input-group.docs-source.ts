@@ -1,16 +1,11 @@
-export const inputGroupRecommendedUsageCode = `import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-} from "@fodmapp/ui";
+export const inputGroupRecommendedUsageCode = `import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@fodmapp/ui/input-group";
 
 export function Example() {
   return (
     <InputGroup>
       <InputGroupText>https://</InputGroupText>
       <InputGroupInput placeholder="mon-profil" />
-      <InputGroupAddon>.fodmapp.app</InputGroupAddon>
+      <InputGroupAddon>.fodmap.app</InputGroupAddon>
     </InputGroup>
   );
 }

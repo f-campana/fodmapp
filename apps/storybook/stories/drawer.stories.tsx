@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { Button } from "@fodmapp/ui/button";
 import {
-  Button,
   Drawer,
   DrawerClose,
   DrawerContent,
@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/drawer";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

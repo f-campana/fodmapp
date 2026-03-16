@@ -3,28 +3,27 @@
   "private": true,
   "version": "3.13.2",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "./app.css": "./dist/app.css",
+    "./full.css": "./dist/full.css",
+    "./hooks/*": {
+      "types": "./dist/hooks/*.d.ts",
+      "import": "./dist/hooks/*.js"
     },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+    "./cn": {
+      "types": "./dist/cn.d.ts",
+      "import": "./dist/cn.js"
     },
-    "./client": {
-      "types": "./dist/client.d.ts",
-      "import": "./dist/client.js"
-    },
-    "./styles.css": "./dist/styles.css"
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
   },
   "files": [
     "dist"
   ],
   "sideEffects": [
-    "./dist/styles.css"
+    "./dist/*.css"
   ],
   "peerDependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -107,12 +106,13 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "pnpm run clean && pnpm run build:ts && pnpm run build:styles",
-    "build:ts": "tsup && node ./scripts/check-entrypoints.mjs",
-    "build:styles": "tailwindcss --config ./tailwind.config.ts -i ./src/styles/index.css -o ./dist/styles.css --minify",
-    "check:server-entry": "node ./scripts/check-server-entry.mjs",
+    "build:ts": "tsup",
+    "build:styles": "pnpm run build:styles:app && pnpm run build:styles:full",
+    "build:styles:app": "tailwindcss --config ./tailwind.config.ts -i ./src/styles/app.css -o ./dist/app.css --minify",
+    "build:styles:full": "tailwindcss --config ./tailwind.config.ts -i ./src/styles/full.css -o ./dist/full.css --minify",
     "styles:check": "node ./scripts/check-styles-contract.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run && pnpm run check:server-entry",
+    "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {

@@ -4,14 +4,14 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { Button } from "@fodmapp/ui/button";
 import {
-  Button,
   Popover,
   PopoverAnchor,
   PopoverArrow,
   PopoverContent,
   PopoverTrigger,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/popover";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

@@ -9,7 +9,7 @@ import {
   CalloutDescription,
   CalloutIcon,
   CalloutTitle,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/callout";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

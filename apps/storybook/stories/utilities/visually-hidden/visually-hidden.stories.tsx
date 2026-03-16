@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
-import { VisuallyHidden } from "@fodmapp/ui";
+import { VisuallyHidden } from "@fodmapp/ui/visually-hidden";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

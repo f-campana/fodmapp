@@ -4,6 +4,8 @@ import type { Preview } from "@storybook/react-vite";
 
 import { Agentation, type AgentationProps } from "agentation";
 
+import "@fodmapp/ui/full.css";
+
 import "./preview.generated.css";
 
 import { tokens } from "@fodmapp/design-tokens";

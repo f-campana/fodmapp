@@ -1,16 +1,16 @@
 import Link from "next/link";
 
 import type { components } from "@fodmapp/types";
+import { Badge } from "@fodmapp/ui/badge";
+import { Button } from "@fodmapp/ui/button";
 import {
-  Badge,
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmapp/ui/server";
+} from "@fodmapp/ui/card";
 
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
@@ -56,8 +56,8 @@ function normalizeLocale(raw: string | string[] | undefined): {
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ locale?: string | string[] }>;
-}) {
+  searchParams?: Promise<{ locale?: string | string[] | undefined }>;
+} = {}) {
   const resolvedSearchParams = await searchParams;
   const { locale, fallback } = normalizeLocale(resolvedSearchParams?.locale);
   const copy = (path: string, vars?: Record<string, string>) =>
@@ -127,12 +127,16 @@ export default async function HomePage({
           </p>
         </CardContent>
         <CardFooter>
-          <div className="product-home-links">
+          <div className="flex flex-wrap items-center gap-3">
             <Button asChild>
+              <Link href="/aliments">Explorer les aliments</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/decouvrir">Voir les substitutions</Link>
+            </Button>
+            <Button asChild variant="ghost">
               <Link href="/espace">{copy("screens.swapDetail.trialHint")}</Link>
             </Button>
-            <Link href="/aliments">Explorer les aliments</Link>
-            <Link href="/decouvrir">Découvrir des bases alimentaires</Link>
           </div>
         </CardFooter>
       </Card>

@@ -1,14 +1,4 @@
-export const alertDialogRecommendedUsageCode = `import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@fodmapp/ui";
+export const alertDialogRecommendedUsageCode = `import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@fodmapp/ui/alert-dialog";
 
 export function Example() {
   return (

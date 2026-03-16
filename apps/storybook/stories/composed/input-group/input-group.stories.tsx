@@ -10,7 +10,7 @@ import {
   InputGroupButton,
   InputGroupInput,
   InputGroupText,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/input-group";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 
@@ -144,7 +144,7 @@ export const Playground: Story = {
   render: (args) => (
     <InputGroupAuditFrame maxWidth="md">
       <div className="space-y-3">
-        <URLInputGroup args={args} addonLabel=".fodmapp.app" />
+        <URLInputGroup args={args} addonLabel=".fodmap.app" />
         <p className="text-sm text-muted-foreground">
           Use this playground as a scenario harness for the default URL
           composition.
@@ -159,7 +159,7 @@ export const Default: Story = {
   render: () => (
     <InputGroupAuditFrame maxWidth="md">
       <div className="space-y-3">
-        <URLInputGroup args={defaultPlaygroundArgs} addonLabel=".fodmapp.app" />
+        <URLInputGroup args={defaultPlaygroundArgs} addonLabel=".fodmap.app" />
         <p className="text-sm text-muted-foreground">
           Leading and trailing text stay attached to the same input without
           splitting the control into separate fields.
@@ -256,7 +256,7 @@ export const ResponsiveStress: Story = {
               ...defaultPlaygroundArgs,
               placeholder: "journal-clinique-tres-detaille",
             }}
-            addonLabel=".centre-de-suivi-fodmapp.fr"
+            addonLabel=".centre-de-suivi-fodmap.fr"
           />
         </div>
         <p className="text-sm text-muted-foreground">

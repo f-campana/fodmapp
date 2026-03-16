@@ -8,7 +8,7 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/resizable";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

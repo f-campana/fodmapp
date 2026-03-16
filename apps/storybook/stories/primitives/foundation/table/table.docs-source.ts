@@ -1,11 +1,4 @@
-export const tableRecommendedUsageCode = `import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@fodmapp/ui";
+export const tableRecommendedUsageCode = `import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@fodmapp/ui/table";
 
 export function Example() {
   return (

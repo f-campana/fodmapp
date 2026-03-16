@@ -1,13 +1,5 @@
-export const cardRecommendedUsageCode = `import {
-  Badge,
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@fodmapp/ui";
+export const cardRecommendedUsageCode = `import { Badge } from "@fodmapp/ui/badge";
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@fodmapp/ui/card";
 
 export function Example() {
   return (

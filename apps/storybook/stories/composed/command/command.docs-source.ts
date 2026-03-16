@@ -1,12 +1,4 @@
-export const commandRecommendedUsageCode = `import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandShortcut,
-} from "@fodmapp/ui";
+export const commandRecommendedUsageCode = `import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@fodmapp/ui/command";
 
 export function Example() {
   return (

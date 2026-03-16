@@ -2,20 +2,14 @@
 
 Shared React UI foundation for the FODMAP platform.
 
-## Entry points
-
-- `@fodmapp/ui/server`: RSC-safe foundation and presentational components for App Router server components.
-- `@fodmapp/ui/client`: client-only components, hooks, and browser-side helpers.
-- `@fodmapp/ui`: legacy compatibility barrel. Keep it for existing consumers, but do not use it for new `apps/app` imports.
-
 ## Exports
 
 - Components: `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent`, `Alert`, `AlertTitle`, `AlertDescription`, `AlertDialog`, `AlertDialogTrigger`, `AlertDialogPortal`, `AlertDialogOverlay`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogFooter`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogAction`, `AlertDialogCancel`, `AspectRatio`, `Avatar`, `AvatarImage`, `AvatarFallback`, `Badge`, `Breadcrumb`, `BreadcrumbList`, `BreadcrumbItem`, `BreadcrumbLink`, `BreadcrumbPage`, `BreadcrumbSeparator`, `BreadcrumbEllipsis`, `Button`, `ButtonGroup`, `Callout`, `CalloutIcon`, `CalloutTitle`, `CalloutDescription`, `Calendar`, `Carousel`, `CarouselContent`, `CarouselItem`, `CarouselPrevious`, `CarouselNext`, `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `Checkbox`, `Chip`, `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent`, `Combobox`, `ComboboxMulti`, `ComboboxTrigger`, `ComboboxContent`, `ComboboxInput`, `ComboboxList`, `ComboboxEmpty`, `ComboboxGroup`, `ComboboxItem`, `ComboboxSeparator`, `Command`, `CommandDialog`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandGroup`, `CommandItem`, `CommandSeparator`, `CommandShortcut`, `DatePicker`, `Dialog`, `DialogTrigger`, `DialogPortal`, `DialogOverlay`, `DialogContent`, `DialogClose`, `DialogHeader`, `DialogBody`, `DialogFooter`, `DialogTitle`, `DialogDescription`, `Drawer`, `DrawerTrigger`, `DrawerPortal`, `DrawerOverlay`, `DrawerContent`, `DrawerClose`, `DrawerHeader`, `DrawerFooter`, `DrawerTitle`, `DrawerDescription`, `Dot`, `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuGroup`, `DropdownMenuPortal`, `DropdownMenuSub`, `DropdownMenuRadioGroup`, `DropdownMenuSubTrigger`, `DropdownMenuSubContent`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuShortcut`, `ContextMenu`, `ContextMenuTrigger`, `ContextMenuGroup`, `ContextMenuPortal`, `ContextMenuSub`, `ContextMenuRadioGroup`, `ContextMenuSubTrigger`, `ContextMenuSubContent`, `ContextMenuContent`, `ContextMenuItem`, `ContextMenuCheckboxItem`, `ContextMenuRadioItem`, `ContextMenuLabel`, `ContextMenuSeparator`, `ContextMenuShortcut`, `Empty`, `EmptyIcon`, `EmptyTitle`, `EmptyDescription`, `EmptyActions`, `Field`, `HoverCard`, `HoverCardTrigger`, `HoverCardPortal`, `HoverCardContent`, `HoverCardArrow`, `Input`, `InputGroup`, `InputGroupInput`, `InputGroupAddon`, `InputGroupText`, `InputGroupButton`, `InputOTP`, `InputOTPGroup`, `InputOTPSlot`, `InputOTPSeparator`, `Item`, `ItemGroup`, `ItemHeader`, `ItemMedia`, `ItemContent`, `ItemTitle`, `ItemDescription`, `ItemActions`, `ItemSeparator`, `Kbd`, `KbdGroup`, `Label`, `Menubar`, `MenubarMenu`, `MenubarTrigger`, `MenubarGroup`, `MenubarPortal`, `MenubarSub`, `MenubarRadioGroup`, `MenubarSubTrigger`, `MenubarSubContent`, `MenubarContent`, `MenubarItem`, `MenubarCheckboxItem`, `MenubarRadioItem`, `MenubarLabel`, `MenubarSeparator`, `MenubarShortcut`, `NativeSelect`, `NavigationMenu`, `NavigationMenuList`, `NavigationMenuItem`, `NavigationMenuTrigger`, `NavigationMenuContent`, `NavigationMenuLink`, `NavigationMenuViewport`, `NavigationMenuIndicator`, `navigationMenuTriggerStyle`, `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink`, `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`, `Popover`, `PopoverTrigger`, `PopoverAnchor`, `PopoverPortal`, `PopoverContent`, `PopoverArrow`, `Progress`, `RadioGroup`, `RadioGroupItem`, `ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`, `ScrollArea`, `ScrollBar`, `ScoreBar`, `Separator`, `Select`, `SelectGroup`, `SelectValue`, `SelectTrigger`, `SelectContent`, `SelectLabel`, `SelectItem`, `SelectSeparator`, `SelectScrollUpButton`, `SelectScrollDownButton`, `Sheet`, `SheetTrigger`, `SheetPortal`, `SheetOverlay`, `SheetContent`, `SheetClose`, `SheetHeader`, `SheetFooter`, `SheetTitle`, `SheetDescription`, `Skeleton`, `Slider`, `Spinner`, `Sonner`, `Stepper`, `Toast`, `StepperStep`, `StepperSeparator`, `StepperLabel`, `StepperDescription`, `Switch`, `Table`, `TableHeader`, `TableBody`, `TableFooter`, `TableRow`, `TableHead`, `TableCell`, `TableCaption`, `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `Textarea`, `Toggle`, `ToggleGroup`, `ToggleGroupItem`, `Tooltip`, `TooltipProvider`, `TooltipTrigger`, `TooltipContent`, `Typography`
 - Utilities: `VisuallyHidden`, `Portal`
 - Hooks: `useControllableState`, `useMediaQuery`, `useMobile`, `useDebounce`, `useCopyToClipboard`, `useLocale`
 - Functions: `toast`
-- Utility: `cn`
-- Stylesheet: `@fodmapp/ui/styles.css`
+- Utility: `cn` via `@fodmapp/ui/cn`
+- Stylesheets: `@fodmapp/ui/app.css`, `@fodmapp/ui/full.css`
 
 ## Build
 
@@ -25,13 +19,10 @@ pnpm --filter @fodmapp/ui build
 
 Outputs:
 
-- `dist/index.js`
-- `dist/index.d.ts`
-- `dist/server.js`
-- `dist/server.d.ts`
-- `dist/client.js`
-- `dist/client.d.ts`
-- `dist/styles.css`
+- `dist/<component>.js`
+- `dist/<component>.d.ts`
+- `dist/app.css`
+- `dist/full.css`
 
 ## Quality checks
 
@@ -49,7 +40,8 @@ The stylesheet consumes shared design tokens and supports:
 - forced light mode with `data-theme="light"`
 - forced dark mode with `data-theme="dark"`
 
-`@fodmapp/ui/styles.css` is a component contract stylesheet only.
+`@fodmapp/ui/app.css` is the app-focused stylesheet for the current Next app surface.
+`@fodmapp/ui/full.css` is the full component contract stylesheet used by Storybook.
 Storybook-only utility classes must not be required or shipped by this package.
 
 ## Component API notes

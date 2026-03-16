@@ -6,7 +6,7 @@ import { logError, logInfo } from "./logger.mjs";
 
 const filename = fileURLToPath(import.meta.url);
 const packageRoot = path.resolve(path.dirname(filename), "..");
-const stylesheetPath = path.join(packageRoot, "dist", "styles.css");
+const stylesheetPath = path.join(packageRoot, "dist", "full.css");
 
 const css = readFileSync(stylesheetPath, "utf8");
 const sourceRootPath = path.join(packageRoot, "src");

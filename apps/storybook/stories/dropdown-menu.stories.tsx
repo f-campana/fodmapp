@@ -20,7 +20,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/dropdown-menu";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

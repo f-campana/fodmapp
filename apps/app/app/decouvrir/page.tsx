@@ -1,16 +1,14 @@
 import Link from "next/link";
 
+import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmapp/ui/server";
+} from "@fodmapp/ui/card";
 
 import { getSafeHarbors } from "../../lib/api";
 

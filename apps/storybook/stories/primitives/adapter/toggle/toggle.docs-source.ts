@@ -1,4 +1,4 @@
-export const toggleRecommendedUsageCode = `import { Toggle } from "@fodmapp/ui";
+export const toggleRecommendedUsageCode = `import { Toggle } from "@fodmapp/ui/toggle";
 
 export function Example() {
   return (

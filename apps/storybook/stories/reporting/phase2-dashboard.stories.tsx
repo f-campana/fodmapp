@@ -4,7 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import "@fodmapp/reporting/styles.css";
 
-import { parseReportingRun, renderDashboardFragment } from "@fodmapp/reporting";
+import { renderDashboardFragment } from "@fodmapp/reporting/dashboard";
+import { parseReportingRun } from "@fodmapp/reporting/validate";
 
 import baselineRun from "../../../../etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json";
 

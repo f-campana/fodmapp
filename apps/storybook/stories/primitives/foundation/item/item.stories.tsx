@@ -11,7 +11,7 @@ import {
   ItemHeader,
   ItemMedia,
   ItemTitle,
-} from "@fodmapp/ui";
+} from "@fodmapp/ui/item";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 
