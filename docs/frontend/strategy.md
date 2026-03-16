@@ -31,6 +31,7 @@ Enable frontend delivery in parallel with data-engine work, without changing API
 - `@fodmapp/ui` export strategy
 - token package contracts
 - shared Tailwind CSS contract
+- design foundations docs under `docs/frontend/design-foundations/*`
 
 3. Non-functional expectations:
 

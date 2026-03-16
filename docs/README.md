@@ -75,6 +75,8 @@ Use this index when you know you need documentation, but do not yet know which s
 
 - [`docs/frontend/strategy.md`](./frontend/strategy.md): frontend ownership split and delivery
   boundaries.
+- [`docs/frontend/design-foundations/README.md`](./frontend/design-foundations/README.md):
+  canonical cross-cutting design-system rules that do not belong in Storybook component docs.
 - [`docs/frontend/storybook-component-taxonomy-contract.md`](./frontend/storybook-component-taxonomy-contract.md):
   component taxonomy contract.
 - [`apps/app/README.md`](../apps/app/README.md): current app scaffold scope and runtime
@@ -147,6 +149,8 @@ Use this index when you know you need documentation, but do not yet know which s
 - `docs/transition/`: current baseline and active transition risks only.
 - `docs/plans/`: active plans, task breakdowns, and gate notes tied to live work.
 - `docs/research/`: current evidence or locked-decision records tied to active tracks.
+- Storybook component docs: component contract, examples, and implementation-backed usage notes.
+- `docs/frontend/design-foundations/*`: cross-cutting design-system rules shared across component families.
 - Code-adjacent READMEs and runbooks: subsystem setup, execution, tests, and local contracts.
 - `docs/archive/`: the only historical home for superseded material.
 
@@ -168,6 +172,7 @@ Use this index when you know you need documentation, but do not yet know which s
 - `ops/`: CI hardening, maintainer runbooks, worktree operations, and repo governance.
 - `transition/`: current baseline and active transition risk artifacts.
 - `frontend/`: UI or design system strategy and implementation contracts.
+- `frontend/design-foundations/`: cross-cutting design-system rules outside Storybook.
 - `plans/`: active execution plans, task breakdowns, and checkpoint notes.
 - `research/`: active evidence and locked-decision records for live tracks.
 - `references/`: external references and supporting context.
