@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { ScrollArea } from "@fodmap/ui";
+import { ScrollArea } from "@fodmap/ui/scroll-area";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

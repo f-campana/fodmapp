@@ -12,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@fodmap/ui";
+} from "@fodmap/ui/table";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

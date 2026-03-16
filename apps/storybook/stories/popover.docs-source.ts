@@ -1,10 +1,5 @@
-export const popoverRecommendedUsageCode = `import {
-  Button,
-  Popover,
-  PopoverArrow,
-  PopoverContent,
-  PopoverTrigger,
-} from "@fodmap/ui";
+export const popoverRecommendedUsageCode = `import { Button } from "@fodmap/ui/button";
+import { Popover, PopoverArrow, PopoverContent, PopoverTrigger } from "@fodmap/ui/popover";
 
 export function Example() {
   return (

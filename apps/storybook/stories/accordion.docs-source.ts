@@ -1,9 +1,4 @@
-export const accordionRecommendedUsageCode = `import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@fodmap/ui";
+export const accordionRecommendedUsageCode = `import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@fodmap/ui/accordion";
 
 export function Example() {
   return (

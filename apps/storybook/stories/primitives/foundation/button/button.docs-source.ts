@@ -1,4 +1,4 @@
-export const buttonRecommendedUsageCode = `import { Button } from "@fodmap/ui";
+export const buttonRecommendedUsageCode = `import { Button } from "@fodmap/ui/button";
 
 export function Example() {
   return (
@@ -9,7 +9,7 @@ export function Example() {
 }
 `;
 
-export const buttonAsChildUsageCode = `import { Button } from "@fodmap/ui";
+export const buttonAsChildUsageCode = `import { Button } from "@fodmap/ui/button";
 
 export function Example() {
   return (

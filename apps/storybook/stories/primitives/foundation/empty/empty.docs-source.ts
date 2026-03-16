@@ -1,9 +1,4 @@
-export const emptyRecommendedUsageCode = `import {
-  Empty,
-  EmptyActions,
-  EmptyDescription,
-  EmptyTitle,
-} from "@fodmap/ui";
+export const emptyRecommendedUsageCode = `import { Empty, EmptyActions, EmptyDescription, EmptyTitle } from "@fodmap/ui/empty";
 
 export function Example() {
   return (

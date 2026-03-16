@@ -4,14 +4,14 @@ import { ClipboardList, SearchX } from "lucide-react";
 import type { ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
+import { Button } from "@fodmap/ui/button";
 import {
-  Button,
   Empty,
   EmptyActions,
   EmptyDescription,
   EmptyIcon,
   EmptyTitle,
-} from "@fodmap/ui";
+} from "@fodmap/ui/empty";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

@@ -14,7 +14,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@fodmap/ui";
+} from "@fodmap/ui/input-otp";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

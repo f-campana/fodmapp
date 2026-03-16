@@ -10,7 +10,7 @@ import {
   InputGroupButton,
   InputGroupInput,
   InputGroupText,
-} from "@fodmap/ui";
+} from "@fodmap/ui/input-group";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

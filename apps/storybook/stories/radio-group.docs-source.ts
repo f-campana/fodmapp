@@ -1,8 +1,5 @@
-export const radioGroupRecommendedUsageCode = `import {
-  Label,
-  RadioGroup,
-  RadioGroupItem,
-} from "@fodmap/ui";
+export const radioGroupRecommendedUsageCode = `import { Label } from "@fodmap/ui/label";
+import { RadioGroup, RadioGroupItem } from "@fodmap/ui/radio-group";
 
 export function Example() {
   return (

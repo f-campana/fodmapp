@@ -1,8 +1,4 @@
-export const collapsibleRecommendedUsageCode = `import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@fodmap/ui";
+export const collapsibleRecommendedUsageCode = `import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@fodmap/ui/collapsible";
 
 export function Example() {
   return (

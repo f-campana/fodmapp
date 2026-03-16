@@ -1,11 +1,4 @@
-export const paginationRecommendedUsageCode = `import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@fodmap/ui";
+export const paginationRecommendedUsageCode = `import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@fodmap/ui/pagination";
 
 export function ResultsPagination() {
   return (

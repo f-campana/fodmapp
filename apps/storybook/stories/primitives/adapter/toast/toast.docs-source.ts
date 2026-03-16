@@ -1,4 +1,6 @@
-export const toastRecommendedUsageCode = `import { Button, Sonner, Toast } from "@fodmap/ui";
+export const toastRecommendedUsageCode = `import { Button } from "@fodmap/ui/button";
+import { Sonner } from "@fodmap/ui/sonner";
+import { Toast } from "@fodmap/ui/toast";
 
 export function Example() {
   return (

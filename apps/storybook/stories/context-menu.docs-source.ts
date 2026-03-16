@@ -1,11 +1,4 @@
-export const contextMenuRecommendedUsageCode = `import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuLabel,
-  ContextMenuSeparator,
-  ContextMenuTrigger,
-} from "@fodmap/ui";
+export const contextMenuRecommendedUsageCode = `import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from "@fodmap/ui/context-menu";
 
 export function Example() {
   return (

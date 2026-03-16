@@ -1,12 +1,4 @@
-export const dropdownMenuRecommendedUsageCode = `import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@fodmap/ui";
+export const dropdownMenuRecommendedUsageCode = `import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "@fodmap/ui/dropdown-menu";
 
 export function Example() {
   return (

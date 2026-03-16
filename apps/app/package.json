@@ -4,8 +4,9 @@
   "version": "0.1.26",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm --filter @fodmap/ui build && next dev",
+    "build": "pnpm --filter @fodmap/ui build && next build",
+    "analyze": "pnpm --filter @fodmap/ui build && ANALYZE=true next build --webpack",
     "start": "next start",
     "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
@@ -20,6 +21,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "16.1.6",
     "@types/node": "25.5.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",

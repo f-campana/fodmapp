@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
-import { Calendar } from "@fodmap/ui";
+import { Calendar } from "@fodmap/ui/calendar";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

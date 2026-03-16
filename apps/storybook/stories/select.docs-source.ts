@@ -1,12 +1,4 @@
-export const selectRecommendedUsageCode = `import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@fodmap/ui";
+export const selectRecommendedUsageCode = `import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@fodmap/ui/select";
 
 export function Example() {
   return (

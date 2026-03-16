@@ -1,4 +1,5 @@
-export const switchRecommendedUsageCode = `import { Label, Switch } from "@fodmap/ui";
+export const switchRecommendedUsageCode = `import { Label } from "@fodmap/ui/label";
+import { Switch } from "@fodmap/ui/switch";
 
 export function Example() {
   return (

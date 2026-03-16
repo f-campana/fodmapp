@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Chip } from "@fodmap/ui";
+import { Chip } from "@fodmap/ui/chip";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

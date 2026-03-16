@@ -1,14 +1,5 @@
-export const drawerRecommendedUsageCode = `import {
-  Button,
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@fodmap/ui";
+export const drawerRecommendedUsageCode = `import { Button } from "@fodmap/ui/button";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@fodmap/ui/drawer";
 
 export function Example() {
   return (

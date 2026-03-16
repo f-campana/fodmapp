@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { Button } from "@fodmap/ui/button";
 import {
-  Button,
   Dialog,
   DialogBody,
   DialogClose,
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@fodmap/ui";
+} from "@fodmap/ui/dialog";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

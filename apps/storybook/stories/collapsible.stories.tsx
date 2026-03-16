@@ -7,7 +7,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@fodmap/ui";
+} from "@fodmap/ui/collapsible";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

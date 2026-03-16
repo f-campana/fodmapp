@@ -118,6 +118,7 @@ if [[ "$run_full" == "true" ]]; then
 
   run_cmd "format check" pnpm format:check
   run_cmd "UI package build for lint imports" pnpm exec turbo run build --filter=@fodmap/ui
+  run_cmd "Reporting package build for lint imports" pnpm exec turbo run build --filter=@fodmap/reporting
   run_cmd "lint (CI)" pnpm lint:ci
   run_cmd "python lint (CI)" pnpm python:ci
   run_cmd "changeset checker unit tests" pnpm changeset:ci:test

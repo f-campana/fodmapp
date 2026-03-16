@@ -1,9 +1,4 @@
-export const inputOtpRecommendedUsageCode = `import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@fodmap/ui";
+export const inputOtpRecommendedUsageCode = `import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@fodmap/ui/input-otp";
 
 export function Example() {
   return (

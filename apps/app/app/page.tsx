@@ -1,16 +1,16 @@
 import Link from "next/link";
 
 import type { components } from "@fodmap/types";
+import { Badge } from "@fodmap/ui/badge";
+import { Button } from "@fodmap/ui/button";
 import {
-  Badge,
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui";
+} from "@fodmap/ui/card";
 
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
@@ -53,12 +53,13 @@ function normalizeLocale(raw: string | string[] | undefined): {
   return { locale: "fr", fallback: true };
 }
 
-export default function HomePage({
+export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { locale?: string | string[] };
+  searchParams: Promise<{ locale?: string | string[] | undefined }>;
 }) {
-  const { locale, fallback } = normalizeLocale(searchParams?.locale);
+  const resolvedSearchParams = await searchParams;
+  const { locale, fallback } = normalizeLocale(resolvedSearchParams?.locale);
   const copy = (path: string, vars?: Record<string, string>) =>
     getMedicalSafetyCopy(locale, path, vars ?? {});
   const auth = getClerkBootstrapStatus();

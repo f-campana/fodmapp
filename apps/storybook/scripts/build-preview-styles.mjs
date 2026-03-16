@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,20 @@ const outputPath = path.resolve(
   storybookCwd,
   ".storybook/preview.generated.css",
 );
+
+const uiStylesBuild = spawnSync(
+  pnpmCmd,
+  ["--filter", "@fodmap/ui", "build:styles"],
+  {
+    cwd: repoRootCwd,
+    env: process.env,
+    stdio: "inherit",
+  },
+);
+
+if (uiStylesBuild.status !== 0) {
+  process.exit(uiStylesBuild.status ?? 1);
+}
 
 const args = [
   "--filter",

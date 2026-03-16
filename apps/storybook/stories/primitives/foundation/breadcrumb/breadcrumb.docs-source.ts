@@ -1,11 +1,4 @@
-export const breadcrumbRecommendedUsageCode = `import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@fodmap/ui";
+export const breadcrumbRecommendedUsageCode = `import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@fodmap/ui/breadcrumb";
 
 export function RecipeBreadcrumb() {
   return (

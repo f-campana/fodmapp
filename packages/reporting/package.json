@@ -3,22 +3,40 @@
   "private": true,
   "version": "0.1.8",
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
-    "./styles.css": "./src/styles/reporting-theme.css"
+    "./dashboard": {
+      "types": "./dist/dashboard.d.ts",
+      "import": "./dist/dashboard.js"
+    },
+    "./scientific": {
+      "types": "./dist/scientific.d.ts",
+      "import": "./dist/scientific.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts.d.ts",
+      "import": "./dist/contracts.js"
+    },
+    "./validate": {
+      "types": "./dist/validate.d.ts",
+      "import": "./dist/validate.js"
+    },
+    "./styles.css": "./dist/styles.css"
   },
   "files": [
-    "src",
-    "dist",
-    "src/styles/reporting-theme.css"
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/styles.css"
   ],
   "scripts": {
-    "build": "tsup",
+    "clean": "rm -rf dist",
+    "build": "pnpm run clean && tsup && cp src/styles/reporting-theme.css dist/styles.css",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "colors:check": "if rg -n -- '#[0-9a-fA-F]{3,6}' src/scientific/render-scientific.ts; then echo 'Hex literals are not allowed in scientific renderer'; exit 1; fi",
     "test": "pnpm run colors:check && vitest run --passWithNoTests",

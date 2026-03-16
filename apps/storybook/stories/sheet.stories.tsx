@@ -4,8 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
+import { Button } from "@fodmap/ui/button";
 import {
-  Button,
   Sheet,
   SheetClose,
   SheetContent,
@@ -14,7 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@fodmap/ui";
+} from "@fodmap/ui/sheet";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

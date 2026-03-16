@@ -40,9 +40,10 @@ function normalizeLocale(raw: string | string[] | undefined): {
 export default async function EspacePage({
   searchParams,
 }: {
-  searchParams?: { locale?: string | string[] };
-} = {}) {
-  const { locale, fallback } = normalizeLocale(searchParams?.locale);
+  searchParams: Promise<{ locale?: string | string[] | undefined }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const { locale, fallback } = normalizeLocale(resolvedSearchParams?.locale);
   const copy = (path: string, vars: Record<string, string> = {}) =>
     getMedicalSafetyCopy(locale, path, vars);
 

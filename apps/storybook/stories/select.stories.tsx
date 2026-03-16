@@ -13,7 +13,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@fodmap/ui";
+} from "@fodmap/ui/select";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

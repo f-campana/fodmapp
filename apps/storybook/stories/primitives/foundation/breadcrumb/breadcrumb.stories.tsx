@@ -11,7 +11,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@fodmap/ui";
+} from "@fodmap/ui/breadcrumb";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

@@ -16,7 +16,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@fodmap/ui";
+} from "@fodmap/ui/carousel";
 
 import { StoryFrame, type StoryFrameProps } from "../../_shared/story-frame";
 

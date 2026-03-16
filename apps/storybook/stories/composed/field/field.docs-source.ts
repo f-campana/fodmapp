@@ -1,4 +1,5 @@
-export const fieldRecommendedUsageCode = `import { Field, Input } from "@fodmap/ui";
+export const fieldRecommendedUsageCode = `import { Field } from "@fodmap/ui/field";
+import { Input } from "@fodmap/ui/input";
 
 export function Example() {
   return (

@@ -19,8 +19,10 @@ vi.mock("../app/espace/ConsentRightsClient", () => ({
 const mockedGetAuthContext = vi.mocked(getAuthContext);
 
 describe("apps/app scaffold routes", () => {
-  it("renders home route with FR-first scaffold copy and espace link", () => {
-    const html = renderToStaticMarkup(<HomePage />);
+  it("renders home route with FR-first scaffold copy and espace link", async () => {
+    const html = renderToStaticMarkup(
+      await HomePage({ searchParams: Promise.resolve({}) }),
+    );
 
     expect(html).toContain(
       "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",
@@ -43,7 +45,9 @@ describe("apps/app scaffold routes", () => {
       userId: null,
     });
 
-    const html = renderToStaticMarkup(await EspacePage({}));
+    const html = renderToStaticMarkup(
+      await EspacePage({ searchParams: Promise.resolve({}) }),
+    );
 
     expect(html).toContain(
       "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",
@@ -66,7 +70,9 @@ describe("apps/app scaffold routes", () => {
       userId: "user_123",
     });
 
-    const html = renderToStaticMarkup(await EspacePage({}));
+    const html = renderToStaticMarkup(
+      await EspacePage({ searchParams: Promise.resolve({}) }),
+    );
 
     expect(html).toContain("consent-rights-client:user_123");
     expect(html).not.toContain('href="/sign-in"');

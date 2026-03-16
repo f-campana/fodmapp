@@ -4,7 +4,7 @@ import { CircleAlert, Info } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { expect, within } from "storybook/test";
 
-import { Alert, AlertDescription, AlertTitle } from "@fodmap/ui";
+import { Alert, AlertDescription, AlertTitle } from "@fodmap/ui/alert";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

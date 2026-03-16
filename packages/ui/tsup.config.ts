@@ -1,7 +1,36 @@
+import { readdirSync } from "node:fs";
+import path from "node:path";
+
 import { defineConfig } from "tsup";
 
+const packageRoot = process.cwd();
+const componentsDir = path.join(packageRoot, "src", "components");
+const hooksDir = path.join(packageRoot, "src", "hooks");
+
+function collectEntries(dir: string, prefix = ""): Record<string, string> {
+  return Object.fromEntries(
+    readdirSync(dir)
+      .filter(
+        (file) =>
+          (file.endsWith(".ts") || file.endsWith(".tsx")) &&
+          !file.endsWith(".test.ts") &&
+          !file.endsWith(".test.tsx"),
+      )
+      .map((file) => {
+        const name = file.replace(/\.(ts|tsx)$/, "");
+        return [prefix ? `${prefix}/${name}` : name, path.join(dir, file)];
+      }),
+  );
+}
+
+const entry = {
+  ...collectEntries(componentsDir),
+  ...collectEntries(hooksDir, "hooks"),
+  cn: path.join(packageRoot, "src", "lib", "cn.ts"),
+};
+
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry,
   format: ["esm"],
   dts: true,
   sourcemap: true,

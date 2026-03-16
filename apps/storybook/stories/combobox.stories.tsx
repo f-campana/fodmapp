@@ -15,7 +15,7 @@ import {
   ComboboxMulti,
   ComboboxSeparator,
   ComboboxTrigger,
-} from "@fodmap/ui";
+} from "@fodmap/ui/combobox";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

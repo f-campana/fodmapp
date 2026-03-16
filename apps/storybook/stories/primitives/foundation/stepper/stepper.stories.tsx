@@ -9,7 +9,7 @@ import {
   StepperLabel,
   StepperSeparator,
   StepperStep,
-} from "@fodmap/ui";
+} from "@fodmap/ui/stepper";
 
 import { StoryFrame, type StoryFrameProps } from "../../../_shared/story-frame";
 

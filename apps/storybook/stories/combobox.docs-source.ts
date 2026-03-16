@@ -1,13 +1,4 @@
-export const comboboxRecommendedUsageCode = `import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxTrigger,
-} from "@fodmap/ui";
+export const comboboxRecommendedUsageCode = `import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxGroup, ComboboxInput, ComboboxItem, ComboboxList, ComboboxTrigger } from "@fodmap/ui/combobox";
 
 export function Example() {
   return (
