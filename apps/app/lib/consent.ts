@@ -1,6 +1,5 @@
+import { buildApiUrl, resolveApiBase } from "./api/base";
 import { getClientRuntimeEnv } from "./env.client";
-
-const API_DEFAULT_BASE = "/v0";
 const API_PATHS = {
   consent: "/me/consent",
   export: "/me/export",
@@ -120,30 +119,6 @@ type ConsentStatePayload = {
   status?: string;
 };
 
-function resolveApiBase(apiBase?: string | null): string {
-  if (apiBase) {
-    return apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
-  }
-
-  return API_DEFAULT_BASE;
-}
-
-function buildUrl(path: string, apiBase?: string | null): string {
-  const base = resolveApiBase(apiBase);
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-
-  if (/^https?:\/\//i.test(base)) {
-    return `${base}${normalizedPath}`;
-  }
-
-  if (typeof window === "undefined") {
-    return `${base}${normalizedPath}`;
-  }
-
-  const location = window.location;
-  return `${location.protocol}//${location.host}${base === "" ? "" : base}${normalizedPath}`;
-}
-
 async function callMeApi<T>(
   path: string,
   userId: string,
@@ -154,7 +129,12 @@ async function callMeApi<T>(
   headers.set("Content-Type", "application/json");
   headers.set("X-User-Id", userId);
 
-  const response = await fetch(buildUrl(path, apiBase), {
+  const url = buildApiUrl(path, apiBase ?? getClientRuntimeEnv().apiBaseUrl);
+  if (!url) {
+    throw new Error("me-api error 0: api_not_configured");
+  }
+
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -435,15 +415,19 @@ export function buildExportUrl(
     return statusUri;
   }
 
-  const base = resolveApiBase(apiBase);
-  if (base === "") {
-    if (typeof window === "undefined") {
-      return statusUri;
-    }
-    return `${window.location.origin}${statusUri}`;
+  const base = resolveApiBase(apiBase ?? getClientRuntimeEnv().apiBaseUrl);
+  if (!base) {
+    return statusUri;
   }
 
-  return `${base}${statusUri.startsWith("/") ? "" : "/"}${statusUri}`;
+  const normalizedStatusUri = statusUri.startsWith("/")
+    ? statusUri
+    : `/${statusUri}`;
+  const basePath = normalizedStatusUri.startsWith("/v0")
+    ? base.replace(/\/v0$/, "")
+    : base;
+
+  return `${basePath}${normalizedStatusUri}`;
 }
 
 export const CONSENT_API_CONFIRM_TEXT = "SUPPRIMER MES DONNÉES";
