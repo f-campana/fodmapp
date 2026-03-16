@@ -49,7 +49,6 @@ const recipeImageSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`
 const meta = {
   title: "Primitives/Adapter/AspectRatio",
   component: AspectRatio,
-  tags: ["autodocs"],
   argTypes: {
     ratio: {
       description: "Width-to-height ratio used to reserve the media box.",

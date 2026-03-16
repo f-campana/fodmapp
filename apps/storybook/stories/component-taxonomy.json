@@ -9,7 +9,7 @@
   "components": {
     "accordion": {
       "category": "adapter",
-      "storyFile": "accordion.stories.tsx",
+      "storyFile": "primitives/adapter/accordion/accordion.stories.tsx",
       "title": "Primitives/Adapter/Accordion"
     },
     "alert-dialog": {
@@ -74,7 +74,7 @@
     },
     "checkbox": {
       "category": "adapter",
-      "storyFile": "checkbox.stories.tsx",
+      "storyFile": "primitives/adapter/checkbox/checkbox.stories.tsx",
       "title": "Primitives/Adapter/Checkbox"
     },
     "chip": {
@@ -84,12 +84,12 @@
     },
     "collapsible": {
       "category": "adapter",
-      "storyFile": "collapsible.stories.tsx",
+      "storyFile": "primitives/adapter/collapsible/collapsible.stories.tsx",
       "title": "Primitives/Adapter/Collapsible"
     },
     "combobox": {
       "category": "composed",
-      "storyFile": "combobox.stories.tsx",
+      "storyFile": "composed/combobox/combobox.stories.tsx",
       "title": "Composed/Combobox"
     },
     "command": {
@@ -99,7 +99,7 @@
     },
     "context-menu": {
       "category": "adapter",
-      "storyFile": "context-menu.stories.tsx",
+      "storyFile": "primitives/adapter/context-menu/context-menu.stories.tsx",
       "title": "Primitives/Adapter/ContextMenu"
     },
     "date-picker": {
@@ -109,7 +109,7 @@
     },
     "dialog": {
       "category": "adapter",
-      "storyFile": "dialog.stories.tsx",
+      "storyFile": "primitives/adapter/dialog/dialog.stories.tsx",
       "title": "Primitives/Adapter/Dialog"
     },
     "dot": {
@@ -119,12 +119,12 @@
     },
     "drawer": {
       "category": "adapter",
-      "storyFile": "drawer.stories.tsx",
+      "storyFile": "primitives/adapter/drawer/drawer.stories.tsx",
       "title": "Primitives/Adapter/Drawer"
     },
     "dropdown-menu": {
       "category": "adapter",
-      "storyFile": "dropdown-menu.stories.tsx",
+      "storyFile": "primitives/adapter/dropdown-menu/dropdown-menu.stories.tsx",
       "title": "Primitives/Adapter/DropdownMenu"
     },
     "empty": {
@@ -139,7 +139,7 @@
     },
     "hover-card": {
       "category": "adapter",
-      "storyFile": "hover-card.stories.tsx",
+      "storyFile": "primitives/adapter/hover-card/hover-card.stories.tsx",
       "title": "Primitives/Adapter/HoverCard"
     },
     "input": {
@@ -174,7 +174,7 @@
     },
     "menubar": {
       "category": "adapter",
-      "storyFile": "menubar.stories.tsx",
+      "storyFile": "primitives/adapter/menubar/menubar.stories.tsx",
       "title": "Primitives/Adapter/Menubar"
     },
     "native-select": {
@@ -184,7 +184,7 @@
     },
     "navigation-menu": {
       "category": "adapter",
-      "storyFile": "navigation-menu.stories.tsx",
+      "storyFile": "primitives/adapter/navigation-menu/navigation-menu.stories.tsx",
       "title": "Primitives/Adapter/NavigationMenu"
     },
     "pagination": {
@@ -194,7 +194,7 @@
     },
     "popover": {
       "category": "adapter",
-      "storyFile": "popover.stories.tsx",
+      "storyFile": "primitives/adapter/popover/popover.stories.tsx",
       "title": "Primitives/Adapter/Popover"
     },
     "portal": {
@@ -204,17 +204,17 @@
     },
     "progress": {
       "category": "adapter",
-      "storyFile": "progress.stories.tsx",
+      "storyFile": "primitives/adapter/progress/progress.stories.tsx",
       "title": "Primitives/Adapter/Progress"
     },
     "radio-group": {
       "category": "adapter",
-      "storyFile": "radio-group.stories.tsx",
+      "storyFile": "primitives/adapter/radio-group/radio-group.stories.tsx",
       "title": "Primitives/Adapter/RadioGroup"
     },
     "resizable": {
       "category": "adapter",
-      "storyFile": "resizable.stories.tsx",
+      "storyFile": "primitives/adapter/resizable/resizable.stories.tsx",
       "title": "Primitives/Adapter/Resizable"
     },
     "score-bar": {
@@ -224,12 +224,12 @@
     },
     "scroll-area": {
       "category": "adapter",
-      "storyFile": "scroll-area.stories.tsx",
+      "storyFile": "primitives/adapter/scroll-area/scroll-area.stories.tsx",
       "title": "Primitives/Adapter/ScrollArea"
     },
     "select": {
       "category": "adapter",
-      "storyFile": "select.stories.tsx",
+      "storyFile": "primitives/adapter/select/select.stories.tsx",
       "title": "Primitives/Adapter/Select"
     },
     "separator": {
@@ -239,7 +239,7 @@
     },
     "sheet": {
       "category": "adapter",
-      "storyFile": "sheet.stories.tsx",
+      "storyFile": "primitives/adapter/sheet/sheet.stories.tsx",
       "title": "Primitives/Adapter/Sheet"
     },
     "skeleton": {
@@ -254,7 +254,7 @@
     },
     "sonner": {
       "category": "adapter",
-      "storyFile": "composed/sonner/sonner.stories.tsx",
+      "storyFile": "primitives/adapter/sonner/sonner.stories.tsx",
       "title": "Primitives/Adapter/Sonner"
     },
     "spinner": {
@@ -279,7 +279,7 @@
     },
     "tabs": {
       "category": "adapter",
-      "storyFile": "tabs.stories.tsx",
+      "storyFile": "primitives/adapter/tabs/tabs.stories.tsx",
       "title": "Primitives/Adapter/Tabs"
     },
     "textarea": {
@@ -289,7 +289,7 @@
     },
     "toast": {
       "category": "composed",
-      "storyFile": "primitives/adapter/toast/toast.stories.tsx",
+      "storyFile": "composed/toast/toast.stories.tsx",
       "title": "Composed/Toast"
     },
     "toggle": {
@@ -304,7 +304,7 @@
     },
     "tooltip": {
       "category": "adapter",
-      "storyFile": "tooltip.stories.tsx",
+      "storyFile": "primitives/adapter/tooltip/tooltip.stories.tsx",
       "title": "Primitives/Adapter/Tooltip"
     },
     "typography": {

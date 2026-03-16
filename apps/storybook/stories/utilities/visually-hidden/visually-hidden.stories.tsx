@@ -29,7 +29,6 @@ const defaultArgs = {
 const meta = {
   title: "Utilities/VisuallyHidden",
   component: VisuallyHidden,
-  tags: ["autodocs"],
   argTypes: {
     children: {
       control: false,

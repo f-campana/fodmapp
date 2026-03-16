@@ -1,0 +1,50 @@
+import {
+  Canvas,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as PortalStories from "./portal.stories";
+import { portalRecommendedUsageCode } from "./portal.docs-source";
+
+<Meta of={PortalStories} />
+
+<Title />
+<Subtitle>
+  Use Portal to mount content outside the local DOM position while preserving
+  the same React ownership tree.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={portalRecommendedUsageCode} language="tsx" />
+
+<Canvas of={PortalStories.Default} sourceState="none" />
+
+## When to use
+
+Use Portal for overlays, floating layers, or local mount targets that must
+escape the source layout container.
+
+Avoid it when inline rendering is already correct and no mount indirection is
+needed.
+
+## Accessibility contract
+
+- Portal changes mount location, not the accessibility contract of the children
+- local container mounting should only be used when the destination must stay in
+  the same screen region
+- `disabled` renders children inline instead of moving them
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies both preview-body mounting and local-container mounting
+
+What is checked manually:
+
+- visual pass for clipping, stacking, and local-target placement in compact
+  layouts

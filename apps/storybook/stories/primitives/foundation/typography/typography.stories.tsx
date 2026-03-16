@@ -31,7 +31,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Foundation/Typography",
   component: Typography,
-  tags: ["autodocs"],
   argTypes: {
     variant: {
       description: "Chooses the text preset and default rendered element.",

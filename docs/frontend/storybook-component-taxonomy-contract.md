@@ -6,11 +6,6 @@ This document defines the canonical taxonomy contract for component stories unde
 
 - `apps/storybook/stories/**/*.stories.tsx`
 
-It does not apply to:
-
-- `apps/storybook/stories/foundations/*`
-- `apps/storybook/stories/reporting/*`
-
 ## Taxonomy Lanes
 
 The Storybook title prefixes are strict and canonical:
@@ -50,7 +45,7 @@ The taxonomy checker must enforce:
 2. No taxonomy entry points to a non-existent component.
 3. Every mapped component story file exists.
 4. Every mapped component story title exactly matches the mapped title.
-5. No unmapped component story exists outside the excluded `foundations/*` and `reporting/*` directories.
+5. No unmapped component story exists under `apps/storybook/stories` outside shared helper files.
 
 `storyFile` values in `component-taxonomy.json` are paths relative to `apps/storybook/stories`.
 

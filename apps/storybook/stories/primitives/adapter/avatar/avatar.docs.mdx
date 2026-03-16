@@ -1,0 +1,55 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as AvatarStories from "./avatar.stories";
+import { avatarRecommendedUsageCode } from "./avatar.docs-source";
+
+<Meta of={AvatarStories} />
+
+<Title />
+<Subtitle>
+  Use Avatar for a compact identity slot with an image path and a fallback path
+  in the same layout footprint.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={avatarRecommendedUsageCode} language="tsx" />
+
+<Canvas of={AvatarStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={AvatarStories.Playground} />
+
+## When to use
+
+Use Avatar when a person or account needs a compact visual marker next to name
+or status copy.
+
+Avoid it when the interface does not need identity media at all or when a full
+profile card already carries the visual emphasis.
+
+## Accessibility contract
+
+- the accessible name comes from `AvatarImage` `alt` text or nearby visible copy
+- fallback content stays visible when the image path is absent or fails
+- root, image, and fallback keep stable slot hooks in default composition
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies loaded-image and fallback rendering inside the audit frame
+- interaction checks cover slot markers and fallback visibility
+
+What is checked manually:
+
+- visual pass for crop, fallback contrast, and profile-row alignment at narrow
+  widths

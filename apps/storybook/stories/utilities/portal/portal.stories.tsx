@@ -31,7 +31,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Utilities/Portal",
   component: Portal,
-  tags: ["autodocs"],
   argTypes: {
     disabled: {
       description:

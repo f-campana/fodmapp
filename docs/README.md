@@ -75,8 +75,6 @@ Use this index when you know you need documentation, but do not yet know which s
 
 - [`docs/frontend/strategy.md`](./frontend/strategy.md): frontend ownership split and delivery
   boundaries.
-- [`docs/frontend/storybook-foundations-contract.md`](./frontend/storybook-foundations-contract.md):
-  Storybook foundations baseline.
 - [`docs/frontend/storybook-component-taxonomy-contract.md`](./frontend/storybook-component-taxonomy-contract.md):
   component taxonomy contract.
 - [`apps/app/README.md`](../apps/app/README.md): current app scaffold scope and runtime

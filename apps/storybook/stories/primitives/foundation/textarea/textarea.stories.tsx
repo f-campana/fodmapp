@@ -87,7 +87,6 @@ const meta = {
       },
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<TextareaStoryArgs>;
 
 export default meta;

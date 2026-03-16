@@ -42,7 +42,6 @@ const defaultPlaygroundArgs = {
 const meta = {
   title: "Primitives/Foundation/Chip",
   component: Chip,
-  tags: ["autodocs"],
   argTypes: {
     variant: {
       description: "Chooses the visual tone for an interactive chip.",

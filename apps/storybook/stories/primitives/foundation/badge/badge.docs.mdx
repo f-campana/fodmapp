@@ -1,0 +1,53 @@
+import {
+  Canvas,
+  Controls,
+  Meta,
+  Source,
+  Subtitle,
+  Title,
+} from "@storybook/addon-docs/blocks";
+
+import * as BadgeStories from "./badge.stories";
+import { badgeRecommendedUsageCode } from "./badge.docs-source";
+
+<Meta of={BadgeStories} />
+
+<Title />
+<Subtitle>
+  Use Badge for a short read-only status label that supports nearby content
+  without behaving like a filter or action.
+</Subtitle>
+
+## Recommended usage
+
+<Source code={badgeRecommendedUsageCode} language="tsx" />
+
+<Canvas of={BadgeStories.Default} sourceState="none" />
+
+## Props and controls
+
+<Controls of={BadgeStories.Playground} />
+
+## When to use
+
+Use Badge for concise state, severity, or review labels that do not respond to
+user input.
+
+Use Chip instead when the user must toggle or remove the token.
+
+## Accessibility contract
+
+- Badge is a passive text container, not an interactive control
+- variant changes are visual only unless surrounding copy provides the meaning
+- the root keeps a stable `data-slot` hook for automation and regression checks
+
+## Validation
+
+What is checked automatically:
+
+- Storybook verifies variant data attributes in a realistic status-card context
+- interaction checks cover the stable slot hook and rendered variant marker
+
+What is checked manually:
+
+- visual pass for tone contrast and short-label legibility in compact layouts
