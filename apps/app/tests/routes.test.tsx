@@ -19,8 +19,8 @@ vi.mock("../app/espace/ConsentRightsClient", () => ({
 const mockedGetAuthContext = vi.mocked(getAuthContext);
 
 describe("apps/app scaffold routes", () => {
-  it("renders home route with FR-first scaffold copy and espace link", () => {
-    const html = renderToStaticMarkup(<HomePage />);
+  it("renders home route with FR-first scaffold copy and espace link", async () => {
+    const html = renderToStaticMarkup(await HomePage({}));
 
     expect(html).toContain(
       "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",

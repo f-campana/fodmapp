@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui";
+} from "@fodmap/ui/server";
 
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
@@ -53,12 +53,13 @@ function normalizeLocale(raw: string | string[] | undefined): {
   return { locale: "fr", fallback: true };
 }
 
-export default function HomePage({
+export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { locale?: string | string[] };
+  searchParams?: Promise<{ locale?: string | string[] }>;
 }) {
-  const { locale, fallback } = normalizeLocale(searchParams?.locale);
+  const resolvedSearchParams = await searchParams;
+  const { locale, fallback } = normalizeLocale(resolvedSearchParams?.locale);
   const copy = (path: string, vars?: Record<string, string>) =>
     getMedicalSafetyCopy(locale, path, vars ?? {});
   const auth = getClerkBootstrapStatus();
@@ -126,9 +127,13 @@ export default function HomePage({
           </p>
         </CardContent>
         <CardFooter>
-          <Button asChild>
-            <Link href="/espace">{copy("screens.swapDetail.trialHint")}</Link>
-          </Button>
+          <div className="product-home-links">
+            <Button asChild>
+              <Link href="/espace">{copy("screens.swapDetail.trialHint")}</Link>
+            </Button>
+            <Link href="/aliments">Explorer les aliments</Link>
+            <Link href="/decouvrir">Découvrir des bases alimentaires</Link>
+          </div>
         </CardFooter>
       </Card>
 
