@@ -7,11 +7,10 @@ type SuccessResult = {
   ok: true;
 };
 
-type ErrorResult =
-  | {
-      ok: false;
-      code: "bad_request" | "invalid_email" | "server_error";
-    };
+type ErrorResult = {
+  ok: false;
+  code: "bad_request" | "invalid_email" | "server_error";
+};
 
 type WaitlistResponse = SuccessResult | ErrorResult;
 
@@ -19,43 +18,39 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: NextRequest): Promise<
-  NextResponse<WaitlistResponse>
-> {
+export async function POST(
+  request: NextRequest,
+): Promise<NextResponse<WaitlistResponse>> {
   let body: unknown;
 
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { ok: false, code: "bad_request" } as const,
-      { status: 400 },
-    );
+    return NextResponse.json({ ok: false, code: "bad_request" } as const, {
+      status: 400,
+    });
   }
 
   const rawEmail = extractEmail(body);
   if (!rawEmail) {
-    return NextResponse.json(
-      { ok: false, code: "invalid_email" } as const,
-      { status: 400 },
-    );
+    return NextResponse.json({ ok: false, code: "invalid_email" } as const, {
+      status: 400,
+    });
   }
 
   const email = rawEmail.trim().toLowerCase();
   if (!emailRegex.test(email)) {
-    return NextResponse.json(
-      { ok: false, code: "invalid_email" } as const,
-      { status: 400 },
-    );
+    return NextResponse.json({ ok: false, code: "invalid_email" } as const, {
+      status: 400,
+    });
   }
 
   const marketingDbUrl = process.env.MARKETING_DB_URL;
   if (!marketingDbUrl) {
     console.error("MARKETING_DB_URL is not set");
-    return NextResponse.json(
-      { ok: false, code: "server_error" } as const,
-      { status: 503 },
-    );
+    return NextResponse.json({ ok: false, code: "server_error" } as const, {
+      status: 503,
+    });
   }
 
   try {
@@ -77,20 +72,18 @@ export async function POST(request: NextRequest): Promise<
           "Failed to send confirmation email",
           emailResult.error ?? "unknown error",
         );
-        return NextResponse.json(
-          { ok: false, code: "server_error" } as const,
-          { status: 500 },
-        );
+        return NextResponse.json({ ok: false, code: "server_error" } as const, {
+          status: 500,
+        });
       }
     }
 
     return NextResponse.json({ ok: true } as const);
   } catch (error) {
     console.error("Failed to write waitlist signup", error);
-    return NextResponse.json(
-      { ok: false, code: "server_error" } as const,
-      { status: 500 },
-    );
+    return NextResponse.json({ ok: false, code: "server_error" } as const, {
+      status: 500,
+    });
   }
 }
 

@@ -124,13 +124,13 @@ These keys are now actively consumed by `apps/app` runtime adapters. All integra
 
 These keys are actively used by the marketing waitlist backend and landing feature flags.
 
-| Variable                                | Adapter / Feature                    | Required    | Behavior when missing                                                                                                                                |
-| --------------------------------------- | ------------------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `MARKETING_DB_URL`                      | Waitlist backend (`app/api/waitlist`) | conditional | `POST /api/waitlist` returns `{ ok: false, code: \"server_error\" }` with HTTP 503.                                                                   |
-| `RESEND_API_KEY`                        | Confirmation email provider            | no          | Signup succeeds and logs a warning; confirmation email is skipped.                                                                                    |
-| `RESEND_FROM_EMAIL`                     | Confirmation email sender             | no          | Defaults to `noreply@fodmapp.fr` when not set.                                                                                                      |
-| `NEXT_PUBLIC_FF_SECTION_APPROACH`       | Marketing feature flag                | no          | `"1"` shows the Approach section; any other value keeps it hidden (default V1 behavior).                                                             |
-| `NEXT_PUBLIC_FF_SECTION_TRUST`          | Marketing feature flag                | no          | `"1"` shows the Trust section; any other value keeps it hidden (default V1 behavior).                                                                |
+| Variable                          | Adapter / Feature                     | Required    | Behavior when missing                                                                    |
+| --------------------------------- | ------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `MARKETING_DB_URL`                | Waitlist backend (`app/api/waitlist`) | conditional | `POST /api/waitlist` returns `{ ok: false, code: \"server_error\" }` with HTTP 503.      |
+| `RESEND_API_KEY`                  | Confirmation email provider           | no          | Signup succeeds and logs a warning; confirmation email is skipped.                       |
+| `RESEND_FROM_EMAIL`               | Confirmation email sender             | no          | Defaults to `noreply@fodmapp.fr` when not set.                                           |
+| `NEXT_PUBLIC_FF_SECTION_APPROACH` | Marketing feature flag                | no          | `"1"` shows the Approach section; any other value keeps it hidden (default V1 behavior). |
+| `NEXT_PUBLIC_FF_SECTION_TRUST`    | Marketing feature flag                | no          | `"1"` shows the Trust section; any other value keeps it hidden (default V1 behavior).    |
 
 ## Reserved Near-Term Variables
 
