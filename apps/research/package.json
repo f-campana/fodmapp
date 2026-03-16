@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "pnpm --filter @fodmapp/reporting build && astro build",
     "preview": "astro preview",
-    "typecheck": "astro check"
+    "typecheck": "pnpm --filter @fodmapp/reporting build && astro check"
   },
   "dependencies": {
     "@fodmapp/content-config": "workspace:*",
