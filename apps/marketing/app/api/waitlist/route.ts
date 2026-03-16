@@ -73,9 +73,6 @@ export async function POST(
           "Failed to send confirmation email",
           emailResult.error ?? "unknown error",
         );
-        return NextResponse.json({ ok: false, code: "server_error" } as const, {
-          status: 500,
-        });
       }
     }
 

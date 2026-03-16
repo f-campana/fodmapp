@@ -89,7 +89,7 @@ export const landingCopy = {
   footer: {
     builtInFrance: "Construit en France.",
     legal: "Mentions légales",
-    legalHref: "/mentions-legales",
+    legalHref: "/",
     githubHref: "https://github.com/f-campana/fodmapp",
     githubLabel: "Github",
   },
