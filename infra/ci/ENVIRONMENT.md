@@ -49,6 +49,14 @@ CI Turbo command policy:
   - Storybook Playwright browser install
   - Phase 2 reporting `render:*` commands
 
+CI lint import preparation:
+
+- `.github/workflows/ci.yml` `eslint` prebuilds workspace packages that expose runtime imports from `dist`
+- current prebuild list:
+  - `@fodmapp/ui`
+  - `@fodmapp/reporting`
+- this is a workflow contract, not an extra environment variable requirement; it keeps package-export import resolution stable on clean runners
+
 ## CI Governance Variables
 
 These keys are optional and used by CI governance helper scripts.

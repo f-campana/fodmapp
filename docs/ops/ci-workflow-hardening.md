@@ -6,7 +6,7 @@ Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the 
 Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
 Last reviewed: 2026-03-11
 
-Last updated: 2026-03-04
+Last updated: 2026-03-16
 
 ## Scope
 
@@ -24,6 +24,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - path-scoped Storybook deployment to Vercel production lane on `main`
 - API workflow job timeouts to fail fast on stalled runner container initialization
 - weekly docs hygiene drift audit with manual dispatch support and report artifacts
+- deterministic lint prebuilds for dist-backed workspace packages consumed through package exports
 
 ## Preconditions
 
@@ -164,6 +165,14 @@ Turbo command contract:
   - `pnpm --filter @fodmapp/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
   - `pnpm --filter @fodmapp/storybook exec playwright install chromium` (runtime dependency install)
   - `pnpm --filter @fodmapp/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
+
+Lint import contract:
+
+- the `eslint` job must prebuild any internal workspace package whose published imports resolve from `dist`
+- current required prebuilds before `pnpm lint:ci`:
+  - `pnpm exec turbo run build --filter=@fodmapp/ui`
+  - `pnpm exec turbo run build --filter=@fodmapp/reporting`
+- this keeps `eslint-plugin-import` resolution deterministic on clean CI checkouts for apps that import workspace subpaths such as `@fodmapp/ui/*` and `@fodmapp/reporting/*`
 
 ## Storybook Deploy Workflow Contract
 
