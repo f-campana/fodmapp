@@ -16,6 +16,10 @@ type ErrorResult = {
 type WaitlistResponse = SuccessResult | ErrorResult;
 
 function isBasicEmailFormat(email: string): boolean {
+  if (/\s/.test(email)) {
+    return false;
+  }
+
   const atIndex = email.indexOf("@");
   if (atIndex <= 0 || atIndex !== email.lastIndexOf("@")) {
     return false;
