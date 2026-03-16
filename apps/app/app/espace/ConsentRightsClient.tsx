@@ -11,7 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui/server";
+} from "@fodmapp/ui/server";
 
 import {
   CONSENT_API_CONFIRM_TEXT,

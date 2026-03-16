@@ -13,7 +13,7 @@ import {
   CardTitle,
   Chip,
   ScoreBar,
-} from "@fodmap/ui/server";
+} from "@fodmapp/ui/server";
 
 import { getFoodDetail, getFoodRollup, getSwaps } from "../../../lib/api";
 

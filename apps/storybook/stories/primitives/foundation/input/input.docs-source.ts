@@ -1,4 +1,4 @@
-export const inputRecommendedUsageCode = `import { Input } from "@fodmap/ui";
+export const inputRecommendedUsageCode = `import { Input } from "@fodmapp/ui";
 
 export function Example() {
   return (

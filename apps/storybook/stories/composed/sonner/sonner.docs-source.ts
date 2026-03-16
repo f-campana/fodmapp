@@ -1,4 +1,4 @@
-export const sonnerRecommendedUsageCode = `import { Button, Sonner, toast } from "@fodmap/ui";
+export const sonnerRecommendedUsageCode = `import { Button, Sonner, toast } from "@fodmapp/ui";
 
 export function Example() {
   return (

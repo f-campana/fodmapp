@@ -18,8 +18,8 @@ Root entry points:
 
 1. Stage 1 (baseline): low-friction correctness/readability defaults in `base.js`.
 2. Stage 2 (balanced): maintainability and async safety warnings in `base.js`, CI fails on warnings.
-3. Stage 3 (Markdown/MDX): enable via `@fodmap/eslint-config/markdown` and scope intentionally in root config.
-4. Stage 4 (LLM-shaping): enable via `lint:llm` / `eslint.llm.config.mjs` + `@fodmap/eslint-config/llm`.
+3. Stage 3 (Markdown/MDX): enable via `@fodmapp/eslint-config/markdown` and scope intentionally in root config.
+4. Stage 4 (LLM-shaping): enable via `lint:llm` / `eslint.llm.config.mjs` + `@fodmapp/eslint-config/llm`.
 
 ## Rule intent
 

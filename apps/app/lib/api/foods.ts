@@ -1,4 +1,4 @@
-import type { operations } from "@fodmap/types";
+import type { operations } from "@fodmapp/types";
 
 import { type ApiResult, requestJson } from "./client";
 

@@ -1,5 +1,5 @@
-@import "@fodmap/design-tokens/css";
-@import "@fodmap/ui/styles.css";
+@import "@fodmapp/design-tokens/css";
+@import "@fodmapp/ui/styles.css";
 
 :root {
   color-scheme: light;

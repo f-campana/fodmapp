@@ -3,7 +3,7 @@ export const accordionRecommendedUsageCode = `import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

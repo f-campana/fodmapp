@@ -6,7 +6,7 @@ import {
   parseReportingRun,
   renderScientificSvgBundle,
   SCIENTIFIC_FIGURE_ORDER,
-} from "@fodmap/reporting";
+} from "@fodmapp/reporting";
 
 import baselineRun from "../../../../etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json";
 

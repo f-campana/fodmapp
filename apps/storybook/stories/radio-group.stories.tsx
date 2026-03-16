@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Label, RadioGroup, RadioGroupItem } from "@fodmap/ui";
+import { Label, RadioGroup, RadioGroupItem } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

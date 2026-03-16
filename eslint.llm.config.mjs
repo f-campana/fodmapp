@@ -1,8 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 
-import baseConfig from "@fodmap/eslint-config";
-import llmConfig from "@fodmap/eslint-config/llm";
-import nextConfig from "@fodmap/eslint-config/next";
+import baseConfig from "@fodmapp/eslint-config";
+import llmConfig from "@fodmapp/eslint-config/llm";
+import nextConfig from "@fodmapp/eslint-config/next";
 
 export default defineConfig([
   globalIgnores([

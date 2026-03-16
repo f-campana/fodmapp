@@ -4,7 +4,7 @@ export const popoverRecommendedUsageCode = `import {
   PopoverArrow,
   PopoverContent,
   PopoverTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

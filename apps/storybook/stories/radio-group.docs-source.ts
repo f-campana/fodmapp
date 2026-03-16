@@ -2,7 +2,7 @@ export const radioGroupRecommendedUsageCode = `import {
   Label,
   RadioGroup,
   RadioGroupItem,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

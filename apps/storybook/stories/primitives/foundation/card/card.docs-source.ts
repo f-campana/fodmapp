@@ -7,7 +7,7 @@ export const cardRecommendedUsageCode = `import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

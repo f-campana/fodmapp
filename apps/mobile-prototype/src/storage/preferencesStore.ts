@@ -7,9 +7,9 @@ import {
   serializeOnboardingCompleted,
 } from "./onboarding";
 
-export const PREFERENCES_KEY = "@fodmap/prototype/preferences";
+export const PREFERENCES_KEY = "@fodmapp/prototype/preferences";
 export const ONBOARDING_COMPLETED_KEY =
-  "@fodmap/prototype/onboarding-completed";
+  "@fodmapp/prototype/onboarding-completed";
 
 export async function loadPreferences(): Promise<Preferences> {
   const raw = await AsyncStorage.getItem(PREFERENCES_KEY);
@@ -42,7 +42,7 @@ export async function saveOnboardingCompleted(
   );
 }
 
-export const COLOR_SCHEME_KEY = "@fodmap/prototype/color-scheme";
+export const COLOR_SCHEME_KEY = "@fodmapp/prototype/color-scheme";
 
 export async function loadColorScheme(): Promise<ColorSchemePreference> {
   const raw = await AsyncStorage.getItem(COLOR_SCHEME_KEY);

@@ -5,7 +5,7 @@ export const navigationMenuRecommendedUsageCode = `import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

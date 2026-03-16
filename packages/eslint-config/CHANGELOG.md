@@ -1,4 +1,4 @@
-# @fodmap/eslint-config
+# @fodmapp/eslint-config
 
 ## 0.1.1
 

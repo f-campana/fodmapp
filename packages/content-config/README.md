@@ -1,4 +1,4 @@
-# @fodmap/content-config
+# @fodmapp/content-config
 
 Shared content and i18n conventions for static Astro apps.
 

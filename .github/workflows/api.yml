@@ -22,19 +22,19 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: fodmap_api_ci
+          POSTGRES_DB: fodmapp_api_ci
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres -d fodmap_api_ci"
+          --health-cmd="pg_isready -U postgres -d fodmapp_api_ci"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
     env:
-      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
 
     steps:
       - name: Checkout
@@ -67,19 +67,19 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: fodmap_api_ci
+          POSTGRES_DB: fodmapp_api_ci
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres -d fodmap_api_ci"
+          --health-cmd="pg_isready -U postgres -d fodmapp_api_ci"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
     env:
-      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
 
     steps:
       - name: Checkout
@@ -125,9 +125,9 @@ jobs:
 
       - name: Seed Phase2 via full replay
         env:
-          REPLAY_DB: fodmap_api_ci
+          REPLAY_DB: fodmapp_api_ci
           ADMIN_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
-          REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+          REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
           PGUSER: postgres
           PGHOST: localhost
           PGPORT: 5432
@@ -137,7 +137,7 @@ jobs:
 
       - name: Seed Phase3 product layer
         env:
-          SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmap_api_ci
+          SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
           PSQL_BIN: psql
         run: |
           uv run --project api bash etl/phase3/scripts/phase3_seed_for_api_ci.sh

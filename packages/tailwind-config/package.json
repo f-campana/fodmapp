@@ -1,5 +1,5 @@
 {
-  "name": "@fodmap/tailwind-config",
+  "name": "@fodmapp/tailwind-config",
   "private": true,
   "version": "0.2.5",
   "type": "module",
@@ -15,7 +15,7 @@
     "styles:check": "pnpm run styles:generate && git diff --exit-code -- shared-styles.css"
   },
   "dependencies": {
-    "@fodmap/design-tokens": "workspace:*"
+    "@fodmapp/design-tokens": "workspace:*"
   },
   "peerDependencies": {
     "tailwindcss": "^4.2.0"

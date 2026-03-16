@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { components } from "@fodmap/types";
+import type { components } from "@fodmapp/types";
 import {
   Badge,
   Button,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui/server";
+} from "@fodmapp/ui/server";
 
 import { AnalyticsPageView } from "../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../lib/analytics";
@@ -30,7 +30,7 @@ type HealthResponse = components["schemas"]["HealthResponse"];
 
 const HEALTH_CONTRACT_SAMPLE: HealthResponse = {
   status: "ok",
-  service: "fodmap-api",
+  service: "fodmapp-api",
   version: "v0",
 };
 

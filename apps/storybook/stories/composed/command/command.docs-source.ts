@@ -6,7 +6,7 @@ export const commandRecommendedUsageCode = `import {
   CommandItem,
   CommandList,
   CommandShortcut,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

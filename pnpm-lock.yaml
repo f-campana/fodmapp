@@ -17,7 +17,7 @@ importers:
       '@eslint/js':
         specifier: 9.39.3
         version: 9.39.3
-      '@fodmap/eslint-config':
+      '@fodmapp/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
       '@next/eslint-plugin-next':
@@ -80,10 +80,10 @@ importers:
       '@clerk/nextjs':
         specifier: 6.39.0
         version: 6.39.0(next@16.1.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@fodmap/types':
+      '@fodmapp/types':
         specifier: workspace:*
         version: link:../../packages/types
-      '@fodmap/ui':
+      '@fodmapp/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@sentry/nextjs':
@@ -117,7 +117,7 @@ importers:
 
   apps/marketing:
     dependencies:
-      '@fodmap/content-config':
+      '@fodmapp/content-config':
         specifier: workspace:*
         version: link:../../packages/content-config
       astro:
@@ -133,7 +133,7 @@ importers:
 
   apps/mobile-prototype:
     dependencies:
-      '@fodmap/design-tokens':
+      '@fodmapp/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
       '@react-native-async-storage/async-storage':
@@ -182,16 +182,16 @@ importers:
 
   apps/research:
     dependencies:
-      '@fodmap/content-config':
+      '@fodmapp/content-config':
         specifier: workspace:*
         version: link:../../packages/content-config
-      '@fodmap/design-tokens':
+      '@fodmapp/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
-      '@fodmap/reporting':
+      '@fodmapp/reporting':
         specifier: workspace:*
         version: link:../../packages/reporting
-      '@fodmap/ui':
+      '@fodmapp/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       astro:
@@ -207,13 +207,13 @@ importers:
 
   apps/storybook:
     dependencies:
-      '@fodmap/design-tokens':
+      '@fodmapp/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
-      '@fodmap/reporting':
+      '@fodmapp/reporting':
         specifier: workspace:*
         version: link:../../packages/reporting
-      '@fodmap/ui':
+      '@fodmapp/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       react:
@@ -331,7 +331,7 @@ importers:
 
   packages/reporting:
     dependencies:
-      '@fodmap/design-tokens':
+      '@fodmapp/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
     devDependencies:
@@ -353,7 +353,7 @@ importers:
 
   packages/tailwind-config:
     dependencies:
-      '@fodmap/design-tokens':
+      '@fodmapp/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
       tailwindcss:
@@ -371,7 +371,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@fodmap/tailwind-config':
+      '@fodmapp/tailwind-config':
         specifier: workspace:*
         version: link:../tailwind-config
       '@radix-ui/react-accordion':

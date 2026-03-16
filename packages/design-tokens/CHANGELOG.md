@@ -1,4 +1,4 @@
-# @fodmap/design-tokens
+# @fodmapp/design-tokens
 
 ## 0.3.0
 

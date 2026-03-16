@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fodmap-api"
+name = "fodmapp-api"
 version = "0.1.0"
 description = "Read-only FastAPI surface for FODMAP food rollups and swap rules"
 readme = "README.md"

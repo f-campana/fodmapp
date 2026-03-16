@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Checkbox, Label } from "@fodmap/ui";
+import { Checkbox, Label } from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

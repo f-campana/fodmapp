@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, Skeleton } from "@fodmap/ui/server";
+import { Card, CardContent, CardHeader, Skeleton } from "@fodmapp/ui/server";
 
 export default function DecouvrirLoading() {
   return (

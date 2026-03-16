@@ -161,9 +161,9 @@ Turbo command contract:
 
 - Turbo-eligible CI commands must use `pnpm exec turbo run ...` to ensure local pinned Turbo resolution
 - intentional non-Turbo exceptions remain direct:
-  - `pnpm --filter @fodmap/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
-  - `pnpm --filter @fodmap/storybook exec playwright install chromium` (runtime dependency install)
-  - `pnpm --filter @fodmap/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
+  - `pnpm --filter @fodmapp/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
+  - `pnpm --filter @fodmapp/storybook exec playwright install chromium` (runtime dependency install)
+  - `pnpm --filter @fodmapp/reporting render:*` commands in `Phase 2 Reporting` lanes (run-id-scoped artifact flow)
 
 ## Storybook Deploy Workflow Contract
 
@@ -206,6 +206,7 @@ UX contract:
 - `api-tests`: `timeout-minutes: 15`
 - `api-integration-seeded`: `timeout-minutes: 25`
 - `api-gate`: `timeout-minutes: 5`
+- seeded workflow DB profile/default URLs: `fodmapp_api_ci`
 
 Operational behavior:
 

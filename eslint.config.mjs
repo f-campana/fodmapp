@@ -1,8 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 
-import baseConfig from "@fodmap/eslint-config";
-import markdownConfig from "@fodmap/eslint-config/markdown";
-import nextConfig from "@fodmap/eslint-config/next";
+import baseConfig from "@fodmapp/eslint-config";
+import markdownConfig from "@fodmapp/eslint-config/markdown";
+import nextConfig from "@fodmapp/eslint-config/next";
 
 export default defineConfig([
   globalIgnores([
@@ -44,9 +44,9 @@ export default defineConfig([
         {
           paths: [
             {
-              name: "@fodmap/ui",
+              name: "@fodmapp/ui",
               message:
-                "Use @fodmap/ui/server or @fodmap/ui/client inside apps/app.",
+                "Use @fodmapp/ui/server or @fodmapp/ui/client inside apps/app.",
             },
           ],
         },

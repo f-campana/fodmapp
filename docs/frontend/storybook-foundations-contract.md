@@ -78,10 +78,10 @@ When adding or changing tokens:
 3. Update relevant foundations `Reference` sections to include new paths.
 4. Update `play` assertions to guarantee path presence and non-empty values.
 5. Validate with:
-   - `pnpm --filter @fodmap/design-tokens tokens:check`
+   - `pnpm --filter @fodmapp/design-tokens tokens:check`
    - `pnpm exec eslint apps/storybook/stories/foundations/**/*.ts apps/storybook/stories/foundations/**/*.tsx`
 
 ## Known Baseline Constraint (March 3, 2026)
 
-`@fodmap/storybook` workspace-wide typecheck/build currently fail on unrelated
-non-foundations stories due missing exports from `@fodmap/ui`.
+`@fodmapp/storybook` workspace-wide typecheck/build currently fail on unrelated
+non-foundations stories due missing exports from `@fodmapp/ui`.

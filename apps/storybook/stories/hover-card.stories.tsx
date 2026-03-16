@@ -9,7 +9,7 @@ import {
   HoverCardArrow,
   HoverCardContent,
   HoverCardTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 import { StoryFrame, type StoryFrameProps } from "./story-frame";
 

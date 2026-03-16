@@ -13,7 +13,7 @@ This document defines environment variables used across the current Python/SQL s
 | Variable          | Used by                                                                                                                      | Required                      | Default/Example                       | Notes                                               |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------------------- |
 | `API_DB_URL`      | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml`                                                    | yes                           | `postgresql://.../fodmap_test`        | Primary FastAPI DB connection string.               |
-| `API_NAME`        | `api/app/config.py`                                                                                                          | no                            | `fodmap-api`                          | Health metadata.                                    |
+| `API_NAME`        | `api/app/config.py`                                                                                                          | no                            | `fodmapp-api`                         | Health metadata.                                    |
 | `API_VERSION`     | `api/app/config.py`                                                                                                          | no                            | `v0`                                  | Health metadata.                                    |
 | `ROOT_DIR`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`                              | no                            | auto-derived from script location     | Repo root override for script portability.          |
 | `REPLAY_DB`       | `etl/phase2/scripts/phase2_replay_from_zero.sh`                                                                              | no                            | `fodmap_replay_test`                  | Replay database name.                               |
@@ -45,7 +45,7 @@ CI Turbo command policy:
 
 - Turbo-eligible CI commands should use `pnpm exec turbo run ...` so workflows always resolve the pinned local Turbo version.
 - Non-Turbo CI exceptions are intentional where Turbo caching does not apply, including:
-  - `pnpm --filter @fodmap/types openapi:check` for deterministic OpenAPI parity validation
+  - `pnpm --filter @fodmapp/types openapi:check` for deterministic OpenAPI parity validation
   - Storybook Playwright browser install
   - Phase 2 reporting `render:*` commands
 

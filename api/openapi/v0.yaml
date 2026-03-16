@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: Fodmap Swap API (v0)
+  title: Fodmapp API (v0)
   version: 0.1.0
   summary: SQL-backed read API for food rollups, traits, and active swaps.
   description: |
@@ -18,7 +18,7 @@ info:
     `phase3_rollups_compute.sql`. Consumers should inspect `rollup_computed_at`
     and `source_slug` to evaluate freshness.
 servers:
-  - url: https://api.fodmap.local
+  - url: https://api.fodmapp.local
     description: Placeholder
 
 tags:
@@ -555,7 +555,7 @@ components:
           enum: [ok]
         service:
           type: string
-          example: fodmap-api
+          example: fodmapp-api
         version:
           type: string
           example: v0

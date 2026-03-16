@@ -2,7 +2,7 @@ export const alertRecommendedUsageCode = `import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

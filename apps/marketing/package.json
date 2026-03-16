@@ -1,5 +1,5 @@
 {
-  "name": "@fodmap/marketing",
+  "name": "@fodmapp/marketing",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@fodmap/content-config": "workspace:*",
+    "@fodmapp/content-config": "workspace:*",
     "astro": "5.17.3"
   },
   "devDependencies": {

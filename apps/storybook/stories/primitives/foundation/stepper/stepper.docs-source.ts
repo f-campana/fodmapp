@@ -4,7 +4,7 @@ export const stepperRecommendedUsageCode = `import {
   StepperLabel,
   StepperSeparator,
   StepperStep,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function ReviewStatusStepper() {
   return (

@@ -16,5 +16,5 @@ for (const relativePath of [
   await access(path.join(rootDir, relativePath));
 }
 
-await import("@fodmap/ui/server");
-await import("@fodmap/ui/client");
+await import("@fodmapp/ui/server");
+await import("@fodmapp/ui/client");

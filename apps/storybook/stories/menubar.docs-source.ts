@@ -5,7 +5,7 @@ export const menubarRecommendedUsageCode = `import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

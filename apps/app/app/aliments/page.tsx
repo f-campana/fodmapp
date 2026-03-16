@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@fodmap/ui/server";
+} from "@fodmapp/ui/server";
 
 import { searchFoods } from "../../lib/api";
 import SearchForm from "./SearchForm";

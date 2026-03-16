@@ -5,7 +5,7 @@ export const tableRecommendedUsageCode = `import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (

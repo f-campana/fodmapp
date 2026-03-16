@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Button, Input } from "@fodmap/ui/server";
+import { Button, Input } from "@fodmapp/ui/server";
 
 interface SearchFormProps {
   initialQuery: string;

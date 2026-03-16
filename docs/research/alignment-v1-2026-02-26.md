@@ -47,9 +47,9 @@ Not allowed in PR-01:
 
 ## Exit criteria for PR-01
 
-1. `pnpm --filter @fodmap/app test` passes.
-2. `pnpm --filter @fodmap/app typecheck` passes.
-3. `pnpm --filter @fodmap/app build` passes.
+1. `pnpm --filter @fodmapp/app test` passes.
+2. `pnpm --filter @fodmapp/app typecheck` passes.
+3. `pnpm --filter @fodmapp/app build` passes.
 4. No path enables analytics prior to valid consent state.
 
 ## Approval record

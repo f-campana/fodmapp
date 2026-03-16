@@ -3,7 +3,7 @@ export const inputOtpRecommendedUsageCode = `import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@fodmap/ui";
+} from "@fodmapp/ui";
 
 export function Example() {
   return (
