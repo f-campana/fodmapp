@@ -8,8 +8,8 @@ export default function MentionsLegalesPage() {
           l&apos;auteur du projet.
         </p>
         <p className="marketing-description">
-          Pour toute question relative aux données ou à la conformité,
-          contactez : contact@fodmapp.fr.
+          Pour toute question relative aux données ou à la conformité, contactez
+          : contact@fodmapp.fr.
         </p>
       </section>
     </main>
