@@ -108,6 +108,7 @@ export async function POST(
           "Failed to send confirmation email",
           emailResult.error ?? "unknown error",
         );
+        // Best-effort delivery: signup is already persisted.
       }
     }
 
