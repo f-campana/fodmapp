@@ -17,7 +17,7 @@ Last reviewed: 2026-03-15
 
 Recommended Vercel project split:
 
-- `fodmapp-marketing` → `apps/marketing` (Astro)
+- `fodmapp-marketing` → `apps/marketing` (Next.js)
 - `fodmapp-app` → `apps/app` (Next.js)
 - `fodmapp-ui` → `apps/storybook` (Storybook)
 - `fodmapp-research` → `apps/research` (Astro)
