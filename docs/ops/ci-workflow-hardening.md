@@ -161,7 +161,7 @@ available, so downstream `turbo run` commands can use remote caching.
 Turbo command contract:
 
 - Turbo-eligible CI commands must use `pnpm exec turbo run ...` to ensure local pinned Turbo resolution
-- workspace `typecheck` tasks now depend on the same-package `build` task in `turbo.json`
+- the `content-scaffolds` lane and matching local quality-gate content scope run `build` first, then `typecheck`,
   to avoid generated-artifact races in scaffold apps that write framework outputs during both phases
   (for example Next.js `.next/*` and Astro `.astro/*`)
 - intentional non-Turbo exceptions remain direct:

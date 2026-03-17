@@ -302,7 +302,8 @@ jobs:
 
       - name: Build and typecheck marketing and research scaffolds
         run: |
-          pnpm exec turbo run typecheck build --filter=@fodmapp/marketing --filter=@fodmapp/research
+          pnpm exec turbo run build --filter=@fodmapp/marketing --filter=@fodmapp/research
+          pnpm exec turbo run typecheck --filter=@fodmapp/marketing --filter=@fodmapp/research
 
       - name: Save Turbo local cache fallback
         if: ${{ always() && steps.setup.outputs.use_remote != 'true' }}
