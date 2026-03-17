@@ -16,7 +16,8 @@ type ErrorResult = {
 type WaitlistResponse = SuccessResult | ErrorResult;
 
 function isBasicEmailFormat(email: string): boolean {
-  if (/\s/.test(email)) {
+  const length = email.length;
+  if (length < 6) {
     return false;
   }
 
@@ -38,6 +39,12 @@ function isBasicEmailFormat(email: string): boolean {
     domain.endsWith(".")
   ) {
     return false;
+  }
+
+  for (const character of email) {
+    if (character.trim() !== character) {
+      return false;
+    }
   }
 
   return local !== "." && !local.includes("..") && !domain.includes("..");
