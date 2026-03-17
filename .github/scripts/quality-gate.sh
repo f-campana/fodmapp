@@ -257,7 +257,7 @@ if [[ "$run_full" == "true" ]]; then
 
   if [[ "$quality_scope_content_scaffolds" == "true" ]]; then
     full_gate_tasks+=(
-      "content scope::pnpm exec turbo run typecheck build --filter=@fodmapp/marketing --filter=@fodmapp/research"
+      "content scope::pnpm exec turbo run build --filter=@fodmapp/marketing --filter=@fodmapp/research && pnpm exec turbo run typecheck --filter=@fodmapp/marketing --filter=@fodmapp/research"
     )
   fi
 

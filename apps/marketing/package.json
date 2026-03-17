@@ -4,14 +4,15 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm --filter @fodmapp/ui build && next dev",
+    "build": "pnpm --filter @fodmapp/ui build && next build",
     "start": "next start",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@fodmapp/design-tokens": "workspace:*",
     "@fodmapp/tailwind-config": "workspace:*",
+    "@fodmapp/ui": "workspace:*",
     "@neondatabase/serverless": "^0.10.3",
     "next": "16.1.6",
     "react": "19.2.4",
