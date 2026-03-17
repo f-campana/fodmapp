@@ -4,17 +4,24 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "typecheck": "astro check"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@fodmapp/content-config": "workspace:*",
-    "astro": "5.17.3"
+    "@fodmapp/design-tokens": "workspace:*",
+    "@fodmapp/tailwind-config": "workspace:*",
+    "@neondatabase/serverless": "^0.10.3",
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "resend": "^4.5.0"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.6",
+    "@types/node": "25.5.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "typescript": "5.9.3"
   }
 }

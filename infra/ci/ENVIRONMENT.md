@@ -120,6 +120,18 @@ These keys are now actively consumed by `apps/app` runtime adapters. All integra
 | `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED` | Consent fallback gate                 | no          | Defaults to `false`; can enable analytics runtime only in non-production validation. Production runtime ignores `true` until Axeptio activation.     |
 | `NEXT_PUBLIC_API_BASE_URL`              | Public app reads + `/me/*` API access | no          | Public read client returns `api_not_configured`; consent bootstrap stays disabled until configured. Use the API origin; app clients normalize `/v0`. |
 
+## Marketing App Variables (`apps/marketing`)
+
+These keys are actively used by the marketing waitlist backend and landing feature flags.
+
+| Variable                          | Adapter / Feature                     | Required    | Behavior when missing                                                                    |
+| --------------------------------- | ------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `MARKETING_DB_URL`                | Waitlist backend (`app/api/waitlist`) | conditional | `POST /api/waitlist` returns `{ ok: false, code: \"server_error\" }` with HTTP 503.      |
+| `RESEND_API_KEY`                  | Confirmation email provider           | no          | Signup succeeds and logs a warning; confirmation email is skipped.                       |
+| `RESEND_FROM_EMAIL`               | Confirmation email sender             | no          | Defaults to `noreply@fodmapp.fr` when not set.                                           |
+| `NEXT_PUBLIC_FF_SECTION_APPROACH` | Marketing feature flag                | no          | `"1"` shows the Approach section; any other value keeps it hidden (default V1 behavior). |
+| `NEXT_PUBLIC_FF_SECTION_TRUST`    | Marketing feature flag                | no          | `"1"` shows the Trust section; any other value keeps it hidden (default V1 behavior).    |
+
 ## Reserved Near-Term Variables
 
 | Variable                    | Intended future owner | Purpose                                     |

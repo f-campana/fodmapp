@@ -22,11 +22,16 @@ function collectFiles(rootDir) {
 
   for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
     const fullPath = path.join(rootDir, entry.name);
-    if (entry.isDirectory()) {
+    const stats = statSync(fullPath);
+
+    if (stats.isDirectory()) {
       files.push(...collectFiles(fullPath));
       continue;
     }
-    files.push(fullPath);
+
+    if (stats.isFile()) {
+      files.push(fullPath);
+    }
   }
 
   return files;
@@ -53,7 +58,7 @@ function summarizeApp(name, relDir) {
 const report = {
   generatedAtUtc: new Date().toISOString(),
   apps: [
-    summarizeApp("marketing", "apps/marketing/dist"),
+    summarizeApp("marketing", "apps/marketing/.next"),
     summarizeApp("research", "apps/research/dist"),
   ],
 };
