@@ -161,6 +161,9 @@ available, so downstream `turbo run` commands can use remote caching.
 Turbo command contract:
 
 - Turbo-eligible CI commands must use `pnpm exec turbo run ...` to ensure local pinned Turbo resolution
+- workspace `typecheck` tasks now depend on the same-package `build` task in `turbo.json`
+  to avoid generated-artifact races in scaffold apps that write framework outputs during both phases
+  (for example Next.js `.next/*` and Astro `.astro/*`)
 - intentional non-Turbo exceptions remain direct:
   - `pnpm --filter @fodmapp/types openapi:check` (deterministic OpenAPI parity check; avoids Turbo cache ambiguity for this gate)
   - `pnpm --filter @fodmapp/storybook exec playwright install chromium` (runtime dependency install)

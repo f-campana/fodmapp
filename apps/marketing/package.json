@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @fodmapp/ui build && next dev",
-    "build": "pnpm --filter @fodmapp/ui build && next build",
+    "build": "pnpm --filter @fodmapp/ui build && node ./scripts/with-next-lock.mjs next build",
     "start": "next start",
-    "typecheck": "pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm --filter @fodmapp/ui build && node ./scripts/with-next-lock.mjs sh -c 'next typegen && tsc -p tsconfig.json --noEmit'"
   },
   "dependencies": {
     "@fodmapp/design-tokens": "workspace:*",
