@@ -1,4 +1,5 @@
 import {
+  existsSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -37,20 +38,26 @@ function collectFiles(rootDir) {
   return files;
 }
 
-function summarizeApp(name, relDir) {
-  const appDir = path.join(repoRoot, relDir);
-  const files = collectFiles(appDir).map((filePath) => {
-    const contents = readFileSync(filePath);
-    return {
-      path: path.relative(repoRoot, filePath),
-      bytes: statSync(filePath).size,
-      gzipBytes: gzipSync(contents).length,
-    };
-  });
+function summarizeApp(name, relDirs) {
+  const roots = relDirs.filter((relDir) =>
+    existsSync(path.join(repoRoot, relDir)),
+  );
+
+  const files = roots
+    .flatMap((relDir) => collectFiles(path.join(repoRoot, relDir)))
+    .sort()
+    .map((filePath) => {
+      const contents = readFileSync(filePath);
+      return {
+        path: path.relative(repoRoot, filePath),
+        bytes: statSync(filePath).size,
+        gzipBytes: gzipSync(contents).length,
+      };
+    });
 
   return {
     name,
-    root: relDir,
+    roots,
     files,
   };
 }
@@ -58,8 +65,11 @@ function summarizeApp(name, relDir) {
 const report = {
   generatedAtUtc: new Date().toISOString(),
   apps: [
-    summarizeApp("marketing", "apps/marketing/.next"),
-    summarizeApp("research", "apps/research/dist"),
+    summarizeApp("marketing", [
+      "apps/marketing/.next/static",
+      "apps/marketing/public",
+    ]),
+    summarizeApp("research", ["apps/research/dist"]),
   ],
 };
 
