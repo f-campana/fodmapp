@@ -1,6 +1,3 @@
--- Run with:
--- psql "$MARKETING_DB_URL" -f etl/marketing/waitlist_signups.sql
-
 CREATE TABLE IF NOT EXISTS waitlist_signups (
     id                    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email                 TEXT NOT NULL,

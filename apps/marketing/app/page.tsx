@@ -1,5 +1,3 @@
-import "../src/styles/landing.css";
-
 import { WaitlistForm } from "../src/components/WaitlistForm";
 import { landingCopy } from "../src/content/landing";
 

@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm --filter @fodmapp/ui build && next dev",
+    "build": "pnpm --filter @fodmapp/ui build && next build",
     "start": "next start",
-    "typecheck": "next typegen && tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@fodmapp/design-tokens": "workspace:*",

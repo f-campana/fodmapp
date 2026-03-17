@@ -1,5 +1,6 @@
 @import "@fodmapp/design-tokens/css";
 @import "@fodmapp/ui/app.css";
+@import "../src/styles/landing.css";
 
 :root {
   color-scheme: light;
