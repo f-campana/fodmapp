@@ -78,27 +78,29 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4">
+    <form onSubmit={onSubmit} className="mt-4 grid gap-3">
       <label htmlFor="waitlist-email" className="marketing-label">
         {landingCopy.waitlist.emailLabel}
       </label>
-      <Input
-        id="waitlist-email"
-        name="email"
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        value={email}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          setEmail(event.currentTarget.value)
-        }
-        placeholder="prenom.nom@exemple.com"
-        aria-invalid={status === "error" && error ? "true" : "false"}
-        required
-      />
-      <Button type="submit" disabled={status === "submitting"}>
-        {status === "submitting" ? "Envoi..." : landingCopy.waitlist.cta}
-      </Button>
+      <div className="marketing-inline-form">
+        <Input
+          id="waitlist-email"
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setEmail(event.currentTarget.value)
+          }
+          placeholder="prenom.nom@exemple.com"
+          aria-invalid={status === "error" && error ? "true" : "false"}
+          required
+        />
+        <Button type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? "Envoi..." : landingCopy.waitlist.cta}
+        </Button>
+      </div>
       {error ? (
         <p
           role="alert"
@@ -107,9 +109,7 @@ export function WaitlistForm() {
           {error}
         </p>
       ) : null}
-      <p className="text-xs text-[var(--fd-semantic-color-text-muted)]">
-        {landingCopy.waitlist.note}
-      </p>
+      <p className="marketing-privacy-note">{landingCopy.waitlist.note}</p>
     </form>
   );
 }
