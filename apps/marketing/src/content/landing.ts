@@ -15,6 +15,8 @@ export const landingCopy = {
       "Tu suis un régime pauvre en FODMAP et tu ne sais plus quoi cuisiner ?",
     description:
       "FODMAPP t'aide à trouver des substitutions compatibles pour poursuivre ton assiette sans te reprendre d’un coup.",
+    descriptionSupport:
+      "Des données nutritionnelles françaises, des alternatives concrètes, un outil pensé pour ton quotidien.",
     cta: "Rejoins la liste d'attente",
   },
   approach: {

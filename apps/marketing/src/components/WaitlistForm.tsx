@@ -95,9 +95,14 @@ export function WaitlistForm() {
           }
           placeholder="prenom.nom@exemple.com"
           aria-invalid={status === "error" && error ? "true" : "false"}
+          className="h-11"
           required
         />
-        <Button type="submit" disabled={status === "submitting"}>
+        <Button
+          type="submit"
+          disabled={status === "submitting"}
+          className="h-11 px-5"
+        >
           {status === "submitting" ? "Envoi..." : landingCopy.waitlist.cta}
         </Button>
       </div>
