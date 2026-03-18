@@ -26,10 +26,8 @@ export default function HomePage() {
         <p className="marketing-eyebrow">{landingCopy.hero.eyebrow}</p>
         <h1 className="marketing-title">{landingCopy.hero.title}</h1>
         <p className="marketing-description">
-          {landingCopy.hero.description}
-          {" "}
-          Des données nutritionnelles françaises, des alternatives concrètes, un
-          outil pensé pour ton quotidien.
+          {landingCopy.hero.description} Des données nutritionnelles françaises,
+          des alternatives concrètes, un outil pensé pour ton quotidien.
         </p>
         <a className="marketing-cta" href="#waitlist">
           {landingCopy.hero.cta}
@@ -134,7 +132,10 @@ export default function HomePage() {
       <footer className="marketing-footer-band">
         <div className="marketing-footer-top">
           <span className="marketing-footer-brand">FODMAPP</span>
-          <nav className="marketing-footer-links" aria-label="Liens du pied de page">
+          <nav
+            className="marketing-footer-links"
+            aria-label="Liens du pied de page"
+          >
             <a href={landingCopy.footer.githubHref}>
               {landingCopy.footer.githubLabel}
             </a>
@@ -145,7 +146,9 @@ export default function HomePage() {
         </div>
         <hr className="marketing-footer-divider" />
         <div className="marketing-footer-bottom">
-          <span>{landingCopy.footer.builtInFrance.replace(/\.$/, ", avec soin.")}</span>
+          <span>
+            {landingCopy.footer.builtInFrance.replace(/\.$/, ", avec soin.")}
+          </span>
           <span>Données CIQUAL · Licence Etalab 2.0</span>
         </div>
       </footer>
