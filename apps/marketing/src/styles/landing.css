@@ -13,6 +13,11 @@
   font-family: var(--fd-base-typography-font-family-body), sans-serif;
 }
 
+.marketing-page--band,
+.marketing-page--footer {
+  width: min(56rem, 100% - 2.5rem);
+}
+
 /* --- Hero --- */
 .marketing-hero {
   padding: 6rem 0 4rem;
@@ -109,10 +114,8 @@
   top: -0.08em;
 }
 
-/* --- Full-width band technique --- */
 .marketing-band {
-  margin: 0 calc(-50vw + 50%);
-  padding: 4rem calc(50vw - 50%);
+  padding: 4rem 0;
   background: var(--fd-semantic-color-surface-default);
   border-top: 1px solid var(--fd-semantic-color-border-subtle);
   border-bottom: 1px solid var(--fd-semantic-color-border-subtle);
@@ -219,8 +222,8 @@
 
 /* --- Footer --- */
 .marketing-footer-band {
-  margin: 3rem calc(-50vw + 50%) 0;
-  padding: 2.5rem calc(50vw - 50%);
+  margin-top: 3rem;
+  padding: 2.5rem 0;
   background: var(--fd-semantic-color-surface-inverse);
   color: var(--fd-semantic-color-text-inverse);
 }
