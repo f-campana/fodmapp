@@ -22,6 +22,11 @@ updates:
       timezone: "Etc/UTC"
     open-pull-requests-limit: 6
     groups:
+      next-stack:
+        patterns:
+          - "next"
+          - "@next/*"
+          - "eslint-config-next"
       storybook-tooling:
         patterns:
           - "@storybook/*"

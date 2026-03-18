@@ -12,7 +12,8 @@ Shared Tailwind v4 styling foundation for FODMAPP apps and packages.
 - `foundation.css`: canonical app-facing import for Tailwind-based consumers in this repo
 - `shared-styles.css`: low-level adapter surface used by internal package styling
 
-Apps should import `foundation.css` directly.
+Apps should import `foundation.css` directly for the Tailwind foundation.
+Consumers using `@fodmapp/ui` should continue importing the matching UI stylesheet separately in this phase.
 
 ## Commands
 
@@ -35,5 +36,6 @@ Do not hand-edit either generated stylesheet.
   - is a generated app-facing variant of the same semantic token mappings
   - gives app consumers a stable, explicit entrypoint without making them depend on the lower-level adapter name
   - uses a plain `@import "tailwindcss";` so app bundlers can consume it directly
+  - does not replace `@fodmapp/ui` component styles; those remain a separate import until the later UI CSS cleanup track lands
 
 This package stays intentionally thin and does not duplicate token values.
