@@ -75,6 +75,8 @@ Use this index when you know you need documentation, but do not yet know which s
 
 - [`docs/frontend/strategy.md`](./frontend/strategy.md): frontend ownership split and delivery
   boundaries.
+- [`docs/frontend/tailwind-v4-token-architecture.md`](./frontend/tailwind-v4-token-architecture.md):
+  accepted styling package contract for Tailwind apps, design tokens, and `@fodmapp/ui`.
 - [`docs/frontend/design-foundations/README.md`](./frontend/design-foundations/README.md):
   canonical cross-cutting design-system rules that do not belong in Storybook component docs.
 - [`docs/frontend/local-app-validation.md`](./frontend/local-app-validation.md): local install,
