@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "6.39.0",
+    "@fodmapp/tailwind-config": "workspace:*",
     "@fodmapp/types": "workspace:*",
     "@fodmapp/ui": "workspace:*",
     "@sentry/nextjs": "10.43.0",
@@ -21,7 +22,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "16.1.6",
+    "@next/bundle-analyzer": "16.1.7",
     "@types/node": "25.5.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",

@@ -1,3 +1,4 @@
+@import "@fodmapp/tailwind-config/foundation.css";
 @import "@fodmapp/ui/app.css";
 
 :root {
