@@ -113,6 +113,33 @@ Local hook behavior:
 
 This prevents non-deterministic pre-push failures caused by stale worktree installs.
 
+### Local Full Gate Serialization Contract
+
+`quality-gate.sh --full` now splits local work into two classes:
+
+- read-only checks still run in parallel:
+  - `pnpm format:check`
+  - `pnpm python:ci`
+  - changeset tests/lint/coverage checks
+  - CI scope and docs hygiene unit tests
+  - OpenAPI, design-token, and Tailwind style checks
+- dist-backed or artifact-producing lanes now run sequentially after the parallel pool:
+  1. dist-backed JS lint
+  2. `ui scope (foundation)`
+  3. `app scope`
+  4. `content scope`
+
+This prevents shared-worktree output races on local pre-push runs, especially around `packages/ui/dist`.
+
+### Local Lint Import Contract
+
+Local full-gate JS lint now mirrors CI's dist-import preparation before `pnpm lint:js:ci`:
+
+- `pnpm exec turbo run build --filter=@fodmapp/ui`
+- `pnpm exec turbo run build --filter=@fodmapp/reporting`
+
+This keeps `eslint-plugin-import` resolution deterministic for workspace subpath imports during local `--full` runs.
+
 ### Full Changeset Lint Contract
 
 `quality-gate.sh --full` now runs:
@@ -151,12 +178,13 @@ The main `CI` workflow now uses a `pr-scope` job to compute execution booleans f
 Turbo cache behavior for scoped jobs:
 
 - repository `TURBO_TEAM` / `TURBO_TOKEN` are removed
-- CI defaults to local `.turbo` cache restore/save (`actions/cache/restore@v4` and `actions/cache/save@v4`)
+- CI defaults to local `.turbo` cache restore/save (`actions/cache/restore@v5` and `actions/cache/save@v5`)
 - if Turbo credentials are explicitly injected in the future, remote cache remains technically supported by the composite action
 
 The composite action (`.github/actions/setup-js-workspace`) centralizes this selection logic and
 exports `TURBO_TEAM` / `TURBO_TOKEN` into the workspace step environment when both values are
-available, so downstream `turbo run` commands can use remote caching.
+available, so downstream `turbo run` commands can use remote caching. The shared action now pins
+Node 24-compatible JavaScript action runtimes for pnpm setup and Turbo cache restore.
 
 Turbo command contract:
 

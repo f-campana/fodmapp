@@ -230,7 +230,6 @@ if [[ "$run_full" == "true" ]]; then
 
   full_gate_tasks=(
     "format check::pnpm format:check"
-    "lint (CI)::pnpm lint:ci"
     "python lint (CI)::pnpm python:ci"
     "changeset checker unit tests::pnpm changeset:ci:test"
     "changeset full-repository lint::pnpm changeset:ci:lint:all"
@@ -243,26 +242,32 @@ if [[ "$run_full" == "true" ]]; then
     "tailwind style check::pnpm tailwind:styles:check"
   )
 
+  if ! run_cmd_parallel "${full_gate_tasks[@]}"; then
+    exit 1
+  fi
+
+  # Dist-backed lint and build lanes share workspace outputs such as packages/ui/dist,
+  # so they must stay serialized even when the read-only checks above run in parallel.
+  run_cmd \
+    "lint (JS dist-backed)" \
+    bash -lc "pnpm exec turbo run build --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm lint:js:ci"
+
   if [[ "$quality_scope_ui_foundation" == "true" ]]; then
-    full_gate_tasks+=(
-      "ui scope (foundation)::pnpm exec turbo run build --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm exec turbo run build typecheck test --filter=@fodmapp/ui && pnpm ui:styles:check && pnpm exec turbo run typecheck storybook:build storybook:test --filter=@fodmapp/storybook"
-    )
+    run_cmd \
+      "ui scope (foundation)" \
+      bash -lc "pnpm exec turbo run build --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm exec turbo run build typecheck test --filter=@fodmapp/ui && pnpm ui:styles:check && pnpm exec turbo run typecheck storybook:build storybook:test --filter=@fodmapp/storybook"
   fi
 
   if [[ "$quality_scope_app_scaffold" == "true" ]]; then
-    full_gate_tasks+=(
-      "app scope::pnpm exec turbo run test typecheck build --filter=@fodmapp/app"
-    )
+    run_cmd "app scope (test)" pnpm exec turbo run test --filter=@fodmapp/app
+    run_cmd "app scope (typecheck)" pnpm exec turbo run typecheck --filter=@fodmapp/app
+    run_cmd "app scope (build)" pnpm exec turbo run build --filter=@fodmapp/app
   fi
 
   if [[ "$quality_scope_content_scaffolds" == "true" ]]; then
-    full_gate_tasks+=(
-      "content scope::pnpm exec turbo run build --filter=@fodmapp/marketing --filter=@fodmapp/research && pnpm exec turbo run typecheck --filter=@fodmapp/marketing --filter=@fodmapp/research"
-    )
-  fi
-
-  if ! run_cmd_parallel "${full_gate_tasks[@]}"; then
-    exit 1
+    run_cmd \
+      "content scope" \
+      bash -lc "pnpm exec turbo run build --filter=@fodmapp/marketing --filter=@fodmapp/research && pnpm exec turbo run typecheck --filter=@fodmapp/marketing --filter=@fodmapp/research"
   fi
 
   echo "[OK] full quality suite passed"
