@@ -32,7 +32,8 @@ Do not hand-edit either generated stylesheet.
   - defines shared `@theme inline` mappings and dark variant selector
   - provides shadcn-compatible color slots (`primary`, `secondary`, `card`, `popover`, `muted`, `accent`, `destructive`, `input`, `ring`) mapped to semantic tokens
 - `foundation.css`:
-  - wraps `shared-styles.css`
+  - is a generated app-facing variant of the same semantic token mappings
   - gives app consumers a stable, explicit entrypoint without making them depend on the lower-level adapter name
+  - uses a plain `@import "tailwindcss";` so app bundlers can consume it directly
 
 This package stays intentionally thin and does not duplicate token values.
