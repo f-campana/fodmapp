@@ -28,9 +28,10 @@ export default function HomePage() {
             <p className="marketing-eyebrow">{landingCopy.hero.eyebrow}</p>
             <h1 className="marketing-title">{landingCopy.hero.title}</h1>
             <p className="marketing-description">
-              {landingCopy.hero.description} Des données nutritionnelles
-              françaises, des alternatives concrètes, un outil pensé pour ton
-              quotidien.
+              <span>{landingCopy.hero.description}</span>
+              <span className="marketing-description-support">
+                {landingCopy.hero.descriptionSupport}
+              </span>
             </p>
             <a className="marketing-cta" href="#waitlist">
               {landingCopy.hero.cta}
@@ -143,7 +144,9 @@ export default function HomePage() {
                   key={item.question}
                   value={`faq-${String(index)}`}
                 >
-                  <AccordionTrigger>{item.question}</AccordionTrigger>
+                  <AccordionTrigger className="marketing-faq-trigger">
+                    {item.question}
+                  </AccordionTrigger>
                   <AccordionContent>{item.answer}</AccordionContent>
                 </AccordionItem>
               ))}

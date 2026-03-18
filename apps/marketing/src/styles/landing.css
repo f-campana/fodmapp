@@ -9,7 +9,6 @@
   padding: 0;
   display: grid;
   gap: 0;
-  color: var(--fd-semantic-color-text-primary);
   font-family: var(--fd-base-typography-font-family-body), sans-serif;
 }
 
@@ -20,7 +19,7 @@
 
 /* --- Hero --- */
 .marketing-hero {
-  padding: 6rem 0 4rem;
+  padding: 6rem 0 3rem;
 }
 
 .marketing-eyebrow {
@@ -38,7 +37,7 @@
   line-height: 1.08;
   font-weight: 400;
   font-family: var(--fd-base-typography-font-family-display), serif;
-  max-width: 16em;
+  max-width: 18em;
 }
 
 .marketing-description {
@@ -47,10 +46,16 @@
   margin-top: var(--fd-base-space-3);
   font-size: 1.1875rem;
   line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.marketing-description-support {
+  display: block;
+  margin-top: var(--fd-base-space-2);
 }
 
 .marketing-cta {
-  margin-top: var(--fd-base-space-5);
+  margin-top: var(--fd-base-space-6);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -81,21 +86,21 @@
 
 /* --- Trust strip --- */
 .marketing-trust-strip {
-  padding: 2rem 0 3rem;
+  padding: 0.75rem 0 2.5rem;
 }
 
 .marketing-trust-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 2rem;
+  display: grid;
+  gap: 1rem;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
 .marketing-trust-list li {
-  display: flex;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 0.625rem;
   font-size: 0.875rem;
   color: var(--fd-semantic-color-text-muted);
@@ -110,8 +115,7 @@
   border-radius: var(--fd-base-radius-full);
   background: var(--fd-semantic-color-action-primary-bg);
   flex-shrink: 0;
-  position: relative;
-  top: -0.08em;
+  margin-top: 0.4rem;
 }
 
 .marketing-band {
@@ -139,11 +143,12 @@
 .marketing-waitlist .marketing-description {
   margin-left: auto;
   margin-right: auto;
+  text-wrap: balance;
 }
 
 /* --- FAQ section --- */
 .marketing-faq-section {
-  padding: 3.5rem 0 2rem;
+  padding: 4rem 0 2rem;
 }
 
 .marketing-faq-title {
@@ -277,8 +282,10 @@
 /* --- Form label (visible) --- */
 .marketing-label {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--fd-semantic-color-text-primary);
+  font-weight: 400;
+  color: var(--fd-semantic-color-text-muted);
+  text-align: left;
+  width: 100%;
 }
 
 /* --- Inline form layout --- */
@@ -305,6 +312,22 @@
   color: var(--fd-semantic-color-text-muted);
   text-align: center;
   margin-top: var(--fd-base-space-3);
+}
+
+.marketing-faq-trigger:hover,
+.marketing-faq-trigger[data-state="open"] {
+  background: transparent;
+}
+
+.marketing-faq-trigger[data-state="open"] {
+  font-weight: 600;
+}
+
+@media (min-width: 48rem) {
+  .marketing-trust-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+  }
 }
 
 /* --- Responsive --- */
