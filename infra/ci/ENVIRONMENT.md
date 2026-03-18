@@ -36,9 +36,11 @@ Repository-level Turbo secrets are no longer part of the default CI contract for
 
 Current contract:
 
-- `.github/workflows/ci.yml` runs in local-cache fallback mode by default (`.turbo` restore/save).
+- `.github/workflows/ci.yml` runs in local-cache fallback mode by default (`.turbo` restore/save via `actions/cache/restore@v5` and `actions/cache/save@v5`).
 - `.github/actions/setup-js-workspace` still supports remote cache if Turbo credentials are
   explicitly provided by a future approved policy.
+- `.github/actions/setup-js-workspace` now uses Node 24-compatible JavaScript action runtimes for
+  pnpm setup and Turbo local-cache restore on GitHub-hosted runners.
 - `TURBO_TEAM` / `TURBO_TOKEN` are removed from repository secrets as of `2026-03-04`.
 
 CI Turbo command policy:
@@ -56,6 +58,13 @@ CI lint import preparation:
   - `@fodmapp/ui`
   - `@fodmapp/reporting`
 - this is a workflow contract, not an extra environment variable requirement; it keeps package-export import resolution stable on clean runners
+
+Local full-gate lint preparation:
+
+- `.github/scripts/quality-gate.sh --full` now applies the same `@fodmapp/ui` + `@fodmapp/reporting`
+  prebuild contract before `pnpm lint:js:ci`
+- dist-backed lint and artifact-producing local scopes are serialized after the read-only parallel pool
+  to avoid shared-worktree races on generated outputs such as `packages/ui/dist`
 
 ## CI Governance Variables
 
