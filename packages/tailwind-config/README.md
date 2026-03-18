@@ -21,8 +21,8 @@ pnpm --filter @fodmapp/tailwind-config styles:generate
 pnpm --filter @fodmapp/tailwind-config styles:check
 ```
 
-`shared-styles.css` is generated from `src/semantic-slot-map.mjs`.
-Do not hand-edit `shared-styles.css`.
+`shared-styles.css` and `foundation.css` are generated from `src/semantic-slot-map.mjs`.
+Do not hand-edit either generated stylesheet.
 
 ## Responsibilities
 
