@@ -93,6 +93,6 @@ export const landingCopy = {
     legal: "Mentions légales",
     legalHref: "/mentions-legales",
     githubHref: "https://github.com/f-campana/fodmapp",
-    githubLabel: "Github",
+    githubLabel: "GitHub",
   },
 } as const;
