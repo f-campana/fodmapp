@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib
 import os
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -9,7 +11,11 @@ import pytest
 from fastapi.testclient import TestClient
 from psycopg.rows import dict_row
 
-from app.main import create_app
+# Anchor pytest to this checkout's api/ package so local multi-worktree runs do
+# not accidentally import a sibling repo's app package.
+API_ROOT = Path(__file__).resolve().parents[1]
+if str(API_ROOT) not in sys.path:
+    sys.path.insert(0, str(API_ROOT))
 
 SECURITY_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-02-25_security_consent_export_delete.sql"
@@ -33,6 +39,11 @@ def _default_db_url() -> str:
     return f"postgresql://{user}@localhost:5432/fodmap_test"
 
 
+def _clear_settings_cache() -> None:
+    config_module = importlib.import_module("app.config")
+    config_module.get_settings.cache_clear()
+
+
 @pytest.fixture(scope="session")
 def db_url() -> str:
     return os.getenv("API_DB_URL", _default_db_url())
@@ -41,7 +52,12 @@ def db_url() -> str:
 @pytest.fixture(scope="session")
 def app_instance(db_url: str):
     os.environ["API_DB_URL"] = db_url
-    return create_app()
+    # Clear cached settings before import/build so test env overrides still take
+    # effect even if another test imported app.config or app.main earlier.
+    _clear_settings_cache()
+    app_main = importlib.import_module("app.main")
+    _clear_settings_cache()
+    return app_main.create_app()
 
 
 @pytest.fixture()
