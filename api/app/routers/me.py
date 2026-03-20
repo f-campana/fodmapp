@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Header, Request, Response
 from psycopg.types.json import Jsonb
 
-from app import sql
+from app import sql, tracking_store
 from app.config import get_settings
 from app.consent_chain import (
     ConsentChainInvalidError,
@@ -180,44 +180,51 @@ def _count_rows(conn, query: str, user_id: UUID) -> int:
     return int(row["count"] or 0)
 
 
-def _execute_hard_delete(conn, user_id: UUID) -> DeleteSummary:
-    consent_count = _count_rows(conn, sql.SQL_COUNT_CONSENT_RECORDS, user_id)
-    queue_count = _count_rows(conn, sql.SQL_COUNT_QUEUE_ROWS, user_id)
-    export_count = _count_rows(conn, sql.SQL_COUNT_EXPORT_JOBS, user_id)
+def _execute_hard_delete(conn, user_id: UUID, scope: str = "all") -> DeleteSummary:
+    symptom_logs_deleted, diet_logs_deleted = tracking_store.hard_delete_tracking_data(conn, user_id, scope=scope)
 
-    conn.execute(
-        sql.SQL_DELETE_QUEUE_ROWS,
-        {"user_id": user_id},
-    )
-    conn.execute(
-        sql.SQL_DELETE_ENTITY_VERSIONS,
-        {"user_id": user_id},
-    )
-    conn.execute(
-        sql.SQL_DELETE_DEVICE_KEYS,
-        {"user_id": user_id},
-    )
-    conn.execute(
-        sql.SQL_INVALIDATE_EXPORT_JOBS,
-        {
-            "user_id": user_id,
-            "error_code": "deleted_by_user_request",
-            "error_detail": "Purge requested by user",
-        },
-    )
-    conn.execute(
-        sql.SQL_DELETE_CONSENT_RECORDS,
-        {"user_id": user_id},
-    )
-    conn.execute(
-        sql.SQL_DELETE_CONSENT_EVENTS,
-        {"user_id": user_id},
-    )
+    consent_count = 0
+    queue_count = 0
+    export_count = 0
+
+    if scope == "all":
+        consent_count = _count_rows(conn, sql.SQL_COUNT_CONSENT_RECORDS, user_id)
+        queue_count = _count_rows(conn, sql.SQL_COUNT_QUEUE_ROWS, user_id)
+        export_count = _count_rows(conn, sql.SQL_COUNT_EXPORT_JOBS, user_id)
+
+        conn.execute(
+            sql.SQL_DELETE_QUEUE_ROWS,
+            {"user_id": user_id},
+        )
+        conn.execute(
+            sql.SQL_DELETE_ENTITY_VERSIONS,
+            {"user_id": user_id},
+        )
+        conn.execute(
+            sql.SQL_DELETE_DEVICE_KEYS,
+            {"user_id": user_id},
+        )
+        conn.execute(
+            sql.SQL_INVALIDATE_EXPORT_JOBS,
+            {
+                "user_id": user_id,
+                "error_code": "deleted_by_user_request",
+                "error_detail": "Purge requested by user",
+            },
+        )
+        conn.execute(
+            sql.SQL_DELETE_CONSENT_RECORDS,
+            {"user_id": user_id},
+        )
+        conn.execute(
+            sql.SQL_DELETE_CONSENT_EVENTS,
+            {"user_id": user_id},
+        )
 
     return DeleteSummary(
         consent_records_touched=consent_count,
-        symptom_logs_deleted=0,
-        diet_logs_deleted=0,
+        symptom_logs_deleted=symptom_logs_deleted,
+        diet_logs_deleted=diet_logs_deleted,
         swap_history_deleted=0,
         queue_items_dropped=queue_count,
         exports_invalidated=export_count,
@@ -622,6 +629,9 @@ def request_export(
 
         counts_row = sql.fetch_one(conn, sql.SQL_COUNT_CONSENT_RECORDS, {"user_id": user_id})
         rows_by_domain["consent"] = int(counts_row["count"] or 0) if counts_row else 0
+        tracking_counts = tracking_store.count_tracking_rows_for_export(conn, user_id)
+        rows_by_domain["symptoms"] = tracking_counts["symptoms"]
+        rows_by_domain["diet_logs"] = tracking_counts["diet_logs"]
         manifest["rows_by_domain"] = rows_by_domain
 
         export_id = conn.execute(
@@ -815,6 +825,7 @@ def request_delete(
                     summary = _execute_hard_delete(
                         conn,
                         user_id=user_id,
+                        scope=payload.scope,
                     )
                     status = "completed"
                 summary_dict = summary.model_dump()

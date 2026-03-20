@@ -7,6 +7,7 @@ export interface ServerRuntimeEnv {
   sentryDsnApp: string | null;
   clerkSecretKey: string | null;
   clerkJwtIssuerDomain: string | null;
+  appAuthPreviewUserId: string | null;
   nodeEnv: string;
 }
 
@@ -19,6 +20,7 @@ export function getServerRuntimeEnv(): ServerRuntimeEnv {
     sentryDsnApp,
     clerkSecretKey: readOptionalEnv("CLERK_SECRET_KEY"),
     clerkJwtIssuerDomain: readOptionalEnv("CLERK_JWT_ISSUER_DOMAIN"),
+    appAuthPreviewUserId: readOptionalEnv("APP_AUTH_PREVIEW_USER_ID"),
     nodeEnv: process.env.NODE_ENV ?? "development",
   };
 }

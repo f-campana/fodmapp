@@ -29,6 +29,9 @@ SAFE_HARBOR_APPLY_PATH = (
 SAFE_HARBOR_CHECKS_PATH = (
     Path(__file__).resolve().parents[2] / "etl" / "phase3" / "sql" / "phase3_safe_harbor_v1_checks.sql"
 )
+TRACKING_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-03-20_symptoms_tracking_v1.sql"
+)
 
 
 def _default_db_url() -> str:
@@ -107,6 +110,17 @@ def _ensure_safe_harbor_schema(db_url: str) -> None:
         conn.execute(checks_sql)
 
 
+def _ensure_tracking_schema(db_url: str) -> None:
+    with psycopg.connect(db_url, row_factory=dict_row) as conn:
+        table_state = conn.execute("SELECT to_regclass('public.symptom_logs') AS symptom_table").fetchone()
+        if table_state and table_state["symptom_table"]:
+            return
+
+    migration_sql = TRACKING_MIGRATION_PATH.read_text(encoding="utf-8")
+    with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+        conn.execute(migration_sql)
+
+
 @pytest.fixture(scope="session")
 def me_security_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
@@ -119,6 +133,13 @@ def safe_harbor_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
         pytest.skip("integration DB is not ready or schema is missing")
     _ensure_safe_harbor_schema(db_url)
+
+
+@pytest.fixture(scope="session")
+def tracking_schema(db_url: str, integration_db_ready: bool) -> None:
+    if not integration_db_ready:
+        pytest.skip("integration DB is not ready or schema is missing")
+    _ensure_tracking_schema(db_url)
 
 
 @pytest.fixture()

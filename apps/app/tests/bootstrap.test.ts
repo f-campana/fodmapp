@@ -13,12 +13,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const PREVIEW_USER_ID = "11111111-1111-4111-8111-111111111111";
+
 describe("cross-cutting runtime adapters", () => {
   it("returns disabled status when env keys are absent", () => {
     vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN_APP", "");
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "");
     vi.stubEnv("SENTRY_DSN_APP", "");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID", "");
@@ -32,6 +35,9 @@ describe("cross-cutting runtime adapters", () => {
 
     expect(auth.fullyConfigured).toBe(false);
     expect(auth.mode).toBe("disabled");
+    expect(auth.previewValuePresent).toBe(false);
+    expect(auth.previewValueValid).toBe(false);
+    expect(auth.previewUserId).toBeNull();
     expect(monitoring.configured).toBe(false);
     expect(monitoring.mode).toBe("disabled");
     expect(analytics.configured).toBe(false);
@@ -44,6 +50,7 @@ describe("cross-cutting runtime adapters", () => {
   it("enables runtime path for Clerk/Sentry/Plausible when env keys are set", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
     vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
     vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN_APP", "https://sentry.example/42");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
     vi.stubEnv("NEXT_PUBLIC_AXEPTIO_CLIENT_ID", "axeptio-client");
@@ -57,6 +64,9 @@ describe("cross-cutting runtime adapters", () => {
 
     expect(auth.fullyConfigured).toBe(true);
     expect(auth.mode).toBe("runtime");
+    expect(auth.previewValuePresent).toBe(true);
+    expect(auth.previewValueValid).toBe(true);
+    expect(auth.previewUserId).toBeNull();
     expect(monitoring.configured).toBe(true);
     expect(monitoring.mode).toBe("runtime");
     expect(analytics.configured).toBe(false);
@@ -117,6 +127,55 @@ describe("cross-cutting runtime adapters", () => {
     expect(getAuthMiddlewareMode("/espace/preferences")).toBe(
       "protected-placeholder",
     );
+  });
+
+  it("activates preview mode with a valid preview user id in development", () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
+    vi.stubEnv("CLERK_SECRET_KEY", "");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
+    vi.stubEnv("NODE_ENV", "development");
+
+    const auth = getClerkBootstrapStatus();
+
+    expect(auth.fullyConfigured).toBe(false);
+    expect(auth.mode).toBe("preview");
+    expect(auth.previewValuePresent).toBe(true);
+    expect(auth.previewValueValid).toBe(true);
+    expect(auth.previewUserId).toBe(PREVIEW_USER_ID);
+    expect(getAuthMiddlewareMode("/espace", auth)).toBe(
+      "protected-placeholder",
+    );
+  });
+
+  it("ignores preview mode in production", () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
+    vi.stubEnv("CLERK_SECRET_KEY", "");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
+    vi.stubEnv("NODE_ENV", "production");
+
+    const auth = getClerkBootstrapStatus();
+
+    expect(auth.mode).toBe("disabled");
+    expect(auth.previewValuePresent).toBe(true);
+    expect(auth.previewValueValid).toBe(true);
+    expect(auth.previewUserId).toBeNull();
+  });
+
+  it("keeps preview mode disabled when the preview user id is invalid", () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
+    vi.stubEnv("CLERK_SECRET_KEY", "");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "not-a-uuid");
+    vi.stubEnv("NODE_ENV", "development");
+
+    const auth = getClerkBootstrapStatus();
+
+    expect(auth.mode).toBe("disabled");
+    expect(auth.previewValuePresent).toBe(true);
+    expect(auth.previewValueValid).toBe(false);
+    expect(auth.previewUserId).toBeNull();
   });
 
   it("switches middleware to runtime mode when Clerk env is complete", () => {

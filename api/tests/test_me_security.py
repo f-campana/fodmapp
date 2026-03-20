@@ -13,7 +13,7 @@ from psycopg.rows import dict_row
 from app.consent_chain import proof_secret
 from app.crypto_utils import canonical_json, hmac_signature, sha256_hex
 
-pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema")]
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema", "tracking_schema")]
 
 
 def _secret_b64(seed: str) -> str:
@@ -84,6 +84,28 @@ def _assert_delete_proof(user_id: uuid.UUID, delete_request_id: uuid.UUID, paylo
 def _cleanup_account(db_url: str, user_id: uuid.UUID) -> None:
     with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
+            writer.execute(
+                """
+                DELETE FROM meal_log_items
+                WHERE meal_log_id IN (
+                    SELECT meal_log_id FROM meal_logs WHERE user_id = %(user_id)s
+                )
+                """,
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM meal_logs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute(
+                """
+                DELETE FROM saved_meal_items
+                WHERE saved_meal_id IN (
+                    SELECT saved_meal_id FROM saved_meals WHERE user_id = %(user_id)s
+                )
+                """,
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM saved_meals WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM custom_foods WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM symptom_logs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -108,6 +130,7 @@ def _grant_consent(client, user_id: uuid.UUID, scope: dict[str, bool] | None = N
         "sync_mutations": True,
         "analytics": True,
         "profile": True,
+        "symptom_logs": True,
         "symptoms": True,
         "diet_logs": True,
     }
