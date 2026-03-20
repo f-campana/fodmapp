@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@fodmapp/ui/accordion";
 
+import { InViewReveal } from "../src/components/InViewReveal";
 import { WaitlistForm } from "../src/components/WaitlistForm";
 import { landingCopy } from "../src/content/landing";
 
@@ -24,16 +25,29 @@ export default function HomePage() {
       <main>
         <div className="marketing-page">
           {/* ---- Hero ---- */}
-          <section className="marketing-hero">
-            <p className="marketing-eyebrow">{landingCopy.hero.eyebrow}</p>
-            <h1 className="marketing-title">{landingCopy.hero.title}</h1>
-            <p className="marketing-description">
-              <span>{landingCopy.hero.description}</span>
-              <span className="marketing-description-support">
+          <section className="marketing-hero" data-motion-section="hero">
+            <div
+              className="marketing-ambient marketing-ambient--hero"
+              aria-hidden="true"
+            >
+              <span className="marketing-ambient-shape marketing-ambient-shape--primary" />
+              <span className="marketing-ambient-shape marketing-ambient-shape--secondary" />
+            </div>
+            <p className="marketing-eyebrow marketing-hero-eyebrow">
+              {landingCopy.hero.eyebrow}
+            </p>
+            <h1 className="marketing-title marketing-hero-title">
+              {landingCopy.hero.title}
+            </h1>
+            <p className="marketing-description marketing-hero-description">
+              <span className="marketing-hero-summary">
+                {landingCopy.hero.description}
+              </span>
+              <span className="marketing-description-support marketing-hero-support">
                 {landingCopy.hero.descriptionSupport}
               </span>
             </p>
-            <a className="marketing-cta" href="#waitlist">
+            <a className="marketing-cta marketing-hero-cta" href="#waitlist">
               {landingCopy.hero.cta}
               <svg
                 aria-hidden="true"
@@ -55,14 +69,22 @@ export default function HomePage() {
           </section>
 
           {/* ---- Trust strip ---- */}
-          <section className="marketing-trust-strip" aria-label="Garanties">
+          <section
+            className="marketing-trust-strip"
+            aria-label="Garanties"
+            data-motion-section="trust-strip"
+          >
             <ul className="marketing-trust-list">
-              <li>
+              <li className="marketing-trust-item">
                 Données issues de CIQUAL, la base nutritionnelle publique
                 française
               </li>
-              <li>Substitutions fondées sur la littérature scientifique</li>
-              <li>Code source ouvert et méthode transparente</li>
+              <li className="marketing-trust-item">
+                Substitutions fondées sur la littérature scientifique
+              </li>
+              <li className="marketing-trust-item">
+                Code source ouvert et méthode transparente
+              </li>
             </ul>
           </section>
 
@@ -71,6 +93,8 @@ export default function HomePage() {
             <section
               aria-labelledby="approach-title"
               className="marketing-section"
+              data-motion-reveal="approach"
+              data-reveal-target="true"
             >
               <h2 id="approach-title" className="marketing-section-title">
                 {landingCopy.approach.title}
@@ -95,6 +119,8 @@ export default function HomePage() {
             <section
               aria-labelledby="trust-title"
               className="marketing-section marketing-muted"
+              data-motion-reveal="trust"
+              data-reveal-target="true"
             >
               <h2 id="trust-title" className="marketing-section-title">
                 {landingCopy.trust.title}
@@ -115,9 +141,26 @@ export default function HomePage() {
         </div>
 
         {/* ---- Waitlist band ---- */}
-        <section id="waitlist" className="marketing-band">
+        <section
+          id="waitlist"
+          className="marketing-band marketing-band--motion"
+          data-motion-section="waitlist"
+        >
+          <div
+            className="marketing-ambient marketing-ambient--waitlist"
+            aria-hidden="true"
+          >
+            <span className="marketing-ambient-shape marketing-ambient-shape--primary" />
+            <span className="marketing-ambient-shape marketing-ambient-shape--secondary" />
+          </div>
           <div className="marketing-page marketing-page--band">
-            <div className="marketing-waitlist">
+            <InViewReveal
+              className="marketing-waitlist marketing-reveal"
+              threshold={0.2}
+              data-reveal="waitlist"
+              data-motion-reveal="waitlist"
+              data-reveal-target="true"
+            >
               <h2 className="marketing-section-title">
                 {landingCopy.waitlist.title}
               </h2>
@@ -125,7 +168,7 @@ export default function HomePage() {
                 {landingCopy.waitlist.description}
               </p>
               <WaitlistForm />
-            </div>
+            </InViewReveal>
           </div>
         </section>
 
@@ -135,22 +178,33 @@ export default function HomePage() {
             aria-labelledby="faq-title"
             className="marketing-faq-section"
           >
-            <h2 id="faq-title" className="marketing-faq-title">
-              {landingCopy.faq.title}
-            </h2>
-            <Accordion type="single" collapsible defaultValue="faq-0">
-              {landingCopy.faq.items.map((item, index) => (
-                <AccordionItem
-                  key={item.question}
-                  value={`faq-${String(index)}`}
-                >
-                  <AccordionTrigger className="marketing-faq-trigger">
-                    {item.question}
-                  </AccordionTrigger>
-                  <AccordionContent>{item.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            <InViewReveal
+              className="marketing-reveal"
+              threshold={0.18}
+              data-reveal="faq"
+              data-motion-reveal="faq"
+              data-reveal-target="true"
+            >
+              <h2 id="faq-title" className="marketing-faq-title">
+                {landingCopy.faq.title}
+              </h2>
+              <Accordion type="single" collapsible defaultValue="faq-0">
+                {landingCopy.faq.items.map((item, index) => (
+                  <AccordionItem
+                    key={item.question}
+                    value={`faq-${String(index)}`}
+                  >
+                    <AccordionTrigger
+                      className="marketing-faq-trigger"
+                      data-motion-item="faq-trigger"
+                    >
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent>{item.answer}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </InViewReveal>
           </section>
         </div>
       </main>
