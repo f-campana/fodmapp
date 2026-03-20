@@ -70,7 +70,9 @@ export function WaitlistForm() {
     return (
       <p
         role="status"
-        className="rounded-[var(--fd-base-radius-lg)] border border-[var(--fd-semantic-color-border-subtle)] bg-[var(--fd-semantic-color-surface-muted)] px-4 py-3 text-[var(--fd-semantic-color-text-primary)]"
+        data-waitlist-state="success"
+        data-waitlist-panel="success"
+        className="marketing-waitlist-success rounded-[var(--fd-base-radius-lg)] border border-[var(--fd-semantic-color-border-subtle)] bg-[var(--fd-semantic-color-surface-muted)] px-4 py-3 text-[var(--fd-semantic-color-text-primary)]"
       >
         {landingCopy.waitlist.successMessage}
       </p>
@@ -78,11 +80,19 @@ export function WaitlistForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-4 grid gap-3">
-      <label htmlFor="waitlist-email" className="marketing-label">
+    <form
+      onSubmit={onSubmit}
+      className="marketing-waitlist-form mt-4 grid gap-3"
+      data-waitlist-state={status}
+    >
+      <label
+        htmlFor="waitlist-email"
+        className="marketing-label"
+        data-waitlist-label="true"
+      >
         {landingCopy.waitlist.emailLabel}
       </label>
-      <div className="marketing-inline-form">
+      <div className="marketing-inline-form" data-waitlist-controls="true">
         <Input
           id="waitlist-email"
           name="email"
@@ -95,13 +105,15 @@ export function WaitlistForm() {
           }
           placeholder="prenom.nom@exemple.com"
           aria-invalid={status === "error" && error ? "true" : "false"}
-          className="h-11"
+          className="marketing-email-input h-11"
+          data-waitlist-input="true"
           required
         />
         <Button
           type="submit"
           disabled={status === "submitting"}
-          className="h-11 px-5"
+          className="marketing-submit-button h-11 px-5"
+          data-waitlist-submit="true"
         >
           {status === "submitting" ? "Envoi..." : landingCopy.waitlist.cta}
         </Button>
@@ -109,12 +121,15 @@ export function WaitlistForm() {
       {error ? (
         <p
           role="alert"
-          className="text-sm text-[var(--fd-semantic-color-validation-error-text)]"
+          className="marketing-waitlist-error text-sm text-[var(--fd-semantic-color-validation-error-text)]"
+          data-waitlist-feedback="error"
         >
           {error}
         </p>
       ) : null}
-      <p className="marketing-privacy-note">{landingCopy.waitlist.note}</p>
+      <p className="marketing-privacy-note" data-waitlist-note="true">
+        {landingCopy.waitlist.note}
+      </p>
     </form>
   );
 }

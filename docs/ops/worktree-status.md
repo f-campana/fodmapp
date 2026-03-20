@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-19
+Last reviewed: 2026-03-20
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,6 +15,7 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                          | Branch                                       | Status             | Scope                                                                                                                                                             | Notes / blockers                                              |
 | -------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`                                               | `main`                                       | active (protected) | Main integration worktree only                                                                                                                                    | Must remain clean.                                            |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/marketing-motion-life-pass`           | `codex/marketing-motion-life-pass`           | active             | Add restrained editorial motion, ambient decorative life, and interaction polish to the marketing landing page without changing backend or package contracts      | In progress.                                                  |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/marketing-post-audit-polish`          | `codex/marketing-post-audit-polish`          | merged             | Post-audit landing-page polish: footer contrast, waitlist control alignment, hero/trust/FAQ spacing refinements, and form/accordion presentation cleanup          | Merged via PR #273; worktree removed and branch deleted.      |
 | `/tmp/fodmapp-marketing-final-polish`                                                  | `codex/marketing-final-polish`               | merged             | Final visual polish pass for the marketing landing page: hero weight/width, trust-strip dots, waitlist spacing/typography, FAQ trigger hierarchy, and footer type | Merged via PR #274; worktree removed and branch deleted.      |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/marketing-ui-full-css-hotfix`         | `codex/marketing-ui-full-css-hotfix`         | merged             | Hotfix marketing to load the full `@fodmapp/ui` stylesheet so composed UI primitives like `Accordion` ship the utility classes they require                       | Merged via PR #271; worktree removed and branch deleted.      |
