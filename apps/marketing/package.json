@@ -4,10 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @fodmapp/ui build && next dev",
-    "build": "pnpm --filter @fodmapp/ui build && next build",
+    "styles:generate": "tailwindcss -i ./src/styles/layout.tailwind.css -o ./src/styles/layout.generated.css --minify",
+    "dev": "pnpm run styles:generate && pnpm --filter @fodmapp/ui build && next dev",
+    "build": "pnpm run styles:generate && pnpm --filter @fodmapp/ui build && next build",
     "start": "next start",
-    "typecheck": "pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm run styles:generate && pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@fodmapp/design-tokens": "workspace:*",
@@ -20,9 +21,11 @@
     "resend": "^4.5.0"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "4.2.1",
     "@types/node": "25.5.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "tailwindcss": "4.2.1",
     "typescript": "5.9.3"
   }
 }

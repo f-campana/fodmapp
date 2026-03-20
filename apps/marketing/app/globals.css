@@ -1,4 +1,4 @@
-@import "@fodmapp/tailwind-config/foundation.css";
+@import "../src/styles/layout.generated.css";
 @import "@fodmapp/ui/full.css";
 @import "../src/styles/landing.css";
 
