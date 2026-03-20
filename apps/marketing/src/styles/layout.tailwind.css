@@ -1,0 +1,5 @@
+/* App-local Tailwind utility bundle for marketing layout primitives. */
+@import "@fodmapp/tailwind-config/foundation.css";
+
+@source "../../app";
+@source "../components";

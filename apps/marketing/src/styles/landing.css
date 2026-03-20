@@ -1,5 +1,5 @@
 /* ========================================
-   Marketing Landing Page — Visual Styles
+   Marketing Landing Page — Motion + Decor
    ======================================== */
 
 @keyframes marketing-fade-up {
@@ -48,21 +48,6 @@
   }
 }
 
-/* --- Page container --- */
-.marketing-page {
-  width: min(56rem, 100% - 2.5rem);
-  margin: 0 auto;
-  padding: 0;
-  display: grid;
-  gap: 0;
-  font-family: var(--fd-base-typography-font-family-body), sans-serif;
-}
-
-.marketing-page--band,
-.marketing-page--footer {
-  width: min(56rem, 100% - 2.5rem);
-}
-
 .marketing-reveal[data-reveal-mounted="true"][data-in-view="false"] {
   opacity: 0;
   transform: translateY(18px);
@@ -104,12 +89,7 @@
 .marketing-ambient-shape--primary {
   background: radial-gradient(
     circle at 35% 35%,
-    color-mix(
-        in oklch,
-        var(--fd-semantic-color-action-primary-bg) 22%,
-        transparent
-      )
-      0%,
+    color-mix(in oklch, var(--color-primary) 22%, transparent) 0%,
     transparent 72%
   );
 }
@@ -117,53 +97,26 @@
 .marketing-ambient-shape--secondary {
   background: radial-gradient(
     circle at 45% 45%,
-    color-mix(
-        in oklch,
-        var(--fd-semantic-color-surface-raised) 72%,
-        transparent
-      )
-      0%,
+    color-mix(in oklch, var(--color-surface-raised) 72%, transparent) 0%,
     transparent 75%
   );
-}
-
-/* --- Hero --- */
-.marketing-hero {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  padding: 6rem 0 3rem;
-}
-
-.marketing-hero > :not(.marketing-ambient) {
-  position: relative;
-  z-index: 1;
 }
 
 .marketing-ambient--hero .marketing-ambient-shape--primary {
   top: -6rem;
   right: -3rem;
-  width: min(34rem, 62vw);
-  height: min(28rem, 54vw);
+  width: min(38rem, 62vw);
+  height: min(30rem, 54vw);
   animation: marketing-drift-primary 18s linear infinite;
 }
 
 .marketing-ambient--hero .marketing-ambient-shape--secondary {
   top: 5rem;
   left: -4rem;
-  width: min(22rem, 42vw);
-  height: min(16rem, 34vw);
+  width: min(24rem, 42vw);
+  height: min(18rem, 34vw);
   opacity: 0.75;
   animation: marketing-drift-secondary 14s linear infinite;
-}
-
-.marketing-eyebrow {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--fd-semantic-color-action-primary-bg);
 }
 
 .marketing-hero-eyebrow {
@@ -171,27 +124,9 @@
     var(--fd-base-motion-easing-decelerated) both;
 }
 
-.marketing-title {
-  margin: var(--fd-base-space-3) 0 0;
-  font-size: clamp(2.5rem, 5.5vw, 3.75rem);
-  line-height: 1.08;
-  font-weight: 600;
-  font-family: var(--fd-base-typography-font-family-display), serif;
-  max-width: 20em;
-}
-
 .marketing-hero-title {
   animation: marketing-soft-reveal var(--fd-base-motion-duration-slower)
     var(--fd-base-motion-easing-decelerated) 80ms both;
-}
-
-.marketing-description {
-  max-width: 36rem;
-  color: var(--fd-semantic-color-text-muted);
-  margin-top: var(--fd-base-space-3);
-  font-size: 1.1875rem;
-  line-height: 1.55;
-  text-wrap: pretty;
 }
 
 .marketing-hero-summary,
@@ -201,14 +136,8 @@
 }
 
 .marketing-hero-summary {
-  display: block;
   animation: marketing-fade-up var(--fd-base-motion-duration-slow)
     var(--fd-base-motion-easing-decelerated) 180ms both;
-}
-
-.marketing-description-support {
-  display: block;
-  margin-top: var(--fd-base-space-2);
 }
 
 .marketing-hero-support {
@@ -217,23 +146,8 @@
 }
 
 .marketing-cta {
-  margin-top: var(--fd-base-space-6);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  border-radius: var(--fd-base-radius-sm);
-  background: var(--fd-semantic-color-action-primary-bg);
-  color: var(--fd-semantic-color-action-primary-fg);
-  text-decoration: none;
-  font-weight: 600;
-  width: fit-content;
   box-shadow: 0 10px 30px
-    color-mix(
-      in oklch,
-      var(--fd-semantic-color-action-primary-bg) 16%,
-      transparent
-    );
+    color-mix(in oklch, var(--color-primary) 16%, transparent);
   transition:
     transform var(--fd-semantic-motion-interactive-duration)
       var(--fd-semantic-motion-interactive-easing),
@@ -249,14 +163,9 @@
 }
 
 .marketing-cta:hover {
-  background: var(--fd-semantic-color-action-primary-bg-hover);
   transform: translateY(-1px);
   box-shadow: 0 16px 34px
-    color-mix(
-      in oklch,
-      var(--fd-semantic-color-action-primary-bg) 22%,
-      transparent
-    );
+    color-mix(in oklch, var(--color-primary) 22%, transparent);
 }
 
 .marketing-cta:active {
@@ -264,7 +173,7 @@
 }
 
 .marketing-cta:focus-visible {
-  outline: 2px solid var(--fd-semantic-color-focus-ring);
+  outline: 2px solid var(--color-ring);
   outline-offset: 2px;
 }
 
@@ -283,40 +192,6 @@
   transform: translateX(2px);
 }
 
-/* --- Trust strip --- */
-.marketing-trust-strip {
-  padding: 0.75rem 0 2.5rem;
-}
-
-.marketing-trust-list {
-  display: grid;
-  gap: 1rem;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.marketing-trust-list li {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: start;
-  gap: 0.625rem;
-  font-size: 0.875rem;
-  color: var(--fd-semantic-color-text-muted);
-  line-height: 1.45;
-}
-
-.marketing-trust-list li::before {
-  content: "";
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: var(--fd-base-radius-full);
-  background: var(--fd-semantic-color-action-primary-bg);
-  flex-shrink: 0;
-  margin-top: 0.4rem;
-}
-
 .marketing-trust-item:nth-child(1) {
   animation: marketing-fade-up var(--fd-base-motion-duration-slow)
     var(--fd-base-motion-easing-decelerated) 220ms both;
@@ -330,21 +205,6 @@
 .marketing-trust-item:nth-child(3) {
   animation: marketing-fade-up var(--fd-base-motion-duration-slow)
     var(--fd-base-motion-easing-decelerated) 340ms both;
-}
-
-.marketing-band {
-  position: relative;
-  isolation: isolate;
-  overflow: clip;
-  padding: 4rem 0;
-  background: var(--fd-semantic-color-surface-default);
-  border-top: 1px solid var(--fd-semantic-color-border-subtle);
-  border-bottom: 1px solid var(--fd-semantic-color-border-subtle);
-}
-
-.marketing-band > :not(.marketing-ambient) {
-  position: relative;
-  z-index: 1;
 }
 
 .marketing-ambient--waitlist .marketing-ambient-shape--primary {
@@ -365,31 +225,6 @@
   animation: marketing-drift-primary 20s linear infinite;
 }
 
-/* --- Waitlist section --- */
-.marketing-waitlist {
-  max-width: 32rem;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.marketing-waitlist-form {
-  position: relative;
-}
-
-.marketing-section-title {
-  margin: 0;
-  font-family: var(--fd-base-typography-font-family-display), serif;
-  font-size: 1.875rem;
-  font-weight: 700;
-  line-height: 1.15;
-}
-
-.marketing-waitlist .marketing-description {
-  margin-left: auto;
-  margin-right: auto;
-  text-wrap: balance;
-}
-
 .marketing-email-input {
   transition:
     box-shadow var(--fd-semantic-motion-interactive-duration)
@@ -403,11 +238,7 @@
 .marketing-email-input:focus-visible,
 .marketing-email-input:focus {
   box-shadow: 0 0 0 4px
-    color-mix(
-      in oklch,
-      var(--fd-semantic-color-action-primary-bg) 14%,
-      transparent
-    );
+    color-mix(in oklch, var(--color-primary) 14%, transparent);
 }
 
 .marketing-submit-button {
@@ -421,11 +252,7 @@
 .marketing-submit-button:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 10px 24px
-    color-mix(
-      in oklch,
-      var(--fd-semantic-color-action-primary-bg) 20%,
-      transparent
-    );
+    color-mix(in oklch, var(--color-primary) 20%, transparent);
 }
 
 .marketing-submit-button:active:not(:disabled) {
@@ -440,175 +267,6 @@
 .marketing-waitlist-error {
   animation: marketing-fade-up var(--fd-base-motion-duration-normal)
     var(--fd-base-motion-easing-standard) both;
-}
-
-/* --- FAQ section --- */
-.marketing-faq-section {
-  padding: 4rem 0 2rem;
-}
-
-.marketing-faq-title {
-  margin: 0 0 var(--fd-base-space-5);
-  font-family: var(--fd-base-typography-font-family-display), serif;
-  font-size: 1.625rem;
-  font-weight: 700;
-}
-
-/* --- Approach section (feature-flagged) --- */
-.marketing-section {
-  padding: clamp(var(--fd-base-space-5), 4vw, var(--fd-base-space-8));
-  border-radius: var(--fd-base-radius-lg);
-  background-color: var(--fd-semantic-color-surface-default);
-  border: 1px solid var(--fd-semantic-color-border-subtle);
-}
-
-.marketing-muted {
-  background-color: var(--fd-semantic-color-surface-muted);
-}
-
-.marketing-pillars {
-  margin-top: var(--fd-base-space-4);
-  display: grid;
-  gap: var(--fd-base-space-4);
-}
-
-@media (min-width: 48rem) {
-  .marketing-pillars {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.marketing-pillars-item {
-  padding: var(--fd-base-space-3);
-  border-radius: var(--fd-base-radius-md);
-  background: var(--fd-semantic-color-surface-default);
-  border: 1px solid var(--fd-semantic-color-border-subtle);
-}
-
-.marketing-pillars-item h3 {
-  margin: 0 0 var(--fd-base-space-2);
-  font-weight: 600;
-}
-
-.marketing-list {
-  margin-top: var(--fd-base-space-4);
-  display: grid;
-  gap: var(--fd-base-space-3);
-  list-style: none;
-  padding: 0;
-}
-
-.marketing-list li {
-  list-style: none;
-  display: grid;
-  grid-template-columns: 0.35rem 1fr;
-  gap: var(--fd-base-space-2);
-  align-items: start;
-  padding: var(--fd-base-space-3);
-  border-radius: var(--fd-base-radius-md);
-  background: var(--fd-semantic-color-surface-default);
-  border: 1px solid var(--fd-semantic-color-border-subtle);
-  font-weight: 600;
-  margin: 0 0 var(--fd-base-space-2);
-}
-
-.marketing-list li::before {
-  content: "";
-  width: 0.35rem;
-  height: 0.35rem;
-  border-radius: var(--fd-base-radius-full);
-  margin-top: 0.5rem;
-  background: var(--fd-semantic-color-action-primary-bg);
-}
-
-/* --- Footer --- */
-.marketing-footer-band {
-  margin-top: 3rem;
-  padding: 2.5rem 0;
-  background: var(--fd-semantic-color-surface-inverse);
-  color: var(--fd-semantic-color-text-inverse);
-}
-
-.marketing-footer-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.marketing-footer-brand {
-  font-family: var(--fd-base-typography-font-family-display), serif;
-  font-size: 1.375rem;
-  font-weight: 900;
-  margin: 0;
-}
-
-.marketing-footer-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.marketing-footer-links a {
-  color: inherit;
-  text-decoration: none;
-  font-size: 0.875rem;
-}
-
-.marketing-footer-links a:hover,
-.marketing-footer-links a:focus-visible {
-  text-decoration: underline;
-}
-
-.marketing-footer-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  margin: 1.5rem 0;
-}
-
-.marketing-footer-bottom {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  opacity: 0.5;
-}
-
-/* --- Form label (visible) --- */
-.marketing-label {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: var(--fd-semantic-color-text-muted);
-  text-align: left;
-  width: 100%;
-}
-
-/* --- Inline form layout --- */
-.marketing-inline-form {
-  display: flex;
-  gap: 0.5rem;
-  align-items: stretch;
-}
-
-.marketing-inline-form > :first-child {
-  flex: 1;
-  min-width: 0;
-}
-
-@media (max-width: 35.999rem) {
-  .marketing-inline-form {
-    flex-direction: column;
-  }
-}
-
-/* --- Privacy note --- */
-.marketing-privacy-note {
-  font-size: 0.8125rem;
-  font-style: italic;
-  color: var(--fd-semantic-color-text-muted);
-  text-align: center;
-  margin-top: var(--fd-base-space-3);
 }
 
 .marketing-faq-trigger {
@@ -626,10 +284,6 @@
   background: transparent;
 }
 
-.marketing-faq-trigger[data-state="open"] {
-  font-weight: 700;
-}
-
 .marketing-faq-section
   [data-slot="accordion-content"][data-state="open"]
   [data-slot="accordion-content-inner"] {
@@ -637,14 +291,6 @@
     var(--fd-base-motion-easing-decelerated) both;
 }
 
-@media (min-width: 48rem) {
-  .marketing-trust-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem 1.5rem;
-  }
-}
-
-/* --- Responsive --- */
 @media (max-width: 35.999rem) {
   .marketing-ambient-shape {
     animation: none;
@@ -665,20 +311,10 @@
   }
 
   .marketing-ambient--waitlist .marketing-ambient-shape--primary {
-    left: -8rem;
     bottom: -8rem;
+    left: -8rem;
     width: 18rem;
     height: 16rem;
-  }
-
-  .marketing-hero {
-    padding: 3.5rem 0 2.5rem;
-  }
-
-  .marketing-footer-top,
-  .marketing-footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
 

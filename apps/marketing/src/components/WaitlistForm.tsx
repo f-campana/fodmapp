@@ -72,7 +72,7 @@ export function WaitlistForm() {
         role="status"
         data-waitlist-state="success"
         data-waitlist-panel="success"
-        className="marketing-waitlist-success rounded-[var(--fd-base-radius-lg)] border border-[var(--fd-semantic-color-border-subtle)] bg-[var(--fd-semantic-color-surface-muted)] px-4 py-3 text-[var(--fd-semantic-color-text-primary)]"
+        className="marketing-waitlist-success rounded-lg border border-border-subtle bg-muted px-4 py-3 text-foreground"
       >
         {landingCopy.waitlist.successMessage}
       </p>
@@ -82,17 +82,20 @@ export function WaitlistForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="marketing-waitlist-form mt-4 grid gap-3"
+      className="mt-4 grid gap-3"
       data-waitlist-state={status}
     >
       <label
         htmlFor="waitlist-email"
-        className="marketing-label"
+        className="w-full text-left text-sm font-normal text-muted-foreground"
         data-waitlist-label="true"
       >
         {landingCopy.waitlist.emailLabel}
       </label>
-      <div className="marketing-inline-form" data-waitlist-controls="true">
+      <div
+        className="flex items-stretch gap-2 max-[35.999rem]:flex-col"
+        data-waitlist-controls="true"
+      >
         <Input
           id="waitlist-email"
           name="email"
@@ -105,7 +108,7 @@ export function WaitlistForm() {
           }
           placeholder="prenom.nom@exemple.com"
           aria-invalid={status === "error" && error ? "true" : "false"}
-          className="marketing-email-input h-11"
+          className="marketing-email-input h-11 min-w-0 flex-1"
           data-waitlist-input="true"
           required
         />
@@ -121,13 +124,16 @@ export function WaitlistForm() {
       {error ? (
         <p
           role="alert"
-          className="marketing-waitlist-error text-sm text-[var(--fd-semantic-color-validation-error-text)]"
+          className="marketing-waitlist-error text-sm text-validation-error-text"
           data-waitlist-feedback="error"
         >
           {error}
         </p>
       ) : null}
-      <p className="marketing-privacy-note" data-waitlist-note="true">
+      <p
+        className="mt-3 text-center text-[0.8125rem] text-muted-foreground italic"
+        data-waitlist-note="true"
+      >
         {landingCopy.waitlist.note}
       </p>
     </form>
