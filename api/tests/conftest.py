@@ -36,6 +36,11 @@ def _default_db_url() -> str:
     return f"postgresql://{user}@localhost:5432/fodmap_test"
 
 
+def _clear_settings_cache() -> None:
+    config_module = importlib.import_module("app.config")
+    config_module.get_settings.cache_clear()
+
+
 @pytest.fixture(scope="session")
 def db_url() -> str:
     return os.getenv("API_DB_URL", _default_db_url())
@@ -44,7 +49,12 @@ def db_url() -> str:
 @pytest.fixture(scope="session")
 def app_instance(db_url: str):
     os.environ["API_DB_URL"] = db_url
-    return importlib.import_module("app.main").create_app()
+    # Clear cached settings before import/build so test env overrides still take
+    # effect even if another test imported app.config or app.main earlier.
+    _clear_settings_cache()
+    app_main = importlib.import_module("app.main")
+    _clear_settings_cache()
+    return app_main.create_app()
 
 
 @pytest.fixture()
