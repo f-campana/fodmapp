@@ -8,6 +8,7 @@ import {
 import { InViewReveal } from "../src/components/InViewReveal";
 import { WaitlistForm } from "../src/components/WaitlistForm";
 import { landingCopy } from "../src/content/landing";
+import { normalizeWaitlistFallbackState } from "../src/lib/waitlist";
 
 const enabled = (value: string | undefined): boolean =>
   value === "1" || value?.toLowerCase() === "true";
@@ -16,14 +17,22 @@ function isFeatureEnabled(name: string): boolean {
   return enabled(process.env[name]);
 }
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ waitlist?: string | string[] | undefined }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const waitlistFallbackState = normalizeWaitlistFallbackState(
+    resolvedSearchParams?.waitlist,
+  );
   const showApproach = isFeatureEnabled("NEXT_PUBLIC_FF_SECTION_APPROACH");
   const showTrust = isFeatureEnabled("NEXT_PUBLIC_FF_SECTION_TRUST");
 
   return (
     <>
       <main>
-        <section className="marketing-top-shell relative isolate overflow-clip bg-background">
+        <div className="marketing-top-shell relative isolate overflow-clip bg-background">
           <div
             className="marketing-ambient marketing-ambient--hero"
             aria-hidden="true"
@@ -33,7 +42,7 @@ export default function HomePage() {
           </div>
 
           <div className="relative z-10 mx-auto w-full max-w-[64rem] px-5">
-            <section className="pt-24 pb-12 max-[35.999rem]:pt-14 max-[35.999rem]:pb-10">
+            <header className="pt-24 pb-12 max-[35.999rem]:pt-14 max-[35.999rem]:pb-10">
               <p className="marketing-hero-eyebrow m-0 text-[0.8125rem] font-semibold tracking-[0.08em] text-primary uppercase">
                 {landingCopy.hero.eyebrow}
               </p>
@@ -70,9 +79,9 @@ export default function HomePage() {
                   />
                 </svg>
               </a>
-            </section>
+            </header>
 
-            <section
+            <aside
               className="pt-3 pb-10"
               aria-label="Garanties"
               data-motion-section="trust-strip"
@@ -105,9 +114,9 @@ export default function HomePage() {
                   <span>Code source ouvert et méthode transparente</span>
                 </li>
               </ul>
-            </section>
+            </aside>
           </div>
-        </section>
+        </div>
 
         {showApproach || showTrust ? (
           <div className="mx-auto grid w-full max-w-[64rem] gap-6 px-5 py-10">
@@ -182,6 +191,7 @@ export default function HomePage() {
 
         <section
           id="waitlist"
+          aria-labelledby="waitlist-title"
           className="relative isolate overflow-clip border-y border-border-subtle bg-surface py-16"
           data-motion-section="waitlist"
         >
@@ -201,13 +211,16 @@ export default function HomePage() {
               data-motion-reveal="waitlist"
               data-reveal-target="true"
             >
-              <h2 className="font-serif text-[1.875rem] leading-[1.15] font-bold">
+              <h2
+                id="waitlist-title"
+                className="font-serif text-[1.875rem] leading-[1.15] font-bold"
+              >
                 {landingCopy.waitlist.title}
               </h2>
               <p className="mx-auto mt-3 max-w-[36rem] text-[1.1875rem] leading-[1.55] text-balance text-muted-foreground">
                 {landingCopy.waitlist.description}
               </p>
-              <WaitlistForm />
+              <WaitlistForm initialResult={waitlistFallbackState} />
             </InViewReveal>
           </div>
         </section>
