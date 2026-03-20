@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import importlib
 import os
+import sys
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -9,7 +11,11 @@ import pytest
 from fastapi.testclient import TestClient
 from psycopg.rows import dict_row
 
-from app.main import create_app
+# Anchor pytest to this checkout's api/ package so local multi-worktree runs do
+# not accidentally import a sibling repo's app package.
+API_ROOT = Path(__file__).resolve().parents[1]
+if str(API_ROOT) not in sys.path:
+    sys.path.insert(0, str(API_ROOT))
 
 SECURITY_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-02-25_security_consent_export_delete.sql"
@@ -38,7 +44,7 @@ def db_url() -> str:
 @pytest.fixture(scope="session")
 def app_instance(db_url: str):
     os.environ["API_DB_URL"] = db_url
-    return create_app()
+    return importlib.import_module("app.main").create_app()
 
 
 @pytest.fixture()
