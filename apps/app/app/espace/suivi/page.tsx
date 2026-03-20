@@ -1,0 +1,71 @@
+import Link from "next/link";
+
+import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
+
+import { getAuthContext } from "../../../lib/auth";
+import { getMedicalSafetyCopy } from "../../../lib/medicalSafetyCopy";
+import TrackingHubClient from "./TrackingHubClient";
+
+export default async function EspaceSuiviPage() {
+  const auth = await getAuthContext();
+  const copy = (path: string, vars: Record<string, string> = {}) =>
+    getMedicalSafetyCopy("fr", path, vars);
+  const authenticatedUserId =
+    auth.isAuthenticated && auth.userId ? auth.userId : null;
+  const isPreviewMode = auth.mode === "preview" && authenticatedUserId !== null;
+  const fallbackTitle =
+    auth.mode === "disabled"
+      ? copy("screens.runtime.authUnavailableTitle")
+      : "Connexion requise pour ouvrir le suivi";
+  const fallbackBody =
+    auth.mode === "disabled"
+      ? copy("screens.runtime.authUnavailableBody")
+      : "Connecte-toi pour accéder à ton journal personnel et à tes modèles de repas.";
+
+  return (
+    <main className="app-shell">
+      <div className="app-shell__meta">
+        <p className="app-shell__eyebrow">Espace / Suivi</p>
+        <p className="app-shell__eyebrow">
+          Journal descriptif, sans interprétation clinique.
+        </p>
+      </div>
+
+      <section className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">Suivi</h1>
+        <p className="app-shell__text">
+          Enregistre tes repas, tes symptômes et un résumé hebdomadaire
+          descriptif. Cette page aide à revoir ton historique; elle ne prouve
+          pas une cause ni un déclencheur.
+        </p>
+      </section>
+
+      {authenticatedUserId ? (
+        <>
+          {isPreviewMode ? (
+            <Alert>
+              <AlertTitle>
+                {copy("screens.runtime.previewModeTitle")}
+              </AlertTitle>
+              <AlertDescription>
+                {copy("screens.runtime.previewModeBody", {
+                  userId: authenticatedUserId,
+                })}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <TrackingHubClient userId={authenticatedUserId} />
+        </>
+      ) : (
+        <Alert>
+          <AlertTitle>{fallbackTitle}</AlertTitle>
+          <AlertDescription>{fallbackBody}</AlertDescription>
+        </Alert>
+      )}
+
+      <p className="app-shell__text">
+        <Link href="/espace">Gérer les droits et les exports</Link>
+      </p>
+    </main>
+  );
+}

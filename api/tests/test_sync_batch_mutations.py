@@ -11,7 +11,7 @@ from psycopg.rows import dict_row
 
 from app.crypto_utils import canonical_json, hmac_signature, sha256_hex
 
-pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema")]
+pytestmark = [pytest.mark.integration, pytest.mark.usefixtures("me_security_schema", "tracking_schema")]
 
 
 def _seed_secret(seed: str) -> str:
@@ -21,6 +21,28 @@ def _seed_secret(seed: str) -> str:
 def _cleanup_account(db_url: str, user_id: uuid.UUID) -> None:
     with connect(db_url, row_factory=dict_row) as writer:
         with writer.transaction():
+            writer.execute(
+                """
+                DELETE FROM meal_log_items
+                WHERE meal_log_id IN (
+                    SELECT meal_log_id FROM meal_logs WHERE user_id = %(user_id)s
+                )
+                """,
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM meal_logs WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute(
+                """
+                DELETE FROM saved_meal_items
+                WHERE saved_meal_id IN (
+                    SELECT saved_meal_id FROM saved_meals WHERE user_id = %(user_id)s
+                )
+                """,
+                {"user_id": user_id},
+            )
+            writer.execute("DELETE FROM saved_meals WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM custom_foods WHERE user_id = %(user_id)s", {"user_id": user_id})
+            writer.execute("DELETE FROM symptom_logs WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_mutation_queue WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_entity_versions WHERE user_id = %(user_id)s", {"user_id": user_id})
             writer.execute("DELETE FROM me_device_signing_keys WHERE user_id = %(user_id)s", {"user_id": user_id})
@@ -51,6 +73,7 @@ def _grant_sync_scope_consent(client, user_id: uuid.UUID) -> None:
                 "sync_mutations": True,
                 "analytics": True,
                 "profile": True,
+                "symptom_logs": True,
                 "symptoms": True,
                 "diet_logs": True,
             },
@@ -259,10 +282,366 @@ def test_sync_batch_withdraw_consent_cancels_following_mutations(client, db_url)
 
 def test_sync_batch_delete_account_cancels_following_and_future_mutations(client, db_url) -> None:
     user_id = uuid.uuid4()
-    device_id = "batch-device-delete"
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+
+
+def test_sync_batch_applies_tracking_entities_with_version_parity(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    device_id = "batch-device-tracking"
+
+    with connect(db_url, row_factory=dict_row) as db_conn:
+        with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+            _grant_sync_scope_consent(client, user_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id)
+
+            custom_food_id = str(uuid.uuid4())
+            saved_meal_id = str(uuid.uuid4())
+            meal_log_id = str(uuid.uuid4())
+            symptom_log_id = str(uuid.uuid4())
+
+            custom_food_create = _build_mutation_item(
+                "CUSTOM_FOOD_CREATE",
+                entity_type="custom_food",
+                entity_id=custom_food_id,
+                client_seq=1,
+                idempotency_key="tracking-01",
+                base_version=0,
+                payload_extra={
+                    "custom_food_id": custom_food_id,
+                    "label": "Poulet vapeur",
+                },
+            )
+            saved_meal_create = _build_mutation_item(
+                "SAVED_MEAL_CREATE",
+                entity_type="saved_meal",
+                entity_id=saved_meal_id,
+                client_seq=2,
+                idempotency_key="tracking-02",
+                base_version=0,
+                depends_on_mutation_id=custom_food_create["mutation_id"],
+                payload_extra={
+                    "saved_meal_id": saved_meal_id,
+                    "label": "Déjeuner de base",
+                    "items": [
+                        {
+                            "item_kind": "custom_food",
+                            "custom_food_id": custom_food_id,
+                        }
+                    ],
+                },
+            )
+            meal_create = _build_mutation_item(
+                "MEAL_CREATE",
+                entity_type="meal_log",
+                entity_id=meal_log_id,
+                client_seq=3,
+                idempotency_key="tracking-03",
+                base_version=0,
+                depends_on_mutation_id=custom_food_create["mutation_id"],
+                payload_extra={
+                    "meal_log_id": meal_log_id,
+                    "occurred_at_utc": "2026-03-19T11:00:00Z",
+                    "items": [
+                        {
+                            "item_kind": "custom_food",
+                            "custom_food_id": custom_food_id,
+                            "quantity_text": "150 g",
+                        }
+                    ],
+                },
+            )
+            symptom_create = _build_mutation_item(
+                "SYMPTOM_CREATE",
+                entity_type="symptom_log",
+                entity_id=symptom_log_id,
+                client_seq=4,
+                idempotency_key="tracking-04",
+                base_version=0,
+                payload_extra={
+                    "symptom_log_id": symptom_log_id,
+                    "symptom_type": "bloating",
+                    "severity": 5,
+                    "noted_at_utc": "2026-03-19T13:00:00Z",
+                },
+            )
+
+            for item in [custom_food_create, saved_meal_create, meal_create, symptom_create]:
+                _sign_mutation_item(secret, item)
+
+            response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(
+                    user_id,
+                    device_id,
+                    [custom_food_create, saved_meal_create, meal_create, symptom_create],
+                ),
+            )
+            assert response.status_code == 200
+            payload = response.json()
+            assert [item["status"] for item in payload["items"]] == ["APPLIED", "APPLIED", "APPLIED", "APPLIED"]
+
+            versions = db_conn.execute(
+                """
+                SELECT entity_type, entity_id, current_version
+                FROM me_entity_versions
+                WHERE user_id = %(user_id)s
+                ORDER BY entity_type, entity_id
+                """,
+                {"user_id": user_id},
+            ).fetchall()
+            assert {(row["entity_type"], row["entity_id"]): int(row["current_version"]) for row in versions} == {
+                ("custom_food", custom_food_id): 1,
+                ("meal_log", meal_log_id): 1,
+                ("saved_meal", saved_meal_id): 1,
+                ("symptom_log", symptom_log_id): 1,
+            }
+
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM custom_foods WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 1
+            )
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM saved_meals WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 1
+            )
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM meal_logs WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 1
+            )
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM symptom_logs WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 1
+            )
+
+            _cleanup_account(db_url, user_id)
+
+
+def test_sync_batch_rolls_back_tracking_parent_rows_on_invalid_item_payload(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    device_id = "batch-device-tracking-rollback"
+
+    with connect(db_url, row_factory=dict_row) as db_conn:
+        with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+            _grant_sync_scope_consent(client, user_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id, seed="tracking-rollback")
+
+            saved_meal_id = str(uuid.uuid4())
+            meal_log_id = str(uuid.uuid4())
+
+            saved_meal_create = _build_mutation_item(
+                "SAVED_MEAL_CREATE",
+                entity_type="saved_meal",
+                entity_id=saved_meal_id,
+                client_seq=1,
+                idempotency_key="tracking-rollback-01",
+                base_version=0,
+                payload_extra={
+                    "saved_meal_id": saved_meal_id,
+                    "label": "Modèle cassé",
+                    "items": [
+                        {
+                            "item_kind": "canonical_food",
+                            "food_slug": "missing-food-slug",
+                        }
+                    ],
+                },
+            )
+            meal_create = _build_mutation_item(
+                "MEAL_CREATE",
+                entity_type="meal_log",
+                entity_id=meal_log_id,
+                client_seq=2,
+                idempotency_key="tracking-rollback-02",
+                base_version=0,
+                payload_extra={
+                    "meal_log_id": meal_log_id,
+                    "occurred_at_utc": "2026-03-19T11:00:00Z",
+                    "items": [
+                        {
+                            "item_kind": "canonical_food",
+                            "food_slug": "missing-food-slug",
+                        }
+                    ],
+                },
+            )
+
+            for item in [saved_meal_create, meal_create]:
+                _sign_mutation_item(secret, item)
+
+            response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [saved_meal_create, meal_create]),
+            )
+            assert response.status_code == 200
+            payload = response.json()
+            assert [item["status"] for item in payload["items"]] == [
+                "FAILED_PERMANENT",
+                "FAILED_PERMANENT",
+            ]
+            assert [item["result_code"] for item in payload["items"]] == [
+                "INVALID_PAYLOAD",
+                "INVALID_PAYLOAD",
+            ]
+
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM saved_meals WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM saved_meal_items
+                    WHERE saved_meal_id = %(saved_meal_id)s
+                    """,
+                    {"saved_meal_id": saved_meal_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM meal_logs WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM meal_log_items
+                    WHERE meal_log_id = %(meal_log_id)s
+                    """,
+                    {"meal_log_id": meal_log_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM me_entity_versions
+                    WHERE user_id = %(user_id)s
+                      AND entity_type IN ('saved_meal', 'meal_log')
+                    """,
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+
+            _cleanup_account(db_url, user_id)
+
+
+def test_sync_batch_custom_food_version_conflict_then_delete_tombstone(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    device_id = "batch-device-custom-food-delete"
+
+    with connect(db_url, row_factory=dict_row) as db_conn:
+        with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+            _grant_sync_scope_consent(client, user_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id)
+
+            custom_food_id = str(uuid.uuid4())
+            create_item = _build_mutation_item(
+                "CUSTOM_FOOD_CREATE",
+                entity_type="custom_food",
+                entity_id=custom_food_id,
+                client_seq=1,
+                idempotency_key="custom-food-create",
+                base_version=0,
+                payload_extra={
+                    "custom_food_id": custom_food_id,
+                    "label": "Oeufs durs",
+                },
+            )
+            _sign_mutation_item(secret, create_item)
+
+            create_response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [create_item]),
+            )
+            assert create_response.status_code == 200
+            assert create_response.json()["items"][0]["status"] == "APPLIED"
+
+            conflict_item = _build_mutation_item(
+                "CUSTOM_FOOD_UPDATE",
+                entity_type="custom_food",
+                entity_id=custom_food_id,
+                client_seq=2,
+                idempotency_key="custom-food-conflict",
+                base_version=0,
+                payload_extra={
+                    "label": "Oeufs durs bio",
+                },
+            )
+            _sign_mutation_item(secret, conflict_item)
+            conflict_response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [conflict_item]),
+            )
+            assert conflict_response.status_code == 200
+            conflict_payload = conflict_response.json()["items"][0]
+            assert conflict_payload["status"] == "RETRY_WAIT"
+            assert conflict_payload["result_code"] == "VERSION_CONFLICT"
+
+            delete_item = _build_mutation_item(
+                "CUSTOM_FOOD_DELETE",
+                entity_type="custom_food",
+                entity_id=custom_food_id,
+                client_seq=3,
+                idempotency_key="custom-food-delete",
+                base_version=1,
+                payload_extra={
+                    "custom_food_id": custom_food_id,
+                },
+            )
+            _sign_mutation_item(secret, delete_item)
+            delete_response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [delete_item]),
+            )
+            assert delete_response.status_code == 200
+            delete_payload = delete_response.json()["items"][0]
+            assert delete_payload["status"] == "APPLIED"
+            assert delete_payload["applied_version"] == 2
+
+            deleted_row = db_conn.execute(
+                """
+                SELECT deleted_at, version
+                FROM custom_foods
+                WHERE custom_food_id = %(custom_food_id)s
+                """,
+                {"custom_food_id": custom_food_id},
+            ).fetchone()
+            assert deleted_row["deleted_at"] is not None
+            assert int(deleted_row["version"]) == 2
+
             _cleanup_account(db_url, user_id)
             _grant_sync_scope_consent(client, user_id)
             secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id="k2", seed="queue-delete")

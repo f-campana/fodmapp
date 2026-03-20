@@ -4,11 +4,22 @@ from datetime import date, datetime
 from typing import Any, Dict, List, Literal, Optional, Sequence
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 FoodLevel = Literal["none", "low", "moderate", "high", "unknown"]
 RuleStatus = Literal["active", "draft"]
 SafeHarborCohortCode = Literal["cohort_oil_fat", "cohort_plain_protein", "cohort_egg"]
+TrackingItemKind = Literal["canonical_food", "custom_food", "free_text"]
+SymptomType = Literal[
+    "bloating",
+    "pain",
+    "gas",
+    "diarrhea",
+    "constipation",
+    "nausea",
+    "reflux",
+    "other",
+]
 ConsentStatus = Literal["active", "revoked", "expired", "superseded", "invalidated"]
 ConsentAction = Literal["grant", "revoke", "update"]
 ConsentLegalBasis = Literal[
@@ -38,6 +49,15 @@ SyncV1MutationType = Literal[
     "SYMPTOM_CREATE",
     "SYMPTOM_UPDATE",
     "SYMPTOM_DELETE",
+    "MEAL_CREATE",
+    "MEAL_UPDATE",
+    "MEAL_DELETE",
+    "CUSTOM_FOOD_CREATE",
+    "CUSTOM_FOOD_UPDATE",
+    "CUSTOM_FOOD_DELETE",
+    "SAVED_MEAL_CREATE",
+    "SAVED_MEAL_UPDATE",
+    "SAVED_MEAL_DELETE",
     "PREF_SET",
     "PREF_DELETE",
     "SWAP_APPLY",
@@ -214,6 +234,225 @@ class SafeHarborMeta(BaseModel):
 class SafeHarborResponse(BaseModel):
     cohorts: list[SafeHarborCohort]
     meta: SafeHarborMeta
+
+
+class TrackingItemInput(BaseModel):
+    item_kind: TrackingItemKind
+    food_slug: Optional[str] = None
+    custom_food_id: Optional[UUID] = None
+    free_text_label: Optional[str] = None
+    quantity_text: Optional[str] = None
+    note: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_item(self) -> "TrackingItemInput":
+        if self.item_kind == "canonical_food":
+            if not self.food_slug or self.custom_food_id is not None or self.free_text_label is not None:
+                raise ValueError("canonical_food items require food_slug only")
+        elif self.item_kind == "custom_food":
+            if self.custom_food_id is None or self.food_slug is not None or self.free_text_label is not None:
+                raise ValueError("custom_food items require custom_food_id only")
+        elif self.item_kind == "free_text":
+            if not self.free_text_label or self.food_slug is not None or self.custom_food_id is not None:
+                raise ValueError("free_text items require free_text_label only")
+
+        return self
+
+
+class MealLogItem(BaseModel):
+    meal_log_item_id: UUID
+    sort_order: int
+    item_kind: TrackingItemKind
+    label: str
+    food_slug: Optional[str] = None
+    custom_food_id: Optional[UUID] = None
+    quantity_text: Optional[str] = None
+    note: Optional[str] = None
+
+
+class MealLog(BaseModel):
+    meal_log_id: UUID
+    title: Optional[str] = None
+    occurred_at_utc: datetime
+    note: Optional[str] = None
+    version: int
+    created_at_utc: datetime
+    updated_at_utc: datetime
+    items: list[MealLogItem]
+
+
+class MealLogCreateRequest(BaseModel):
+    occurred_at_utc: datetime
+    title: Optional[str] = None
+    note: Optional[str] = None
+    items: list[TrackingItemInput] = Field(min_length=1)
+
+
+class MealLogUpdateRequest(BaseModel):
+    occurred_at_utc: Optional[datetime] = None
+    title: Optional[str] = None
+    note: Optional[str] = None
+    items: Optional[list[TrackingItemInput]] = None
+
+    @model_validator(mode="after")
+    def validate_update(self) -> "MealLogUpdateRequest":
+        if not self.model_fields_set:
+            raise ValueError("at least one meal field must be provided")
+        if self.items is not None and len(self.items) == 0:
+            raise ValueError("items cannot be empty")
+        return self
+
+
+class SymptomLog(BaseModel):
+    symptom_log_id: UUID
+    symptom_type: SymptomType
+    severity: int = Field(ge=0, le=10)
+    noted_at_utc: datetime
+    note: Optional[str] = None
+    version: int
+    created_at_utc: datetime
+    updated_at_utc: datetime
+
+
+class SymptomLogCreateRequest(BaseModel):
+    symptom_type: SymptomType
+    severity: int = Field(ge=0, le=10)
+    noted_at_utc: datetime
+    note: Optional[str] = None
+
+
+class SymptomLogUpdateRequest(BaseModel):
+    symptom_type: Optional[SymptomType] = None
+    severity: Optional[int] = Field(default=None, ge=0, le=10)
+    noted_at_utc: Optional[datetime] = None
+    note: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_update(self) -> "SymptomLogUpdateRequest":
+        if not self.model_fields_set:
+            raise ValueError("at least one symptom field must be provided")
+        return self
+
+
+class CustomFood(BaseModel):
+    custom_food_id: UUID
+    label: str
+    note: Optional[str] = None
+    version: int
+    created_at_utc: datetime
+    updated_at_utc: datetime
+
+
+class CustomFoodCreateRequest(BaseModel):
+    label: str = Field(min_length=1)
+    note: Optional[str] = None
+
+
+class CustomFoodUpdateRequest(BaseModel):
+    label: Optional[str] = None
+    note: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_update(self) -> "CustomFoodUpdateRequest":
+        if not self.model_fields_set:
+            raise ValueError("at least one custom food field must be provided")
+        return self
+
+
+class SavedMealItem(BaseModel):
+    saved_meal_item_id: UUID
+    sort_order: int
+    item_kind: TrackingItemKind
+    label: str
+    food_slug: Optional[str] = None
+    custom_food_id: Optional[UUID] = None
+    quantity_text: Optional[str] = None
+    note: Optional[str] = None
+
+
+class SavedMeal(BaseModel):
+    saved_meal_id: UUID
+    label: str
+    note: Optional[str] = None
+    version: int
+    created_at_utc: datetime
+    updated_at_utc: datetime
+    items: list[SavedMealItem]
+
+
+class SavedMealCreateRequest(BaseModel):
+    label: str = Field(min_length=1)
+    note: Optional[str] = None
+    items: list[TrackingItemInput] = Field(min_length=1)
+
+
+class SavedMealUpdateRequest(BaseModel):
+    label: Optional[str] = None
+    note: Optional[str] = None
+    items: Optional[list[TrackingItemInput]] = None
+
+    @model_validator(mode="after")
+    def validate_update(self) -> "SavedMealUpdateRequest":
+        if not self.model_fields_set:
+            raise ValueError("at least one saved meal field must be provided")
+        if self.items is not None and len(self.items) == 0:
+            raise ValueError("items cannot be empty")
+        return self
+
+
+class TrackingFeedEntry(BaseModel):
+    entry_type: Literal["meal", "symptom"]
+    occurred_at_utc: datetime
+    meal: Optional[MealLog] = None
+    symptom: Optional[SymptomLog] = None
+
+
+class TrackingFeedResponse(BaseModel):
+    total: int
+    limit: int
+    items: list[TrackingFeedEntry]
+
+
+class DailyTrackingCount(BaseModel):
+    date: date
+    meal_count: int
+    symptom_count: int
+
+
+class SymptomTypeCount(BaseModel):
+    symptom_type: SymptomType
+    count: int
+
+
+class TrackingSeveritySummary(BaseModel):
+    average: Optional[float] = None
+    maximum: Optional[int] = None
+
+
+class ProximityMeal(BaseModel):
+    meal_log_id: UUID
+    title: Optional[str] = None
+    occurred_at_utc: datetime
+    hours_before_symptom: float
+    item_labels: list[str]
+
+
+class SymptomProximityGroup(BaseModel):
+    symptom_log_id: UUID
+    symptom_type: SymptomType
+    severity: int = Field(ge=0, le=10)
+    noted_at_utc: datetime
+    nearby_meals: list[ProximityMeal]
+
+
+class WeeklyTrackingSummaryResponse(BaseModel):
+    anchor_date: date
+    window_start_utc: datetime
+    window_end_utc: datetime
+    daily_counts: list[DailyTrackingCount]
+    symptom_counts: list[SymptomTypeCount]
+    severity: TrackingSeveritySummary
+    proximity_groups: list[SymptomProximityGroup]
 
 
 class SwapItem(BaseModel):

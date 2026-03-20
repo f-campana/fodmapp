@@ -253,6 +253,184 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/me/tracking/feed": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get mixed meal and symptom history feed */
+    get: operations["getTrackingFeed"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/summary/weekly": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get descriptive weekly tracking summary */
+    get: operations["getWeeklyTrackingSummary"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/symptoms": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List active symptom logs */
+    get: operations["listTrackingSymptoms"];
+    put?: never;
+    /** Create symptom log */
+    post: operations["createTrackingSymptom"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/symptoms/{symptom_log_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Tombstone symptom log */
+    delete: operations["deleteTrackingSymptom"];
+    options?: never;
+    head?: never;
+    /** Update symptom log */
+    patch: operations["updateTrackingSymptom"];
+    trace?: never;
+  };
+  "/v0/me/tracking/meals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List active meal logs */
+    get: operations["listTrackingMeals"];
+    put?: never;
+    /** Create meal log */
+    post: operations["createTrackingMeal"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/meals/{meal_log_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Tombstone meal log */
+    delete: operations["deleteTrackingMeal"];
+    options?: never;
+    head?: never;
+    /** Update meal log */
+    patch: operations["updateTrackingMeal"];
+    trace?: never;
+  };
+  "/v0/me/tracking/custom-foods": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List active custom foods */
+    get: operations["listTrackingCustomFoods"];
+    put?: never;
+    /** Create custom food */
+    post: operations["createTrackingCustomFood"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/custom-foods/{custom_food_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Tombstone custom food */
+    delete: operations["deleteTrackingCustomFood"];
+    options?: never;
+    head?: never;
+    /** Update custom food */
+    patch: operations["updateTrackingCustomFood"];
+    trace?: never;
+  };
+  "/v0/me/tracking/saved-meals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List active saved meals */
+    get: operations["listTrackingSavedMeals"];
+    put?: never;
+    /** Create saved meal */
+    post: operations["createTrackingSavedMeal"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/me/tracking/saved-meals/{saved_meal_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Tombstone saved meal */
+    delete: operations["deleteTrackingSavedMeal"];
+    options?: never;
+    head?: never;
+    /** Update saved meal */
+    patch: operations["updateTrackingSavedMeal"];
+    trace?: never;
+  };
   "/v0/sync/mutations": {
     parameters: {
       query?: never;
@@ -579,6 +757,205 @@ export interface components {
       evidence_hash: string;
       history: components["schemas"]["ConsentHistoryEntry"][];
     };
+    /** @enum {string} */
+    TrackingItemKind: "canonical_food" | "custom_food" | "free_text";
+    /** @enum {string} */
+    SymptomType:
+      | "bloating"
+      | "pain"
+      | "gas"
+      | "diarrhea"
+      | "constipation"
+      | "nausea"
+      | "reflux"
+      | "other";
+    TrackingItemInput: {
+      item_kind: components["schemas"]["TrackingItemKind"];
+      food_slug?: string | null;
+      /** Format: uuid */
+      custom_food_id?: string | null;
+      free_text_label?: string | null;
+      quantity_text?: string | null;
+      note?: string | null;
+    };
+    MealLogItem: {
+      /** Format: uuid */
+      meal_log_item_id: string;
+      sort_order: number;
+      item_kind: components["schemas"]["TrackingItemKind"];
+      label: string;
+      food_slug?: string | null;
+      /** Format: uuid */
+      custom_food_id?: string | null;
+      quantity_text?: string | null;
+      note?: string | null;
+    };
+    MealLog: {
+      /** Format: uuid */
+      meal_log_id: string;
+      title?: string | null;
+      /** Format: date-time */
+      occurred_at_utc: string;
+      note?: string | null;
+      version: number;
+      /** Format: date-time */
+      created_at_utc: string;
+      /** Format: date-time */
+      updated_at_utc: string;
+      items: components["schemas"]["MealLogItem"][];
+    };
+    MealLogCreateRequest: {
+      /** Format: date-time */
+      occurred_at_utc: string;
+      title?: string | null;
+      note?: string | null;
+      items: components["schemas"]["TrackingItemInput"][];
+    };
+    MealLogUpdateRequest: {
+      /** Format: date-time */
+      occurred_at_utc?: string | null;
+      title?: string | null;
+      note?: string | null;
+      items?: components["schemas"]["TrackingItemInput"][];
+    };
+    SymptomLog: {
+      /** Format: uuid */
+      symptom_log_id: string;
+      symptom_type: components["schemas"]["SymptomType"];
+      severity: number;
+      /** Format: date-time */
+      noted_at_utc: string;
+      note?: string | null;
+      version: number;
+      /** Format: date-time */
+      created_at_utc: string;
+      /** Format: date-time */
+      updated_at_utc: string;
+    };
+    SymptomLogCreateRequest: {
+      symptom_type: components["schemas"]["SymptomType"];
+      severity: number;
+      /** Format: date-time */
+      noted_at_utc: string;
+      note?: string | null;
+    };
+    SymptomLogUpdateRequest: {
+      symptom_type?: components["schemas"]["SymptomType"];
+      severity?: number | null;
+      /** Format: date-time */
+      noted_at_utc?: string | null;
+      note?: string | null;
+    };
+    CustomFood: {
+      /** Format: uuid */
+      custom_food_id: string;
+      label: string;
+      note?: string | null;
+      version: number;
+      /** Format: date-time */
+      created_at_utc: string;
+      /** Format: date-time */
+      updated_at_utc: string;
+    };
+    CustomFoodCreateRequest: {
+      label: string;
+      note?: string | null;
+    };
+    CustomFoodUpdateRequest: {
+      label?: string | null;
+      note?: string | null;
+    };
+    SavedMealItem: {
+      /** Format: uuid */
+      saved_meal_item_id: string;
+      sort_order: number;
+      item_kind: components["schemas"]["TrackingItemKind"];
+      label: string;
+      food_slug?: string | null;
+      /** Format: uuid */
+      custom_food_id?: string | null;
+      quantity_text?: string | null;
+      note?: string | null;
+    };
+    SavedMeal: {
+      /** Format: uuid */
+      saved_meal_id: string;
+      label: string;
+      note?: string | null;
+      version: number;
+      /** Format: date-time */
+      created_at_utc: string;
+      /** Format: date-time */
+      updated_at_utc: string;
+      items: components["schemas"]["SavedMealItem"][];
+    };
+    SavedMealCreateRequest: {
+      label: string;
+      note?: string | null;
+      items: components["schemas"]["TrackingItemInput"][];
+    };
+    SavedMealUpdateRequest: {
+      label?: string | null;
+      note?: string | null;
+      items?: components["schemas"]["TrackingItemInput"][];
+    };
+    TrackingFeedEntry: {
+      /** @enum {string} */
+      entry_type: "meal" | "symptom";
+      /** Format: date-time */
+      occurred_at_utc: string;
+      meal?: components["schemas"]["MealLog"];
+      symptom?: components["schemas"]["SymptomLog"];
+    };
+    TrackingFeedResponse: {
+      total: number;
+      limit: number;
+      items: components["schemas"]["TrackingFeedEntry"][];
+    };
+    DailyTrackingCount: {
+      /** Format: date */
+      date: string;
+      meal_count: number;
+      symptom_count: number;
+    };
+    SymptomTypeCount: {
+      symptom_type: components["schemas"]["SymptomType"];
+      count: number;
+    };
+    TrackingSeveritySummary: {
+      average?: number | null;
+      maximum?: number | null;
+    };
+    ProximityMeal: {
+      /** Format: uuid */
+      meal_log_id: string;
+      title?: string | null;
+      /** Format: date-time */
+      occurred_at_utc: string;
+      hours_before_symptom: number;
+      item_labels: string[];
+    };
+    SymptomProximityGroup: {
+      /** Format: uuid */
+      symptom_log_id: string;
+      symptom_type: components["schemas"]["SymptomType"];
+      severity: number;
+      /** Format: date-time */
+      noted_at_utc: string;
+      nearby_meals: components["schemas"]["ProximityMeal"][];
+    };
+    WeeklyTrackingSummaryResponse: {
+      /** Format: date */
+      anchor_date: string;
+      /** Format: date-time */
+      window_start_utc: string;
+      /** Format: date-time */
+      window_end_utc: string;
+      daily_counts: components["schemas"]["DailyTrackingCount"][];
+      symptom_counts: components["schemas"]["SymptomTypeCount"][];
+      severity: components["schemas"]["TrackingSeveritySummary"];
+      proximity_groups: components["schemas"]["SymptomProximityGroup"][];
+    };
     Receipt: {
       /** Format: uuid */
       receipt_id: string;
@@ -840,6 +1217,15 @@ export interface components {
         | "SYMPTOM_CREATE"
         | "SYMPTOM_UPDATE"
         | "SYMPTOM_DELETE"
+        | "MEAL_CREATE"
+        | "MEAL_UPDATE"
+        | "MEAL_DELETE"
+        | "CUSTOM_FOOD_CREATE"
+        | "CUSTOM_FOOD_UPDATE"
+        | "CUSTOM_FOOD_DELETE"
+        | "SAVED_MEAL_CREATE"
+        | "SAVED_MEAL_UPDATE"
+        | "SAVED_MEAL_DELETE"
         | "PREF_SET"
         | "PREF_DELETE"
         | "SWAP_APPLY"
@@ -868,6 +1254,15 @@ export interface components {
         | "SYMPTOM_CREATE"
         | "SYMPTOM_UPDATE"
         | "SYMPTOM_DELETE"
+        | "MEAL_CREATE"
+        | "MEAL_UPDATE"
+        | "MEAL_DELETE"
+        | "CUSTOM_FOOD_CREATE"
+        | "CUSTOM_FOOD_UPDATE"
+        | "CUSTOM_FOOD_DELETE"
+        | "SAVED_MEAL_CREATE"
+        | "SAVED_MEAL_UPDATE"
+        | "SAVED_MEAL_DELETE"
         | "PREF_SET"
         | "PREF_DELETE"
         | "SWAP_APPLY"
@@ -1409,6 +1804,584 @@ export interface operations {
       404: components["responses"]["NotFound"];
       /** @description Delete request expired */
       410: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  getTrackingFeed: {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Tracking feed */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TrackingFeedResponse"];
+        };
+      };
+    };
+  };
+  getWeeklyTrackingSummary: {
+    parameters: {
+      query?: {
+        anchor_date?: string;
+      };
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Weekly summary */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WeeklyTrackingSummaryResponse"];
+        };
+      };
+    };
+  };
+  listTrackingSymptoms: {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Symptom logs */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SymptomLog"][];
+        };
+      };
+    };
+  };
+  createTrackingSymptom: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SymptomLogCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Symptom log created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SymptomLog"];
+        };
+      };
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  deleteTrackingSymptom: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        symptom_log_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Symptom log tombstoned */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  updateTrackingSymptom: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        symptom_log_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SymptomLogUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Symptom log updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SymptomLog"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  listTrackingMeals: {
+    parameters: {
+      query?: {
+        limit?: number;
+      };
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Meal logs */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MealLog"][];
+        };
+      };
+    };
+  };
+  createTrackingMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MealLogCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Meal log created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MealLog"];
+        };
+      };
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  deleteTrackingMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        meal_log_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Meal log tombstoned */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  updateTrackingMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        meal_log_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MealLogUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Meal log updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MealLog"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  listTrackingCustomFoods: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Custom foods */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomFood"][];
+        };
+      };
+    };
+  };
+  createTrackingCustomFood: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CustomFoodCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Custom food created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomFood"];
+        };
+      };
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  deleteTrackingCustomFood: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        custom_food_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Custom food tombstoned */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  updateTrackingCustomFood: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        custom_food_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CustomFoodUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Custom food updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CustomFood"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  listTrackingSavedMeals: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Saved meals */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SavedMeal"][];
+        };
+      };
+    };
+  };
+  createTrackingSavedMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SavedMealCreateRequest"];
+      };
+    };
+    responses: {
+      /** @description Saved meal created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SavedMeal"];
+        };
+      };
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  deleteTrackingSavedMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        saved_meal_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Saved meal tombstoned */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  updateTrackingSavedMeal: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
+      path: {
+        saved_meal_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SavedMealUpdateRequest"];
+      };
+    };
+    responses: {
+      /** @description Saved meal updated */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SavedMeal"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Write blocked by consent scope */
+      423: {
         headers: {
           [name: string]: unknown;
         };

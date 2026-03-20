@@ -11,7 +11,7 @@ export type AuthBootstrapState =
 export interface AuthContextStub {
   state: AuthBootstrapState;
   provider: "clerk";
-  mode: "disabled" | "runtime";
+  mode: "disabled" | "preview" | "runtime";
   isAuthenticated: boolean;
   configured: boolean;
   userId: string | null;
@@ -59,6 +59,28 @@ export async function getAuthContext(
   reportFailure: AuthRuntimeFailureReporter = reportAuthRuntimeFailure,
 ): Promise<AuthContextStub> {
   const clerk = getClerkBootstrapStatus();
+  if (clerk.mode === "preview" && clerk.previewUserId) {
+    return {
+      state: "authenticated",
+      provider: clerk.provider,
+      mode: clerk.mode,
+      isAuthenticated: true,
+      configured: true,
+      userId: clerk.previewUserId,
+    };
+  }
+
+  if (
+    !clerk.fullyConfigured &&
+    clerk.previewValuePresent &&
+    !clerk.previewValueValid
+  ) {
+    reportFailure(
+      "auth_preview_user_invalid",
+      new Error("APP_AUTH_PREVIEW_USER_ID must be a valid UUID"),
+    );
+  }
+
   if (!clerk.fullyConfigured) {
     return {
       state: "placeholder",
