@@ -153,14 +153,18 @@ Important note:
 Safe-Harbor V1 is modeled via two tables:
 
 1. `safe_harbor_cohorts`: cohort metadata (labels + rationale + caveats + ordering)
-2. `food_safe_harbor_assignments`: per-food assignment (one row per food, per assignment version)
+2. `food_safe_harbor_assignments`: per-food current assignment (one row per food in V1)
 
 Key contract fields (V1):
 
-- `assignment_version = 'safe_harbor_v1'`
+- `assignment_version = 'safe_harbor_v1'` identifies the applied assignment set for ETL checks and public provenance metadata; it is not a coexistence key
 - `assignment_method = 'explicit_measurement_pack_v1'`
 - `rule_source_id` must reference `sources.source_slug='internal_rules_v1'`
 - `data_source_id` must reference `sources.source_slug='ciqual_2025'`
+
+Safe-Harbor V1 does not support side-by-side assignment versions in
+`food_safe_harbor_assignments`. If additive version history is needed later, it
+must be modeled separately from the current V1 table contract.
 
 ## 8. Data pipeline (implemented)
 
