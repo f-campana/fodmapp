@@ -1,26 +1,47 @@
 import { getClientFeatureFlags } from "./env.client";
-import { getServerFeatureFlags } from "./env.server";
+import { getServerFeatureFlags, getServerRuntimeEnv } from "./env.server";
 
 export interface ClerkBootstrapStatus {
   provider: "clerk";
-  mode: "disabled" | "runtime";
+  mode: "disabled" | "preview" | "runtime";
   publishableKeyConfigured: boolean;
   serverKeysConfigured: boolean;
   fullyConfigured: boolean;
+  previewValuePresent: boolean;
+  previewValueValid: boolean;
+  previewUserId: string | null;
+}
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isValidUuid(value: string | null): value is string {
+  return Boolean(value && UUID_PATTERN.test(value));
 }
 
 export function getClerkBootstrapStatus(): ClerkBootstrapStatus {
   const clientFlags = getClientFeatureFlags();
-  const serverFlags = getServerFeatureFlags();
+  const env = getServerRuntimeEnv();
+  const serverFlags = getServerFeatureFlags(env);
   const fullyConfigured =
     clientFlags.clerkConfigured && serverFlags.clerkConfigured;
+  const previewValuePresent = Boolean(env.appAuthPreviewUserId);
+  const previewValueValid = isValidUuid(env.appAuthPreviewUserId);
+  const previewEnabled =
+    !fullyConfigured &&
+    env.nodeEnv !== "production" &&
+    previewValuePresent &&
+    previewValueValid;
 
   return {
     provider: "clerk",
-    mode: fullyConfigured ? "runtime" : "disabled",
+    mode: fullyConfigured ? "runtime" : previewEnabled ? "preview" : "disabled",
     publishableKeyConfigured: clientFlags.clerkConfigured,
     serverKeysConfigured: serverFlags.clerkConfigured,
     fullyConfigured,
+    previewValuePresent,
+    previewValueValid,
+    previewUserId: previewEnabled ? env.appAuthPreviewUserId : null,
   };
 }
 

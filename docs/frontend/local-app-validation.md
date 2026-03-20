@@ -4,7 +4,7 @@ Status: Implemented
 Audience: Contributor or engineer; Product or design collaborator
 Scope: Local installation, API startup, frontend startup, and manual validation for the first live web product slice.
 Related docs: [`apps/app/README.md`](../../apps/app/README.md), [`api/README.md`](../../api/README.md), [`infra/ci/ENVIRONMENT.md`](../../infra/ci/ENVIRONMENT.md)
-Last reviewed: 2026-03-16
+Last reviewed: 2026-03-20
 
 Use this runbook to validate the live app slice locally against a real seeded API.
 
@@ -87,12 +87,14 @@ Add:
 
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+APP_AUTH_PREVIEW_USER_ID=11111111-1111-4111-8111-111111111111
 ```
 
 Important:
 
 - Use the API origin only, not `/v0`.
 - The value must be an absolute URL because server-rendered app routes cannot resolve a relative API base.
+- `APP_AUTH_PREVIEW_USER_ID` is development-only local preview auth for `/espace` and `/espace/suivi`. It is not a real sign-in flow.
 
 ## Start the Frontend
 
@@ -156,6 +158,22 @@ Check:
 3. Attribution and no-endorsement text are visible
 4. Empty or degraded states remain understandable if no cohorts are returned
 
+### Espace And Suivi (Local Preview Auth)
+
+Open:
+
+- `/espace`
+- `/espace/suivi`
+
+Check:
+
+1. `/espace` shows the local preview banner with user id `11111111-1111-4111-8111-111111111111`
+2. Consent scopes can be granted from `/espace` for that preview user
+3. `/espace/suivi` shows the same preview banner and loads without redirecting to `/sign-in`
+4. You can create at least one meal log and one symptom log
+5. History updates after create/edit/delete actions
+6. Weekly summary renders descriptive counts and nearby-meal groupings without causal wording
+
 ### Failure Handling
 
 Stop the API and reload:
@@ -171,4 +189,5 @@ Confirm the app renders handled failure states rather than crashing.
 2. Food search returns real results from `/v0/foods`
 3. At least one detail page loads successfully
 4. `/decouvrir` renders a coherent live state
-5. No route crashes when the API is unavailable
+5. `/espace` and `/espace/suivi` are testable locally with preview auth
+6. No route crashes when the API is unavailable
