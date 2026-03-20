@@ -112,7 +112,7 @@ export function WaitlistForm() {
         <Button
           type="submit"
           disabled={status === "submitting"}
-          className="marketing-submit-button h-11 px-5"
+          className="marketing-submit-button h-full"
           data-waitlist-submit="true"
         >
           {status === "submitting" ? "Envoi..." : landingCopy.waitlist.cta}
