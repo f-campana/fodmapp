@@ -1633,7 +1633,17 @@ def sync_mutations_batch(
                 "SAVED_MEAL_DELETE",
             }:
                 try:
-                    _apply_tracking_mutation(conn, user_id, normalized, entity_type, entity_id, max(next_version, 1))
+                    with conn.transaction():
+                        _apply_tracking_mutation(
+                            conn,
+                            user_id,
+                            normalized,
+                            entity_type,
+                            entity_id,
+                            max(next_version, 1),
+                        )
+                        if normalized.base_version is not None:
+                            _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
                 except (ValueError, ApiError):
                     _insert_queue(
                         conn,
@@ -1669,7 +1679,20 @@ def sync_mutations_batch(
                     )
                     continue
 
-            if normalized.base_version is not None:
+            if normalized.base_version is not None and op not in {
+                "SYMPTOM_CREATE",
+                "SYMPTOM_UPDATE",
+                "SYMPTOM_DELETE",
+                "MEAL_CREATE",
+                "MEAL_UPDATE",
+                "MEAL_DELETE",
+                "CUSTOM_FOOD_CREATE",
+                "CUSTOM_FOOD_UPDATE",
+                "CUSTOM_FOOD_DELETE",
+                "SAVED_MEAL_CREATE",
+                "SAVED_MEAL_UPDATE",
+                "SAVED_MEAL_DELETE",
+            }:
                 _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
 
             _insert_queue(

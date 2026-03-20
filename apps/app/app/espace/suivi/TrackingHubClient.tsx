@@ -37,6 +37,10 @@ import { Textarea } from "@fodmapp/ui/textarea";
 
 import { searchFoods } from "../../../lib/api";
 import {
+  formatUtcIsoForDateTimeLocal,
+  nowDateInputValue,
+} from "../../../lib/dateTimeLocal";
+import {
   createTrackingCustomFood,
   createTrackingMeal,
   createTrackingSavedMeal,
@@ -150,10 +154,6 @@ const SYMPTOM_OPTIONS: Array<{
   { value: "other", label: "Autre" },
 ];
 
-function nowDateInputValue() {
-  return new Date().toISOString().slice(0, 16);
-}
-
 function normalizeText(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
@@ -229,7 +229,7 @@ function toEditableItem(
 function buildMealForm(meal: MealLog): MealFormState {
   return {
     title: meal.title ?? "",
-    occurredAtUtc: meal.occurred_at_utc.slice(0, 16),
+    occurredAtUtc: formatUtcIsoForDateTimeLocal(meal.occurred_at_utc),
     note: meal.note ?? "",
     items: meal.items.map(toEditableItem),
   };
@@ -247,7 +247,7 @@ function buildSymptomForm(symptom: SymptomLog): SymptomFormState {
   return {
     symptomType: symptom.symptom_type,
     severity: String(symptom.severity),
-    notedAtUtc: symptom.noted_at_utc.slice(0, 16),
+    notedAtUtc: formatUtcIsoForDateTimeLocal(symptom.noted_at_utc),
     note: symptom.note ?? "",
   };
 }

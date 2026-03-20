@@ -388,6 +388,108 @@ def test_tracking_feed_total_counts_full_history_beyond_limit(client, db_url) ->
     _cleanup_account(db_url, user_id)
 
 
+def test_deleted_custom_foods_still_resolve_for_existing_tracking_references(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    _cleanup_account(db_url, user_id)
+    _grant_tracking_consent(client, user_id)
+
+    custom_food_response = client.post(
+        "/v0/me/tracking/custom-foods",
+        headers={"X-User-Id": str(user_id)},
+        json={"label": "Soupe maison"},
+    )
+    assert custom_food_response.status_code == 201
+    custom_food = custom_food_response.json()
+
+    saved_meal_response = client.post(
+        "/v0/me/tracking/saved-meals",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "label": "Modèle soupe",
+            "items": [
+                {
+                    "item_kind": "custom_food",
+                    "custom_food_id": custom_food["custom_food_id"],
+                }
+            ],
+        },
+    )
+    assert saved_meal_response.status_code == 201
+    saved_meal = saved_meal_response.json()
+
+    meal_response = client.post(
+        "/v0/me/tracking/meals",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "occurred_at_utc": "2026-03-19T12:00:00Z",
+            "items": [
+                {
+                    "item_kind": "custom_food",
+                    "custom_food_id": custom_food["custom_food_id"],
+                }
+            ],
+        },
+    )
+    assert meal_response.status_code == 201
+    meal = meal_response.json()
+
+    delete_response = client.delete(
+        f"/v0/me/tracking/custom-foods/{custom_food['custom_food_id']}",
+        headers={"X-User-Id": str(user_id)},
+    )
+    assert delete_response.status_code == 204
+
+    update_saved_meal_response = client.patch(
+        f"/v0/me/tracking/saved-meals/{saved_meal['saved_meal_id']}",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "note": "toujours utile",
+            "items": [
+                {
+                    "item_kind": "custom_food",
+                    "custom_food_id": custom_food["custom_food_id"],
+                }
+            ],
+        },
+    )
+    assert update_saved_meal_response.status_code == 200
+    assert update_saved_meal_response.json()["items"][0]["label"] == "Soupe maison"
+
+    update_meal_response = client.patch(
+        f"/v0/me/tracking/meals/{meal['meal_log_id']}",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "note": "historique conservé",
+            "items": [
+                {
+                    "item_kind": "custom_food",
+                    "custom_food_id": custom_food["custom_food_id"],
+                }
+            ],
+        },
+    )
+    assert update_meal_response.status_code == 200
+    assert update_meal_response.json()["items"][0]["label"] == "Soupe maison"
+
+    create_meal_from_deleted_reference = client.post(
+        "/v0/me/tracking/meals",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "occurred_at_utc": "2026-03-19T13:00:00Z",
+            "items": [
+                {
+                    "item_kind": "custom_food",
+                    "custom_food_id": custom_food["custom_food_id"],
+                }
+            ],
+        },
+    )
+    assert create_meal_from_deleted_reference.status_code == 201
+    assert create_meal_from_deleted_reference.json()["items"][0]["label"] == "Soupe maison"
+
+    _cleanup_account(db_url, user_id)
+
+
 def test_meal_logs_keep_snapshot_labels_when_custom_food_changes(client, db_url) -> None:
     user_id = uuid.uuid4()
     _cleanup_account(db_url, user_id)

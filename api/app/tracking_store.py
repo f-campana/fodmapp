@@ -129,7 +129,6 @@ def _resolve_custom_food(conn: Connection, user_id: UUID, custom_food_id: UUID) 
         FROM custom_foods
         WHERE custom_food_id = %(custom_food_id)s
           AND user_id = %(user_id)s
-          AND deleted_at IS NULL
         """,
         {"custom_food_id": custom_food_id, "user_id": user_id},
     ).fetchone()

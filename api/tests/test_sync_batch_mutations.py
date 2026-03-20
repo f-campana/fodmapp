@@ -433,6 +433,127 @@ def test_sync_batch_applies_tracking_entities_with_version_parity(client, db_url
             _cleanup_account(db_url, user_id)
 
 
+def test_sync_batch_rolls_back_tracking_parent_rows_on_invalid_item_payload(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    device_id = "batch-device-tracking-rollback"
+
+    with connect(db_url, row_factory=dict_row) as db_conn:
+        with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+            _grant_sync_scope_consent(client, user_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id, seed="tracking-rollback")
+
+            saved_meal_id = str(uuid.uuid4())
+            meal_log_id = str(uuid.uuid4())
+
+            saved_meal_create = _build_mutation_item(
+                "SAVED_MEAL_CREATE",
+                entity_type="saved_meal",
+                entity_id=saved_meal_id,
+                client_seq=1,
+                idempotency_key="tracking-rollback-01",
+                base_version=0,
+                payload_extra={
+                    "saved_meal_id": saved_meal_id,
+                    "label": "Modèle cassé",
+                    "items": [
+                        {
+                            "item_kind": "canonical_food",
+                            "food_slug": "missing-food-slug",
+                        }
+                    ],
+                },
+            )
+            meal_create = _build_mutation_item(
+                "MEAL_CREATE",
+                entity_type="meal_log",
+                entity_id=meal_log_id,
+                client_seq=2,
+                idempotency_key="tracking-rollback-02",
+                base_version=0,
+                payload_extra={
+                    "meal_log_id": meal_log_id,
+                    "occurred_at_utc": "2026-03-19T11:00:00Z",
+                    "items": [
+                        {
+                            "item_kind": "canonical_food",
+                            "food_slug": "missing-food-slug",
+                        }
+                    ],
+                },
+            )
+
+            for item in [saved_meal_create, meal_create]:
+                _sign_mutation_item(secret, item)
+
+            response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [saved_meal_create, meal_create]),
+            )
+            assert response.status_code == 200
+            payload = response.json()
+            assert [item["status"] for item in payload["items"]] == [
+                "FAILED_PERMANENT",
+                "FAILED_PERMANENT",
+            ]
+            assert [item["result_code"] for item in payload["items"]] == [
+                "INVALID_PAYLOAD",
+                "INVALID_PAYLOAD",
+            ]
+
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM saved_meals WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM saved_meal_items
+                    WHERE saved_meal_id = %(saved_meal_id)s
+                    """,
+                    {"saved_meal_id": saved_meal_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    "SELECT COUNT(*) AS count FROM meal_logs WHERE user_id = %(user_id)s",
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM meal_log_items
+                    WHERE meal_log_id = %(meal_log_id)s
+                    """,
+                    {"meal_log_id": meal_log_id},
+                ).fetchone()["count"]
+                == 0
+            )
+            assert (
+                db_conn.execute(
+                    """
+                    SELECT COUNT(*) AS count
+                    FROM me_entity_versions
+                    WHERE user_id = %(user_id)s
+                      AND entity_type IN ('saved_meal', 'meal_log')
+                    """,
+                    {"user_id": user_id},
+                ).fetchone()["count"]
+                == 0
+            )
+
+            _cleanup_account(db_url, user_id)
+
+
 def test_sync_batch_custom_food_version_conflict_then_delete_tombstone(client, db_url) -> None:
     user_id = uuid.uuid4()
     device_id = "batch-device-custom-food-delete"
