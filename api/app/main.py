@@ -13,6 +13,7 @@ from app.routers.me import router as me_router
 from app.routers.safe_harbors import router as safe_harbors_router
 from app.routers.swaps import router as swaps_router
 from app.routers.sync import router as sync_router
+from app.routers.tracking import router as tracking_router
 
 
 def create_app() -> FastAPI:
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(safe_harbors_router)
     app.include_router(swaps_router)
     app.include_router(me_router)
+    app.include_router(tracking_router)
     app.include_router(sync_router)
 
     return app

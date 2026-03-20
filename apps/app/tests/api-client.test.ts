@@ -7,6 +7,11 @@ import {
   getSwaps,
   searchFoods,
 } from "../lib/api";
+import {
+  createTrackingSymptom,
+  deleteTrackingMeal,
+  getTrackingFeed,
+} from "../lib/tracking";
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -120,5 +125,85 @@ describe("public read client", () => {
       status: 500,
       error: "request_failed",
     });
+  });
+});
+
+describe("tracking client", () => {
+  it("sends X-User-Id on authenticated feed requests", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          total: 0,
+          limit: 50,
+          items: [],
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await getTrackingFeed("user_123", 50);
+
+    expect(result).toEqual({
+      total: 0,
+      limit: 50,
+      items: [],
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.fodmap.example/v0/me/tracking/feed?limit=50",
+      expect.objectContaining({
+        cache: "no-store",
+        headers: expect.any(Headers),
+      }),
+    );
+    const [, init] = fetchMock.mock.calls[0];
+    expect((init.headers as Headers).get("X-User-Id")).toBe("user_123");
+  });
+
+  it("posts symptom payloads and keeps JSON headers", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          symptom_log_id: "symptom-1",
+          symptom_type: "bloating",
+          severity: 4,
+          noted_at_utc: "2026-03-20T10:00:00Z",
+          note: null,
+          version: 1,
+          created_at_utc: "2026-03-20T10:00:00Z",
+          updated_at_utc: "2026-03-20T10:00:00Z",
+        }),
+        { status: 201 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await createTrackingSymptom("user_123", {
+      symptom_type: "bloating",
+      severity: 4,
+      noted_at_utc: "2026-03-20T10:00:00Z",
+      note: null,
+    });
+
+    expect(result.symptom_type).toBe("bloating");
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.method).toBe("POST");
+    expect((init.headers as Headers).get("Content-Type")).toBe(
+      "application/json",
+    );
+  });
+
+  it("returns undefined on 204 delete responses", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
+    );
+
+    const result = await deleteTrackingMeal("user_123", "meal-1");
+
+    expect(result).toBeUndefined();
   });
 });

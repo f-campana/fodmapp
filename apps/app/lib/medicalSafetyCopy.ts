@@ -88,6 +88,10 @@ type ErrorStateCopy = {
 type RuntimeCopy = {
   authRequiredTitle: CopyText;
   authRequiredBody: CopyText;
+  authUnavailableTitle: CopyText;
+  authUnavailableBody: CopyText;
+  previewModeTitle: CopyText;
+  previewModeBody: CopyText;
   signInCta: CopyText;
   loadingConsent: CopyText;
   exportRequestLabel: CopyText;
@@ -387,6 +391,12 @@ export const MEDICAL_SAFETY_COPY: MedicalSafetyCopy = {
         authRequiredTitle: "Connexion requise pour gérer vos droits",
         authRequiredBody:
           "Connectez-vous pour consulter, exporter ou supprimer vos données personnelles.",
+        authUnavailableTitle: "Connexion indisponible dans cette version",
+        authUnavailableBody:
+          "Cette version locale n’embarque pas encore de parcours de connexion. Utilisez le mode aperçu local pour tester l’espace compte et le suivi.",
+        previewModeTitle: "Mode aperçu local actif",
+        previewModeBody:
+          "Vous naviguez avec l’utilisateur local {{userId}}. Les écritures passent par l’API réelle, mais il ne s’agit pas d’une authentification réelle.",
         signInCta: "Se connecter",
         loadingConsent: "Chargement de l’état de consentement...",
         exportRequestLabel: "Demande d’export",
@@ -622,6 +632,12 @@ export const MEDICAL_SAFETY_COPY: MedicalSafetyCopy = {
         authRequiredTitle: "Sign in required to manage your rights",
         authRequiredBody:
           "Sign in to review, export, or delete your personal data.",
+        authUnavailableTitle: "Sign-in unavailable in this build",
+        authUnavailableBody:
+          "This local build does not include a real sign-in flow yet. Use local preview mode to validate account and tracking screens.",
+        previewModeTitle: "Local preview mode active",
+        previewModeBody:
+          "You are browsing as local preview user {{userId}}. Writes go to the real API, but this is not real authentication.",
         signInCta: "Sign in",
         loadingConsent: "Loading consent state...",
         exportRequestLabel: "Export request",

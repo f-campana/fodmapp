@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
+
 import { AnalyticsPageView } from "../../components/analytics-page-view";
 import { getAnalyticsBootstrapStatus } from "../../lib/analytics";
 import { getAuthContext } from "../../lib/auth";
@@ -63,6 +65,18 @@ export default async function EspacePage({
     locale_fallback: String(fallback),
   });
 
+  const authenticatedUserId =
+    auth.isAuthenticated && auth.userId ? auth.userId : null;
+  const isPreviewMode = auth.mode === "preview" && authenticatedUserId !== null;
+  const fallbackTitle =
+    auth.mode === "disabled"
+      ? copy("screens.runtime.authUnavailableTitle")
+      : copy("screens.runtime.authRequiredTitle");
+  const fallbackBody =
+    auth.mode === "disabled"
+      ? copy("screens.runtime.authUnavailableBody")
+      : copy("screens.runtime.authRequiredBody");
+
   return (
     <main className="app-shell">
       <AnalyticsPageView
@@ -86,19 +100,35 @@ export default async function EspacePage({
       </div>
 
       <section className="app-shell__section">
-        {auth.isAuthenticated && auth.userId ? (
-          <ConsentRightsClient userId={auth.userId} locale={locale} />
+        {authenticatedUserId ? (
+          <>
+            {isPreviewMode ? (
+              <Alert>
+                <AlertTitle>
+                  {copy("screens.runtime.previewModeTitle")}
+                </AlertTitle>
+                <AlertDescription>
+                  {copy("screens.runtime.previewModeBody", {
+                    userId: authenticatedUserId,
+                  })}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            <ConsentRightsClient userId={authenticatedUserId} locale={locale} />
+            <article className="app-shell__section">
+              <h2 className="app-shell__text">Ouvrir le suivi</h2>
+              <p className="app-shell__text">
+                Enregistre repas, symptômes et résumé hebdomadaire descriptif.
+              </p>
+              <p className="app-shell__text">
+                <Link href="/espace/suivi">Accéder au suivi</Link>
+              </p>
+            </article>
+          </>
         ) : (
           <article className="app-shell__section">
-            <h2 className="app-shell__text">
-              {copy("screens.runtime.authRequiredTitle")}
-            </h2>
-            <p className="app-shell__text">
-              {copy("screens.runtime.authRequiredBody")}
-            </p>
-            <p className="app-shell__text">
-              <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
-            </p>
+            <h2 className="app-shell__text">{fallbackTitle}</h2>
+            <p className="app-shell__text">{fallbackBody}</p>
           </article>
         )}
       </section>

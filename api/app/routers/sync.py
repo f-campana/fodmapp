@@ -9,15 +9,23 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Header, Request, Response
 from psycopg.types.json import Jsonb
 
-from app import sql
+from app import sql, tracking_store
 from app.config import get_settings
 from app.consent_chain import insert_event as insert_consent_event
 from app.consent_chain import proof_payload_signature
 from app.crypto_utils import canonical_json, hmac_verify, sha256_hex
 from app.db import Database
-from app.errors import bad_request
+from app.errors import ApiError, bad_request
 from app.models import (
+    CustomFoodCreateRequest,
+    CustomFoodUpdateRequest,
     DeleteSummary,
+    MealLogCreateRequest,
+    MealLogUpdateRequest,
+    SavedMealCreateRequest,
+    SavedMealUpdateRequest,
+    SymptomLogCreateRequest,
+    SymptomLogUpdateRequest,
     SyncV1ConflictCode,
     SyncV1MutationBatchRequest,
     SyncV1MutationBatchResponse,
@@ -342,7 +350,19 @@ def _infer_entity(user_id: UUID, mutation: SyncV1MutationItem) -> Tuple[str, str
         return mutation.entity_type, mutation.entity_id or "__global__"
 
     if op in {"SYMPTOM_CREATE", "SYMPTOM_UPDATE", "SYMPTOM_DELETE"}:
-        return "symptom_log", payload.get("symptom_id") or payload.get("id") or "__global__"
+        return (
+            "symptom_log",
+            payload.get("symptom_log_id") or payload.get("symptom_id") or payload.get("id") or "__global__",
+        )
+
+    if op in {"MEAL_CREATE", "MEAL_UPDATE", "MEAL_DELETE"}:
+        return "meal_log", payload.get("meal_log_id") or payload.get("id") or "__global__"
+
+    if op in {"CUSTOM_FOOD_CREATE", "CUSTOM_FOOD_UPDATE", "CUSTOM_FOOD_DELETE"}:
+        return "custom_food", payload.get("custom_food_id") or payload.get("id") or "__global__"
+
+    if op in {"SAVED_MEAL_CREATE", "SAVED_MEAL_UPDATE", "SAVED_MEAL_DELETE"}:
+        return "saved_meal", payload.get("saved_meal_id") or payload.get("id") or "__global__"
 
     if op in {"PREF_SET", "PREF_DELETE"}:
         return "preference", payload.get("preference_key") or payload.get("key") or "__global__"
@@ -409,6 +429,13 @@ def _get_consent_active(conn, user_id: UUID) -> bool:
         return False
     scope = row.get("consent_scope") or {}
     return bool(scope.get("sync_mutations", False))
+
+
+def _get_consent_scope(conn, user_id: UUID) -> dict[str, bool]:
+    row = conn.execute(sql.SQL_GET_ACTIVE_USER_CONSENT, {"user_id": user_id}).fetchone()
+    if row is None:
+        return {}
+    return row.get("consent_scope") or {}
 
 
 def _is_account_deleted(conn, user_id: UUID) -> bool:
@@ -691,6 +718,7 @@ def _apply_withdraw_consent(conn, user_id: UUID) -> None:
 
 
 def _run_account_purge(conn, user_id: UUID) -> DeleteSummary:
+    symptom_logs_deleted, diet_logs_deleted = tracking_store.hard_delete_tracking_data(conn, user_id, scope="all")
     consent_count = conn.execute(sql.SQL_COUNT_CONSENT_RECORDS, {"user_id": user_id}).fetchone()["count"] or 0
     queue_count = conn.execute(sql.SQL_COUNT_QUEUE_ROWS, {"user_id": user_id}).fetchone()["count"] or 0
     export_count = conn.execute(sql.SQL_COUNT_EXPORT_JOBS, {"user_id": user_id}).fetchone()["count"] or 0
@@ -711,8 +739,8 @@ def _run_account_purge(conn, user_id: UUID) -> DeleteSummary:
 
     return DeleteSummary(
         consent_records_touched=int(consent_count),
-        symptom_logs_deleted=0,
-        diet_logs_deleted=0,
+        symptom_logs_deleted=int(symptom_logs_deleted),
+        diet_logs_deleted=int(diet_logs_deleted),
         swap_history_deleted=0,
         queue_items_dropped=int(queue_count),
         exports_invalidated=int(export_count),
@@ -787,6 +815,166 @@ def _set_entity_version(conn, user_id: UUID, entity_type: str, entity_id: str, n
     )
 
 
+def _coerce_symptom_payload(payload: Dict[str, Any], fallback_noted_at: datetime, *, partial: bool) -> Dict[str, Any]:
+    symptom_value = payload.get("symptom_type") or payload.get("symptom")
+    allowed = {
+        "bloating",
+        "pain",
+        "gas",
+        "diarrhea",
+        "constipation",
+        "nausea",
+        "reflux",
+        "other",
+    }
+    symptom_type = symptom_value if symptom_value in allowed else ("other" if symptom_value else None)
+    note_parts = []
+    if symptom_type == "other" and symptom_value and symptom_value != "other":
+        note_parts.append(str(symptom_value))
+    if payload.get("note"):
+        note_parts.append(str(payload["note"]))
+
+    normalized: Dict[str, Any] = {}
+    if symptom_type is not None:
+        normalized["symptom_type"] = symptom_type
+    elif not partial:
+        normalized["symptom_type"] = "other"
+
+    if "severity" in payload:
+        normalized["severity"] = int(payload.get("severity") or 0)
+    elif not partial:
+        normalized["severity"] = 0
+
+    if "noted_at_utc" in payload:
+        normalized["noted_at_utc"] = payload["noted_at_utc"]
+    elif not partial:
+        normalized["noted_at_utc"] = fallback_noted_at
+
+    if note_parts:
+        normalized["note"] = " — ".join(note_parts)
+    elif "note" in payload:
+        normalized["note"] = payload.get("note")
+
+    return normalized
+
+
+def _apply_tracking_mutation(
+    conn,
+    user_id: UUID,
+    mutation: SyncV1MutationItem,
+    entity_type: str,
+    entity_id: str,
+    next_version: int,
+) -> None:
+    op = mutation.operation_type
+    if op is None:
+        raise ValueError("operation_type is required")
+
+    if entity_id == "__global__":
+        raise ValueError("entity_id is required")
+
+    entity_uuid = UUID(entity_id)
+
+    if op == "SYMPTOM_CREATE":
+        tracking_store.create_symptom_log(
+            conn,
+            user_id,
+            SymptomLogCreateRequest.model_validate(
+                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=False)
+            ),
+            symptom_log_id=entity_uuid,
+            version=next_version,
+        )
+        return
+
+    if op == "SYMPTOM_UPDATE":
+        tracking_store.update_symptom_log(
+            conn,
+            user_id,
+            entity_uuid,
+            SymptomLogUpdateRequest.model_validate(
+                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=True)
+            ),
+            version=next_version,
+        )
+        return
+
+    if op == "SYMPTOM_DELETE":
+        tracking_store.delete_symptom_log(conn, user_id, entity_uuid, version=next_version)
+        return
+
+    if op == "MEAL_CREATE":
+        tracking_store.create_meal_log(
+            conn,
+            user_id,
+            MealLogCreateRequest.model_validate(mutation.payload),
+            meal_log_id=entity_uuid,
+            version=next_version,
+        )
+        return
+
+    if op == "MEAL_UPDATE":
+        tracking_store.update_meal_log(
+            conn,
+            user_id,
+            entity_uuid,
+            MealLogUpdateRequest.model_validate(mutation.payload),
+            version=next_version,
+        )
+        return
+
+    if op == "MEAL_DELETE":
+        tracking_store.delete_meal_log(conn, user_id, entity_uuid, version=next_version)
+        return
+
+    if op == "CUSTOM_FOOD_CREATE":
+        tracking_store.create_custom_food(
+            conn,
+            user_id,
+            CustomFoodCreateRequest.model_validate(mutation.payload),
+            custom_food_id=entity_uuid,
+            version=next_version,
+        )
+        return
+
+    if op == "CUSTOM_FOOD_UPDATE":
+        tracking_store.update_custom_food(
+            conn,
+            user_id,
+            entity_uuid,
+            CustomFoodUpdateRequest.model_validate(mutation.payload),
+            version=next_version,
+        )
+        return
+
+    if op == "CUSTOM_FOOD_DELETE":
+        tracking_store.delete_custom_food(conn, user_id, entity_uuid, version=next_version)
+        return
+
+    if op == "SAVED_MEAL_CREATE":
+        tracking_store.create_saved_meal(
+            conn,
+            user_id,
+            SavedMealCreateRequest.model_validate(mutation.payload),
+            saved_meal_id=entity_uuid,
+            version=next_version,
+        )
+        return
+
+    if op == "SAVED_MEAL_UPDATE":
+        tracking_store.update_saved_meal(
+            conn,
+            user_id,
+            entity_uuid,
+            SavedMealUpdateRequest.model_validate(mutation.payload),
+            version=next_version,
+        )
+        return
+
+    if op == "SAVED_MEAL_DELETE":
+        tracking_store.delete_saved_meal(conn, user_id, entity_uuid, version=next_version)
+
+
 def _normalize_mutation(item: SyncV1MutationItem, migration_mode: bool) -> SyncV1MutationItem:
     if migration_mode and item.operation_legacy is None and item.operation_type is None:
         raise ValueError("operation_legacy required in migration mode")
@@ -855,7 +1043,8 @@ def sync_mutations_batch(
         _ensure_sync_schema(conn)
         server_batch_seq = _next_batch_seq(conn)
 
-        consent_active = _get_consent_active(conn, user_id)
+        consent_scope = _get_consent_scope(conn, user_id)
+        consent_active = bool(consent_scope.get("sync_mutations", False))
         account_deleted = _is_account_deleted(conn, user_id)
         results: list[SyncV1MutationResult] = []
         applied_ids: set[str] = set()
@@ -1277,6 +1466,43 @@ def sync_mutations_batch(
                 )
                 continue
 
+            tracking_scope = tracking_store.tracking_scope_for_entity(entity_type)
+            if tracking_scope is not None and not tracking_store.has_tracking_scope(consent_scope, tracking_scope):
+                state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
+                _insert_queue(
+                    conn,
+                    payload,
+                    normalized,
+                    user_id,
+                    entity_type,
+                    entity_id,
+                    signature_hash,
+                    signature_key_id,
+                    state,
+                    signature_valid,
+                    "CONSENT_REVOKED",
+                    f"{tracking_scope}_missing",
+                    chain_prev_hash,
+                    chain_item_hash,
+                )
+                results.append(
+                    _build_result(
+                        payload,
+                        normalized,
+                        state,
+                        "CONSENT_REVOKED",
+                        received_at,
+                        max(0, _now_ms() - start_ms),
+                        signature_hash,
+                        signature_valid,
+                        None,
+                        conflict,
+                        retry_after_ms,
+                        False,
+                    )
+                )
+                continue
+
             if normalized.depends_on_mutation_id and normalized.depends_on_mutation_id not in applied_ids:
                 _insert_queue(
                     conn,
@@ -1389,9 +1615,62 @@ def sync_mutations_batch(
 
             if normalized.base_version is not None:
                 next_version = current_version + 1
-                _set_entity_version(conn, user_id, entity_type, entity_id, next_version)
             else:
                 next_version = current_version
+
+            if op in {
+                "SYMPTOM_CREATE",
+                "SYMPTOM_UPDATE",
+                "SYMPTOM_DELETE",
+                "MEAL_CREATE",
+                "MEAL_UPDATE",
+                "MEAL_DELETE",
+                "CUSTOM_FOOD_CREATE",
+                "CUSTOM_FOOD_UPDATE",
+                "CUSTOM_FOOD_DELETE",
+                "SAVED_MEAL_CREATE",
+                "SAVED_MEAL_UPDATE",
+                "SAVED_MEAL_DELETE",
+            }:
+                try:
+                    _apply_tracking_mutation(conn, user_id, normalized, entity_type, entity_id, max(next_version, 1))
+                except (ValueError, ApiError):
+                    _insert_queue(
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        "FAILED_PERMANENT",
+                        signature_valid,
+                        "INVALID_PAYLOAD",
+                        "tracking_apply_failed",
+                        chain_prev_hash,
+                        chain_item_hash,
+                    )
+                    results.append(
+                        _build_result(
+                            payload,
+                            normalized,
+                            "FAILED_PERMANENT",
+                            "INVALID_PAYLOAD",
+                            received_at,
+                            max(0, _now_ms() - start_ms),
+                            signature_hash,
+                            signature_valid,
+                            None,
+                            None,
+                            0,
+                            False,
+                        )
+                    )
+                    continue
+
+            if normalized.base_version is not None:
+                _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
 
             _insert_queue(
                 conn,

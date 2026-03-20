@@ -9,6 +9,8 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
+const PREVIEW_USER_ID = "11111111-1111-4111-8111-111111111111";
+
 function configureClerkRuntimeEnv(): void {
   vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
   vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
@@ -51,6 +53,59 @@ describe("auth runtime hardening", () => {
     expect(auth.userId).toBeNull();
     expect(reportFailure).toHaveBeenCalledWith(
       "clerk_auth_context_unavailable",
+      expect.any(Error),
+    );
+  });
+
+  it("returns authenticated preview context when preview auth is enabled", async () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
+    vi.stubEnv("CLERK_SECRET_KEY", "");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
+    vi.stubEnv("NODE_ENV", "development");
+
+    const loadAuthModule = vi.fn(async () => ({
+      auth: async () => ({
+        userId: "user_should_not_load",
+      }),
+    }));
+    const reportFailure = vi.fn();
+
+    const auth = await getAuthContext(loadAuthModule, reportFailure);
+
+    expect(auth.state).toBe("authenticated");
+    expect(auth.mode).toBe("preview");
+    expect(auth.configured).toBe(true);
+    expect(auth.isAuthenticated).toBe(true);
+    expect(auth.userId).toBe(PREVIEW_USER_ID);
+    expect(loadAuthModule).not.toHaveBeenCalled();
+    expect(reportFailure).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when preview auth user id is invalid", async () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
+    vi.stubEnv("CLERK_SECRET_KEY", "");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "invalid-preview-user");
+    vi.stubEnv("NODE_ENV", "development");
+
+    const loadAuthModule = vi.fn(async () => ({
+      auth: async () => ({
+        userId: "user_should_not_load",
+      }),
+    }));
+    const reportFailure = vi.fn();
+
+    const auth = await getAuthContext(loadAuthModule, reportFailure);
+
+    expect(auth.state).toBe("placeholder");
+    expect(auth.mode).toBe("disabled");
+    expect(auth.configured).toBe(false);
+    expect(auth.isAuthenticated).toBe(false);
+    expect(auth.userId).toBeNull();
+    expect(loadAuthModule).not.toHaveBeenCalled();
+    expect(reportFailure).toHaveBeenCalledWith(
+      "auth_preview_user_invalid",
       expect.any(Error),
     );
   });
