@@ -1048,6 +1048,24 @@ def delete_saved_meal(conn: Connection, user_id: UUID, saved_meal_id: UUID, *, v
 def build_tracking_feed(conn: Connection, user_id: UUID, limit: int = 50) -> TrackingFeedResponse:
     symptoms = list_symptom_logs(conn, user_id, limit=limit)
     meals = list_meal_logs(conn, user_id, limit=limit)
+    symptom_total = conn.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM symptom_logs
+        WHERE user_id = %(user_id)s
+          AND deleted_at IS NULL
+        """,
+        {"user_id": user_id},
+    ).fetchone()
+    meal_total = conn.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM meal_logs
+        WHERE user_id = %(user_id)s
+          AND deleted_at IS NULL
+        """,
+        {"user_id": user_id},
+    ).fetchone()
     items: list[TrackingFeedEntry] = [
         TrackingFeedEntry(entry_type="symptom", occurred_at_utc=item.noted_at_utc, symptom=item) for item in symptoms
     ] + [TrackingFeedEntry(entry_type="meal", occurred_at_utc=item.occurred_at_utc, meal=item) for item in meals]
@@ -1060,7 +1078,8 @@ def build_tracking_feed(conn: Connection, user_id: UUID, limit: int = 50) -> Tra
         reverse=True,
     )
     limited = items[:limit]
-    return TrackingFeedResponse(total=len(items), limit=limit, items=limited)
+    total = int(symptom_total["count"] or 0) + int(meal_total["count"] or 0)
+    return TrackingFeedResponse(total=total, limit=limit, items=limited)
 
 
 def build_weekly_summary(

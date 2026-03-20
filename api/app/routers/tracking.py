@@ -6,9 +6,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Header, Query, Request, Response, status
 
-from app import tracking_store
+from app import sql, tracking_store
 from app.db import Database
-from app.errors import bad_request
+from app.errors import bad_request, locked
 from app.models import (
     CustomFood,
     CustomFoodCreateRequest,
@@ -44,6 +44,12 @@ def _require_user_id(x_user_id: Optional[str]) -> UUID:
 
 def _next_version(conn, user_id: UUID, entity_type: str, entity_id: str) -> int:
     return tracking_store.get_entity_version(conn, user_id, entity_type, entity_id) + 1
+
+
+def _require_tracking_write_allowed(conn, user_id: UUID) -> None:
+    row = sql.fetch_one(conn, sql.SQL_GET_ACCOUNT_DELETE_STATE, {"user_id": user_id})
+    if row is not None:
+        raise locked("Tracking writes are locked after deletion request")
 
 
 @router.get("/feed", response_model=TrackingFeedResponse)
@@ -95,6 +101,7 @@ def create_symptom(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "symptom_logs")
         created = tracking_store.create_symptom_log(conn, user_id, payload, version=1)
         tracking_store.set_entity_version(conn, user_id, "symptom_log", str(created.symptom_log_id), created.version)
@@ -112,6 +119,7 @@ def update_symptom(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "symptom_logs")
         version = _next_version(conn, user_id, "symptom_log", str(symptom_log_id))
         updated = tracking_store.update_symptom_log(conn, user_id, symptom_log_id, payload, version=version)
@@ -129,6 +137,7 @@ def delete_symptom(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "symptom_logs")
         version = _next_version(conn, user_id, "symptom_log", str(symptom_log_id))
         tracking_store.delete_symptom_log(conn, user_id, symptom_log_id, version=version)
@@ -160,6 +169,7 @@ def create_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         created = tracking_store.create_meal_log(conn, user_id, payload, version=1)
         tracking_store.set_entity_version(conn, user_id, "meal_log", str(created.meal_log_id), created.version)
@@ -177,6 +187,7 @@ def update_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "meal_log", str(meal_log_id))
         updated = tracking_store.update_meal_log(conn, user_id, meal_log_id, payload, version=version)
@@ -194,6 +205,7 @@ def delete_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "meal_log", str(meal_log_id))
         tracking_store.delete_meal_log(conn, user_id, meal_log_id, version=version)
@@ -224,6 +236,7 @@ def create_custom_food(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         created = tracking_store.create_custom_food(conn, user_id, payload, version=1)
         tracking_store.set_entity_version(conn, user_id, "custom_food", str(created.custom_food_id), created.version)
@@ -241,6 +254,7 @@ def update_custom_food(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "custom_food", str(custom_food_id))
         updated = tracking_store.update_custom_food(conn, user_id, custom_food_id, payload, version=version)
@@ -258,6 +272,7 @@ def delete_custom_food(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "custom_food", str(custom_food_id))
         tracking_store.delete_custom_food(conn, user_id, custom_food_id, version=version)
@@ -288,6 +303,7 @@ def create_saved_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         created = tracking_store.create_saved_meal(conn, user_id, payload, version=1)
         tracking_store.set_entity_version(conn, user_id, "saved_meal", str(created.saved_meal_id), created.version)
@@ -305,6 +321,7 @@ def update_saved_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "saved_meal", str(saved_meal_id))
         updated = tracking_store.update_saved_meal(conn, user_id, saved_meal_id, payload, version=version)
@@ -322,6 +339,7 @@ def delete_saved_meal(
     db = _get_db(request)
 
     with db.connection() as conn:
+        _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "saved_meal", str(saved_meal_id))
         tracking_store.delete_saved_meal(conn, user_id, saved_meal_id, version=version)

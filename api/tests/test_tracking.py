@@ -234,6 +234,160 @@ def test_tracking_crud_feed_and_summary(client, db_url) -> None:
     _cleanup_account(db_url, user_id)
 
 
+def test_tracking_writes_stay_locked_after_full_account_delete(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    _cleanup_account(db_url, user_id)
+    _grant_tracking_consent(client, user_id)
+
+    symptom_response = client.post(
+        "/v0/me/tracking/symptoms",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "symptom_type": "pain",
+            "severity": 5,
+            "noted_at_utc": "2026-03-19T15:00:00Z",
+        },
+    )
+    assert symptom_response.status_code == 201
+    symptom_id = symptom_response.json()["symptom_log_id"]
+
+    custom_food_response = client.post(
+        "/v0/me/tracking/custom-foods",
+        headers={"X-User-Id": str(user_id)},
+        json={"label": "Bol maison"},
+    )
+    assert custom_food_response.status_code == 201
+    custom_food_id = custom_food_response.json()["custom_food_id"]
+
+    delete_request = client.post(
+        "/v0/me/delete",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "scope": "all",
+            "hard_delete": True,
+            "soft_delete_window_days": 0,
+            "confirm_text": "SUPPRIMER MES DONNÉES",
+            "reason": "tracking_lock_regression",
+        },
+    )
+    assert delete_request.status_code == 202
+
+    delete_status = client.get(
+        delete_request.json()["status_uri"],
+        headers={"X-User-Id": str(user_id)},
+    )
+    assert delete_status.status_code == 200
+    assert delete_status.json()["status"] in {"processing", "completed"}
+
+    _grant_tracking_consent(client, user_id)
+
+    create_symptom_after_delete = client.post(
+        "/v0/me/tracking/symptoms",
+        headers={"X-User-Id": str(user_id)},
+        json={
+            "symptom_type": "gas",
+            "severity": 4,
+            "noted_at_utc": "2026-03-19T16:00:00Z",
+        },
+    )
+    assert create_symptom_after_delete.status_code == 423
+    assert create_symptom_after_delete.json()["error"]["code"] == "locked"
+
+    update_symptom_after_delete = client.patch(
+        f"/v0/me/tracking/symptoms/{symptom_id}",
+        headers={"X-User-Id": str(user_id)},
+        json={"severity": 6},
+    )
+    assert update_symptom_after_delete.status_code == 423
+    assert update_symptom_after_delete.json()["error"]["code"] == "locked"
+
+    create_custom_food_after_delete = client.post(
+        "/v0/me/tracking/custom-foods",
+        headers={"X-User-Id": str(user_id)},
+        json={"label": "Riz nature"},
+    )
+    assert create_custom_food_after_delete.status_code == 423
+    assert create_custom_food_after_delete.json()["error"]["code"] == "locked"
+
+    delete_custom_food_after_delete = client.delete(
+        f"/v0/me/tracking/custom-foods/{custom_food_id}",
+        headers={"X-User-Id": str(user_id)},
+    )
+    assert delete_custom_food_after_delete.status_code == 423
+    assert delete_custom_food_after_delete.json()["error"]["code"] == "locked"
+
+    _cleanup_account(db_url, user_id)
+
+
+def test_tracking_feed_total_counts_full_history_beyond_limit(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    _cleanup_account(db_url, user_id)
+    _grant_tracking_consent(client, user_id)
+
+    base_time = datetime(2026, 3, 20, 8, 0, tzinfo=timezone.utc)
+
+    for index in range(6):
+        meal_time = base_time + timedelta(minutes=index * 2)
+        meal_response = client.post(
+            "/v0/me/tracking/meals",
+            headers={"X-User-Id": str(user_id)},
+            json={
+                "title": f"Repas {index}",
+                "occurred_at_utc": meal_time.isoformat().replace("+00:00", "Z"),
+                "items": [
+                    {
+                        "item_kind": "free_text",
+                        "free_text_label": f"Plat {index}",
+                    }
+                ],
+            },
+        )
+        assert meal_response.status_code == 201
+
+        symptom_time = base_time + timedelta(minutes=index * 2 + 1)
+        symptom_response = client.post(
+            "/v0/me/tracking/symptoms",
+            headers={"X-User-Id": str(user_id)},
+            json={
+                "symptom_type": "bloating",
+                "severity": index % 10,
+                "noted_at_utc": symptom_time.isoformat().replace("+00:00", "Z"),
+            },
+        )
+        assert symptom_response.status_code == 201
+
+    feed_response = client.get(
+        "/v0/me/tracking/feed?limit=5",
+        headers={"X-User-Id": str(user_id)},
+    )
+    assert feed_response.status_code == 200
+
+    feed_payload = feed_response.json()
+    assert feed_payload["total"] == 12
+    assert len(feed_payload["items"]) == 5
+    assert [item["entry_type"] for item in feed_payload["items"]] == [
+        "symptom",
+        "meal",
+        "symptom",
+        "meal",
+        "symptom",
+    ]
+
+    occurred_times = [
+        datetime.fromisoformat(item["occurred_at_utc"].replace("Z", "+00:00")) for item in feed_payload["items"]
+    ]
+    assert occurred_times == sorted(occurred_times, reverse=True)
+    assert occurred_times == [
+        base_time + timedelta(minutes=11),
+        base_time + timedelta(minutes=10),
+        base_time + timedelta(minutes=9),
+        base_time + timedelta(minutes=8),
+        base_time + timedelta(minutes=7),
+    ]
+
+    _cleanup_account(db_url, user_id)
+
+
 def test_meal_logs_keep_snapshot_labels_when_custom_food_changes(client, db_url) -> None:
     user_id = uuid.uuid4()
     _cleanup_account(db_url, user_id)
