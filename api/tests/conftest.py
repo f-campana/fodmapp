@@ -49,6 +49,15 @@ def _clear_settings_cache() -> None:
     config_module.get_settings.cache_clear()
 
 
+@pytest.fixture(autouse=True)
+def settings_cache_guard() -> Iterator[None]:
+    _clear_settings_cache()
+    try:
+        yield
+    finally:
+        _clear_settings_cache()
+
+
 @pytest.fixture(scope="session")
 def db_url() -> str:
     return os.getenv("API_DB_URL", _default_db_url())

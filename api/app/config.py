@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from functools import lru_cache
 
 
 def _split_csv_env(raw_value: str) -> tuple[str, ...]:
@@ -21,6 +22,7 @@ class Settings:
     node_env: str
 
 
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
     user = os.getenv("USER", "postgres")
     default_db_url = f"postgresql://{user}@localhost:5432/fodmap_test"

@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi.testclient import TestClient
 from psycopg.rows import dict_row
 
+from app.config import get_settings
 from app.main import create_app
 
 ISSUER_DOMAIN = "clerk.test.local"
@@ -221,15 +222,18 @@ def test_preview_user_id_header_requires_explicit_non_production_flag(client, mo
 
     monkeypatch.setenv("NODE_ENV", "development")
     monkeypatch.setenv("API_ALLOW_PREVIEW_USER_ID_HEADER", "false")
+    get_settings.cache_clear()
     denied = client.post("/v0/me/consent", headers={"X-User-Id": preview_user_id}, json=consent_payload)
     assert denied.status_code == 401
     assert denied.json()["error"]["code"] == "unauthorized"
 
     monkeypatch.setenv("API_ALLOW_PREVIEW_USER_ID_HEADER", "true")
+    get_settings.cache_clear()
     allowed = client.post("/v0/me/consent", headers={"X-User-Id": preview_user_id}, json=consent_payload)
     assert allowed.status_code == 200
 
     monkeypatch.setenv("NODE_ENV", "production")
+    get_settings.cache_clear()
     production = client.post(
         "/v0/me/consent",
         headers={"X-User-Id": preview_user_id},
@@ -242,6 +246,7 @@ def test_preview_user_id_header_requires_explicit_non_production_flag(client, mo
 def test_cors_preflight_allows_authorized_party_origin(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", AUTHORIZED_PARTY)
     monkeypatch.delenv("API_CORS_ALLOW_ORIGINS", raising=False)
+    get_settings.cache_clear()
 
     with TestClient(create_app()) as local_client:
         response = local_client.options(
@@ -255,12 +260,14 @@ def test_cors_preflight_allows_authorized_party_origin(monkeypatch: pytest.Monke
 
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == AUTHORIZED_PARTY
+    get_settings.cache_clear()
 
 
 def test_cors_preflight_allows_explicit_preview_origin(monkeypatch: pytest.MonkeyPatch):
     preview_origin = "http://127.0.0.1:3000"
     monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", AUTHORIZED_PARTY)
     monkeypatch.setenv("API_CORS_ALLOW_ORIGINS", preview_origin)
+    get_settings.cache_clear()
 
     with TestClient(create_app()) as local_client:
         response = local_client.options(
@@ -274,6 +281,7 @@ def test_cors_preflight_allows_explicit_preview_origin(monkeypatch: pytest.Monke
 
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == preview_origin
+    get_settings.cache_clear()
 
 
 @pytest.mark.usefixtures("me_security_schema", "tracking_schema")
