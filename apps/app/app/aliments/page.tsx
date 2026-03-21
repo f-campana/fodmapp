@@ -17,6 +17,8 @@ function normalizeSearchQuery(raw: string | string[] | undefined): string {
   return Array.isArray(raw) ? (raw[0]?.trim() ?? "") : (raw?.trim() ?? "");
 }
 
+const QUICK_SEARCHES = ["ail", "oignon", "champignons", "lentilles"] as const;
+
 export default async function AlimentsPage({
   searchParams,
 }: {
@@ -58,6 +60,21 @@ export default async function AlimentsPage({
               Essaie par exemple ail, oignon, champignons ou lentilles.
             </CardDescription>
           </CardHeader>
+          <CardContent className="product-page__stack">
+            <p className="product-page__note">Suggestions rapides</p>
+            <ul className="product-page__link-list">
+              {QUICK_SEARCHES.map((suggestion) => (
+                <li key={suggestion}>
+                  <Link
+                    className="product-page__link-pill"
+                    href={`/aliments?q=${encodeURIComponent(suggestion)}`}
+                  >
+                    {suggestion}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
         </Card>
       ) : results && !results.ok ? (
         <Alert variant="destructive">
@@ -81,6 +98,7 @@ export default async function AlimentsPage({
         </Card>
       ) : results && results.ok ? (
         <section className="product-page__stack">
+          <h2 className="product-page__section-title">Résultats</h2>
           <p className="product-page__note">
             {results.data.total} résultat{results.data.total > 1 ? "s" : ""}{" "}
             pour « {results.data.query} »

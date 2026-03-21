@@ -87,11 +87,18 @@ export default async function EspacePage({
         route="/espace"
       />
 
-      <div className="app-shell__meta">
-        <p className="app-shell__text">
-          {copy("screens.onboarding.safetyPositioningBanner")}
+      <section className="app-shell__header">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Espace</p>
+          <p className="app-shell__status">
+            {copy("screens.clinicianShare.disclaimer")}
+          </p>
+        </div>
+        <h1 className="app-shell__title">Consentement, exports et suivi</h1>
+        <p className="app-shell__description">
+          {copy("screens.clinicianShare.description")}
         </p>
-        <p className="app-shell__eyebrow">
+        <p className="app-shell__text">
           {copy("screens.onboarding.dataModeTransitionInfo")}
         </p>
         {fallback && (
@@ -99,11 +106,20 @@ export default async function EspacePage({
             {copy("fallbacks.missingLocale")}
           </p>
         )}
-      </div>
+      </section>
 
       <section className="app-shell__section">
         {authenticatedUserId ? (
           <>
+            <div className="app-shell__meta">
+              <p className="app-shell__eyebrow">Droits</p>
+              <p className="app-shell__status">
+                {isPreviewMode
+                  ? copy("screens.runtime.previewModeTitle")
+                  : "Espace actif"}
+              </p>
+            </div>
+            <h2 className="app-shell__section-title">Gérer mon espace</h2>
             {isRuntimeMode ? <RuntimeUserButton /> : null}
             {isPreviewMode ? (
               <Alert>
@@ -125,32 +141,46 @@ export default async function EspacePage({
               }
               locale={locale}
             />
-            <article className="app-shell__section">
-              <h2 className="app-shell__text">Ouvrir le suivi</h2>
-              <p className="app-shell__text">
-                Enregistre repas, symptômes et résumé hebdomadaire descriptif.
-              </p>
-              <p className="app-shell__text">
-                <Link href="/espace/suivi">Accéder au suivi</Link>
-              </p>
-            </article>
           </>
         ) : (
-          <article className="app-shell__section">
-            <h2 className="app-shell__text">{fallbackTitle}</h2>
+          <>
+            <div className="app-shell__meta">
+              <p className="app-shell__eyebrow">Accès</p>
+              <p className="app-shell__status">
+                {auth.mode === "disabled"
+                  ? "Version locale sans authentification"
+                  : "Authentification requise"}
+              </p>
+            </div>
+            <h2 className="app-shell__section-title">{fallbackTitle}</h2>
             <p className="app-shell__text">{fallbackBody}</p>
             {isRuntimeMode ? (
               <p className="app-shell__text">
                 <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
               </p>
             ) : null}
-          </article>
+          </>
         )}
       </section>
 
-      <p className="app-shell__text">
-        {copy("screens.clinicianShare.disclaimer")}
-      </p>
+      <section className="app-shell__section">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Suivi</p>
+          <p className="app-shell__status">
+            Journal descriptif, sans interprétation clinique.
+          </p>
+        </div>
+        <h2 className="app-shell__section-title">
+          Ouvrir le journal personnel
+        </h2>
+        <p className="app-shell__text">
+          Enregistre repas, symptômes et résumé hebdomadaire descriptif.
+        </p>
+        <p className="app-shell__text">
+          <Link href="/espace/suivi">Accéder au suivi</Link>
+        </p>
+      </section>
+
       <p className="app-shell__text">
         <Link href="/">{copy("fallbacks.advisoryFooter")}</Link>
       </p>
