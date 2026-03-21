@@ -19,16 +19,3 @@ vi.mock("next/navigation", () => ({
   }),
   useSearchParams: () => new URLSearchParams(),
 }));
-
-vi.mock("next/font/google", () => {
-  const createFontMock = (config?: { variable?: string }) => ({
-    className: "",
-    style: {},
-    variable: config?.variable ?? "",
-  });
-
-  return {
-    Cormorant_Garamond: createFontMock,
-    Source_Sans_3: createFontMock,
-  };
-});

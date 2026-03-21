@@ -3,6 +3,8 @@
 
 :root {
   color-scheme: light;
+  --app-font-body: var(--fd-semantic-typography-font-family-body);
+  --app-font-display: var(--fd-semantic-typography-font-family-display);
   --font-body:
     var(--app-font-body), var(--fd-base-typography-font-family-body),
     "Source Sans 3", Arial, sans-serif;

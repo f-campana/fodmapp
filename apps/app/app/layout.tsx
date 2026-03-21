@@ -1,5 +1,3 @@
-import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
-
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -16,20 +14,6 @@ import {
   captureArchitectureEvent,
   getMonitoringBootstrapStatus,
 } from "../lib/monitoring";
-
-const bodyFont = Source_Sans_3({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--app-font-body",
-  display: "swap",
-});
-
-const displayFont = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--app-font-display",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: {
@@ -73,7 +57,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="fr">
       <body
-        className={`${bodyFont.variable} ${displayFont.variable}`}
         data-auth-provider={auth.provider}
         data-auth-mode={auth.mode}
         data-auth-configured={String(auth.fullyConfigured)}
