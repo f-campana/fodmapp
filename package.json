@@ -57,7 +57,12 @@
     "changeset:ci:test": "node --test .github/scripts/check-pr-changesets.test.mjs",
     "changeset:ci:status": "node .github/scripts/check-pr-changesets.mjs",
     "changeset:ci:lint:all": "node .github/scripts/check-pr-changesets.mjs --all",
-    "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs"
+    "changeset:ci:status:strict": "BASE_SHA=origin/main HEAD_SHA=HEAD node .github/scripts/check-pr-changesets.mjs",
+    "db:wait": "./scripts/dbmate.sh wait",
+    "db:status": "./scripts/dbmate.sh status",
+    "db:migrate": "./scripts/dbmate.sh migrate",
+    "db:up": "./scripts/dbmate.sh up",
+    "db:new": "./scripts/dbmate.sh new"
   },
   "devDependencies": {
     "@changesets/changelog-github": "0.5.2",
@@ -65,6 +70,7 @@
     "@eslint/js": "9.39.3",
     "@fodmapp/eslint-config": "workspace:*",
     "@next/eslint-plugin-next": "16.1.7",
+    "dbmate": "2.31.0",
     "eslint": "9.39.3",
     "eslint-config-next": "16.1.7",
     "eslint-config-prettier": "10.1.8",

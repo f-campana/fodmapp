@@ -10,25 +10,25 @@ This document defines environment variables used across the current Python/SQL s
 
 ## Active Variables (Current Stack)
 
-| Variable          | Used by                                                                                                                      | Required                      | Default/Example                       | Notes                                               |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------------------- |
-| `API_DB_URL`      | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml`                                                    | yes                           | `postgresql://.../fodmap_test`        | Primary FastAPI DB connection string.               |
-| `API_NAME`        | `api/app/config.py`                                                                                                          | no                            | `fodmapp-api`                         | Health metadata.                                    |
-| `API_VERSION`     | `api/app/config.py`                                                                                                          | no                            | `v0`                                  | Health metadata.                                    |
-| `ROOT_DIR`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`                              | no                            | auto-derived from script location     | Repo root override for script portability.          |
-| `REPLAY_DB`       | `etl/phase2/scripts/phase2_replay_from_zero.sh`                                                                              | no                            | `fodmap_replay_test`                  | Replay database name.                               |
-| `REPLAY_DB_URL`   | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | yes for non-default host/user | `postgresql://.../fodmap_replay_test` | Target DB URL for Phase2 replay.                    |
-| `ADMIN_DB`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`                                                                              | no                            | `template1`                           | Admin database name used for drop/create replay DB. |
-| `ADMIN_DB_URL`    | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | yes for CI/remote             | `postgresql://.../template1`          | Admin connection for DB lifecycle operations.       |
-| `PGHOST`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `localhost`                           | Used to build default DB URLs.                      |
-| `PGPORT`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `5432`                                | Used to build default DB URLs.                      |
-| `PGUSER`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `$USER` or `postgres`                 | Used to build default DB URLs.                      |
-| `PSQL_BIN`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml` | no                            | `psql` / auto-detected                | Path to `psql` executable.                          |
-| `CIQUAL_DATA_DIR` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/ciqual/fetch_ciqual_data.sh`                                           | no                            | script default path                   | Override location of CIQUAL files.                  |
-| `CIQUAL_XLSX`     | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL XLSX override.                               |
-| `CIQUAL_ALIM_XML` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim` XML override.                         |
-| `CIQUAL_GRP_XML`  | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim_grp` XML override.                     |
-| `SEED_DB_URL`     | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml`                                                  | yes for non-arg usage         | `postgresql://.../fodmap_test`        | Phase3 seed DB connection string.                   |
+| Variable          | Used by                                                                                                                      | Required                      | Default/Example                       | Notes                                                                                                                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `API_DB_URL`      | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml`, `scripts/dbmate.sh`, `package.json`               | yes                           | `postgresql://.../fodmap_test`        | Primary FastAPI DB connection string and dbmate target DSN. Local disposable Postgres URLs should set `sslmode=disable`; hosted Neon URLs keep provider SSL settings. |
+| `API_NAME`        | `api/app/config.py`                                                                                                          | no                            | `fodmapp-api`                         | Health metadata.                                                                                                                                                      |
+| `API_VERSION`     | `api/app/config.py`                                                                                                          | no                            | `v0`                                  | Health metadata.                                                                                                                                                      |
+| `ROOT_DIR`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`                              | no                            | auto-derived from script location     | Repo root override for script portability.                                                                                                                            |
+| `REPLAY_DB`       | `etl/phase2/scripts/phase2_replay_from_zero.sh`                                                                              | no                            | `fodmap_replay_test`                  | Replay database name.                                                                                                                                                 |
+| `REPLAY_DB_URL`   | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | yes for non-default host/user | `postgresql://.../fodmap_replay_test` | Target DB URL for Phase2 replay.                                                                                                                                      |
+| `ADMIN_DB`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`                                                                              | no                            | `template1`                           | Admin database name used for drop/create replay DB.                                                                                                                   |
+| `ADMIN_DB_URL`    | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | yes for CI/remote             | `postgresql://.../template1`          | Admin connection for DB lifecycle operations.                                                                                                                         |
+| `PGHOST`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `localhost`                           | Used to build default DB URLs.                                                                                                                                        |
+| `PGPORT`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `5432`                                | Used to build default DB URLs.                                                                                                                                        |
+| `PGUSER`          | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | `$USER` or `postgres`                 | Used to build default DB URLs.                                                                                                                                        |
+| `PSQL_BIN`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml` | no                            | `psql` / auto-detected                | Path to `psql` executable.                                                                                                                                            |
+| `CIQUAL_DATA_DIR` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/ciqual/fetch_ciqual_data.sh`                                           | no                            | script default path                   | Override location of CIQUAL files.                                                                                                                                    |
+| `CIQUAL_XLSX`     | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL XLSX override.                                                                                                                                                 |
+| `CIQUAL_ALIM_XML` | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim` XML override.                                                                                                                                           |
+| `CIQUAL_GRP_XML`  | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `.github/workflows/api.yml`                                                 | no                            | exported by fetch script in CI        | CIQUAL `alim_grp` XML override.                                                                                                                                       |
+| `SEED_DB_URL`     | `etl/phase3/scripts/phase3_seed_for_api_ci.sh`, `.github/workflows/api.yml`                                                  | yes for non-arg usage         | `postgresql://.../fodmap_test`        | Phase3 seed DB connection string.                                                                                                                                     |
 
 ## CI Turborepo Cache Contract
 
@@ -81,9 +81,38 @@ API workflow runtime guardrails are enforced in workflow config (not via environ
 
 - `.github/workflows/api.yml` sets job timeouts to bound runner/container stalls:
   - `api-tests`: `timeout-minutes: 15`
+  - `dbmate-smoke`: `timeout-minutes: 15`
   - `api-integration-seeded`: `timeout-minutes: 25`
   - `api-gate`: `timeout-minutes: 5`
 - if a timeout is reached, GitHub Actions fails the timed-out job and the required `API` gate fails via `api-gate`
+
+## DBMate Migration Lane
+
+`dbmate` is the forward-only schema migration lane for long-lived databases.
+
+Contract:
+
+- repo commands:
+  - `pnpm db:wait`
+  - `pnpm db:status`
+  - `pnpm db:migrate`
+  - `pnpm db:up`
+  - `pnpm db:new -- <slug>`
+- wrapper entrypoint:
+  - `scripts/dbmate.sh`
+- migration artifacts:
+  - `schema/dbmate/migrations/`
+  - `schema/dbmate/schema.sql`
+
+Semantics:
+
+- `API_DB_URL` is reused as the migration target DSN; no second runtime DSN is introduced.
+- `.github/workflows/api.yml` pins `postgresql-client-16` in API jobs so `pg_dump` output stays aligned with the Postgres 16 CI service and the checked-in dbmate schema dump remains deterministic.
+- local disposable Postgres URLs should explicitly set `sslmode=disable` so `dbmate` can connect to non-TLS local services; hosted Neon URLs keep the provider-managed SSL mode.
+- `schema/dbmate/schema.sql` is generated schema dump only and is not the full bootstrap source of truth.
+- `schema/fodmap_fr_schema.sql` remains the curated bootstrap for disposable replay/local CI databases.
+- `schema/migrations/` is legacy compatibility only for current tests/docs and should not receive new migrations after dbmate bootstrap lands.
+- destructive replay/seed scripts must never target a persistent Neon branch.
 
 ## CI Storybook Deploy Variables
 
@@ -143,15 +172,15 @@ These keys are actively used by the marketing waitlist backend and landing featu
 
 ## Reserved Near-Term Variables
 
-| Variable                    | Intended future owner | Purpose                                     |
-| --------------------------- | --------------------- | ------------------------------------------- |
-| `NEON_API_KEY`              | Infra/CI              | Neon API authentication.                    |
-| `NEON_PROJECT_ID`           | Infra/CI              | Neon project target for branch workflow.    |
-| `NEON_BRANCH_PROD`          | Infra/CI              | Production branch name (`main`).            |
-| `NEON_BRANCH_STAGING`       | Infra/CI              | Persistent staging branch name (`staging`). |
-| `NEON_DATABASE_URL_PROD`    | Infra/CI              | Production database URL.                    |
-| `NEON_DATABASE_URL_STAGING` | Infra/CI              | Staging database URL.                       |
-| `SENTRY_DSN_API`            | API                   | API Sentry DSN.                             |
+| Variable                    | Intended future owner | Purpose                                          |
+| --------------------------- | --------------------- | ------------------------------------------------ |
+| `NEON_API_KEY`              | Infra/CI              | Neon API authentication.                         |
+| `NEON_PROJECT_ID`           | Infra/CI              | Neon project target for branch workflow.         |
+| `NEON_BRANCH_PROD`          | Infra/CI              | Production branch name (`main`).                 |
+| `NEON_BRANCH_STAGING`       | Infra/CI              | Reserved future staging branch name (`staging`). |
+| `NEON_DATABASE_URL_PROD`    | Infra/CI              | Production database URL.                         |
+| `NEON_DATABASE_URL_STAGING` | Infra/CI              | Staging database URL.                            |
+| `SENTRY_DSN_API`            | API                   | API Sentry DSN.                                  |
 
 ## Operational Notes
 
@@ -159,4 +188,5 @@ These keys are actively used by the marketing waitlist backend and landing featu
 - Workflow-level secrets are usually passed through workflow inputs to `.github/actions/setup-js-workspace`,
   which handles cache mode selection and environment export for Turbo commands.
 - CI remains explicit via workflow `env` blocks and/or action inputs; this file is documentation and local bootstrap aid.
+- Disposable DBs still use monolithic bootstrap + replay/seed scripts; persistent DBs move through dbmate.
 - Any newly introduced runtime variable must be added to both `.env.example` and this document in the same PR.

@@ -4,9 +4,9 @@ Status: Implemented
 Audience: Maintainer or operator; Reviewer or auditor
 Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.
 Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
-Last reviewed: 2026-03-11
+Last reviewed: 2026-03-21
 
-Last updated: 2026-03-16
+Last updated: 2026-03-21
 
 ## Scope
 
@@ -23,6 +23,8 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
 - API workflow job timeouts to fail fast on stalled runner container initialization
+- dbmate smoke validation for the long-lived migration lane without weakening replay/seed CI
+- explicit local Postgres `sslmode=disable` wiring for dbmate/API smoke jobs while hosted Neon keeps provider SSL settings
 - weekly docs hygiene drift audit with manual dispatch support and report artifacts
 - deterministic lint prebuilds for dist-backed workspace packages consumed through package exports
 
@@ -244,6 +246,7 @@ UX contract:
 `.github/workflows/api.yml` now enforces explicit job-level fail-fast bounds to prevent indefinite hangs during service-container bootstrap on GitHub-hosted runners:
 
 - `api-tests`: `timeout-minutes: 15`
+- `dbmate-smoke`: `timeout-minutes: 15`
 - `api-integration-seeded`: `timeout-minutes: 25`
 - `api-gate`: `timeout-minutes: 5`
 - seeded workflow DB profile/default URLs: `fodmapp_api_ci`
@@ -253,6 +256,33 @@ Operational behavior:
 - if container initialization or test execution stalls beyond these bounds, the job is force-failed by Actions
 - `api-gate` remains authoritative and fails the required `API` check when either upstream job times out
 - push-to-`main` API runs remain the source of truth after merge; stale PR runs should be canceled if still running
+
+## API DBMate Smoke Contract
+
+The `API` workflow now includes a dedicated `dbmate-smoke` job for the long-lived migration lane.
+
+Contract:
+
+- runs on a fresh Postgres 16 service database (`fodmapp_dbmate_ci`)
+- installs workspace dependencies through `.github/actions/setup-js-workspace`
+- installs `postgresql-client-16` so `pg_dump` matches the Postgres 16 service and keeps `schema/dbmate/schema.sql` diff-stable
+- runs `pnpm db:migrate` against the empty database
+- asserts presence of:
+  - `foods`
+  - `safe_harbor_cohorts`
+  - `user_consent_ledger`
+  - `schema_migrations`
+- asserts the baseline version `20260321000000` is recorded
+- asserts `pnpm db:status` is clean after migrate
+- asserts no working-tree diff remains in `schema/dbmate/schema.sql`
+
+Intent:
+
+- prove dbmate can bootstrap a fresh long-lived-environment schema
+- keep the existing destructive replay/seed path unchanged and authoritative for disposable CI/local databases
+- enforce the split contract:
+  - disposable DBs: `schema/fodmap_fr_schema.sql` + replay/seed scripts
+  - persistent DBs: `schema/dbmate/` + `pnpm db:*`
 
 ## Docs Hygiene Audit Workflow Contract
 
