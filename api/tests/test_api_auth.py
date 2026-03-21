@@ -8,7 +8,10 @@ import psycopg
 import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from fastapi.testclient import TestClient
 from psycopg.rows import dict_row
+
+from app.main import create_app
 
 ISSUER_DOMAIN = "clerk.test.local"
 AUTHORIZED_PARTY = "http://localhost:3000"
@@ -234,6 +237,43 @@ def test_preview_user_id_header_requires_explicit_non_production_flag(client, mo
     )
     assert production.status_code == 401
     assert production.json()["error"]["code"] == "unauthorized"
+
+
+def test_cors_preflight_allows_authorized_party_origin(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", AUTHORIZED_PARTY)
+    monkeypatch.delenv("API_CORS_ALLOW_ORIGINS", raising=False)
+
+    with TestClient(create_app()) as local_client:
+        response = local_client.options(
+            "/v0/me/consent",
+            headers={
+                "Origin": AUTHORIZED_PARTY,
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "authorization,content-type",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == AUTHORIZED_PARTY
+
+
+def test_cors_preflight_allows_explicit_preview_origin(monkeypatch: pytest.MonkeyPatch):
+    preview_origin = "http://127.0.0.1:3000"
+    monkeypatch.setenv("CLERK_AUTHORIZED_PARTIES", AUTHORIZED_PARTY)
+    monkeypatch.setenv("API_CORS_ALLOW_ORIGINS", preview_origin)
+
+    with TestClient(create_app()) as local_client:
+        response = local_client.options(
+            "/v0/me/consent",
+            headers={
+                "Origin": preview_origin,
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "x-user-id,content-type",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == preview_origin
 
 
 @pytest.mark.usefixtures("me_security_schema", "tracking_schema")

@@ -60,6 +60,7 @@ Important runtime note:
 
 - `NEXT_PUBLIC_API_BASE_URL` must be an absolute API origin for server-rendered app routes (for example `http://localhost:8000`).
 - Runtime Clerk validation uses `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_JWT_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, and `CLERK_AUTHORIZED_PARTIES`, plus the app-hosted route envs for `/sign-in` and `/sign-up`.
+- The API CORS allowlist follows `CLERK_AUTHORIZED_PARTIES` for runtime Clerk flows; add `API_CORS_ALLOW_ORIGINS` only when you need extra local preview origins that are not part of the Clerk authorized-party list.
 - Local preview validation remains available with `APP_AUTH_PREVIEW_USER_ID=11111111-1111-4111-8111-111111111111` and `API_ALLOW_PREVIEW_USER_ID_HEADER=true`.
 
 ## Runtime Integration Matrix

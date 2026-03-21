@@ -95,6 +95,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_OUT_URL=/
 CLERK_JWT_ISSUER_DOMAIN=
 CLERK_JWT_KEY=
 CLERK_AUTHORIZED_PARTIES=http://localhost:3000
+API_CORS_ALLOW_ORIGINS=http://localhost:3000
 APP_AUTH_PREVIEW_USER_ID=11111111-1111-4111-8111-111111111111
 API_ALLOW_PREVIEW_USER_ID_HEADER=true
 ```
@@ -104,6 +105,7 @@ Important:
 - Use the API origin only, not `/v0`.
 - The value must be an absolute URL because server-rendered app routes cannot resolve a relative API base.
 - `CLERK_JWT_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, and `CLERK_AUTHORIZED_PARTIES` harden `/v0/me*`, `/v0/me/tracking*`, and `/v0/sync*` when runtime Clerk auth is active.
+- The API CORS allowlist automatically includes `CLERK_AUTHORIZED_PARTIES`; use `API_CORS_ALLOW_ORIGINS` only for extra local preview origins or split-origin validation not already covered there.
 - `APP_AUTH_PREVIEW_USER_ID` plus `API_ALLOW_PREVIEW_USER_ID_HEADER=true` keep local preview auth available when Clerk runtime keys are absent. It is not a real sign-in flow.
 
 ## Start the Frontend
