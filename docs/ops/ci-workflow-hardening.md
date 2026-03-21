@@ -25,6 +25,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - API workflow job timeouts to fail fast on stalled runner container initialization
 - dbmate smoke validation for the long-lived migration lane without weakening replay/seed CI
 - explicit local Postgres `sslmode=disable` wiring for dbmate/API smoke jobs while hosted Neon keeps provider SSL settings
+- manual Phase 3 promote smoke validation for the non-destructive persistent-db refresh lane
 - weekly docs hygiene drift audit with manual dispatch support and report artifacts
 - deterministic lint prebuilds for dist-backed workspace packages consumed through package exports
 
@@ -247,6 +248,7 @@ UX contract:
 
 - `api-tests`: `timeout-minutes: 15`
 - `dbmate-smoke`: `timeout-minutes: 15`
+- `phase3-promote-smoke`: `timeout-minutes: 25`
 - `api-integration-seeded`: `timeout-minutes: 25`
 - `api-gate`: `timeout-minutes: 5`
 - seeded workflow DB profile/default URLs: `fodmapp_api_ci`
@@ -278,6 +280,8 @@ Contract:
 - asserts the baseline version `20260321000000` is recorded
 - asserts the publish-boundary migration version `20260321143000` is recorded
 - asserts `pnpm db:status` is clean after migrate
+- asserts `pnpm phase3:promote:check` fails on the schema-only database with the explicit bootstrap-out-of-scope message
+- enforces that refresh-only promote cannot be used to create the first persistent publish release
 - asserts no working-tree diff remains in `schema/dbmate/schema.sql`
 
 Intent:
@@ -287,6 +291,30 @@ Intent:
 - enforce the split contract:
   - disposable DBs: `schema/fodmap_fr_schema.sql` + replay/seed scripts
   - persistent DBs: `schema/dbmate/` + `pnpm db:*`
+
+## Phase 3 Promote Smoke Contract
+
+The `API` workflow now includes a dedicated `phase3-promote-smoke` job for the persistent-db refresh lane.
+
+Contract:
+
+- seeds a disposable Postgres 16 database with the existing replay + `phase3_seed_for_api_ci.sh` path first
+- stamps the current dbmate migration versions into that replay-seeded disposable database before promote runs, so the preflight contract stays strict while replay/bootstrap remains the disposable setup lane
+- captures the current `api_v0_phase3` `publish_id` plus published row counts and active/draft swap counts
+- captures the active publishable-rule `scoring_version` distribution before the first promote run
+- runs `pnpm phase3:promote` twice with JSON manifests
+- asserts each run produces a new current `publish_id`
+- asserts published rollup/subtype/swap counts stay stable across reruns
+- asserts `swap_rules.status` counts stay unchanged across reruns
+- asserts the active publishable-rule `scoring_version` distribution stays unchanged across reruns
+- relies on the runner to recheck conservative active-rule eligibility before publish and to execute publish apply/checks inside one transaction
+- asserts the repo worktree stays clean after promote, proving the runner does not depend on git restore or review-packet mutation
+
+Intent:
+
+- prove the new operator lane is non-destructive and publish-safe for already-loaded databases
+- keep Gate A / Gate B review flows unchanged for human-reviewed batch work
+- block hosted persistent-db activation until the refresh lane has explicit CI proof
 
 ## Seeded Publish-Boundary Contract
 

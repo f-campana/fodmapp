@@ -280,8 +280,44 @@ Data freshness / dependency note:
 - preflight before serving refreshed API data:
   - rerun `etl/phase3/sql/phase3_rollups_compute.sql`
   - rerun `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+  - rerun `etl/phase3/sql/phase3_active_swap_scores_refresh.sql`
+  - rerun `etl/phase3/sql/phase3_active_swap_scores_checks.sql`
   - rerun `etl/phase3/sql/phase3_publish_release_apply.sql`
   - rerun `etl/phase3/sql/phase3_publish_release_checks.sql`
+
+## Persistent Manual Promote Lane
+
+Long-lived databases use a non-destructive refresh lane after `dbmate` migrations succeed.
+
+Execution order:
+
+1. `pnpm db:migrate`
+2. `pnpm phase3:promote`
+
+`phase3:promote` runs:
+
+1. preflight checks (`dbmate status`, schema/data prerequisites)
+2. `phase3_traits_apply.sql`
+3. `phase3_safe_harbor_v1_apply.sql`
+4. `phase3_safe_harbor_v1_checks.sql`
+5. `phase3_rollups_compute.sql`
+6. `phase3_rollups_6subtype_checks.sql`
+7. `phase3_active_swap_scores_refresh.sql`
+8. `phase3_active_swap_scores_checks.sql`
+9. `phase3_publish_release_apply.sql`
+10. `phase3_publish_release_checks.sql`
+
+Manual promote semantics:
+
+- refresh-only for already-loaded persistent databases
+- requires an existing current `api_v0_phase3` publish release before refresh
+- does not define first-time persistent bootstrap
+- never exports or restores review CSVs
+- never calls `*_activation_apply.sql`
+- never mutates `swap_rules.status`
+- preserves activation-era `swap_rule_scores.scoring_version` values while recomputing live active-rule `fodmap_safety_score`
+- reruns the conservative active-rule safety gate after score refresh and fails closed if any active rule becomes ineligible
+- executes `phase3_publish_release_apply.sql` and `phase3_publish_release_checks.sql` inside one publish transaction so a failed publish check cannot leave `api_*_current` on a partially validated release
 
 Subtype endpoint payload contract:
 
