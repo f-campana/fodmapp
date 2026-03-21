@@ -2958,7 +2958,6 @@ ALTER TABLE ONLY public.user_fodmap_tolerances
 \unrestrict dbmate
 
 
-
 --
 -- Dbmate schema migrations
 --
