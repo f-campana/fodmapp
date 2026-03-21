@@ -200,7 +200,8 @@ Read interfaces:
   - `api_food_subtypes_current`
   - `api_food_rollups_current`
   - `api_swaps_current`
-- before the first `api_v0_phase3` publish exists on a migrated long-lived DB, `api_*_current` falls back to the compatibility `v_phase3_*_latest*` views; once a publish exists, the fallback path is disabled automatically
+- the publish-boundary dbmate migration backfills one `api_v0_phase3` release when it upgrades a long-lived DB that already has Phase 3 rollups and active swaps
+- fresh databases stay unpublished until `etl/phase3/sql/phase3_publish_release_apply.sql` runs
 
 Pipeline-managed snapshot artifacts:
 

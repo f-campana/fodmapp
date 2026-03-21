@@ -939,7 +939,8 @@ Read interfaces:
   - `v_phase3_rollup_subtype_levels_latest`
   - `v_phase3_rollups_latest_full`
   - these exist as empty compatibility anchors on a fresh migrated database and are replaced by `etl/phase3/sql/phase3_rollups_compute.sql`
-- before the first `api_v0_phase3` release exists, `api_*_current` falls back to the compatibility `v_phase3_*_latest*` views; after publish, serving is release-boundary only
+- the publish-boundary dbmate migration backfills one `api_v0_phase3` release when it upgrades a long-lived DB that already has Phase 3 rollups and active swaps
+- after that backfill or any later explicit publish, serving is release-boundary only
 
 Pipeline-managed snapshot artifacts:
 

@@ -962,8 +962,8 @@ components:
     MeUserIdHeader:
       name: X-User-Id
       in: header
-      required: true
-      description: Account or user identifier.
+      required: false
+      description: Preview-only compatibility header. Production callers should use bearer authentication.
       schema:
         type: string
         format: uuid

@@ -1,6 +1,6 @@
 \restrict dbmate
 
--- Dumped from database version 16.13
+-- Dumped from database version 16.12
 -- Dumped by pg_dump version 16.13
 
 SET statement_timeout = 0;
@@ -181,31 +181,14 @@ CREATE TABLE public.published_food_rollups (
 
 
 --
--- Name: v_phase3_rollups_latest_full; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.v_phase3_rollups_latest_full AS
- SELECT NULL::integer AS priority_rank,
-    NULL::uuid AS food_id,
-    NULL::numeric(8,2) AS rollup_serving_g,
-    NULL::public.fodmap_level AS overall_level,
-    NULL::text AS driver_subtype_code,
-    NULL::integer AS known_subtypes_count,
-    NULL::numeric(6,4) AS coverage_ratio,
-    NULL::timestamp with time zone AS computed_at,
-    NULL::text AS source_slug
-  WHERE false;
-
-
---
 -- Name: api_food_rollups_current; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.api_food_rollups_current AS
  WITH current_release AS (
-         SELECT cur.publish_id
-           FROM public.publish_release_current cur
-          WHERE (cur.release_kind = 'api_v0_phase3'::text)
+         SELECT cur_1.publish_id
+           FROM public.publish_release_current cur_1
+          WHERE (cur_1.release_kind = 'api_v0_phase3'::text)
         )
  SELECT pfr.publish_id,
     pfr.priority_rank,
@@ -218,21 +201,7 @@ CREATE VIEW public.api_food_rollups_current AS
     pfr.source_slug,
     pfr.computed_at
    FROM (public.published_food_rollups pfr
-     JOIN current_release cur ON ((cur.publish_id = pfr.publish_id)))
-UNION ALL
- SELECT NULL::uuid AS publish_id,
-    v.priority_rank,
-    v.food_id,
-    v.rollup_serving_g,
-    v.overall_level,
-    v.driver_subtype_code,
-    v.known_subtypes_count,
-    v.coverage_ratio,
-    v.source_slug,
-    v.computed_at
-   FROM public.v_phase3_rollups_latest_full v
-  WHERE (NOT (EXISTS ( SELECT 1
-           FROM current_release)));
+     JOIN current_release cur ON ((cur.publish_id = pfr.publish_id)));
 
 
 --
@@ -264,43 +233,14 @@ CREATE TABLE public.published_food_subtype_levels (
 
 
 --
--- Name: v_phase3_rollup_subtype_levels_latest; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.v_phase3_rollup_subtype_levels_latest AS
- SELECT NULL::integer AS priority_rank,
-    NULL::uuid AS food_id,
-    NULL::numeric(8,2) AS rollup_serving_g,
-    NULL::text AS subtype_code,
-    NULL::smallint AS fodmap_subtype_id,
-    NULL::numeric(12,6) AS amount_g_per_serving,
-    NULL::public.comparator_code AS comparator,
-    NULL::numeric(12,6) AS low_max_g,
-    NULL::numeric(12,6) AS moderate_max_g,
-    NULL::public.fodmap_level AS subtype_level,
-    NULL::text AS signal_source_kind,
-    NULL::text AS signal_source_slug,
-    NULL::text AS threshold_source,
-    NULL::text AS threshold_source_slug,
-    NULL::boolean AS is_default_threshold,
-    NULL::boolean AS is_polyol_proxy,
-    NULL::text AS default_threshold_citation_ref,
-    NULL::text AS default_threshold_derivation_method,
-    NULL::integer AS severity_rank,
-    NULL::numeric(12,6) AS burden_ratio,
-    NULL::timestamp with time zone AS computed_at
-  WHERE false;
-
-
---
 -- Name: api_food_subtypes_current; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.api_food_subtypes_current AS
  WITH current_release AS (
-         SELECT cur.publish_id
-           FROM public.publish_release_current cur
-          WHERE (cur.release_kind = 'api_v0_phase3'::text)
+         SELECT cur_1.publish_id
+           FROM public.publish_release_current cur_1
+          WHERE (cur_1.release_kind = 'api_v0_phase3'::text)
         )
  SELECT pfs.publish_id,
     pfs.priority_rank,
@@ -321,59 +261,7 @@ CREATE VIEW public.api_food_subtypes_current AS
     pfs.burden_ratio,
     pfs.computed_at
    FROM (public.published_food_subtype_levels pfs
-     JOIN current_release cur ON ((cur.publish_id = pfs.publish_id)))
-UNION ALL
- SELECT NULL::uuid AS publish_id,
-    v.priority_rank,
-    v.food_id,
-    v.rollup_serving_g,
-    v.subtype_code,
-    v.fodmap_subtype_id,
-    v.amount_g_per_serving,
-    v.comparator,
-    v.low_max_g,
-    v.moderate_max_g,
-    v.subtype_level,
-    v.signal_source_kind,
-    v.signal_source_slug,
-    v.threshold_source_slug,
-    v.is_default_threshold,
-    v.is_polyol_proxy,
-    v.burden_ratio,
-    v.computed_at
-   FROM public.v_phase3_rollup_subtype_levels_latest v
-  WHERE (NOT (EXISTS ( SELECT 1
-           FROM current_release)));
-
-
---
--- Name: phase2_priority_foods; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.phase2_priority_foods (
-    priority_rank integer NOT NULL,
-    gap_bucket text NOT NULL,
-    target_subtype text NOT NULL,
-    food_label text NOT NULL,
-    variant_label text NOT NULL,
-    ciqual_code_hint text,
-    food_slug_hint text,
-    resolved_food_id uuid,
-    resolution_method text,
-    resolution_notes text,
-    serving_g_provisional numeric(8,2) NOT NULL,
-    source_strategy text NOT NULL,
-    status text DEFAULT 'pending_research'::text NOT NULL,
-    resolved_at timestamp with time zone,
-    resolved_by text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT phase2_priority_foods_gap_bucket_check CHECK ((gap_bucket = ANY (ARRAY['fructan_dominant'::text, 'gos_dominant'::text, 'polyol_split_needed'::text]))),
-    CONSTRAINT phase2_priority_foods_priority_rank_check CHECK ((priority_rank > 0)),
-    CONSTRAINT phase2_priority_foods_resolution_method_check CHECK ((resolution_method = ANY (ARRAY['ciqual_code'::text, 'slug_match'::text, 'name_match'::text, 'manual'::text, 'new_food'::text]))),
-    CONSTRAINT phase2_priority_foods_serving_g_provisional_check CHECK ((serving_g_provisional > (0)::numeric)),
-    CONSTRAINT phase2_priority_foods_status_check CHECK ((status = ANY (ARRAY['pending_research'::text, 'resolved'::text, 'measured'::text, 'threshold_set'::text])))
-);
+     JOIN current_release cur ON ((cur.publish_id = pfs.publish_id)));
 
 
 --
@@ -397,46 +285,14 @@ CREATE TABLE public.publish_releases (
 
 
 --
--- Name: swap_rules; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.swap_rules (
-    swap_rule_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    from_food_id uuid NOT NULL,
-    to_food_id uuid NOT NULL,
-    status public.swap_status DEFAULT 'draft'::public.swap_status NOT NULL,
-    rule_kind text NOT NULL,
-    instruction_fr text NOT NULL,
-    instruction_en text,
-    min_ratio numeric(8,3) DEFAULT 0.50 NOT NULL,
-    max_ratio numeric(8,3) DEFAULT 1.50 NOT NULL,
-    default_ratio numeric(8,3) DEFAULT 1.00 NOT NULL,
-    source_id uuid,
-    evidence_tier public.evidence_tier DEFAULT 'inferred'::public.evidence_tier NOT NULL,
-    confidence_score numeric(4,3),
-    valid_from date DEFAULT CURRENT_DATE NOT NULL,
-    valid_to date,
-    notes text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT chk_swap_distinct_foods CHECK ((from_food_id <> to_food_id)),
-    CONSTRAINT chk_swap_ratios CHECK (((min_ratio <= default_ratio) AND (default_ratio <= max_ratio))),
-    CONSTRAINT swap_rules_confidence_score_check CHECK (((confidence_score IS NULL) OR ((confidence_score >= (0)::numeric) AND (confidence_score <= (1)::numeric)))),
-    CONSTRAINT swap_rules_default_ratio_check CHECK ((default_ratio > (0)::numeric)),
-    CONSTRAINT swap_rules_max_ratio_check CHECK ((max_ratio > (0)::numeric)),
-    CONSTRAINT swap_rules_min_ratio_check CHECK ((min_ratio > (0)::numeric)),
-    CONSTRAINT swap_rules_rule_kind_check CHECK ((rule_kind = ANY (ARRAY['direct_swap'::text, 'technique_swap'::text, 'pairing_swap'::text, 'recipe_rewrite'::text])))
-);
-
-
---
 -- Name: api_publish_meta_current; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.api_publish_meta_current AS
  WITH current_release AS (
-         SELECT cur.publish_id
-           FROM public.publish_release_current cur
-          WHERE (cur.release_kind = 'api_v0_phase3'::text)
+         SELECT cur_1.publish_id
+           FROM public.publish_release_current cur_1
+          WHERE (cur_1.release_kind = 'api_v0_phase3'::text)
         )
  SELECT (pr.publish_id)::text AS publish_id,
     pr.release_kind,
@@ -446,54 +302,7 @@ CREATE VIEW public.api_publish_meta_current AS
     pr.subtype_row_count,
     pr.swap_row_count
    FROM (public.publish_releases pr
-     JOIN current_release cur ON ((cur.publish_id = pr.publish_id)))
-UNION ALL
- SELECT NULL::text AS publish_id,
-    'api_v0_phase3'::text AS release_kind,
-    NULL::timestamp with time zone AS published_at,
-    ( SELECT max(v.computed_at) AS max
-           FROM public.v_phase3_rollups_latest_full v) AS rollup_computed_at_max,
-    ( SELECT (count(*))::integer AS count
-           FROM public.v_phase3_rollups_latest_full) AS rollup_row_count,
-    ( SELECT (count(*))::integer AS count
-           FROM public.v_phase3_rollup_subtype_levels_latest) AS subtype_row_count,
-    ( WITH active_rules AS (
-                 SELECT r.swap_rule_id
-                   FROM ((public.swap_rules r
-                     LEFT JOIN public.phase2_priority_foods p_from ON ((p_from.resolved_food_id = r.from_food_id)))
-                     LEFT JOIN public.phase2_priority_foods p_to ON ((p_to.resolved_food_id = r.to_food_id)))
-                  WHERE ((r.status = 'active'::public.swap_status) AND (COALESCE(p_from.priority_rank, 0) <> 2) AND (COALESCE(p_to.priority_rank, 0) <> 2))
-                )
-         SELECT (count(*))::integer AS count
-           FROM active_rules) AS swap_row_count
-  WHERE (NOT (EXISTS ( SELECT 1
-           FROM current_release)));
-
-
---
--- Name: foods; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.foods (
-    food_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    food_slug text NOT NULL,
-    canonical_name_fr text,
-    canonical_name_en text,
-    scientific_name text,
-    description_fr text,
-    preparation_state public.preparation_state DEFAULT 'unknown'::public.preparation_state NOT NULL,
-    default_serving_g numeric(8,2),
-    edible_portion_pct numeric(5,2),
-    density_g_per_ml numeric(8,4),
-    is_branded_product boolean DEFAULT false NOT NULL,
-    status text DEFAULT 'active'::text NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT foods_default_serving_g_check CHECK (((default_serving_g IS NULL) OR (default_serving_g > (0)::numeric))),
-    CONSTRAINT foods_density_g_per_ml_check CHECK (((density_g_per_ml IS NULL) OR (density_g_per_ml > (0)::numeric))),
-    CONSTRAINT foods_edible_portion_pct_check CHECK (((edible_portion_pct IS NULL) OR ((edible_portion_pct >= (0)::numeric) AND (edible_portion_pct <= (100)::numeric)))),
-    CONSTRAINT foods_status_check CHECK ((status = ANY (ARRAY['active'::text, 'draft'::text, 'deprecated'::text])))
-);
+     JOIN current_release cur ON ((cur.publish_id = pr.publish_id)));
 
 
 --
@@ -536,240 +345,43 @@ CREATE TABLE public.published_swaps (
 
 
 --
--- Name: sources; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sources (
-    source_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    source_slug text NOT NULL,
-    source_name text NOT NULL,
-    source_kind text NOT NULL,
-    organization text,
-    country_code character(2),
-    citation text,
-    url text,
-    dataset_version text,
-    published_at date,
-    accessed_at timestamp with time zone,
-    trust_tier public.evidence_tier DEFAULT 'secondary_db'::public.evidence_tier NOT NULL,
-    is_commercial boolean DEFAULT false NOT NULL,
-    license_id uuid,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    CONSTRAINT sources_source_kind_check CHECK ((source_kind = ANY (ARRAY['official_database'::text, 'lab'::text, 'research_paper'::text, 'app_vendor'::text, 'community'::text, 'internal'::text])))
-);
-
-
---
--- Name: swap_rule_scores; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.swap_rule_scores (
-    swap_rule_id uuid NOT NULL,
-    scoring_version text DEFAULT 'v1'::text NOT NULL,
-    fodmap_safety_score numeric(4,3) NOT NULL,
-    flavor_match_score numeric(4,3) NOT NULL,
-    texture_match_score numeric(4,3) NOT NULL,
-    method_match_score numeric(4,3) NOT NULL,
-    availability_fr_score numeric(4,3) NOT NULL,
-    cost_fr_score numeric(4,3) NOT NULL,
-    overall_score numeric(4,3) GENERATED ALWAYS AS (round(((((((fodmap_safety_score * 0.50) + (flavor_match_score * 0.20)) + (texture_match_score * 0.10)) + (method_match_score * 0.10)) + (availability_fr_score * 0.07)) + (cost_fr_score * 0.03)), 3)) STORED,
-    CONSTRAINT swap_rule_scores_availability_fr_score_check CHECK (((availability_fr_score >= (0)::numeric) AND (availability_fr_score <= (1)::numeric))),
-    CONSTRAINT swap_rule_scores_cost_fr_score_check CHECK (((cost_fr_score >= (0)::numeric) AND (cost_fr_score <= (1)::numeric))),
-    CONSTRAINT swap_rule_scores_flavor_match_score_check CHECK (((flavor_match_score >= (0)::numeric) AND (flavor_match_score <= (1)::numeric))),
-    CONSTRAINT swap_rule_scores_fodmap_safety_score_check CHECK (((fodmap_safety_score >= (0)::numeric) AND (fodmap_safety_score <= (1)::numeric))),
-    CONSTRAINT swap_rule_scores_method_match_score_check CHECK (((method_match_score >= (0)::numeric) AND (method_match_score <= (1)::numeric))),
-    CONSTRAINT swap_rule_scores_texture_match_score_check CHECK (((texture_match_score >= (0)::numeric) AND (texture_match_score <= (1)::numeric)))
-);
-
-
---
 -- Name: api_swaps_current; Type: VIEW; Schema: public; Owner: -
 --
 
 CREATE VIEW public.api_swaps_current AS
  WITH current_release AS (
-         SELECT cur.publish_id
-           FROM public.publish_release_current cur
-          WHERE (cur.release_kind = 'api_v0_phase3'::text)
-        ), published_rows AS (
-         SELECT ps.publish_id,
-            ps.swap_rule_id,
-            ps.from_food_id,
-            ps.to_food_id,
-            ps.from_food_slug,
-            ps.to_food_slug,
-            ps.from_food_name_fr,
-            ps.from_food_name_en,
-            ps.to_food_name_fr,
-            ps.to_food_name_en,
-            ps.instruction_fr,
-            ps.instruction_en,
-            ps.rule_status,
-            ps.source_slug,
-            ps.scoring_version,
-            ps.fodmap_safety_score,
-            ps.overall_score,
-            ps.from_priority_rank,
-            ps.to_priority_rank,
-            ps.from_overall_level,
-            ps.to_overall_level,
-            ps.driver_subtype,
-            ps.from_burden_ratio,
-            ps.to_burden_ratio,
-            ps.coverage_ratio,
-            ps.rollup_computed_at
-           FROM (public.published_swaps ps
-             JOIN current_release cur ON ((cur.publish_id = ps.publish_id)))
-        ), fallback_rows AS (
-         WITH active_rules AS (
-                 SELECT r.swap_rule_id,
-                    r.from_food_id,
-                    r.to_food_id,
-                    f_from.food_slug AS from_food_slug,
-                    f_to.food_slug AS to_food_slug,
-                    f_from.canonical_name_fr AS from_food_name_fr,
-                    f_from.canonical_name_en AS from_food_name_en,
-                    f_to.canonical_name_fr AS to_food_name_fr,
-                    f_to.canonical_name_en AS to_food_name_en,
-                    r.instruction_fr,
-                    COALESCE(r.instruction_en, r.instruction_fr) AS instruction_en,
-                    r.status AS rule_status,
-                    src.source_slug,
-                    rs.scoring_version,
-                    rs.fodmap_safety_score,
-                    rs.overall_score,
-                    p_from.priority_rank AS from_priority_rank,
-                    p_to.priority_rank AS to_priority_rank,
-                    COALESCE(vrf.overall_level, 'unknown'::public.fodmap_level) AS from_overall_level,
-                    COALESCE(vrt.overall_level, 'unknown'::public.fodmap_level) AS to_overall_level,
-                    vrt.driver_subtype_code AS driver_subtype,
-                    (COALESCE(vrt.coverage_ratio, (0)::numeric))::numeric(6,4) AS coverage_ratio,
-                    COALESCE(vrt.computed_at, vrf.computed_at) AS rollup_computed_at
-                   FROM ((((((((public.swap_rules r
-                     JOIN public.foods f_from ON ((f_from.food_id = r.from_food_id)))
-                     JOIN public.foods f_to ON ((f_to.food_id = r.to_food_id)))
-                     JOIN public.swap_rule_scores rs ON ((rs.swap_rule_id = r.swap_rule_id)))
-                     JOIN public.sources src ON ((src.source_id = r.source_id)))
-                     LEFT JOIN public.phase2_priority_foods p_from ON ((p_from.resolved_food_id = r.from_food_id)))
-                     LEFT JOIN public.phase2_priority_foods p_to ON ((p_to.resolved_food_id = r.to_food_id)))
-                     LEFT JOIN public.v_phase3_rollups_latest_full vrf ON ((vrf.food_id = r.from_food_id)))
-                     LEFT JOIN public.v_phase3_rollups_latest_full vrt ON ((vrt.food_id = r.to_food_id)))
-                  WHERE ((r.status = 'active'::public.swap_status) AND (COALESCE(p_from.priority_rank, 0) <> 2) AND (COALESCE(p_to.priority_rank, 0) <> 2))
-                ), with_burden AS (
-                 SELECT ar.swap_rule_id,
-                    ar.from_food_id,
-                    ar.to_food_id,
-                    ar.from_food_slug,
-                    ar.to_food_slug,
-                    ar.from_food_name_fr,
-                    ar.from_food_name_en,
-                    ar.to_food_name_fr,
-                    ar.to_food_name_en,
-                    ar.instruction_fr,
-                    ar.instruction_en,
-                    ar.rule_status,
-                    ar.source_slug,
-                    ar.scoring_version,
-                    ar.fodmap_safety_score,
-                    ar.overall_score,
-                    ar.from_priority_rank,
-                    ar.to_priority_rank,
-                    ar.from_overall_level,
-                    ar.to_overall_level,
-                    ar.driver_subtype,
-                    ar.coverage_ratio,
-                    ar.rollup_computed_at,
-                    fd.burden_ratio AS from_burden_ratio,
-                    td.burden_ratio AS to_burden_ratio
-                   FROM ((active_rules ar
-                     LEFT JOIN public.v_phase3_rollup_subtype_levels_latest fd ON (((fd.priority_rank = ar.from_priority_rank) AND (fd.subtype_code = ar.driver_subtype))))
-                     LEFT JOIN public.v_phase3_rollup_subtype_levels_latest td ON (((td.priority_rank = ar.to_priority_rank) AND (td.subtype_code = ar.driver_subtype))))
-                )
-         SELECT NULL::uuid AS publish_id,
-            wb.swap_rule_id,
-            wb.from_food_id,
-            wb.to_food_id,
-            wb.from_food_slug,
-            wb.to_food_slug,
-            wb.from_food_name_fr,
-            wb.from_food_name_en,
-            wb.to_food_name_fr,
-            wb.to_food_name_en,
-            wb.instruction_fr,
-            wb.instruction_en,
-            wb.rule_status,
-            wb.source_slug,
-            wb.scoring_version,
-            wb.fodmap_safety_score,
-            wb.overall_score,
-            wb.from_priority_rank,
-            wb.to_priority_rank,
-            wb.from_overall_level,
-            wb.to_overall_level,
-            wb.driver_subtype,
-            wb.from_burden_ratio,
-            wb.to_burden_ratio,
-            wb.coverage_ratio,
-            wb.rollup_computed_at
-           FROM with_burden wb
-          WHERE (NOT (EXISTS ( SELECT 1
-                   FROM current_release)))
+         SELECT cur_1.publish_id
+           FROM public.publish_release_current cur_1
+          WHERE (cur_1.release_kind = 'api_v0_phase3'::text)
         )
- SELECT published_rows.publish_id,
-    published_rows.swap_rule_id,
-    published_rows.from_food_id,
-    published_rows.to_food_id,
-    published_rows.from_food_slug,
-    published_rows.to_food_slug,
-    published_rows.from_food_name_fr,
-    published_rows.from_food_name_en,
-    published_rows.to_food_name_fr,
-    published_rows.to_food_name_en,
-    published_rows.instruction_fr,
-    published_rows.instruction_en,
-    published_rows.rule_status,
-    published_rows.source_slug,
-    published_rows.scoring_version,
-    published_rows.fodmap_safety_score,
-    published_rows.overall_score,
-    published_rows.from_priority_rank,
-    published_rows.to_priority_rank,
-    published_rows.from_overall_level,
-    published_rows.to_overall_level,
-    published_rows.driver_subtype,
-    published_rows.from_burden_ratio,
-    published_rows.to_burden_ratio,
-    published_rows.coverage_ratio,
-    published_rows.rollup_computed_at
-   FROM published_rows
-UNION ALL
- SELECT fallback_rows.publish_id,
-    fallback_rows.swap_rule_id,
-    fallback_rows.from_food_id,
-    fallback_rows.to_food_id,
-    fallback_rows.from_food_slug,
-    fallback_rows.to_food_slug,
-    fallback_rows.from_food_name_fr,
-    fallback_rows.from_food_name_en,
-    fallback_rows.to_food_name_fr,
-    fallback_rows.to_food_name_en,
-    fallback_rows.instruction_fr,
-    fallback_rows.instruction_en,
-    fallback_rows.rule_status,
-    fallback_rows.source_slug,
-    fallback_rows.scoring_version,
-    fallback_rows.fodmap_safety_score,
-    fallback_rows.overall_score,
-    fallback_rows.from_priority_rank,
-    fallback_rows.to_priority_rank,
-    fallback_rows.from_overall_level,
-    fallback_rows.to_overall_level,
-    fallback_rows.driver_subtype,
-    fallback_rows.from_burden_ratio,
-    fallback_rows.to_burden_ratio,
-    fallback_rows.coverage_ratio,
-    fallback_rows.rollup_computed_at
-   FROM fallback_rows;
+ SELECT ps.publish_id,
+    ps.swap_rule_id,
+    ps.from_food_id,
+    ps.to_food_id,
+    ps.from_food_slug,
+    ps.to_food_slug,
+    ps.from_food_name_fr,
+    ps.from_food_name_en,
+    ps.to_food_name_fr,
+    ps.to_food_name_en,
+    ps.instruction_fr,
+    ps.instruction_en,
+    ps.rule_status,
+    ps.source_slug,
+    ps.scoring_version,
+    ps.fodmap_safety_score,
+    ps.overall_score,
+    ps.from_priority_rank,
+    ps.to_priority_rank,
+    ps.from_overall_level,
+    ps.to_overall_level,
+    ps.driver_subtype,
+    ps.from_burden_ratio,
+    ps.to_burden_ratio,
+    ps.coverage_ratio,
+    ps.rollup_computed_at
+   FROM (public.published_swaps ps
+     JOIN current_release cur ON ((cur.publish_id = ps.publish_id)));
 
 
 --
@@ -1263,6 +875,32 @@ CREATE TABLE public.food_texture_profiles (
 
 
 --
+-- Name: foods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.foods (
+    food_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    food_slug text NOT NULL,
+    canonical_name_fr text,
+    canonical_name_en text,
+    scientific_name text,
+    description_fr text,
+    preparation_state public.preparation_state DEFAULT 'unknown'::public.preparation_state NOT NULL,
+    default_serving_g numeric(8,2),
+    edible_portion_pct numeric(5,2),
+    density_g_per_ml numeric(8,4),
+    is_branded_product boolean DEFAULT false NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT foods_default_serving_g_check CHECK (((default_serving_g IS NULL) OR (default_serving_g > (0)::numeric))),
+    CONSTRAINT foods_density_g_per_ml_check CHECK (((density_g_per_ml IS NULL) OR (density_g_per_ml > (0)::numeric))),
+    CONSTRAINT foods_edible_portion_pct_check CHECK (((edible_portion_pct IS NULL) OR ((edible_portion_pct >= (0)::numeric) AND (edible_portion_pct <= (100)::numeric)))),
+    CONSTRAINT foods_status_check CHECK ((status = ANY (ARRAY['active'::text, 'draft'::text, 'deprecated'::text])))
+);
+
+
+--
 -- Name: ingestion_runs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1486,6 +1124,36 @@ CREATE SEQUENCE public.nutrient_definitions_nutrient_id_seq
 --
 
 ALTER SEQUENCE public.nutrient_definitions_nutrient_id_seq OWNED BY public.nutrient_definitions.nutrient_id;
+
+
+--
+-- Name: phase2_priority_foods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.phase2_priority_foods (
+    priority_rank integer NOT NULL,
+    gap_bucket text NOT NULL,
+    target_subtype text NOT NULL,
+    food_label text NOT NULL,
+    variant_label text NOT NULL,
+    ciqual_code_hint text,
+    food_slug_hint text,
+    resolved_food_id uuid,
+    resolution_method text,
+    resolution_notes text,
+    serving_g_provisional numeric(8,2) NOT NULL,
+    source_strategy text NOT NULL,
+    status text DEFAULT 'pending_research'::text NOT NULL,
+    resolved_at timestamp with time zone,
+    resolved_by text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT phase2_priority_foods_gap_bucket_check CHECK ((gap_bucket = ANY (ARRAY['fructan_dominant'::text, 'gos_dominant'::text, 'polyol_split_needed'::text]))),
+    CONSTRAINT phase2_priority_foods_priority_rank_check CHECK ((priority_rank > 0)),
+    CONSTRAINT phase2_priority_foods_resolution_method_check CHECK ((resolution_method = ANY (ARRAY['ciqual_code'::text, 'slug_match'::text, 'name_match'::text, 'manual'::text, 'new_food'::text]))),
+    CONSTRAINT phase2_priority_foods_serving_g_provisional_check CHECK ((serving_g_provisional > (0)::numeric)),
+    CONSTRAINT phase2_priority_foods_status_check CHECK ((status = ANY (ARRAY['pending_research'::text, 'resolved'::text, 'measured'::text, 'threshold_set'::text])))
+);
 
 
 --
@@ -1715,6 +1383,30 @@ CREATE TABLE public.source_files (
 
 
 --
+-- Name: sources; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.sources (
+    source_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    source_slug text NOT NULL,
+    source_name text NOT NULL,
+    source_kind text NOT NULL,
+    organization text,
+    country_code character(2),
+    citation text,
+    url text,
+    dataset_version text,
+    published_at date,
+    accessed_at timestamp with time zone,
+    trust_tier public.evidence_tier DEFAULT 'secondary_db'::public.evidence_tier NOT NULL,
+    is_commercial boolean DEFAULT false NOT NULL,
+    license_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT sources_source_kind_check CHECK ((source_kind = ANY (ARRAY['official_database'::text, 'lab'::text, 'research_paper'::text, 'app_vendor'::text, 'community'::text, 'internal'::text])))
+);
+
+
+--
 -- Name: swap_rule_contexts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1748,6 +1440,61 @@ CREATE SEQUENCE public.swap_rule_contexts_swap_rule_context_id_seq
 --
 
 ALTER SEQUENCE public.swap_rule_contexts_swap_rule_context_id_seq OWNED BY public.swap_rule_contexts.swap_rule_context_id;
+
+
+--
+-- Name: swap_rule_scores; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_rule_scores (
+    swap_rule_id uuid NOT NULL,
+    scoring_version text DEFAULT 'v1'::text NOT NULL,
+    fodmap_safety_score numeric(4,3) NOT NULL,
+    flavor_match_score numeric(4,3) NOT NULL,
+    texture_match_score numeric(4,3) NOT NULL,
+    method_match_score numeric(4,3) NOT NULL,
+    availability_fr_score numeric(4,3) NOT NULL,
+    cost_fr_score numeric(4,3) NOT NULL,
+    overall_score numeric(4,3) GENERATED ALWAYS AS (round(((((((fodmap_safety_score * 0.50) + (flavor_match_score * 0.20)) + (texture_match_score * 0.10)) + (method_match_score * 0.10)) + (availability_fr_score * 0.07)) + (cost_fr_score * 0.03)), 3)) STORED,
+    CONSTRAINT swap_rule_scores_availability_fr_score_check CHECK (((availability_fr_score >= (0)::numeric) AND (availability_fr_score <= (1)::numeric))),
+    CONSTRAINT swap_rule_scores_cost_fr_score_check CHECK (((cost_fr_score >= (0)::numeric) AND (cost_fr_score <= (1)::numeric))),
+    CONSTRAINT swap_rule_scores_flavor_match_score_check CHECK (((flavor_match_score >= (0)::numeric) AND (flavor_match_score <= (1)::numeric))),
+    CONSTRAINT swap_rule_scores_fodmap_safety_score_check CHECK (((fodmap_safety_score >= (0)::numeric) AND (fodmap_safety_score <= (1)::numeric))),
+    CONSTRAINT swap_rule_scores_method_match_score_check CHECK (((method_match_score >= (0)::numeric) AND (method_match_score <= (1)::numeric))),
+    CONSTRAINT swap_rule_scores_texture_match_score_check CHECK (((texture_match_score >= (0)::numeric) AND (texture_match_score <= (1)::numeric)))
+);
+
+
+--
+-- Name: swap_rules; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.swap_rules (
+    swap_rule_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    from_food_id uuid NOT NULL,
+    to_food_id uuid NOT NULL,
+    status public.swap_status DEFAULT 'draft'::public.swap_status NOT NULL,
+    rule_kind text NOT NULL,
+    instruction_fr text NOT NULL,
+    instruction_en text,
+    min_ratio numeric(8,3) DEFAULT 0.50 NOT NULL,
+    max_ratio numeric(8,3) DEFAULT 1.50 NOT NULL,
+    default_ratio numeric(8,3) DEFAULT 1.00 NOT NULL,
+    source_id uuid,
+    evidence_tier public.evidence_tier DEFAULT 'inferred'::public.evidence_tier NOT NULL,
+    confidence_score numeric(4,3),
+    valid_from date DEFAULT CURRENT_DATE NOT NULL,
+    valid_to date,
+    notes text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT chk_swap_distinct_foods CHECK ((from_food_id <> to_food_id)),
+    CONSTRAINT chk_swap_ratios CHECK (((min_ratio <= default_ratio) AND (default_ratio <= max_ratio))),
+    CONSTRAINT swap_rules_confidence_score_check CHECK (((confidence_score IS NULL) OR ((confidence_score >= (0)::numeric) AND (confidence_score <= (1)::numeric)))),
+    CONSTRAINT swap_rules_default_ratio_check CHECK ((default_ratio > (0)::numeric)),
+    CONSTRAINT swap_rules_max_ratio_check CHECK ((max_ratio > (0)::numeric)),
+    CONSTRAINT swap_rules_min_ratio_check CHECK ((min_ratio > (0)::numeric)),
+    CONSTRAINT swap_rules_rule_kind_check CHECK ((rule_kind = ANY (ARRAY['direct_swap'::text, 'technique_swap'::text, 'pairing_swap'::text, 'recipe_rewrite'::text])))
+);
 
 
 --
@@ -1973,6 +1720,52 @@ CREATE VIEW public.v_food_excess_fructose_latest AS
 --
 
 COMMENT ON VIEW public.v_food_excess_fructose_latest IS 'Best current excess-fructose estimate per food; prefers computable rows, then most recent observation.';
+
+
+--
+-- Name: v_phase3_rollup_subtype_levels_latest; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_phase3_rollup_subtype_levels_latest AS
+ SELECT NULL::integer AS priority_rank,
+    NULL::uuid AS food_id,
+    NULL::numeric(8,2) AS rollup_serving_g,
+    NULL::text AS subtype_code,
+    NULL::smallint AS fodmap_subtype_id,
+    NULL::numeric(12,6) AS amount_g_per_serving,
+    NULL::public.comparator_code AS comparator,
+    NULL::numeric(12,6) AS low_max_g,
+    NULL::numeric(12,6) AS moderate_max_g,
+    NULL::public.fodmap_level AS subtype_level,
+    NULL::text AS signal_source_kind,
+    NULL::text AS signal_source_slug,
+    NULL::text AS threshold_source,
+    NULL::text AS threshold_source_slug,
+    NULL::boolean AS is_default_threshold,
+    NULL::boolean AS is_polyol_proxy,
+    NULL::text AS default_threshold_citation_ref,
+    NULL::text AS default_threshold_derivation_method,
+    NULL::integer AS severity_rank,
+    NULL::numeric(12,6) AS burden_ratio,
+    NULL::timestamp with time zone AS computed_at
+  WHERE false;
+
+
+--
+-- Name: v_phase3_rollups_latest_full; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_phase3_rollups_latest_full AS
+ SELECT NULL::integer AS priority_rank,
+    NULL::uuid AS food_id,
+    NULL::numeric(8,2) AS rollup_serving_g,
+    NULL::public.fodmap_level AS overall_level,
+    NULL::text AS driver_subtype_code,
+    NULL::integer AS known_subtypes_count,
+    NULL::numeric(6,4) AS coverage_ratio,
+    NULL::timestamp with time zone AS computed_at,
+    NULL::text AS source_slug
+  WHERE false;
 
 
 --

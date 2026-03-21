@@ -1355,7 +1355,7 @@ export interface components {
     };
   };
   parameters: {
-    /** @description Account or user identifier. */
+    /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
     MeUserIdHeader: string;
     /** @description Opaque device identifier required for signing lookup. */
     MeDeviceIdHeader: string;
@@ -1580,9 +1580,9 @@ export interface operations {
   getMeConsent: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1604,9 +1604,9 @@ export interface operations {
   postMeConsent: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
         /** @description Opaque device identifier required for signing lookup. */
         "X-Device-Id"?: components["parameters"]["MeDeviceIdHeader"];
         /** @description Actor UUID when changes are performed by support automation. */
@@ -1654,9 +1654,9 @@ export interface operations {
   requestMeExport: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1706,9 +1706,9 @@ export interface operations {
   getMeExport: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         export_id: string;
@@ -1741,9 +1741,9 @@ export interface operations {
   requestMeDelete: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1793,9 +1793,9 @@ export interface operations {
   getMeDelete: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         delete_request_id: string;
@@ -1830,9 +1830,9 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1855,9 +1855,9 @@ export interface operations {
       query?: {
         anchor_date?: string;
       };
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1880,9 +1880,9 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1903,9 +1903,9 @@ export interface operations {
   createTrackingSymptom: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -1939,9 +1939,9 @@ export interface operations {
   deleteTrackingSymptom: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         symptom_log_id: string;
@@ -1972,9 +1972,9 @@ export interface operations {
   updateTrackingSymptom: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         symptom_log_id: string;
@@ -2013,9 +2013,9 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2036,9 +2036,9 @@ export interface operations {
   createTrackingMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2072,9 +2072,9 @@ export interface operations {
   deleteTrackingMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         meal_log_id: string;
@@ -2105,9 +2105,9 @@ export interface operations {
   updateTrackingMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         meal_log_id: string;
@@ -2144,9 +2144,9 @@ export interface operations {
   listTrackingCustomFoods: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2167,9 +2167,9 @@ export interface operations {
   createTrackingCustomFood: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2203,9 +2203,9 @@ export interface operations {
   deleteTrackingCustomFood: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         custom_food_id: string;
@@ -2236,9 +2236,9 @@ export interface operations {
   updateTrackingCustomFood: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         custom_food_id: string;
@@ -2275,9 +2275,9 @@ export interface operations {
   listTrackingSavedMeals: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2298,9 +2298,9 @@ export interface operations {
   createTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
@@ -2334,9 +2334,9 @@ export interface operations {
   deleteTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         saved_meal_id: string;
@@ -2367,9 +2367,9 @@ export interface operations {
   updateTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path: {
         saved_meal_id: string;
@@ -2407,8 +2407,8 @@ export interface operations {
     parameters: {
       query?: never;
       header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
         "X-Device-Id": components["parameters"]["SyncDeviceIdHeader"];
       };
       path?: never;
@@ -2461,9 +2461,9 @@ export interface operations {
   postSyncMutationsBatch: {
     parameters: {
       query?: never;
-      header: {
-        /** @description Account or user identifier. */
-        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      header?: {
+        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
+        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
       };
       path?: never;
       cookie?: never;
