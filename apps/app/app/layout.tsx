@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import "./globals.css";
 
+import { ClerkShell } from "../components/clerk-shell";
 import {
   getAnalyticsBootstrapStatus,
   getPlausibleScriptConfig,
@@ -63,7 +64,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         {plausible ? (
           <script defer data-domain={plausible.domain} src={plausible.src} />
         ) : null}
-        {children}
+        <ClerkShell enabled={auth.fullyConfigured}>{children}</ClerkShell>
       </body>
     </html>
   );

@@ -26,6 +26,8 @@ Next.js product app for the first live web slice.
 4. Auth-gated account flows for:
    - consent and rights management in `/espace`
    - tracking history, weekly summary, and write actions in `/espace/suivi`
+   - app-hosted Clerk sign-in in `/sign-in`
+   - app-hosted Clerk sign-up in `/sign-up`
 5. Typed public API client consumption from `@fodmapp/types`.
 6. `@fodmapp/ui/server` and `@fodmapp/ui/client` consumption for App Router-safe rendering.
 7. Env-gated cross-cutting seams:
@@ -42,7 +44,7 @@ Next.js product app for the first live web slice.
 
 ## Out Of Scope
 
-1. Full production auth flows and consent policy orchestration, including app-hosted `/sign-in` or `/sign-up` pages.
+1. Broader auth redesign beyond the current web Clerk flow, including mobile auth, org/role management, and non-account-route protection.
 2. Mobile UI, offline-first local persistence, and bowel-tracking surfaces.
 3. Predictive, diagnostic, or causal interpretation of meals and symptoms.
 4. Additional API endpoints or ETL/schema changes beyond the current tracking and food contracts.
@@ -57,16 +59,17 @@ Use the local validation runbook for install, seed, API startup, frontend startu
 Important runtime note:
 
 - `NEXT_PUBLIC_API_BASE_URL` must be an absolute API origin for server-rendered app routes (for example `http://localhost:8000`).
-- Local validation of `/espace` and `/espace/suivi` can use preview auth by setting `APP_AUTH_PREVIEW_USER_ID=11111111-1111-4111-8111-111111111111` in `apps/app/.env.local`.
+- Runtime Clerk validation uses `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `CLERK_JWT_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, and `CLERK_AUTHORIZED_PARTIES`, plus the app-hosted route envs for `/sign-in` and `/sign-up`.
+- Local preview validation remains available with `APP_AUTH_PREVIEW_USER_ID=11111111-1111-4111-8111-111111111111` and `API_ALLOW_PREVIEW_USER_ID_HEADER=true`.
 
 ## Runtime Integration Matrix
 
-| Provider  | Adapter mode                                                 | Implemented now                                                                                                                                                    | Account/paid constraints                                                                                                                                 |
-| --------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Clerk     | Env-gated runtime (`@clerk/nextjs`) + local preview fallback | Yes, when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` are set; local preview auth is also available in non-production with `APP_AUTH_PREVIEW_USER_ID` | Requires Clerk account and keys to activate runtime auth context and `/espace` protection. Preview mode is development-only and not real authentication. |
-| Sentry    | Env-gated runtime (`@sentry/nextjs`)                         | Yes, server (`SENTRY_DSN_APP`) and client (`NEXT_PUBLIC_SENTRY_DSN_APP`) instrumentation are wired                                                                 | Requires Sentry project/DSN to send events; app remains no-op without DSN.                                                                               |
-| Plausible | Env-gated runtime script + event API                         | Yes, when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` and consent gate are enabled                                                                                              | Can run with hosted or self-hosted script; no paid plan required for baseline usage.                                                                     |
-| Axeptio   | Deferred no-op adapter                                       | No (deferred)                                                                                                                                                      | Deferred until account-level Axeptio project setup and consent taxonomy/legal validation are available.                                                  |
+| Provider  | Adapter mode                                                 | Implemented now                                                                                                                                                                                                | Account/paid constraints                                                                                                                                                                                                                               |
+| --------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Clerk     | Env-gated runtime (`@clerk/nextjs`) + local preview fallback | Yes, app-hosted `/sign-in` and `/sign-up` render when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY` are set; local preview auth is also available in non-production with `APP_AUTH_PREVIEW_USER_ID` | Requires Clerk account plus JWT verification settings (`CLERK_JWT_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, `CLERK_AUTHORIZED_PARTIES`) to harden `/v0/me*`, `/v0/me/tracking*`, and `/v0/sync*`. Preview mode is development-only and not real authentication. |
+| Sentry    | Env-gated runtime (`@sentry/nextjs`)                         | Yes, server (`SENTRY_DSN_APP`) and client (`NEXT_PUBLIC_SENTRY_DSN_APP`) instrumentation are wired                                                                                                             | Requires Sentry project/DSN to send events; app remains no-op without DSN.                                                                                                                                                                             |
+| Plausible | Env-gated runtime script + event API                         | Yes, when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` and consent gate are enabled                                                                                                                                          | Can run with hosted or self-hosted script; no paid plan required for baseline usage.                                                                                                                                                                   |
+| Axeptio   | Deferred no-op adapter                                       | No (deferred)                                                                                                                                                                                                  | Deferred until account-level Axeptio project setup and consent taxonomy/legal validation are available.                                                                                                                                                |
 
 ## Zero-Credential Behavior Contract
 
@@ -76,4 +79,4 @@ Important runtime note:
 4. Manual consent override is hard-disabled in production even if `NEXT_PUBLIC_ANALYTICS_CONSENT_GRANTED=true`.
 5. Public routes remain renderable without provider accounts or paid subscriptions.
 6. If `NEXT_PUBLIC_API_BASE_URL` is missing, public read routes must degrade to handled error or empty states rather than crash.
-7. `/espace` and `/espace/suivi` must not render dead `/sign-in` links when runtime auth is unavailable; local validation uses preview auth instead.
+7. `/espace` and `/espace/suivi` must render real `/sign-in` CTAs only when Clerk runtime is configured; otherwise local validation uses preview auth instead.

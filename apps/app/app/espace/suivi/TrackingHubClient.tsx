@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useAuth } from "@clerk/nextjs";
+
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 import {
   AlertDialog,
@@ -40,6 +42,7 @@ import {
   formatUtcIsoForDateTimeLocal,
   nowDateInputValue,
 } from "../../../lib/dateTimeLocal";
+import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
   createTrackingCustomFood,
   createTrackingMeal,
@@ -506,11 +509,15 @@ function TrackingItemEditor({
   );
 }
 
+type TrackingHubClientMode =
+  | { mode: "preview"; userId: string }
+  | { mode: "runtime" };
+
 interface TrackingHubClientProps {
-  userId: string;
+  auth: TrackingHubClientMode;
 }
 
-export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
+function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -554,10 +561,10 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
     try {
       const [nextFeed, nextSummary, nextCustomFoods, nextSavedMeals] =
         await Promise.all([
-          getTrackingFeed(userId, 50),
-          getWeeklyTrackingSummary(userId, anchorDate),
-          listTrackingCustomFoods(userId),
-          listTrackingSavedMeals(userId),
+          getTrackingFeed(auth, 50),
+          getWeeklyTrackingSummary(auth, anchorDate),
+          listTrackingCustomFoods(auth),
+          listTrackingSavedMeals(auth),
         ]);
       setFeed(nextFeed);
       setSummary(nextSummary);
@@ -568,7 +575,7 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
     } finally {
       setLoading(false);
     }
-  }, [anchorDate, userId]);
+  }, [anchorDate, auth]);
 
   useEffect(() => {
     void loadData();
@@ -609,12 +616,12 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
       if (editingSymptom) {
         const updatePayload: SymptomLogUpdateRequest = { ...payload };
         await updateTrackingSymptom(
-          userId,
+          auth,
           editingSymptom.symptom_log_id,
           updatePayload,
         );
       } else {
-        await createTrackingSymptom(userId, payload);
+        await createTrackingSymptom(auth, payload);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -636,13 +643,9 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
       };
       if (editingMeal) {
         const updatePayload: MealLogUpdateRequest = { ...payload };
-        await updateTrackingMeal(
-          userId,
-          editingMeal.meal_log_id,
-          updatePayload,
-        );
+        await updateTrackingMeal(auth, editingMeal.meal_log_id, updatePayload);
       } else {
-        await createTrackingMeal(userId, payload);
+        await createTrackingMeal(auth, payload);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -663,12 +666,12 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
       if (editingCustomFood) {
         const updatePayload: CustomFoodUpdateRequest = { ...payload };
         await updateTrackingCustomFood(
-          userId,
+          auth,
           editingCustomFood.custom_food_id,
           updatePayload,
         );
       } else {
-        await createTrackingCustomFood(userId, payload);
+        await createTrackingCustomFood(auth, payload);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -690,12 +693,12 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
       if (editingSavedMeal) {
         const updatePayload: SavedMealUpdateRequest = { ...payload };
         await updateTrackingSavedMeal(
-          userId,
+          auth,
           editingSavedMeal.saved_meal_id,
           updatePayload,
         );
       } else {
-        await createTrackingSavedMeal(userId, payload);
+        await createTrackingSavedMeal(auth, payload);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -795,25 +798,19 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
     try {
       switch (pendingDelete.kind) {
         case "symptom":
-          await deleteTrackingSymptom(
-            userId,
-            pendingDelete.item.symptom_log_id,
-          );
+          await deleteTrackingSymptom(auth, pendingDelete.item.symptom_log_id);
           break;
         case "meal":
-          await deleteTrackingMeal(userId, pendingDelete.item.meal_log_id);
+          await deleteTrackingMeal(auth, pendingDelete.item.meal_log_id);
           break;
         case "custom_food":
           await deleteTrackingCustomFood(
-            userId,
+            auth,
             pendingDelete.item.custom_food_id,
           );
           break;
         case "saved_meal":
-          await deleteTrackingSavedMeal(
-            userId,
-            pendingDelete.item.saved_meal_id,
-          );
+          await deleteTrackingSavedMeal(auth, pendingDelete.item.saved_meal_id);
           break;
       }
       await loadData();
@@ -1588,5 +1585,28 @@ export default function TrackingHubClient({ userId }: TrackingHubClientProps) {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function RuntimeTrackingHubClient() {
+  const { getToken } = useAuth();
+  const auth = useMemo<ProtectedApiAuth>(
+    () => ({
+      mode: "runtime",
+      getToken: async () => getToken(),
+    }),
+    [getToken],
+  );
+
+  return <TrackingHubClientInner auth={auth} />;
+}
+
+export default function TrackingHubClient({ auth }: TrackingHubClientProps) {
+  if (auth.mode === "runtime") {
+    return <RuntimeTrackingHubClient />;
+  }
+
+  return (
+    <TrackingHubClientInner auth={{ mode: "preview", userId: auth.userId }} />
   );
 }

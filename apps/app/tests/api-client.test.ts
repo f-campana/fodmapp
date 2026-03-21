@@ -7,6 +7,7 @@ import {
   getSwaps,
   searchFoods,
 } from "../lib/api";
+import type { ProtectedApiAuth } from "../lib/protectedApiAuth";
 import {
   createTrackingSymptom,
   deleteTrackingMeal,
@@ -129,7 +130,7 @@ describe("public read client", () => {
 });
 
 describe("tracking client", () => {
-  it("sends X-User-Id on authenticated feed requests", async () => {
+  it("sends Authorization bearer headers on runtime feed requests", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
@@ -142,8 +143,12 @@ describe("tracking client", () => {
       ),
     );
     vi.stubGlobal("fetch", fetchMock);
+    const auth: ProtectedApiAuth = {
+      mode: "runtime",
+      getToken: vi.fn().mockResolvedValue("token_123"),
+    };
 
-    const result = await getTrackingFeed("user_123", 50);
+    const result = await getTrackingFeed(auth, 50);
 
     expect(result).toEqual({
       total: 0,
@@ -158,10 +163,13 @@ describe("tracking client", () => {
       }),
     );
     const [, init] = fetchMock.mock.calls[0];
-    expect((init.headers as Headers).get("X-User-Id")).toBe("user_123");
+    expect((init.headers as Headers).get("Authorization")).toBe(
+      "Bearer token_123",
+    );
+    expect((init.headers as Headers).has("X-User-Id")).toBe(false);
   });
 
-  it("posts symptom payloads and keeps JSON headers", async () => {
+  it("keeps preview mode on X-User-Id for local validation", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
@@ -179,8 +187,12 @@ describe("tracking client", () => {
       ),
     );
     vi.stubGlobal("fetch", fetchMock);
+    const auth: ProtectedApiAuth = {
+      mode: "preview",
+      userId: "11111111-1111-4111-8111-111111111111",
+    };
 
-    const result = await createTrackingSymptom("user_123", {
+    const result = await createTrackingSymptom(auth, {
       symptom_type: "bloating",
       severity: 4,
       noted_at_utc: "2026-03-20T10:00:00Z",
@@ -190,9 +202,27 @@ describe("tracking client", () => {
     expect(result.symptom_type).toBe("bloating");
     const [, init] = fetchMock.mock.calls[0];
     expect(init.method).toBe("POST");
+    expect((init.headers as Headers).get("X-User-Id")).toBe(
+      "11111111-1111-4111-8111-111111111111",
+    );
     expect((init.headers as Headers).get("Content-Type")).toBe(
       "application/json",
     );
+  });
+
+  it("fails fast when a runtime session token is unavailable", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const auth: ProtectedApiAuth = {
+      mode: "runtime",
+      getToken: vi.fn().mockResolvedValue(null),
+    };
+
+    await expect(getTrackingFeed(auth, 50)).rejects.toThrow(
+      "session_token_unavailable",
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("returns undefined on 204 delete responses", async () => {
@@ -201,8 +231,12 @@ describe("tracking client", () => {
       "fetch",
       vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
     );
+    const auth: ProtectedApiAuth = {
+      mode: "runtime",
+      getToken: vi.fn().mockResolvedValue("token_123"),
+    };
 
-    const result = await deleteTrackingMeal("user_123", "meal-1");
+    const result = await deleteTrackingMeal(auth, "meal-1");
 
     expect(result).toBeUndefined();
   });

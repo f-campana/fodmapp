@@ -4,6 +4,10 @@ import type { components } from "@fodmapp/types";
 
 import { buildApiUrl } from "./api/base";
 import { getClientRuntimeEnv } from "./env.client";
+import {
+  buildProtectedApiHeaders,
+  type ProtectedApiAuth,
+} from "./protectedApiAuth";
 
 const TRACKING_API_ROOT = "/me/tracking";
 
@@ -38,15 +42,13 @@ function getTrackingApiBase(apiBase?: string | null): string | null {
 
 async function callTrackingApi<T>(
   path: string,
-  userId: string,
+  auth: ProtectedApiAuth,
   options: RequestInit = {},
   apiBase?: string | null,
 ): Promise<T> {
-  const headers = new Headers(options.headers ?? {});
-  headers.set("X-User-Id", userId);
-  if (options.body && !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
+  const headers = await buildProtectedApiHeaders(auth, options.headers, {
+    json: Boolean(options.body),
+  });
 
   const url = buildApiUrl(path, getTrackingApiBase(apiBase));
   if (!url) {
@@ -76,20 +78,20 @@ async function callTrackingApi<T>(
 }
 
 export function getTrackingFeed(
-  userId: string,
+  auth: ProtectedApiAuth,
   limit = 50,
   apiBase?: string | null,
 ): Promise<TrackingFeedResponse> {
   return callTrackingApi<TrackingFeedResponse>(
     `${TRACKING_API_ROOT}/feed?limit=${limit}`,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function getWeeklyTrackingSummary(
-  userId: string,
+  auth: ProtectedApiAuth,
   anchorDate?: string,
   apiBase?: string | null,
 ): Promise<WeeklyTrackingSummaryResponse> {
@@ -98,217 +100,217 @@ export function getWeeklyTrackingSummary(
     : `${TRACKING_API_ROOT}/summary/weekly`;
   return callTrackingApi<WeeklyTrackingSummaryResponse>(
     suffix,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function listTrackingSymptoms(
-  userId: string,
+  auth: ProtectedApiAuth,
   limit = 100,
   apiBase?: string | null,
 ): Promise<SymptomLog[]> {
   return callTrackingApi<SymptomLog[]>(
     `${TRACKING_API_ROOT}/symptoms?limit=${limit}`,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function createTrackingSymptom(
-  userId: string,
+  auth: ProtectedApiAuth,
   payload: SymptomLogCreateRequest,
   apiBase?: string | null,
 ): Promise<SymptomLog> {
   return callTrackingApi<SymptomLog>(
     `${TRACKING_API_ROOT}/symptoms`,
-    userId,
+    auth,
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function updateTrackingSymptom(
-  userId: string,
+  auth: ProtectedApiAuth,
   symptomLogId: string,
   payload: SymptomLogUpdateRequest,
   apiBase?: string | null,
 ): Promise<SymptomLog> {
   return callTrackingApi<SymptomLog>(
     `${TRACKING_API_ROOT}/symptoms/${symptomLogId}`,
-    userId,
+    auth,
     { method: "PATCH", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function deleteTrackingSymptom(
-  userId: string,
+  auth: ProtectedApiAuth,
   symptomLogId: string,
   apiBase?: string | null,
 ): Promise<void> {
   return callTrackingApi<void>(
     `${TRACKING_API_ROOT}/symptoms/${symptomLogId}`,
-    userId,
+    auth,
     { method: "DELETE" },
     apiBase,
   );
 }
 
 export function listTrackingMeals(
-  userId: string,
+  auth: ProtectedApiAuth,
   limit = 100,
   apiBase?: string | null,
 ): Promise<MealLog[]> {
   return callTrackingApi<MealLog[]>(
     `${TRACKING_API_ROOT}/meals?limit=${limit}`,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function createTrackingMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   payload: MealLogCreateRequest,
   apiBase?: string | null,
 ): Promise<MealLog> {
   return callTrackingApi<MealLog>(
     `${TRACKING_API_ROOT}/meals`,
-    userId,
+    auth,
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function updateTrackingMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   mealLogId: string,
   payload: MealLogUpdateRequest,
   apiBase?: string | null,
 ): Promise<MealLog> {
   return callTrackingApi<MealLog>(
     `${TRACKING_API_ROOT}/meals/${mealLogId}`,
-    userId,
+    auth,
     { method: "PATCH", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function deleteTrackingMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   mealLogId: string,
   apiBase?: string | null,
 ): Promise<void> {
   return callTrackingApi<void>(
     `${TRACKING_API_ROOT}/meals/${mealLogId}`,
-    userId,
+    auth,
     { method: "DELETE" },
     apiBase,
   );
 }
 
 export function listTrackingCustomFoods(
-  userId: string,
+  auth: ProtectedApiAuth,
   apiBase?: string | null,
 ): Promise<CustomFood[]> {
   return callTrackingApi<CustomFood[]>(
     `${TRACKING_API_ROOT}/custom-foods`,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function createTrackingCustomFood(
-  userId: string,
+  auth: ProtectedApiAuth,
   payload: CustomFoodCreateRequest,
   apiBase?: string | null,
 ): Promise<CustomFood> {
   return callTrackingApi<CustomFood>(
     `${TRACKING_API_ROOT}/custom-foods`,
-    userId,
+    auth,
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function updateTrackingCustomFood(
-  userId: string,
+  auth: ProtectedApiAuth,
   customFoodId: string,
   payload: CustomFoodUpdateRequest,
   apiBase?: string | null,
 ): Promise<CustomFood> {
   return callTrackingApi<CustomFood>(
     `${TRACKING_API_ROOT}/custom-foods/${customFoodId}`,
-    userId,
+    auth,
     { method: "PATCH", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function deleteTrackingCustomFood(
-  userId: string,
+  auth: ProtectedApiAuth,
   customFoodId: string,
   apiBase?: string | null,
 ): Promise<void> {
   return callTrackingApi<void>(
     `${TRACKING_API_ROOT}/custom-foods/${customFoodId}`,
-    userId,
+    auth,
     { method: "DELETE" },
     apiBase,
   );
 }
 
 export function listTrackingSavedMeals(
-  userId: string,
+  auth: ProtectedApiAuth,
   apiBase?: string | null,
 ): Promise<SavedMeal[]> {
   return callTrackingApi<SavedMeal[]>(
     `${TRACKING_API_ROOT}/saved-meals`,
-    userId,
+    auth,
     { method: "GET" },
     apiBase,
   );
 }
 
 export function createTrackingSavedMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   payload: SavedMealCreateRequest,
   apiBase?: string | null,
 ): Promise<SavedMeal> {
   return callTrackingApi<SavedMeal>(
     `${TRACKING_API_ROOT}/saved-meals`,
-    userId,
+    auth,
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function updateTrackingSavedMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   savedMealId: string,
   payload: SavedMealUpdateRequest,
   apiBase?: string | null,
 ): Promise<SavedMeal> {
   return callTrackingApi<SavedMeal>(
     `${TRACKING_API_ROOT}/saved-meals/${savedMealId}`,
-    userId,
+    auth,
     { method: "PATCH", body: JSON.stringify(payload) },
     apiBase,
   );
 }
 
 export function deleteTrackingSavedMeal(
-  userId: string,
+  auth: ProtectedApiAuth,
   savedMealId: string,
   apiBase?: string | null,
 ): Promise<void> {
   return callTrackingApi<void>(
     `${TRACKING_API_ROOT}/saved-meals/${savedMealId}`,
-    userId,
+    auth,
     { method: "DELETE" },
     apiBase,
   );

@@ -11,6 +11,8 @@ from psycopg.rows import dict_row
 
 from app.main import create_app
 
+os.environ.setdefault("API_ALLOW_PREVIEW_USER_ID_HEADER", "true")
+
 SECURITY_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-02-25_security_consent_export_delete.sql"
 )
@@ -25,6 +27,9 @@ SAFE_HARBOR_CHECKS_PATH = (
 )
 TRACKING_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-03-20_symptoms_tracking_v1.sql"
+)
+AUTH_IDENTITY_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-03-21_clerk_auth_identities.sql"
 )
 
 
@@ -69,12 +74,14 @@ def integration_guard(integration_db_ready: bool) -> None:
 def _ensure_me_security_schema(db_url: str) -> None:
     with psycopg.connect(db_url, row_factory=dict_row) as conn:
         table_state = conn.execute("SELECT to_regclass('public.me_mutation_queue') AS queue_table").fetchone()
-        if table_state and table_state["queue_table"]:
+        auth_state = conn.execute("SELECT to_regclass('public.me_auth_identities') AS identity_table").fetchone()
+        if table_state and table_state["queue_table"] and auth_state and auth_state["identity_table"]:
             return
 
     migration_sql = SECURITY_MIGRATION_PATH.read_text(encoding="utf-8")
     with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
         conn.execute(migration_sql)
+    _ensure_auth_identity_schema(db_url)
 
 
 def _ensure_safe_harbor_schema(db_url: str) -> None:
@@ -105,6 +112,17 @@ def _ensure_tracking_schema(db_url: str) -> None:
         conn.execute(migration_sql)
 
 
+def _ensure_auth_identity_schema(db_url: str) -> None:
+    with psycopg.connect(db_url, row_factory=dict_row) as conn:
+        table_state = conn.execute("SELECT to_regclass('public.me_auth_identities') AS identity_table").fetchone()
+        if table_state and table_state["identity_table"]:
+            return
+
+    migration_sql = AUTH_IDENTITY_MIGRATION_PATH.read_text(encoding="utf-8")
+    with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+        conn.execute(migration_sql)
+
+
 @pytest.fixture(scope="session")
 def me_security_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
@@ -124,6 +142,13 @@ def tracking_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
         pytest.skip("integration DB is not ready or schema is missing")
     _ensure_tracking_schema(db_url)
+
+
+@pytest.fixture(scope="session")
+def auth_identity_schema(db_url: str, integration_db_ready: bool) -> None:
+    if not integration_db_ready:
+        pytest.skip("integration DB is not ready or schema is missing")
+    _ensure_auth_identity_schema(db_url)
 
 
 @pytest.fixture()

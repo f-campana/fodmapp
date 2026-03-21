@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useAuth } from "@clerk/nextjs";
+
 import { Badge } from "@fodmapp/ui/badge";
 import { Button } from "@fodmapp/ui/button";
 import {
@@ -30,6 +32,7 @@ import {
   getMedicalSafetyCopy,
   type MedicalLocale,
 } from "../../lib/medicalSafetyCopy";
+import { type ProtectedApiAuth } from "../../lib/protectedApiAuth";
 
 type PollState = {
   loading: boolean;
@@ -39,8 +42,18 @@ type PollState = {
 
 type ConsentActionState = "idle" | "loading" | "submitted" | "error";
 
+type ConsentRightsClientMode =
+  | { mode: "preview"; userId: string }
+  | { mode: "runtime" };
+
 interface ConsentRightsClientProps {
-  userId: string | null;
+  auth: ConsentRightsClientMode;
+  locale: MedicalLocale;
+}
+
+interface ConsentRightsInnerProps {
+  auth: ProtectedApiAuth;
+  isAuthenticated: boolean;
   locale: MedicalLocale;
 }
 
@@ -164,10 +177,11 @@ function formatScope(scope: unknown): string {
     .join(", ");
 }
 
-export default function ConsentRightsClient({
-  userId,
+function ConsentRightsInner({
+  auth,
+  isAuthenticated,
   locale,
-}: ConsentRightsClientProps) {
+}: ConsentRightsInnerProps) {
   const { apiBase } = getConsentApiConfig();
 
   const [consentState, setConsentState] = useState<ConsentRecord | null>(null);
@@ -226,17 +240,16 @@ export default function ConsentRightsClient({
   useEffect(() => {
     let cancelled = false;
 
-    if (!userId) {
+    if (!isAuthenticated) {
       setConsentState(null);
       setConsentLoading(false);
       return;
     }
-    const currentUserId = userId;
 
     async function load() {
       setConsentLoading(true);
       try {
-        const record = await getConsentRecord(currentUserId, apiBase);
+        const record = await getConsentRecord(auth, apiBase);
         if (!cancelled) {
           setConsentState(record);
           setConsentError(null);
@@ -256,13 +269,12 @@ export default function ConsentRightsClient({
     return () => {
       cancelled = true;
     };
-  }, [apiBase, userId]);
+  }, [apiBase, auth, isAuthenticated]);
 
   useEffect(() => {
-    if (!userId || !exportRequest) {
+    if (!isAuthenticated || !exportRequest) {
       return;
     }
-    const currentUserId = userId;
     const currentExportId = exportRequest.exportId;
 
     let cancelled = false;
@@ -272,7 +284,7 @@ export default function ConsentRightsClient({
       setExportPoll((state) => ({ ...state, loading: true, error: null }));
       try {
         const result = (await pollExportStatus({
-          userId: currentUserId,
+          auth,
           exportId: currentExportId,
           apiBase,
         })) as Record<string, unknown>;
@@ -311,13 +323,12 @@ export default function ConsentRightsClient({
         clearTimeout(timer);
       }
     };
-  }, [apiBase, exportRequest, userId]);
+  }, [apiBase, auth, exportRequest, isAuthenticated]);
 
   useEffect(() => {
-    if (!userId || !deleteRequest) {
+    if (!isAuthenticated || !deleteRequest) {
       return;
     }
-    const currentUserId = userId;
     const currentDeleteRequestId = deleteRequest.deleteRequestId;
 
     let cancelled = false;
@@ -327,7 +338,7 @@ export default function ConsentRightsClient({
       setDeletePoll((state) => ({ ...state, loading: true, error: null }));
       try {
         const result = (await pollDeleteStatus({
-          userId: currentUserId,
+          auth,
           deleteRequestId: currentDeleteRequestId,
           apiBase,
         })) as Record<string, unknown>;
@@ -366,10 +377,10 @@ export default function ConsentRightsClient({
         clearTimeout(timer);
       }
     };
-  }, [apiBase, deleteRequest, userId]);
+  }, [apiBase, auth, deleteRequest, isAuthenticated]);
 
   const updateConsentMode = async (nextMode: "grant" | "revoke") => {
-    if (!userId) {
+    if (!isAuthenticated) {
       return;
     }
 
@@ -381,13 +392,13 @@ export default function ConsentRightsClient({
 
     try {
       await grantOrRevokeConsent({
-        userId,
+        auth,
         action: nextMode,
         policyVersion: consentState?.consentState.policyVersion || "gdpr-v1",
         scope,
         apiBase,
       });
-      const record = await getConsentRecord(userId, apiBase);
+      const record = await getConsentRecord(auth, apiBase);
       setConsentState(record);
       setConsentError(null);
       setConsentActionState("submitted");
@@ -398,14 +409,14 @@ export default function ConsentRightsClient({
   };
 
   const sendExport = async () => {
-    if (!userId) {
+    if (!isAuthenticated) {
       return;
     }
 
     setExportPoll({ loading: true, error: null, payload: null });
     try {
       const response = await requestExport({
-        userId,
+        auth,
         apiBase,
         request: {
           anonymize: true,
@@ -431,7 +442,7 @@ export default function ConsentRightsClient({
   };
 
   const sendDelete = async () => {
-    if (!userId) {
+    if (!isAuthenticated) {
       return;
     }
 
@@ -446,7 +457,7 @@ export default function ConsentRightsClient({
     setDeletePoll({ loading: true, error: null, payload: null });
     try {
       const response = await requestDelete({
-        userId,
+        auth,
         apiBase,
         request: {
           scope: "all",
@@ -483,7 +494,7 @@ export default function ConsentRightsClient({
     ? copy("screens.consentMode.downgradeWarning")
     : copy("screens.consentMode.upgradeSubtext");
 
-  if (!userId) {
+  if (!isAuthenticated) {
     return (
       <Card>
         <CardHeader>
@@ -648,5 +659,37 @@ export default function ConsentRightsClient({
         </CardContent>
       </Card>
     </main>
+  );
+}
+
+function RuntimeConsentRightsClient({ locale }: { locale: MedicalLocale }) {
+  const { getToken } = useAuth();
+  const auth = useMemo<ProtectedApiAuth>(
+    () => ({
+      mode: "runtime",
+      getToken: async () => getToken(),
+    }),
+    [getToken],
+  );
+
+  return (
+    <ConsentRightsInner auth={auth} isAuthenticated={true} locale={locale} />
+  );
+}
+
+export default function ConsentRightsClient({
+  auth,
+  locale,
+}: ConsentRightsClientProps) {
+  if (auth.mode === "runtime") {
+    return <RuntimeConsentRightsClient locale={locale} />;
+  }
+
+  return (
+    <ConsentRightsInner
+      auth={{ mode: "preview", userId: auth.userId }}
+      isAuthenticated={true}
+      locale={locale}
+    />
   );
 }

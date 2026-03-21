@@ -194,8 +194,9 @@ paths:
       tags: [me]
       summary: Get latest consent record with history
       operationId: getMeConsent
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       responses:
         "200":
           description: Consent state
@@ -209,8 +210,9 @@ paths:
       tags: [me]
       summary: Grant, update, or revoke consent
       operationId: postMeConsent
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - $ref: "#/components/parameters/MeDeviceIdHeader"
         - $ref: "#/components/parameters/MeActorIdHeader"
       requestBody:
@@ -246,8 +248,9 @@ paths:
       tags: [me]
       summary: Request data export package
       operationId: requestMeExport
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -281,8 +284,9 @@ paths:
       tags: [me]
       summary: Poll export status
       operationId: getMeExport
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: export_id
           in: path
           required: true
@@ -310,8 +314,9 @@ paths:
       tags: [me]
       summary: Request data delete/purge
       operationId: requestMeDelete
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -345,8 +350,9 @@ paths:
       tags: [me]
       summary: Poll delete status
       operationId: getMeDelete
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: delete_request_id
           in: path
           required: true
@@ -374,8 +380,9 @@ paths:
       tags: [me, tracking]
       summary: Get mixed meal and symptom history feed
       operationId: getTrackingFeed
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
           in: query
           required: false
@@ -397,8 +404,9 @@ paths:
       tags: [me, tracking]
       summary: Get descriptive weekly tracking summary
       operationId: getWeeklyTrackingSummary
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: anchor_date
           in: query
           required: false
@@ -418,8 +426,9 @@ paths:
       tags: [me, tracking]
       summary: List active symptom logs
       operationId: listTrackingSymptoms
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
           in: query
           required: false
@@ -441,8 +450,9 @@ paths:
       tags: [me, tracking]
       summary: Create symptom log
       operationId: createTrackingSymptom
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -468,8 +478,9 @@ paths:
       tags: [me, tracking]
       summary: Update symptom log
       operationId: updateTrackingSymptom
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: symptom_log_id
           in: path
           required: true
@@ -501,8 +512,9 @@ paths:
       tags: [me, tracking]
       summary: Tombstone symptom log
       operationId: deleteTrackingSymptom
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: symptom_log_id
           in: path
           required: true
@@ -526,8 +538,9 @@ paths:
       tags: [me, tracking]
       summary: List active meal logs
       operationId: listTrackingMeals
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
           in: query
           required: false
@@ -549,8 +562,9 @@ paths:
       tags: [me, tracking]
       summary: Create meal log
       operationId: createTrackingMeal
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -576,8 +590,9 @@ paths:
       tags: [me, tracking]
       summary: Update meal log
       operationId: updateTrackingMeal
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: meal_log_id
           in: path
           required: true
@@ -609,8 +624,9 @@ paths:
       tags: [me, tracking]
       summary: Tombstone meal log
       operationId: deleteTrackingMeal
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: meal_log_id
           in: path
           required: true
@@ -634,8 +650,9 @@ paths:
       tags: [me, tracking]
       summary: List active custom foods
       operationId: listTrackingCustomFoods
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       responses:
         "200":
           description: Custom foods
@@ -649,8 +666,9 @@ paths:
       tags: [me, tracking]
       summary: Create custom food
       operationId: createTrackingCustomFood
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -676,8 +694,9 @@ paths:
       tags: [me, tracking]
       summary: Update custom food
       operationId: updateTrackingCustomFood
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: custom_food_id
           in: path
           required: true
@@ -709,8 +728,9 @@ paths:
       tags: [me, tracking]
       summary: Tombstone custom food
       operationId: deleteTrackingCustomFood
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: custom_food_id
           in: path
           required: true
@@ -734,8 +754,9 @@ paths:
       tags: [me, tracking]
       summary: List active saved meals
       operationId: listTrackingSavedMeals
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       responses:
         "200":
           description: Saved meals
@@ -749,8 +770,9 @@ paths:
       tags: [me, tracking]
       summary: Create saved meal
       operationId: createTrackingSavedMeal
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -776,8 +798,9 @@ paths:
       tags: [me, tracking]
       summary: Update saved meal
       operationId: updateTrackingSavedMeal
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: saved_meal_id
           in: path
           required: true
@@ -809,8 +832,9 @@ paths:
       tags: [me, tracking]
       summary: Tombstone saved meal
       operationId: deleteTrackingSavedMeal
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - name: saved_meal_id
           in: path
           required: true
@@ -839,8 +863,9 @@ paths:
         New implementations must call `/v0/sync/mutations:batch` with
         signed envelopes and replay-window enforcement.
       operationId: postSyncMutations
+      security:
+        - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
         - $ref: "#/components/parameters/SyncDeviceIdHeader"
       requestBody:
         required: true
@@ -879,8 +904,9 @@ paths:
       tags: [sync]
       summary: Push signed mutation batch with deterministic conflict codes
       operationId: postSyncMutationsBatch
-      parameters:
-        - $ref: "#/components/parameters/MeUserIdHeader"
+      security:
+        - BearerAuth: []
+      parameters: []
       requestBody:
         required: true
         content:
@@ -902,15 +928,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   parameters:
-    MeUserIdHeader:
-      name: X-User-Id
-      in: header
-      required: true
-      description: Account or user identifier.
-      schema:
-        type: string
-        format: uuid
     MeDeviceIdHeader:
       name: X-Device-Id
       in: header
@@ -2782,7 +2805,6 @@ components:
           client_device_id,
           sync_session_id,
           client_time_utc,
-          user_id,
           items,
         ]
       properties:

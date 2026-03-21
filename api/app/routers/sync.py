@@ -6,10 +6,11 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Tuple
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Header, Request, Response
+from fastapi import APIRouter, Depends, Request, Response
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store
+from app.auth import require_api_user_id
 from app.config import get_settings
 from app.consent_chain import insert_event as insert_consent_event
 from app.consent_chain import proof_payload_signature
@@ -76,15 +77,6 @@ def _decorate_legacy_sync_headers(response: Response) -> None:
 
 def _get_db(request: Request) -> Database:
     return request.app.state.db
-
-
-def _require_user_id(x_user_id: Optional[str]) -> UUID:
-    if not x_user_id:
-        raise bad_request("Missing X-User-Id header")
-    try:
-        return UUID(x_user_id)
-    except ValueError as exc:
-        raise bad_request("Invalid X-User-Id format") from exc
 
 
 def _ensure_sync_schema(conn) -> None:
@@ -1025,10 +1017,9 @@ def _sort_items(items: list[SyncV1MutationItem]) -> list[SyncV1MutationItem]:
 def sync_mutations_batch(
     request: Request,
     payload: SyncV1MutationBatchRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> SyncV1MutationBatchResponse:
-    user_id = _require_user_id(x_user_id)
-    if payload.user_id != str(user_id):
+    if payload.user_id is not None and payload.user_id != str(user_id):
         raise bad_request("user_id mismatch")
     if payload.schema_version != 1:
         raise bad_request("schema_version must be 1")

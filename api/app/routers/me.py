@@ -6,10 +6,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Header, Request, Response
+from fastapi import APIRouter, Depends, Header, Request, Response
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store
+from app.auth import require_api_user_id
 from app.config import get_settings
 from app.consent_chain import (
     ConsentChainInvalidError,
@@ -64,15 +65,6 @@ def _decorate_legacy_sync_headers(response: Response) -> None:
 
 def _get_db(request: Request) -> Database:
     return request.app.state.db
-
-
-def _require_user_id(x_user_id: Optional[str]) -> UUID:
-    if not x_user_id:
-        raise bad_request("Missing X-User-Id header")
-    try:
-        return UUID(x_user_id)
-    except ValueError as exc:
-        raise bad_request("Invalid X-User-Id format") from exc
 
 
 def _now() -> datetime:
@@ -369,9 +361,8 @@ def _verify_delete_receipt(delete_request_id: UUID, user_id: UUID, row: Dict[str
 @router.get("/me/consent", response_model=ConsentGetResponse)
 def get_me_consent(
     request: Request,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> ConsentGetResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -404,11 +395,10 @@ def get_me_consent(
 def post_me_consent(
     request: Request,
     payload: ConsentPostRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
     x_device_id: Optional[str] = Header(default=None),
     x_actor_id: Optional[str] = Header(default=None),
 ) -> ConsentPostResponse:
-    user_id = _require_user_id(x_user_id)
     actor_id = UUID(x_actor_id) if x_actor_id else None
 
     db = _get_db(request)
@@ -577,9 +567,8 @@ def post_me_consent(
 def request_export(
     request: Request,
     payload: ExportRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> ExportAcceptedResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
     include = _normalize_include(payload.include)
     idempotency_key = payload.idempotency_key or str(uuid4())
@@ -692,9 +681,8 @@ def request_export(
 def get_export_status(
     request: Request,
     export_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> ExportPollResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -745,9 +733,8 @@ def get_export_status(
 def request_delete(
     request: Request,
     payload: DeleteRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> DeleteAcceptedResponse:
-    user_id = _require_user_id(x_user_id)
     if payload.scope == "all" and payload.confirm_text.strip() != EXPORT_CONFIRM_TEXT:
         raise bad_request("Invalid confirm_text for scope=all")
 
@@ -893,9 +880,8 @@ def request_delete(
 def get_delete_status(
     request: Request,
     delete_request_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> DeletePollResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -935,12 +921,11 @@ def sync_mutations(
     request: Request,
     response: Response,
     payload: SyncMutationRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
     x_device_id: Optional[str] = Header(default=None),
 ) -> SyncMutationResponse:
     _decorate_legacy_sync_headers(response)
 
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     if not payload.items:

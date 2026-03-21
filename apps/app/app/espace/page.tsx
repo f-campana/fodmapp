@@ -16,6 +16,7 @@ import {
 } from "../../lib/medicalSafetyCopy";
 import { captureArchitectureEvent } from "../../lib/monitoring";
 import ConsentRightsClient from "./ConsentRightsClient";
+import RuntimeUserButton from "./RuntimeUserButton";
 
 function normalizeLocale(raw: string | string[] | undefined): {
   locale: MedicalLocale;
@@ -68,6 +69,7 @@ export default async function EspacePage({
   const authenticatedUserId =
     auth.isAuthenticated && auth.userId ? auth.userId : null;
   const isPreviewMode = auth.mode === "preview" && authenticatedUserId !== null;
+  const isRuntimeMode = auth.mode === "runtime";
   const fallbackTitle =
     auth.mode === "disabled"
       ? copy("screens.runtime.authUnavailableTitle")
@@ -102,6 +104,7 @@ export default async function EspacePage({
       <section className="app-shell__section">
         {authenticatedUserId ? (
           <>
+            {isRuntimeMode ? <RuntimeUserButton /> : null}
             {isPreviewMode ? (
               <Alert>
                 <AlertTitle>
@@ -114,7 +117,14 @@ export default async function EspacePage({
                 </AlertDescription>
               </Alert>
             ) : null}
-            <ConsentRightsClient userId={authenticatedUserId} locale={locale} />
+            <ConsentRightsClient
+              auth={
+                isPreviewMode
+                  ? { mode: "preview", userId: authenticatedUserId }
+                  : { mode: "runtime" }
+              }
+              locale={locale}
+            />
             <article className="app-shell__section">
               <h2 className="app-shell__text">Ouvrir le suivi</h2>
               <p className="app-shell__text">
@@ -129,6 +139,11 @@ export default async function EspacePage({
           <article className="app-shell__section">
             <h2 className="app-shell__text">{fallbackTitle}</h2>
             <p className="app-shell__text">{fallbackBody}</p>
+            {isRuntimeMode ? (
+              <p className="app-shell__text">
+                <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
+              </p>
+            ) : null}
           </article>
         )}
       </section>

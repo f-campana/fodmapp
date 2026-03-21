@@ -1,7 +1,18 @@
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import RootLayout from "../app/layout";
+
+vi.mock("../components/clerk-shell", () => ({
+  ClerkShell: ({
+    enabled,
+    children,
+  }: {
+    enabled: boolean;
+    children: ReactNode;
+  }) => <div data-clerk-shell={String(enabled)}>{children}</div>,
+}));
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -35,5 +46,20 @@ describe("root layout runtime injections", () => {
 
     expect(html).not.toContain("plausible.io/js/script.js");
     expect(html).not.toContain('data-domain="example.com"');
+  });
+
+  it("mounts the clerk shell only when runtime auth is configured", () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
+    vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+
+    const html = renderToStaticMarkup(
+      <RootLayout>
+        <div>content</div>
+      </RootLayout>,
+    );
+
+    expect(html).toContain('data-clerk-shell="true"');
+    expect(html).toContain('data-auth-mode="runtime"');
+    expect(html).toContain('data-auth-configured="true"');
   });
 });

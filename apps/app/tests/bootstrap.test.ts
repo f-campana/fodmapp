@@ -127,6 +127,8 @@ describe("cross-cutting runtime adapters", () => {
     expect(getAuthMiddlewareMode("/espace/preferences")).toBe(
       "protected-placeholder",
     );
+    expect(getAuthMiddlewareMode("/sign-in")).toBe("public-pass-through");
+    expect(getAuthMiddlewareMode("/sign-up")).toBe("public-pass-through");
   });
 
   it("activates preview mode with a valid preview user id in development", () => {
