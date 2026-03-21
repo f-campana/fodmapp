@@ -29,10 +29,13 @@ The platform prerequisites that are already on `main` are:
 - published `api_*_current` read models for Phase 3 serving
 - `pnpm phase3:promote` for refresh-only persistent-db publish reruns
 
-Hosted activation is still deferred because the repo does not yet implement the first-time persistent
-data bootstrap path for Neon.
+This branch adds the missing first-time persistent bootstrap operator path:
 
-Until that bootstrap track exists:
+- `pnpm phase3:bootstrap:check`
+- `pnpm phase3:bootstrap`
+- `pnpm phase3:bootstrap:status`
+
+Until this bootstrap branch lands on `main`:
 
 - keep CI replay/seed scripts on disposable databases only
 - do not point destructive replay scripts at a persistent Neon branch
@@ -77,11 +80,11 @@ When hosted activation resumes:
 - leave `staging` reserved for later
 - use `pr-*` branches only for later validation if needed
 
-Before the API is exposed publicly, the later hosted-activation track must supply:
+Before the API is exposed publicly, the hosted-activation track must run:
 
-1. the initial persistent data bootstrap path
-2. `pnpm db:migrate` on the target Neon branch
-3. `pnpm phase3:promote` on the already-loaded database
+1. `pnpm db:migrate` on the target Neon branch
+2. `pnpm phase3:bootstrap` on the schema-only database
+3. `pnpm phase3:promote` for later refreshes on the already-loaded database
 
 ## Planned domain attachment
 
@@ -103,4 +106,4 @@ Before calling the hosted environment ready in the later activation track:
 3. `https://api.fodmapp.fr/v0/health` returns `200`.
 4. `https://api.fodmapp.fr/v0/foods?q=a&limit=1` returns a valid response.
 5. Docs-only commits do not trigger redeploys because of `.koyebignore`.
-6. The target Neon database was populated through the later initial-bootstrap path, then refreshed with `pnpm phase3:promote`.
+6. The target Neon database was first loaded through `pnpm phase3:bootstrap`, then refreshed through `pnpm phase3:promote`.

@@ -179,6 +179,191 @@ jobs:
         run: |
           git diff --exit-code -- schema/dbmate/schema.sql
 
+  phase3-bootstrap-smoke:
+    name: phase3-bootstrap-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fodmapp_bootstrap_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fodmapp_bootstrap_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_bootstrap_ci?sslmode=disable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-js-workspace
+        with:
+          node-version: "22"
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          enable-turbo-cache: "false"
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+
+      - name: Install system PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-16
+
+      - name: Install bootstrap dependencies
+        run: |
+          cd api
+          uv sync --extra bootstrap --locked
+
+      - name: Run dbmate migrate
+        run: |
+          pnpm db:migrate
+
+      - name: Verify bootstrap preflight fails without CIQUAL files
+        run: |
+          set +e
+          output="$(pnpm phase3:bootstrap:check 2>&1)"
+          status=$?
+          set -e
+
+          echo "$output"
+          test "$status" -ne 0
+          echo "$output" | grep -F "Missing required CIQUAL files for phase3 bootstrap"
+
+      - name: Cache CIQUAL data
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/ciqual-data
+          key: ciqual-2025-5555c572-e0b1de25-e216928b
+
+      - name: Fetch CIQUAL files (pinned + checksum-verified)
+        run: |
+          while IFS= read -r line; do
+            case "$line" in
+              CIQUAL_XLSX=*|CIQUAL_ALIM_XML=*|CIQUAL_GRP_XML=*)
+                echo "$line" >> "$GITHUB_ENV"
+                ;;
+            esac
+          done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
+
+      - name: Verify bootstrap preflight succeeds on schema-only database
+        run: |
+          pnpm phase3:bootstrap:check -- --manifest-out "$RUNNER_TEMP/phase3-bootstrap-preflight.json"
+
+      - name: Run initial persistent bootstrap
+        run: |
+          pnpm phase3:bootstrap -- --manifest-out "$RUNNER_TEMP/phase3-bootstrap-run.json"
+
+      - name: Verify bootstrap result
+        env:
+          BOOTSTRAP_MANIFEST_PATH: ${{ runner.temp }}/phase3-bootstrap-run.json
+        run: |
+          bootstrap_publish_id="$(psql "$API_DB_URL" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+          test -n "$bootstrap_publish_id"
+          echo "BOOTSTRAP_PUBLISH_ID=$bootstrap_publish_id" >> "$GITHUB_ENV"
+
+          current_rollup_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_rollups_current;")"
+          current_subtype_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_subtypes_current;")"
+          current_swap_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_swaps_current;")"
+          current_active_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'active';")"
+          current_draft_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'draft';")"
+
+          test "$current_rollup_count" = "42"
+          test "$current_subtype_count" = "252"
+          test "$current_swap_count" = "11"
+          test "$current_active_count" = "11"
+          test "$current_draft_count" = "1"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path(os.environ["BOOTSTRAP_MANIFEST_PATH"]).read_text())
+          assert manifest["publish_id"], manifest
+          assert manifest["phase2_priority_count"] == 42, manifest
+          assert manifest["resolved_priority_count"] == 42, manifest
+          assert manifest["rollup_row_count"] == 42, manifest
+          assert manifest["subtype_row_count"] == 252, manifest
+          assert manifest["swap_row_count"] == 11, manifest
+          assert manifest["active_swap_count"] == 11, manifest
+          assert manifest["draft_swap_count"] == 1, manifest
+          PY
+
+      - name: Verify bootstrap recheck rejects bootstrapped database
+        run: |
+          set +e
+          output="$(pnpm phase3:bootstrap:check 2>&1)"
+          status=$?
+          set -e
+
+          echo "$output"
+          test "$status" -ne 0
+          echo "$output" | grep -F "schema-only persistent database"
+
+      - name: Verify promote handoff succeeds
+        run: |
+          pnpm phase3:promote:check
+
+      - name: Run promote after bootstrap
+        run: |
+          pnpm phase3:promote -- --manifest-out "$RUNNER_TEMP/phase3-bootstrap-promote.json"
+
+      - name: Verify post-bootstrap promote result
+        env:
+          PROMOTE_MANIFEST_PATH: ${{ runner.temp }}/phase3-bootstrap-promote.json
+        run: |
+          current_publish_id="$(psql "$API_DB_URL" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+          test -n "$current_publish_id"
+          test "$current_publish_id" != "$BOOTSTRAP_PUBLISH_ID"
+
+          current_rollup_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_rollups_current;")"
+          current_subtype_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_subtypes_current;")"
+          current_swap_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_swaps_current;")"
+          current_active_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'active';")"
+          current_draft_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'draft';")"
+
+          test "$current_rollup_count" = "42"
+          test "$current_subtype_count" = "252"
+          test "$current_swap_count" = "11"
+          test "$current_active_count" = "11"
+          test "$current_draft_count" = "1"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path(os.environ["PROMOTE_MANIFEST_PATH"]).read_text())
+          assert manifest["publish_id"], manifest
+          assert manifest["publish_id"] != os.environ["BOOTSTRAP_PUBLISH_ID"], manifest
+          assert manifest["rollup_row_count"] == 42, manifest
+          assert manifest["subtype_row_count"] == 252, manifest
+          assert manifest["swap_row_count"] == 11, manifest
+          assert manifest["active_swap_count"] == 11, manifest
+          assert manifest["draft_swap_count"] == 1, manifest
+          PY
+
+      - name: Verify bootstrap + promote left repository clean
+        run: |
+          git diff --exit-code
+
   phase3-promote-smoke:
     name: phase3-promote-smoke
     runs-on: ubuntu-latest
@@ -229,7 +414,7 @@ jobs:
       - name: Install dependencies for seed + promote
         run: |
           cd api
-          uv sync --extra dev --extra ci --locked
+          uv sync --extra bootstrap --locked
 
       - name: Cache CIQUAL data
         uses: actions/cache@v5
@@ -460,7 +645,7 @@ jobs:
       - name: Install dependencies for seed + API tests
         run: |
           cd api
-          uv sync --extra dev --extra ci --locked
+          uv sync --extra dev --extra bootstrap --locked
 
       - name: Cache CIQUAL data
         uses: actions/cache@v5
@@ -534,6 +719,7 @@ jobs:
       - api-tests
       - api-container-smoke
       - dbmate-smoke
+      - phase3-bootstrap-smoke
       - phase3-promote-smoke
       - api-integration-seeded
     runs-on: ubuntu-latest
@@ -543,7 +729,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for result in "${{ needs.api-tests.result }}" "${{ needs.api-container-smoke.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.phase3-promote-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
+          for result in "${{ needs.api-tests.result }}" "${{ needs.api-container-smoke.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.phase3-bootstrap-smoke.result }}" "${{ needs.phase3-promote-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
             if [ "$result" != "success" ]; then
               echo "::error::API gate failed because a dependency result was '$result'."
               exit 1

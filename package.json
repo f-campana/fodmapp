@@ -63,6 +63,9 @@
     "db:migrate": "./scripts/dbmate.sh migrate",
     "db:up": "./scripts/dbmate.sh up",
     "db:new": "./scripts/dbmate.sh new",
+    "phase3:bootstrap:check": "uv run --project api python api/scripts/phase3_bootstrap.py check",
+    "phase3:bootstrap": "uv run --project api python api/scripts/phase3_bootstrap.py run",
+    "phase3:bootstrap:status": "uv run --project api python api/scripts/phase3_bootstrap.py status",
     "phase3:promote:check": "uv run --project api python api/scripts/phase3_promote.py check",
     "phase3:promote": "uv run --project api python api/scripts/phase3_promote.py run",
     "phase3:promote:status": "uv run --project api python api/scripts/phase3_promote.py status"

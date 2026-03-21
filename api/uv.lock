@@ -317,7 +317,7 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-ci = [
+bootstrap = [
     { name = "openpyxl" },
     { name = "psycopg2-binary" },
 ]
@@ -333,9 +333,9 @@ lint = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.0,<1.0.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0,<1.0.0" },
-    { name = "openpyxl", marker = "extra == 'ci'", specifier = ">=3.1.0" },
+    { name = "openpyxl", marker = "extra == 'bootstrap'", specifier = ">=3.1.0,<4.0.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2.0,<4.0.0" },
-    { name = "psycopg2-binary", marker = "extra == 'ci'", specifier = ">=2.9.0" },
+    { name = "psycopg2-binary", marker = "extra == 'bootstrap'", specifier = ">=2.9.0,<3.0.0" },
     { name = "pydantic", specifier = ">=2.8.0,<3.0.0" },
     { name = "pyjwt", extras = ["crypto"], specifier = ">=2.10.0,<3.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.2.0,<9.0.0" },
@@ -343,7 +343,7 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'lint'", specifier = ">=0.6.0,<1.0.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.30.0,<1.0.0" },
 ]
-provides-extras = ["dev", "lint", "ci"]
+provides-extras = ["dev", "lint", "bootstrap"]
 
 [[package]]
 name = "h11"

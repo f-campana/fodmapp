@@ -44,7 +44,7 @@ CREATE TEMP TABLE stg_review (
   reviewed_at TEXT
 ) ON COMMIT DROP;
 
-\copy stg_review (rule_key,from_priority_rank,to_priority_rank,scoring_version_snapshot,fodmap_safety_score_snapshot,from_level,to_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,auto_eligible,review_decision,review_notes,reviewed_by,reviewed_at) FROM 'etl/phase3/decisions/phase3_swap_activation_review_v1.csv' WITH (FORMAT csv, HEADER true)
+\copy stg_review (rule_key,from_priority_rank,to_priority_rank,scoring_version_snapshot,fodmap_safety_score_snapshot,from_level,to_level,from_burden_ratio,to_burden_ratio,to_coverage_ratio,auto_eligible,review_decision,review_notes,reviewed_by,reviewed_at) FROM program 'sh -c "cat \"${PHASE3_REVIEW_CSV_PATH:-etl/phase3/decisions/phase3_swap_activation_review_v1.csv}\""' WITH (FORMAT csv, HEADER true)
 
 CREATE TEMP TABLE mvp_rules ON COMMIT DROP AS
 SELECT

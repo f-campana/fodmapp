@@ -21,6 +21,13 @@ cd api
 uv sync --extra dev
 ```
 
+Operator scripts that load or refresh persistent data also need the bootstrap extra:
+
+```bash
+cd api
+uv sync --extra dev --extra bootstrap
+```
+
 ## Run
 
 ```bash
@@ -94,10 +101,14 @@ The first hosted API target is planned as:
 - Neon for PostgreSQL
 - `https://api.fodmapp.fr` as the canonical hosted origin
 
-The hosted API is not live from this branch. Current blockers are:
+The hosted API is not live from this branch. First hosted activation now depends on this operator sequence:
 
-- the initial persistent Neon data bootstrap path is still unimplemented
-- hosted activation remains a later operator track
+1. `pnpm db:migrate`
+2. `pnpm phase3:bootstrap`
+3. later refreshes via `pnpm phase3:promote`
+4. only then attach `https://api.fodmapp.fr`
+
+Hosted activation remains a later operator track until this bootstrap branch lands on `main`.
 
 Container bootstrap artifacts for that later hosting track are now committed:
 

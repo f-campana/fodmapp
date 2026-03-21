@@ -27,6 +27,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - dbmate smoke validation for the long-lived migration lane without weakening replay/seed CI
 - explicit local Postgres `sslmode=disable` wiring for dbmate/API smoke jobs while hosted Neon keeps provider SSL settings
 - manual Phase 3 promote smoke validation for the non-destructive persistent-db refresh lane
+- initial Phase 3 bootstrap smoke validation for the first-time persistent-db load lane
 - weekly docs hygiene drift audit with manual dispatch support and report artifacts
 - deterministic lint prebuilds for dist-backed workspace packages consumed through package exports
 
@@ -311,6 +312,33 @@ Intent:
 - enforce the split contract:
   - disposable DBs: `schema/fodmap_fr_schema.sql` + replay/seed scripts
   - persistent DBs: `schema/dbmate/` + `pnpm db:*`
+
+## Phase 3 Bootstrap Smoke Contract
+
+The `API` workflow now includes a dedicated `phase3-bootstrap-smoke` job for first-time persistent-db load.
+
+Contract:
+
+- runs on a fresh Postgres 16 service database (`fodmapp_bootstrap_ci`) after `pnpm db:migrate`
+- proves `pnpm phase3:bootstrap:check` fails before CIQUAL files are present, then succeeds once explicit CIQUAL paths are available
+- runs `pnpm phase3:bootstrap` once on the schema-only database
+- asserts the bootstrap manifest and current views report:
+  - `42` resolved Phase 2 priorities
+  - `42` published rollups
+  - `252` published subtype rows
+  - `11` published swaps
+  - `11` active / `1` draft MVP swap rules
+  - a current `api_v0_phase3` publish release
+- asserts a rerun of `pnpm phase3:bootstrap:check` fails with the schema-only-only guard once the database is loaded
+- runs `pnpm phase3:promote:check` and one `pnpm phase3:promote` handoff after bootstrap
+- asserts the second publish creates a new `publish_id` while counts stay stable
+- asserts the worktree stays clean after bootstrap + promote, proving the new temp review-packet flow does not mutate tracked review CSVs or depend on git restore
+
+Intent:
+
+- prove the first persistent Neon load path is non-destructive
+- prove bootstrap hands off cleanly to the refresh-only promote lane
+- keep destructive replay/bootstrap limited to disposable CI/local databases
 
 ## Phase 3 Promote Smoke Contract
 
