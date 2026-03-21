@@ -4,7 +4,7 @@ Status: Implemented
 Audience: Reviewer or auditor; Maintainer or operator; Contributor or engineer
 Scope: Current decision status for repo-wide architecture, platform, and operations choices.
 Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
-Last reviewed: 2026-03-08
+Last reviewed: 2026-03-21
 
 Status definitions:
 
@@ -25,8 +25,8 @@ Status definitions:
 | ADR-005  | Root environment contract: `.env.example` + `infra/ci/ENVIRONMENT.md`                                                 | Implemented | Landed in `main`                                                                                                                                                                                         |
 | ADR-006  | Path portability in Phase2/Phase3 scripts (repo-relative)                                                             | Implemented | Landed via replay/seed script updates                                                                                                                                                                    |
 | ADR-007  | `/v0/health` must reflect DB readiness                                                                                | Implemented | Returns `503` on DB outage                                                                                                                                                                               |
-| ADR-008  | Use `dbmate` for SQL-first migration workflow                                                                         | Planned     | Tool choice converged; timing remains gated                                                                                                                                                              |
-| ADR-009  | Neon branch policy (`main` prod, `staging`, `pr-*`)                                                                   | Planned     | Not wired yet                                                                                                                                                                                            |
+| ADR-008  | Use `dbmate` for SQL-first migration workflow                                                                         | In progress | Baseline migration lane, repo commands, and smoke validation are active in `codex/dbmate-neon-bootstrap`; merge pending.                                                                                |
+| ADR-009  | Neon branch policy (`main` prod, `staging`, `pr-*`)                                                                   | Planned     | Still blocked on dbmate landing and later hosted-environment activation work.                                                                                                                            |
 | ADR-010  | Next.js app + Astro marketing/research split                                                                          | Implemented | `apps/app`, `apps/marketing`, and `apps/research` scaffolds are merged on `main`                                                                                                                         |
 | ADR-011  | Clerk (EU), Sentry, Plausible, Axeptio as cross-cutting frontend stack                                                | In progress | Env-gated runtime baseline landed for Clerk/Sentry/Plausible; Axeptio remains deferred/no-op pending activation readiness                                                                                |
 | ADR-012  | Start UI library from shadcn/ui primitives and iterate                                                                | Implemented | `packages/ui` + Storybook foundations are merged on `main`                                                                                                                                               |
@@ -45,7 +45,7 @@ Status definitions:
 
 - Trigger option A: first schema change needed in long-lived environments.
 - Trigger option B: proactive setup before first change.
-- Current leaning: introduce when first schema migration is required by platform work.
+- Current state: proactive bootstrap is active in `codex/dbmate-neon-bootstrap`; merge pending.
 
 2. When to move from scaffolds to first product flow:
 

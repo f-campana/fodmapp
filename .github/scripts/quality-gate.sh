@@ -64,6 +64,7 @@ required_files=(
   ".github/scripts/detect-ci-scope.test.mjs"
   ".github/scripts/docs-hygiene-audit.mjs"
   ".github/scripts/docs-hygiene-audit.test.mjs"
+  "scripts/dbmate.sh"
 )
 
 run_cmd() {
@@ -203,6 +204,7 @@ run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mj
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
 run_cmd "docs hygiene audit syntax" node --check .github/scripts/docs-hygiene-audit.mjs
 run_cmd "docs hygiene audit tests syntax" node --check .github/scripts/docs-hygiene-audit.test.mjs
+run_cmd "dbmate wrapper syntax" bash -n scripts/dbmate.sh
 run_cmd "reporting python script syntax" python3 -m py_compile \
   etl/phase2/reporting/scripts/collect_reporting.py \
   etl/phase2/reporting/scripts/compare_baselines.py \

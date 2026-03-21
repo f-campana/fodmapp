@@ -12,7 +12,7 @@ This document defines environment variables used across the current Python/SQL s
 
 | Variable          | Used by                                                                                                                      | Required                      | Default/Example                       | Notes                                               |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- | --------------------------------------------------- |
-| `API_DB_URL`      | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml`                                                    | yes                           | `postgresql://.../fodmap_test`        | Primary FastAPI DB connection string.               |
+| `API_DB_URL`      | `api/app/config.py`, `api/tests/conftest.py`, `.github/workflows/api.yml`, `scripts/dbmate.sh`, `package.json`                | yes                           | `postgresql://.../fodmap_test`        | Primary FastAPI DB connection string and dbmate target DSN. Local disposable Postgres URLs should set `sslmode=disable`; hosted Neon URLs keep provider SSL settings. |
 | `API_NAME`        | `api/app/config.py`                                                                                                          | no                            | `fodmapp-api`                         | Health metadata.                                    |
 | `API_VERSION`     | `api/app/config.py`                                                                                                          | no                            | `v0`                                  | Health metadata.                                    |
 | `ROOT_DIR`        | `etl/phase2/scripts/phase2_replay_from_zero.sh`, `etl/phase3/scripts/phase3_seed_for_api_ci.sh`                              | no                            | auto-derived from script location     | Repo root override for script portability.          |
@@ -81,9 +81,37 @@ API workflow runtime guardrails are enforced in workflow config (not via environ
 
 - `.github/workflows/api.yml` sets job timeouts to bound runner/container stalls:
   - `api-tests`: `timeout-minutes: 15`
+  - `dbmate-smoke`: `timeout-minutes: 15`
   - `api-integration-seeded`: `timeout-minutes: 25`
   - `api-gate`: `timeout-minutes: 5`
 - if a timeout is reached, GitHub Actions fails the timed-out job and the required `API` gate fails via `api-gate`
+
+## DBMate Migration Lane
+
+`dbmate` is the forward-only schema migration lane for long-lived databases.
+
+Contract:
+
+- repo commands:
+  - `pnpm db:wait`
+  - `pnpm db:status`
+  - `pnpm db:migrate`
+  - `pnpm db:up`
+  - `pnpm db:new -- <slug>`
+- wrapper entrypoint:
+  - `scripts/dbmate.sh`
+- migration artifacts:
+  - `schema/dbmate/migrations/`
+  - `schema/dbmate/schema.sql`
+
+Semantics:
+
+- `API_DB_URL` is reused as the migration target DSN; no second runtime DSN is introduced.
+- local disposable Postgres URLs should explicitly set `sslmode=disable` so `dbmate` can connect to non-TLS local services; hosted Neon URLs keep the provider-managed SSL mode.
+- `schema/dbmate/schema.sql` is generated schema dump only and is not the full bootstrap source of truth.
+- `schema/fodmap_fr_schema.sql` remains the curated bootstrap for disposable replay/local CI databases.
+- `schema/migrations/` is legacy compatibility only for current tests/docs and should not receive new migrations after dbmate bootstrap lands.
+- destructive replay/seed scripts must never target a persistent Neon branch.
 
 ## CI Storybook Deploy Variables
 
@@ -148,7 +176,7 @@ These keys are actively used by the marketing waitlist backend and landing featu
 | `NEON_API_KEY`              | Infra/CI              | Neon API authentication.                    |
 | `NEON_PROJECT_ID`           | Infra/CI              | Neon project target for branch workflow.    |
 | `NEON_BRANCH_PROD`          | Infra/CI              | Production branch name (`main`).            |
-| `NEON_BRANCH_STAGING`       | Infra/CI              | Persistent staging branch name (`staging`). |
+| `NEON_BRANCH_STAGING`       | Infra/CI              | Reserved future staging branch name (`staging`). |
 | `NEON_DATABASE_URL_PROD`    | Infra/CI              | Production database URL.                    |
 | `NEON_DATABASE_URL_STAGING` | Infra/CI              | Staging database URL.                       |
 | `SENTRY_DSN_API`            | API                   | API Sentry DSN.                             |
@@ -159,4 +187,5 @@ These keys are actively used by the marketing waitlist backend and landing featu
 - Workflow-level secrets are usually passed through workflow inputs to `.github/actions/setup-js-workspace`,
   which handles cache mode selection and environment export for Turbo commands.
 - CI remains explicit via workflow `env` blocks and/or action inputs; this file is documentation and local bootstrap aid.
+- Disposable DBs still use monolithic bootstrap + replay/seed scripts; persistent DBs move through dbmate.
 - Any newly introduced runtime variable must be added to both `.env.example` and this document in the same PR.
