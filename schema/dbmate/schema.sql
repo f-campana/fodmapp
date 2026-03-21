@@ -1,12 +1,11 @@
 \restrict dbmate
 
 -- Dumped from database version 16.13 (Debian 16.13-1.pgdg13+1)
--- Dumped by pg_dump version 18.3
+-- Dumped by pg_dump version 16.13 (Ubuntu 16.13-1.pgdg24.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -178,6 +177,23 @@ CREATE TABLE public.culinary_roles (
     label_fr text NOT NULL,
     label_en text NOT NULL,
     description text
+);
+
+
+--
+-- Name: custom_foods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.custom_foods (
+    custom_food_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    label text NOT NULL,
+    note text,
+    version bigint DEFAULT 1 NOT NULL,
+    created_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    CONSTRAINT custom_foods_version_check CHECK ((version >= 1))
 );
 
 
@@ -666,6 +682,20 @@ CREATE TABLE public.ingestion_runs (
 
 
 --
+-- Name: me_auth_identities; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.me_auth_identities (
+    user_id uuid NOT NULL,
+    auth_provider text NOT NULL,
+    auth_subject text NOT NULL,
+    created_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    last_authenticated_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT me_auth_identities_auth_provider_check CHECK ((auth_provider = 'clerk'::text))
+);
+
+
+--
 -- Name: me_delete_jobs; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -779,6 +809,46 @@ CREATE TABLE public.me_mutation_queue (
     chain_prev_hash text,
     chain_item_hash text,
     CONSTRAINT me_mutation_queue_status_check CHECK ((status = ANY (ARRAY['accepted'::text, 'duplicate'::text, 'conflict'::text, 'replayed'::text, 'rejected'::text, 'error'::text])))
+);
+
+
+--
+-- Name: meal_log_items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.meal_log_items (
+    meal_log_item_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    meal_log_id uuid NOT NULL,
+    sort_order integer NOT NULL,
+    item_kind text NOT NULL,
+    food_id uuid,
+    food_slug_snapshot text,
+    custom_food_id uuid,
+    free_text_label text,
+    label_snapshot text NOT NULL,
+    quantity_text text,
+    note text,
+    CONSTRAINT meal_log_items_check CHECK ((((item_kind = 'canonical_food'::text) AND (food_id IS NOT NULL) AND (food_slug_snapshot IS NOT NULL) AND (custom_food_id IS NULL) AND (free_text_label IS NULL)) OR ((item_kind = 'custom_food'::text) AND (food_id IS NULL) AND (food_slug_snapshot IS NULL) AND (custom_food_id IS NOT NULL) AND (free_text_label IS NULL)) OR ((item_kind = 'free_text'::text) AND (food_id IS NULL) AND (food_slug_snapshot IS NULL) AND (custom_food_id IS NULL) AND (free_text_label IS NOT NULL)))),
+    CONSTRAINT meal_log_items_item_kind_check CHECK ((item_kind = ANY (ARRAY['canonical_food'::text, 'custom_food'::text, 'free_text'::text]))),
+    CONSTRAINT meal_log_items_sort_order_check CHECK ((sort_order >= 0))
+);
+
+
+--
+-- Name: meal_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.meal_logs (
+    meal_log_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    title text,
+    occurred_at_utc timestamp with time zone NOT NULL,
+    note text,
+    version bigint DEFAULT 1 NOT NULL,
+    created_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    CONSTRAINT meal_logs_version_check CHECK ((version >= 1))
 );
 
 
@@ -1012,6 +1082,45 @@ CREATE TABLE public.safe_harbor_cohorts (
 
 
 --
+-- Name: saved_meal_items; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.saved_meal_items (
+    saved_meal_item_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    saved_meal_id uuid NOT NULL,
+    sort_order integer NOT NULL,
+    item_kind text NOT NULL,
+    food_id uuid,
+    food_slug_snapshot text,
+    custom_food_id uuid,
+    free_text_label text,
+    label_snapshot text NOT NULL,
+    quantity_text text,
+    note text,
+    CONSTRAINT saved_meal_items_check CHECK ((((item_kind = 'canonical_food'::text) AND (food_id IS NOT NULL) AND (food_slug_snapshot IS NOT NULL) AND (custom_food_id IS NULL) AND (free_text_label IS NULL)) OR ((item_kind = 'custom_food'::text) AND (food_id IS NULL) AND (food_slug_snapshot IS NULL) AND (custom_food_id IS NOT NULL) AND (free_text_label IS NULL)) OR ((item_kind = 'free_text'::text) AND (food_id IS NULL) AND (food_slug_snapshot IS NULL) AND (custom_food_id IS NULL) AND (free_text_label IS NOT NULL)))),
+    CONSTRAINT saved_meal_items_item_kind_check CHECK ((item_kind = ANY (ARRAY['canonical_food'::text, 'custom_food'::text, 'free_text'::text]))),
+    CONSTRAINT saved_meal_items_sort_order_check CHECK ((sort_order >= 0))
+);
+
+
+--
+-- Name: saved_meals; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.saved_meals (
+    saved_meal_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    label text NOT NULL,
+    note text,
+    version bigint DEFAULT 1 NOT NULL,
+    created_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    CONSTRAINT saved_meals_version_check CHECK ((version >= 1))
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1147,6 +1256,27 @@ CREATE TABLE public.swap_rules (
     CONSTRAINT swap_rules_max_ratio_check CHECK ((max_ratio > (0)::numeric)),
     CONSTRAINT swap_rules_min_ratio_check CHECK ((min_ratio > (0)::numeric)),
     CONSTRAINT swap_rules_rule_kind_check CHECK ((rule_kind = ANY (ARRAY['direct_swap'::text, 'technique_swap'::text, 'pairing_swap'::text, 'recipe_rewrite'::text])))
+);
+
+
+--
+-- Name: symptom_logs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.symptom_logs (
+    symptom_log_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    user_id uuid NOT NULL,
+    symptom_type text NOT NULL,
+    severity smallint NOT NULL,
+    noted_at_utc timestamp with time zone NOT NULL,
+    note text,
+    version bigint DEFAULT 1 NOT NULL,
+    created_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at_utc timestamp with time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp with time zone,
+    CONSTRAINT symptom_logs_severity_check CHECK (((severity >= 0) AND (severity <= 10))),
+    CONSTRAINT symptom_logs_symptom_type_check CHECK ((symptom_type = ANY (ARRAY['bloating'::text, 'pain'::text, 'gas'::text, 'diarrhea'::text, 'constipation'::text, 'nausea'::text, 'reflux'::text, 'other'::text]))),
+    CONSTRAINT symptom_logs_version_check CHECK ((version >= 1))
 );
 
 
@@ -1442,6 +1572,14 @@ ALTER TABLE ONLY public.culinary_roles
 
 
 --
+-- Name: custom_foods custom_foods_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.custom_foods
+    ADD CONSTRAINT custom_foods_pkey PRIMARY KEY (custom_food_id);
+
+
+--
 -- Name: data_licenses data_licenses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1682,6 +1820,14 @@ ALTER TABLE ONLY public.ingestion_runs
 
 
 --
+-- Name: me_auth_identities me_auth_identities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.me_auth_identities
+    ADD CONSTRAINT me_auth_identities_pkey PRIMARY KEY (user_id);
+
+
+--
 -- Name: me_delete_jobs me_delete_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1719,6 +1865,22 @@ ALTER TABLE ONLY public.me_export_jobs
 
 ALTER TABLE ONLY public.me_mutation_queue
     ADD CONSTRAINT me_mutation_queue_pkey PRIMARY KEY (mutation_id);
+
+
+--
+-- Name: meal_log_items meal_log_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meal_log_items
+    ADD CONSTRAINT meal_log_items_pkey PRIMARY KEY (meal_log_item_id);
+
+
+--
+-- Name: meal_logs meal_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meal_logs
+    ADD CONSTRAINT meal_logs_pkey PRIMARY KEY (meal_log_id);
 
 
 --
@@ -1842,6 +2004,22 @@ ALTER TABLE ONLY public.safe_harbor_cohorts
 
 
 --
+-- Name: saved_meal_items saved_meal_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.saved_meal_items
+    ADD CONSTRAINT saved_meal_items_pkey PRIMARY KEY (saved_meal_item_id);
+
+
+--
+-- Name: saved_meals saved_meals_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.saved_meals
+    ADD CONSTRAINT saved_meals_pkey PRIMARY KEY (saved_meal_id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1914,11 +2092,27 @@ ALTER TABLE ONLY public.swap_rules
 
 
 --
+-- Name: symptom_logs symptom_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.symptom_logs
+    ADD CONSTRAINT symptom_logs_pkey PRIMARY KEY (symptom_log_id);
+
+
+--
 -- Name: texture_traits texture_traits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.texture_traits
     ADD CONSTRAINT texture_traits_pkey PRIMARY KEY (texture_code);
+
+
+--
+-- Name: me_auth_identities uq_me_auth_identities_provider_subject; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.me_auth_identities
+    ADD CONSTRAINT uq_me_auth_identities_provider_subject UNIQUE (auth_provider, auth_subject);
 
 
 --
@@ -2046,6 +2240,13 @@ CREATE INDEX ix_consent_events_consent ON public.user_consent_ledger_events USIN
 
 
 --
+-- Name: ix_custom_foods_user_updated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_custom_foods_user_updated ON public.custom_foods USING btree (user_id, deleted_at, updated_at_utc DESC);
+
+
+--
 -- Name: ix_delete_jobs_user_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2060,6 +2261,13 @@ CREATE INDEX ix_export_jobs_user_status ON public.me_export_jobs USING btree (us
 
 
 --
+-- Name: ix_meal_logs_user_time; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_meal_logs_user_time ON public.meal_logs USING btree (user_id, deleted_at, occurred_at_utc DESC);
+
+
+--
 -- Name: ix_mutation_device_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2071,6 +2279,20 @@ CREATE INDEX ix_mutation_device_status ON public.me_mutation_queue USING btree (
 --
 
 CREATE INDEX ix_mutation_queue_chain ON public.me_mutation_queue USING btree (user_id, device_id, chain_item_hash);
+
+
+--
+-- Name: ix_saved_meals_user_updated; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_saved_meals_user_updated ON public.saved_meals USING btree (user_id, deleted_at, updated_at_utc DESC);
+
+
+--
+-- Name: ix_symptom_logs_user_time; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_symptom_logs_user_time ON public.symptom_logs USING btree (user_id, deleted_at, noted_at_utc DESC);
 
 
 --
@@ -2102,10 +2324,24 @@ CREATE UNIQUE INDEX uq_export_idempotent ON public.me_export_jobs USING btree (u
 
 
 --
+-- Name: uq_meal_log_items_parent_sort; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uq_meal_log_items_parent_sort ON public.meal_log_items USING btree (meal_log_id, sort_order);
+
+
+--
 -- Name: uq_mutation_idempotency_user; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX uq_mutation_idempotency_user ON public.me_mutation_queue USING btree (user_id, idempotency_key);
+
+
+--
+-- Name: uq_saved_meal_items_parent_sort; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uq_saved_meal_items_parent_sort ON public.saved_meal_items USING btree (saved_meal_id, sort_order);
 
 
 --
@@ -2476,6 +2712,22 @@ ALTER TABLE ONLY public.ingestion_runs
 
 
 --
+-- Name: meal_log_items meal_log_items_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meal_log_items
+    ADD CONSTRAINT meal_log_items_food_id_fkey FOREIGN KEY (food_id) REFERENCES public.foods(food_id);
+
+
+--
+-- Name: meal_log_items meal_log_items_meal_log_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meal_log_items
+    ADD CONSTRAINT meal_log_items_meal_log_id_fkey FOREIGN KEY (meal_log_id) REFERENCES public.meal_logs(meal_log_id) ON DELETE CASCADE;
+
+
+--
 -- Name: phase2_priority_foods phase2_priority_foods_resolved_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2588,6 +2840,22 @@ ALTER TABLE ONLY public.recipes
 
 
 --
+-- Name: saved_meal_items saved_meal_items_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.saved_meal_items
+    ADD CONSTRAINT saved_meal_items_food_id_fkey FOREIGN KEY (food_id) REFERENCES public.foods(food_id);
+
+
+--
+-- Name: saved_meal_items saved_meal_items_saved_meal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.saved_meal_items
+    ADD CONSTRAINT saved_meal_items_saved_meal_id_fkey FOREIGN KEY (saved_meal_id) REFERENCES public.saved_meals(saved_meal_id) ON DELETE CASCADE;
+
+
+--
 -- Name: source_files source_files_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2688,6 +2956,7 @@ ALTER TABLE ONLY public.user_fodmap_tolerances
 --
 
 \unrestrict dbmate
+
 
 
 --
