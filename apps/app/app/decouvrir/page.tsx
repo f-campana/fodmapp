@@ -60,7 +60,9 @@ export default async function DecouvrirPage() {
                 </CardDescription>
               </CardHeader>
               <CardFooter>
-                <Link href="/aliments">Retourner à la recherche</Link>
+                <Link className="product-page__link-pill" href="/aliments">
+                  Retourner à la recherche
+                </Link>
               </CardFooter>
             </Card>
           ) : (
@@ -94,6 +96,11 @@ export default async function DecouvrirPage() {
           <footer className="product-page__footer">
             <p>{safeHarbors.data.meta.attribution}</p>
             <p>{safeHarbors.data.meta.no_endorsement_notice}</p>
+            <p>
+              <Link href="/aliments">
+                Retour à la recherche d&apos;aliments
+              </Link>
+            </p>
           </footer>
         </>
       )}

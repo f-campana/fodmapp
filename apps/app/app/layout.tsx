@@ -16,8 +16,17 @@ import {
 } from "../lib/monitoring";
 
 export const metadata: Metadata = {
-  title: "FODMAP App Scaffold",
-  description: "Architecture-only app shell for FR-first frontend rollout.",
+  title: {
+    default: "FODMAPP App",
+    template: "%s | FODMAPP App",
+  },
+  description:
+    "Recherchez des aliments, consultez des substitutions actives et suivez votre journal FODMAP dans un espace personnel FR-first.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 interface RootLayoutProps {

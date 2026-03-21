@@ -10,10 +10,19 @@ export default function SignInPage() {
   if (!auth.fullyConfigured) {
     return (
       <main className="app-shell">
+        <section className="app-shell__header">
+          <div className="app-shell__meta">
+            <p className="app-shell__eyebrow">Accès</p>
+            <p className="app-shell__status">Espace personnel FODMAPP</p>
+          </div>
+          <h1 className="app-shell__title">Se connecter</h1>
+          <p className="app-shell__description">
+            Accédez à vos droits, exports et suivi descriptif depuis un espace
+            dédié.
+          </p>
+        </section>
         <section className="app-shell__section">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Se connecter
-          </h1>
+          <h2 className="app-shell__section-title">Se connecter</h2>
           <p className="app-shell__text">Connexion Clerk non disponible.</p>
           <p className="app-shell__text">
             Cette page s’active uniquement quand les clés Clerk runtime sont
@@ -29,8 +38,18 @@ export default function SignInPage() {
 
   return (
     <main className="app-shell">
+      <section className="app-shell__header">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Accès</p>
+          <p className="app-shell__status">Espace personnel FODMAPP</p>
+        </div>
+        <h1 className="app-shell__title">Se connecter</h1>
+        <p className="app-shell__description">
+          Accédez à vos droits, exports et suivi descriptif depuis un espace
+          dédié.
+        </p>
+      </section>
       <section className="app-shell__section">
-        <h1 className="text-3xl font-semibold tracking-tight">Se connecter</h1>
         <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
       </section>
     </main>

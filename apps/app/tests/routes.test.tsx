@@ -48,20 +48,21 @@ afterEach(() => {
   mockedGetAuthContext.mockReset();
 });
 
-describe("apps/app scaffold routes", () => {
-  it("renders home route with FR-first scaffold copy and espace link", async () => {
+describe("apps/app routes", () => {
+  it("renders home route with product framing and primary route links", async () => {
     const html = renderToStaticMarkup(
       await HomePage({ searchParams: Promise.resolve({}) }),
     );
 
+    expect(html).toContain("Repères alimentaires et suivi personnel");
     expect(html).toContain(
       "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",
     );
-    expect(html).toContain("fodmapp-api@v0");
-    expect(html).toContain("Mode minimal / Mode consenti");
-    expect(html).toContain(
-      "Partager un récapitulatif avec votre professionnel",
-    );
+    expect(html).toContain("Trois entrées complémentaires");
+    expect(html).toContain("Sécurité d’usage");
+    expect(html).not.toContain("fodmapp-api@v0");
+    expect(html).toContain('href="/aliments"');
+    expect(html).toContain('href="/decouvrir"');
     expect(html).toContain('href="/espace"');
   });
 
@@ -79,8 +80,9 @@ describe("apps/app scaffold routes", () => {
       await EspacePage({ searchParams: Promise.resolve({}) }),
     );
 
+    expect(html).toContain("Consentement, exports et suivi");
     expect(html).toContain(
-      "L’app soutient vos choix digestifs et ne pose pas de conclusion clinique.",
+      "Partagez un résumé non clinique : tendances, substitutions actives, niveaux de confiance.",
     );
     expect(html).toContain("Connexion indisponible dans cette version");
     expect(html).toContain(

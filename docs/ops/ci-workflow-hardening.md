@@ -265,7 +265,7 @@ Contract:
 
 - runs on a fresh Postgres 16 service database (`fodmapp_dbmate_ci`)
 - installs workspace dependencies through `.github/actions/setup-js-workspace`
-- installs `postgresql-client-16` so `pg_dump` matches the Postgres 16 service and keeps `schema/dbmate/schema.sql` diff-stable
+- installs `postgresql-client-16` so the dump path stays on the Postgres 16 major version; `scripts/dbmate.sh` normalizes minor-version header noise before checking `schema/dbmate/schema.sql`
 - runs `pnpm db:migrate` against the empty database
 - asserts presence of:
   - `foods`

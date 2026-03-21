@@ -26,56 +26,69 @@ export default async function EspaceSuiviPage() {
 
   return (
     <main className="app-shell">
-      <div className="app-shell__meta">
-        <p className="app-shell__eyebrow">Espace / Suivi</p>
-        <p className="app-shell__eyebrow">
-          Journal descriptif, sans interprétation clinique.
-        </p>
-      </div>
-
-      <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Suivi</h1>
-        <p className="app-shell__text">
+      <section className="app-shell__header">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Espace / Suivi</p>
+          <p className="app-shell__status">
+            Journal descriptif, sans interprétation clinique.
+          </p>
+        </div>
+        <h1 className="app-shell__title">Suivi</h1>
+        <p className="app-shell__description">
           Enregistre tes repas, tes symptômes et un résumé hebdomadaire
           descriptif. Cette page aide à revoir ton historique; elle ne prouve
           pas une cause ni un déclencheur.
         </p>
       </section>
 
-      {authenticatedUserId ? (
-        <>
-          {isRuntimeMode ? <RuntimeUserButton /> : null}
-          {isPreviewMode ? (
-            <Alert>
-              <AlertTitle>
-                {copy("screens.runtime.previewModeTitle")}
-              </AlertTitle>
-              <AlertDescription>
-                {copy("screens.runtime.previewModeBody", {
-                  userId: authenticatedUserId,
-                })}
-              </AlertDescription>
-            </Alert>
-          ) : null}
-          <TrackingHubClient
-            auth={
-              isPreviewMode
-                ? { mode: "preview", userId: authenticatedUserId }
-                : { mode: "runtime" }
-            }
-          />
-        </>
-      ) : (
-        <Alert>
-          <AlertTitle>{fallbackTitle}</AlertTitle>
-          <AlertDescription>{fallbackBody}</AlertDescription>
-          {isRuntimeMode ? (
-            <p className="app-shell__text">
-              <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
-            </p>
-          ) : null}
-        </Alert>
-      )}
+      <section className="app-shell__section">
+        {authenticatedUserId ? (
+          <>
+            <div className="app-shell__meta">
+              <p className="app-shell__eyebrow">Journal</p>
+              <p className="app-shell__status">Historique personnel</p>
+            </div>
+            {isRuntimeMode ? <RuntimeUserButton /> : null}
+            {isPreviewMode ? (
+              <Alert>
+                <AlertTitle>
+                  {copy("screens.runtime.previewModeTitle")}
+                </AlertTitle>
+                <AlertDescription>
+                  {copy("screens.runtime.previewModeBody", {
+                    userId: authenticatedUserId,
+                  })}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+            <TrackingHubClient
+              auth={
+                isPreviewMode
+                  ? { mode: "preview", userId: authenticatedUserId }
+                  : { mode: "runtime" }
+              }
+            />
+          </>
+        ) : (
+          <>
+            <div className="app-shell__meta">
+              <p className="app-shell__eyebrow">Accès</p>
+              <p className="app-shell__status">
+                {auth.mode === "disabled"
+                  ? "Version locale sans authentification"
+                  : "Authentification requise"}
+              </p>
+            </div>
+            <h2 className="app-shell__section-title">{fallbackTitle}</h2>
+            <p className="app-shell__text">{fallbackBody}</p>
+            {isRuntimeMode ? (
+              <p className="app-shell__text">
+                <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
+              </p>
+            ) : null}
+          </>
+        )}
+      </section>
 
       <p className="app-shell__text">
         <Link href="/espace">Gérer les droits et les exports</Link>

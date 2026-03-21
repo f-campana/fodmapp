@@ -49,8 +49,8 @@ normalize_schema_dump_headers() {
   fi
 
   perl -0pi -e '
-    s/^-- Dumped from database version ([^\n(]+?)(?: \([^)]+\))?$/-- Dumped from database version $1/mg;
-    s/^-- Dumped by pg_dump version ([^\n(]+?)(?: \([^)]+\))?$/-- Dumped by pg_dump version $1/mg;
+    s/^-- Dumped from database version ([0-9]+)(?:\.[^\n(]+)?(?: \([^)]+\))?$/-- Dumped from database version $1/mg;
+    s/^-- Dumped by pg_dump version ([0-9]+)(?:\.[^\n(]+)?(?: \([^)]+\))?$/-- Dumped by pg_dump version $1/mg;
   ' "${SCHEMA_FILE}"
 }
 

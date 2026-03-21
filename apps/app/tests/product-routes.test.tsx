@@ -299,9 +299,13 @@ describe("product routes", () => {
     ).rejects.toThrow("NEXT_NOT_FOUND");
   });
 
-  it("keeps the home page links minimal but discoverable", async () => {
+  it("keeps the home page route navigation discoverable", async () => {
     const html = renderToStaticMarkup(await HomePage({}));
 
+    expect(html).toContain("Repères alimentaires et suivi personnel");
+    expect(html).toContain("Rechercher un aliment");
+    expect(html).toContain("Ouvrir mon espace");
+    expect(html).not.toContain("fodmapp-api@v0");
     expect(html).toContain('href="/aliments"');
     expect(html).toContain('href="/decouvrir"');
     expect(html).toContain('href="/espace"');
