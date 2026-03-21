@@ -77,7 +77,7 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM api_food_rollups_current r
-    WHERE r.publish_id <> v_publish_id
+    WHERE r.publish_id IS DISTINCT FROM v_publish_id
   ) THEN
     RAISE EXCEPTION 'api_food_rollups_current exposes rows outside current publish release %', v_publish_id;
   END IF;
@@ -85,7 +85,7 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM api_food_subtypes_current s
-    WHERE s.publish_id <> v_publish_id
+    WHERE s.publish_id IS DISTINCT FROM v_publish_id
   ) THEN
     RAISE EXCEPTION 'api_food_subtypes_current exposes rows outside current publish release %', v_publish_id;
   END IF;
@@ -93,7 +93,7 @@ BEGIN
   IF EXISTS (
     SELECT 1
     FROM api_swaps_current s
-    WHERE s.publish_id <> v_publish_id
+    WHERE s.publish_id IS DISTINCT FROM v_publish_id
   ) THEN
     RAISE EXCEPTION 'api_swaps_current exposes rows outside current publish release %', v_publish_id;
   END IF;

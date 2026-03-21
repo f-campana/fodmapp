@@ -194,6 +194,8 @@ paths:
       tags: [me]
       summary: Get latest consent record with history
       operationId: getMeConsent
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       responses:
@@ -209,6 +211,8 @@ paths:
       tags: [me]
       summary: Grant, update, or revoke consent
       operationId: postMeConsent
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - $ref: "#/components/parameters/MeDeviceIdHeader"
@@ -246,6 +250,8 @@ paths:
       tags: [me]
       summary: Request data export package
       operationId: requestMeExport
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -281,6 +287,8 @@ paths:
       tags: [me]
       summary: Poll export status
       operationId: getMeExport
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: export_id
@@ -310,6 +318,8 @@ paths:
       tags: [me]
       summary: Request data delete/purge
       operationId: requestMeDelete
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -345,6 +355,8 @@ paths:
       tags: [me]
       summary: Poll delete status
       operationId: getMeDelete
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: delete_request_id
@@ -374,6 +386,8 @@ paths:
       tags: [me, tracking]
       summary: Get mixed meal and symptom history feed
       operationId: getTrackingFeed
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
@@ -397,6 +411,8 @@ paths:
       tags: [me, tracking]
       summary: Get descriptive weekly tracking summary
       operationId: getWeeklyTrackingSummary
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: anchor_date
@@ -418,6 +434,8 @@ paths:
       tags: [me, tracking]
       summary: List active symptom logs
       operationId: listTrackingSymptoms
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
@@ -441,6 +459,8 @@ paths:
       tags: [me, tracking]
       summary: Create symptom log
       operationId: createTrackingSymptom
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -468,6 +488,8 @@ paths:
       tags: [me, tracking]
       summary: Update symptom log
       operationId: updateTrackingSymptom
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: symptom_log_id
@@ -501,6 +523,8 @@ paths:
       tags: [me, tracking]
       summary: Tombstone symptom log
       operationId: deleteTrackingSymptom
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: symptom_log_id
@@ -526,6 +550,8 @@ paths:
       tags: [me, tracking]
       summary: List active meal logs
       operationId: listTrackingMeals
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: limit
@@ -549,6 +575,8 @@ paths:
       tags: [me, tracking]
       summary: Create meal log
       operationId: createTrackingMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -576,6 +604,8 @@ paths:
       tags: [me, tracking]
       summary: Update meal log
       operationId: updateTrackingMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: meal_log_id
@@ -609,6 +639,8 @@ paths:
       tags: [me, tracking]
       summary: Tombstone meal log
       operationId: deleteTrackingMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: meal_log_id
@@ -634,6 +666,8 @@ paths:
       tags: [me, tracking]
       summary: List active custom foods
       operationId: listTrackingCustomFoods
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       responses:
@@ -649,6 +683,8 @@ paths:
       tags: [me, tracking]
       summary: Create custom food
       operationId: createTrackingCustomFood
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -676,6 +712,8 @@ paths:
       tags: [me, tracking]
       summary: Update custom food
       operationId: updateTrackingCustomFood
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: custom_food_id
@@ -709,6 +747,8 @@ paths:
       tags: [me, tracking]
       summary: Tombstone custom food
       operationId: deleteTrackingCustomFood
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: custom_food_id
@@ -734,6 +774,8 @@ paths:
       tags: [me, tracking]
       summary: List active saved meals
       operationId: listTrackingSavedMeals
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       responses:
@@ -749,6 +791,8 @@ paths:
       tags: [me, tracking]
       summary: Create saved meal
       operationId: createTrackingSavedMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -776,6 +820,8 @@ paths:
       tags: [me, tracking]
       summary: Update saved meal
       operationId: updateTrackingSavedMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: saved_meal_id
@@ -809,6 +855,8 @@ paths:
       tags: [me, tracking]
       summary: Tombstone saved meal
       operationId: deleteTrackingSavedMeal
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - name: saved_meal_id
@@ -839,6 +887,8 @@ paths:
         New implementations must call `/v0/sync/mutations:batch` with
         signed envelopes and replay-window enforcement.
       operationId: postSyncMutations
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
         - $ref: "#/components/parameters/SyncDeviceIdHeader"
@@ -879,6 +929,8 @@ paths:
       tags: [sync]
       summary: Push signed mutation batch with deterministic conflict codes
       operationId: postSyncMutationsBatch
+      security:
+        - HTTPBearer: []
       parameters:
         - $ref: "#/components/parameters/MeUserIdHeader"
       requestBody:
@@ -902,6 +954,10 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
 components:
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer
   parameters:
     MeUserIdHeader:
       name: X-User-Id

@@ -935,6 +935,11 @@ Read interfaces:
   - `api_food_subtypes_current`
   - `api_food_rollups_current`
   - `api_swaps_current`
+- dbmate-compatible bootstrap placeholder views:
+  - `v_phase3_rollup_subtype_levels_latest`
+  - `v_phase3_rollups_latest_full`
+  - these exist as empty compatibility anchors on a fresh migrated database and are replaced by `etl/phase3/sql/phase3_rollups_compute.sql`
+- before the first `api_v0_phase3` release exists, `api_*_current` falls back to the compatibility `v_phase3_*_latest*` views; after publish, serving is release-boundary only
 
 Pipeline-managed snapshot artifacts:
 

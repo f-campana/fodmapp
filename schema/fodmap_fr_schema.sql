@@ -606,7 +606,50 @@ CREATE TABLE published_swaps (
   PRIMARY KEY (publish_id, swap_rule_id)
 );
 
+CREATE VIEW v_phase3_rollup_subtype_levels_latest AS
+SELECT
+  NULL::INTEGER AS priority_rank,
+  NULL::UUID AS food_id,
+  NULL::NUMERIC(8,2) AS rollup_serving_g,
+  NULL::TEXT AS subtype_code,
+  NULL::SMALLINT AS fodmap_subtype_id,
+  NULL::NUMERIC(12,6) AS amount_g_per_serving,
+  NULL::comparator_code AS comparator,
+  NULL::NUMERIC(12,6) AS low_max_g,
+  NULL::NUMERIC(12,6) AS moderate_max_g,
+  NULL::fodmap_level AS subtype_level,
+  NULL::TEXT AS signal_source_kind,
+  NULL::TEXT AS signal_source_slug,
+  NULL::TEXT AS threshold_source,
+  NULL::TEXT AS threshold_source_slug,
+  NULL::BOOLEAN AS is_default_threshold,
+  NULL::BOOLEAN AS is_polyol_proxy,
+  NULL::TEXT AS default_threshold_citation_ref,
+  NULL::TEXT AS default_threshold_derivation_method,
+  NULL::INTEGER AS severity_rank,
+  NULL::NUMERIC(12,6) AS burden_ratio,
+  NULL::TIMESTAMPTZ AS computed_at
+WHERE FALSE;
+
+CREATE VIEW v_phase3_rollups_latest_full AS
+SELECT
+  NULL::INTEGER AS priority_rank,
+  NULL::UUID AS food_id,
+  NULL::NUMERIC(8,2) AS rollup_serving_g,
+  NULL::fodmap_level AS overall_level,
+  NULL::TEXT AS driver_subtype_code,
+  NULL::INTEGER AS known_subtypes_count,
+  NULL::NUMERIC(6,4) AS coverage_ratio,
+  NULL::TIMESTAMPTZ AS computed_at,
+  NULL::TEXT AS source_slug
+WHERE FALSE;
+
 CREATE VIEW api_publish_meta_current AS
+WITH current_release AS (
+  SELECT cur.publish_id
+  FROM publish_release_current cur
+  WHERE cur.release_kind = 'api_v0_phase3'
+)
 SELECT
   pr.publish_id::text AS publish_id,
   pr.release_kind,
@@ -616,11 +659,37 @@ SELECT
   pr.subtype_row_count,
   pr.swap_row_count
 FROM publish_releases pr
-JOIN publish_release_current cur
+JOIN current_release cur
   ON cur.publish_id = pr.publish_id
-WHERE cur.release_kind = 'api_v0_phase3';
+UNION ALL
+SELECT
+  NULL::text AS publish_id,
+  'api_v0_phase3'::text AS release_kind,
+  NULL::TIMESTAMPTZ AS published_at,
+  (SELECT MAX(v.computed_at) FROM v_phase3_rollups_latest_full v) AS rollup_computed_at_max,
+  (SELECT COUNT(*)::int FROM v_phase3_rollups_latest_full) AS rollup_row_count,
+  (SELECT COUNT(*)::int FROM v_phase3_rollup_subtype_levels_latest) AS subtype_row_count,
+  (
+    WITH active_rules AS (
+      SELECT r.swap_rule_id
+      FROM swap_rules r
+      LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
+      LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
+      WHERE r.status = 'active'
+        AND COALESCE(p_from.priority_rank, 0) <> 2
+        AND COALESCE(p_to.priority_rank, 0) <> 2
+    )
+    SELECT COUNT(*)::int
+    FROM active_rules
+  ) AS swap_row_count
+WHERE NOT EXISTS (SELECT 1 FROM current_release);
 
 CREATE VIEW api_food_rollups_current AS
+WITH current_release AS (
+  SELECT cur.publish_id
+  FROM publish_release_current cur
+  WHERE cur.release_kind = 'api_v0_phase3'
+)
 SELECT
   pfr.publish_id,
   pfr.priority_rank,
@@ -633,11 +702,29 @@ SELECT
   pfr.source_slug,
   pfr.computed_at
 FROM published_food_rollups pfr
-JOIN publish_release_current cur
+JOIN current_release cur
   ON cur.publish_id = pfr.publish_id
-WHERE cur.release_kind = 'api_v0_phase3';
+UNION ALL
+SELECT
+  NULL::UUID AS publish_id,
+  v.priority_rank,
+  v.food_id,
+  v.rollup_serving_g,
+  v.overall_level,
+  v.driver_subtype_code,
+  v.known_subtypes_count,
+  v.coverage_ratio,
+  v.source_slug,
+  v.computed_at
+FROM v_phase3_rollups_latest_full v
+WHERE NOT EXISTS (SELECT 1 FROM current_release);
 
 CREATE VIEW api_food_subtypes_current AS
+WITH current_release AS (
+  SELECT cur.publish_id
+  FROM publish_release_current cur
+  WHERE cur.release_kind = 'api_v0_phase3'
+)
 SELECT
   pfs.publish_id,
   pfs.priority_rank,
@@ -658,42 +745,154 @@ SELECT
   pfs.burden_ratio,
   pfs.computed_at
 FROM published_food_subtype_levels pfs
-JOIN publish_release_current cur
+JOIN current_release cur
   ON cur.publish_id = pfs.publish_id
-WHERE cur.release_kind = 'api_v0_phase3';
+UNION ALL
+SELECT
+  NULL::UUID AS publish_id,
+  v.priority_rank,
+  v.food_id,
+  v.rollup_serving_g,
+  v.subtype_code,
+  v.fodmap_subtype_id,
+  v.amount_g_per_serving,
+  v.comparator,
+  v.low_max_g,
+  v.moderate_max_g,
+  v.subtype_level,
+  v.signal_source_kind,
+  v.signal_source_slug,
+  v.threshold_source_slug,
+  v.is_default_threshold,
+  v.is_polyol_proxy,
+  v.burden_ratio,
+  v.computed_at
+FROM v_phase3_rollup_subtype_levels_latest v
+WHERE NOT EXISTS (SELECT 1 FROM current_release);
 
 CREATE VIEW api_swaps_current AS
-SELECT
-  ps.publish_id,
-  ps.swap_rule_id,
-  ps.from_food_id,
-  ps.to_food_id,
-  ps.from_food_slug,
-  ps.to_food_slug,
-  ps.from_food_name_fr,
-  ps.from_food_name_en,
-  ps.to_food_name_fr,
-  ps.to_food_name_en,
-  ps.instruction_fr,
-  ps.instruction_en,
-  ps.rule_status,
-  ps.source_slug,
-  ps.scoring_version,
-  ps.fodmap_safety_score,
-  ps.overall_score,
-  ps.from_priority_rank,
-  ps.to_priority_rank,
-  ps.from_overall_level,
-  ps.to_overall_level,
-  ps.driver_subtype,
-  ps.from_burden_ratio,
-  ps.to_burden_ratio,
-  ps.coverage_ratio,
-  ps.rollup_computed_at
-FROM published_swaps ps
-JOIN publish_release_current cur
-  ON cur.publish_id = ps.publish_id
-WHERE cur.release_kind = 'api_v0_phase3';
+WITH current_release AS (
+  SELECT cur.publish_id
+  FROM publish_release_current cur
+  WHERE cur.release_kind = 'api_v0_phase3'
+),
+published_rows AS (
+  SELECT
+    ps.publish_id,
+    ps.swap_rule_id,
+    ps.from_food_id,
+    ps.to_food_id,
+    ps.from_food_slug,
+    ps.to_food_slug,
+    ps.from_food_name_fr,
+    ps.from_food_name_en,
+    ps.to_food_name_fr,
+    ps.to_food_name_en,
+    ps.instruction_fr,
+    ps.instruction_en,
+    ps.rule_status,
+    ps.source_slug,
+    ps.scoring_version,
+    ps.fodmap_safety_score,
+    ps.overall_score,
+    ps.from_priority_rank,
+    ps.to_priority_rank,
+    ps.from_overall_level,
+    ps.to_overall_level,
+    ps.driver_subtype,
+    ps.from_burden_ratio,
+    ps.to_burden_ratio,
+    ps.coverage_ratio,
+    ps.rollup_computed_at
+  FROM published_swaps ps
+  JOIN current_release cur
+    ON cur.publish_id = ps.publish_id
+),
+fallback_rows AS (
+  WITH active_rules AS (
+    SELECT
+      r.swap_rule_id,
+      r.from_food_id,
+      r.to_food_id,
+      f_from.food_slug AS from_food_slug,
+      f_to.food_slug AS to_food_slug,
+      f_from.canonical_name_fr AS from_food_name_fr,
+      f_from.canonical_name_en AS from_food_name_en,
+      f_to.canonical_name_fr AS to_food_name_fr,
+      f_to.canonical_name_en AS to_food_name_en,
+      r.instruction_fr,
+      COALESCE(r.instruction_en, r.instruction_fr) AS instruction_en,
+      r.status AS rule_status,
+      src.source_slug,
+      rs.scoring_version,
+      rs.fodmap_safety_score,
+      rs.overall_score,
+      p_from.priority_rank AS from_priority_rank,
+      p_to.priority_rank AS to_priority_rank,
+      COALESCE(vrf.overall_level, 'unknown'::fodmap_level) AS from_overall_level,
+      COALESCE(vrt.overall_level, 'unknown'::fodmap_level) AS to_overall_level,
+      vrt.driver_subtype_code AS driver_subtype,
+      COALESCE(vrt.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
+      COALESCE(vrt.computed_at, vrf.computed_at) AS rollup_computed_at
+    FROM swap_rules r
+    JOIN foods f_from ON f_from.food_id = r.from_food_id
+    JOIN foods f_to ON f_to.food_id = r.to_food_id
+    JOIN swap_rule_scores rs ON rs.swap_rule_id = r.swap_rule_id
+    JOIN sources src ON src.source_id = r.source_id
+    LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
+    LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
+    LEFT JOIN v_phase3_rollups_latest_full vrf ON vrf.food_id = r.from_food_id
+    LEFT JOIN v_phase3_rollups_latest_full vrt ON vrt.food_id = r.to_food_id
+    WHERE r.status = 'active'
+      AND COALESCE(p_from.priority_rank, 0) <> 2
+      AND COALESCE(p_to.priority_rank, 0) <> 2
+  ),
+  with_burden AS (
+    SELECT
+      ar.*,
+      fd.burden_ratio AS from_burden_ratio,
+      td.burden_ratio AS to_burden_ratio
+    FROM active_rules ar
+    LEFT JOIN v_phase3_rollup_subtype_levels_latest fd
+      ON fd.priority_rank = ar.from_priority_rank
+     AND fd.subtype_code = ar.driver_subtype
+    LEFT JOIN v_phase3_rollup_subtype_levels_latest td
+      ON td.priority_rank = ar.to_priority_rank
+     AND td.subtype_code = ar.driver_subtype
+  )
+  SELECT
+    NULL::UUID AS publish_id,
+    wb.swap_rule_id,
+    wb.from_food_id,
+    wb.to_food_id,
+    wb.from_food_slug,
+    wb.to_food_slug,
+    wb.from_food_name_fr,
+    wb.from_food_name_en,
+    wb.to_food_name_fr,
+    wb.to_food_name_en,
+    wb.instruction_fr,
+    wb.instruction_en,
+    wb.rule_status,
+    wb.source_slug,
+    wb.scoring_version,
+    wb.fodmap_safety_score,
+    wb.overall_score,
+    wb.from_priority_rank,
+    wb.to_priority_rank,
+    wb.from_overall_level,
+    wb.to_overall_level,
+    wb.driver_subtype,
+    wb.from_burden_ratio,
+    wb.to_burden_ratio,
+    wb.coverage_ratio,
+    wb.rollup_computed_at
+  FROM with_burden wb
+  WHERE NOT EXISTS (SELECT 1 FROM current_release)
+)
+SELECT * FROM published_rows
+UNION ALL
+SELECT * FROM fallback_rows;
 
 CREATE TABLE eu_allergens (
   allergen_code TEXT PRIMARY KEY,

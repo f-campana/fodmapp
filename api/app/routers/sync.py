@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Tuple
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Request, Response, Security
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store
@@ -1017,7 +1017,7 @@ def _sort_items(items: list[SyncV1MutationItem]) -> list[SyncV1MutationItem]:
 def sync_mutations_batch(
     request: Request,
     payload: SyncV1MutationBatchRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> SyncV1MutationBatchResponse:
     if payload.user_id is not None and payload.user_id != str(user_id):
         raise bad_request("user_id mismatch")

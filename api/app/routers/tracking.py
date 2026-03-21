@@ -4,7 +4,7 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi import APIRouter, Query, Request, Response, Security, status
 
 from app import sql, tracking_store
 from app.auth import require_api_user_id
@@ -48,7 +48,7 @@ def _require_tracking_write_allowed(conn, user_id: UUID) -> None:
 def get_tracking_feed(
     request: Request,
     limit: int = Query(default=50, ge=1, le=200),
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> TrackingFeedResponse:
     db = _get_db(request)
 
@@ -60,7 +60,7 @@ def get_tracking_feed(
 def get_weekly_summary(
     request: Request,
     anchor_date: Optional[date] = Query(default=None),
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> WeeklyTrackingSummaryResponse:
     db = _get_db(request)
 
@@ -72,7 +72,7 @@ def get_weekly_summary(
 def list_symptoms(
     request: Request,
     limit: int = Query(default=100, ge=1, le=200),
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> list[SymptomLog]:
     db = _get_db(request)
 
@@ -84,7 +84,7 @@ def list_symptoms(
 def create_symptom(
     request: Request,
     payload: SymptomLogCreateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> SymptomLog:
     db = _get_db(request)
 
@@ -101,7 +101,7 @@ def update_symptom(
     request: Request,
     symptom_log_id: UUID,
     payload: SymptomLogUpdateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> SymptomLog:
     db = _get_db(request)
 
@@ -118,7 +118,7 @@ def update_symptom(
 def delete_symptom(
     request: Request,
     symptom_log_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> Response:
     db = _get_db(request)
 
@@ -136,7 +136,7 @@ def delete_symptom(
 def list_meals(
     request: Request,
     limit: int = Query(default=100, ge=1, le=200),
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> list[MealLog]:
     db = _get_db(request)
 
@@ -148,7 +148,7 @@ def list_meals(
 def create_meal(
     request: Request,
     payload: MealLogCreateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> MealLog:
     db = _get_db(request)
 
@@ -165,7 +165,7 @@ def update_meal(
     request: Request,
     meal_log_id: UUID,
     payload: MealLogUpdateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> MealLog:
     db = _get_db(request)
 
@@ -182,7 +182,7 @@ def update_meal(
 def delete_meal(
     request: Request,
     meal_log_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> Response:
     db = _get_db(request)
 
@@ -199,7 +199,7 @@ def delete_meal(
 @router.get("/custom-foods", response_model=list[CustomFood])
 def list_custom_foods(
     request: Request,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> list[CustomFood]:
     db = _get_db(request)
 
@@ -211,7 +211,7 @@ def list_custom_foods(
 def create_custom_food(
     request: Request,
     payload: CustomFoodCreateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> CustomFood:
     db = _get_db(request)
 
@@ -228,7 +228,7 @@ def update_custom_food(
     request: Request,
     custom_food_id: UUID,
     payload: CustomFoodUpdateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> CustomFood:
     db = _get_db(request)
 
@@ -245,7 +245,7 @@ def update_custom_food(
 def delete_custom_food(
     request: Request,
     custom_food_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> Response:
     db = _get_db(request)
 
@@ -262,7 +262,7 @@ def delete_custom_food(
 @router.get("/saved-meals", response_model=list[SavedMeal])
 def list_saved_meals(
     request: Request,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> list[SavedMeal]:
     db = _get_db(request)
 
@@ -274,7 +274,7 @@ def list_saved_meals(
 def create_saved_meal(
     request: Request,
     payload: SavedMealCreateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> SavedMeal:
     db = _get_db(request)
 
@@ -291,7 +291,7 @@ def update_saved_meal(
     request: Request,
     saved_meal_id: UUID,
     payload: SavedMealUpdateRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> SavedMeal:
     db = _get_db(request)
 
@@ -308,7 +308,7 @@ def update_saved_meal(
 def delete_saved_meal(
     request: Request,
     saved_meal_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> Response:
     db = _get_db(request)
 

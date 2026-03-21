@@ -84,3 +84,4 @@ Rollup, subtype, and swap serving now go through the Phase 3 publish boundary:
 - Phase 3 compute still rebuilds internal snapshot artifacts.
 - `etl/phase3/sql/phase3_publish_release_apply.sql` copies the current compiler outputs into immutable `publish_id` tables and flips the `api_*_current` views atomically.
 - API reads use the published current views rather than the compiler-owned `v_phase3_*_latest*` views directly.
+- On a dbmate-migrated database with no `api_v0_phase3` release yet, `api_*_current` falls back to the compatibility `v_phase3_*_latest*` views until the first publish is created.

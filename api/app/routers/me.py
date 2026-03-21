@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, Header, Request, Response
+from fastapi import APIRouter, Header, Request, Response, Security
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store
@@ -361,7 +361,7 @@ def _verify_delete_receipt(delete_request_id: UUID, user_id: UUID, row: Dict[str
 @router.get("/me/consent", response_model=ConsentGetResponse)
 def get_me_consent(
     request: Request,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> ConsentGetResponse:
     db = _get_db(request)
 
@@ -395,7 +395,7 @@ def get_me_consent(
 def post_me_consent(
     request: Request,
     payload: ConsentPostRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
     x_device_id: Optional[str] = Header(default=None),
     x_actor_id: Optional[str] = Header(default=None),
 ) -> ConsentPostResponse:
@@ -567,7 +567,7 @@ def post_me_consent(
 def request_export(
     request: Request,
     payload: ExportRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> ExportAcceptedResponse:
     db = _get_db(request)
     include = _normalize_include(payload.include)
@@ -681,7 +681,7 @@ def request_export(
 def get_export_status(
     request: Request,
     export_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> ExportPollResponse:
     db = _get_db(request)
 
@@ -733,7 +733,7 @@ def get_export_status(
 def request_delete(
     request: Request,
     payload: DeleteRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> DeleteAcceptedResponse:
     if payload.scope == "all" and payload.confirm_text.strip() != EXPORT_CONFIRM_TEXT:
         raise bad_request("Invalid confirm_text for scope=all")
@@ -880,7 +880,7 @@ def request_delete(
 def get_delete_status(
     request: Request,
     delete_request_id: UUID,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
 ) -> DeletePollResponse:
     db = _get_db(request)
 
@@ -921,7 +921,7 @@ def sync_mutations(
     request: Request,
     response: Response,
     payload: SyncMutationRequest,
-    user_id: UUID = Depends(require_api_user_id),
+    user_id: UUID = Security(require_api_user_id),
     x_device_id: Optional[str] = Header(default=None),
 ) -> SyncMutationResponse:
     _decorate_legacy_sync_headers(response)
