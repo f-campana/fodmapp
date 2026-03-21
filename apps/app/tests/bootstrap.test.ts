@@ -21,6 +21,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "");
     vi.stubEnv("SENTRY_DSN_APP", "");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "");
@@ -50,6 +52,9 @@ describe("cross-cutting runtime adapters", () => {
   it("enables runtime path for Clerk/Sentry/Plausible when env keys are set", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
     vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "clerk.example");
+    vi.stubEnv("CLERK_JWT_KEY", "jwt_public_key");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "http://localhost:3000");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
     vi.stubEnv("NEXT_PUBLIC_SENTRY_DSN_APP", "https://sentry.example/42");
     vi.stubEnv("NEXT_PUBLIC_PLAUSIBLE_DOMAIN", "example.com");
@@ -121,6 +126,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
 
     expect(getAuthMiddlewareMode("/")).toBe("public-pass-through");
     expect(getAuthMiddlewareMode("/espace")).toBe("protected-placeholder");
@@ -135,6 +142,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
     vi.stubEnv("NODE_ENV", "development");
 
@@ -154,6 +163,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
     vi.stubEnv("NODE_ENV", "production");
 
@@ -169,6 +180,8 @@ describe("cross-cutting runtime adapters", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "not-a-uuid");
     vi.stubEnv("NODE_ENV", "development");
 
@@ -183,10 +196,29 @@ describe("cross-cutting runtime adapters", () => {
   it("switches middleware to runtime mode when Clerk env is complete", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
     vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "clerk.example");
+    vi.stubEnv("CLERK_JWT_KEY", "jwt_public_key");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "http://localhost:3000");
 
     expect(getAuthMiddlewareMode("/espace")).toBe("protected-runtime");
     expect(getAuthMiddlewareMode("/espace/preferences")).toBe(
       "protected-runtime",
+    );
+  });
+
+  it("keeps runtime auth disabled when the JWT verifier env is incomplete", () => {
+    vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
+    vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "clerk.example");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "http://localhost:3000");
+
+    const auth = getClerkBootstrapStatus();
+
+    expect(auth.fullyConfigured).toBe(false);
+    expect(auth.mode).toBe("disabled");
+    expect(getAuthMiddlewareMode("/espace", auth)).toBe(
+      "protected-placeholder",
     );
   });
 });

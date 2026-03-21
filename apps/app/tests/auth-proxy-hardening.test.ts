@@ -14,6 +14,9 @@ const PREVIEW_USER_ID = "11111111-1111-4111-8111-111111111111";
 function configureClerkRuntimeEnv(): void {
   vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
   vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+  vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "clerk.example");
+  vi.stubEnv("CLERK_JWT_KEY", "jwt_public_key");
+  vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "http://localhost:3000");
 }
 
 describe("auth runtime hardening", () => {
@@ -61,6 +64,8 @@ describe("auth runtime hardening", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", PREVIEW_USER_ID);
     vi.stubEnv("NODE_ENV", "development");
 
@@ -86,6 +91,8 @@ describe("auth runtime hardening", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "");
     vi.stubEnv("CLERK_SECRET_KEY", "");
     vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "");
+    vi.stubEnv("CLERK_JWT_KEY", "");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "");
     vi.stubEnv("APP_AUTH_PREVIEW_USER_ID", "invalid-preview-user");
     vi.stubEnv("NODE_ENV", "development");
 

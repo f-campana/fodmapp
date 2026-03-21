@@ -51,6 +51,9 @@ describe("root layout runtime injections", () => {
   it("mounts the clerk shell only when runtime auth is configured", () => {
     vi.stubEnv("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY", "pk_test_stub");
     vi.stubEnv("CLERK_SECRET_KEY", "sk_test_stub");
+    vi.stubEnv("CLERK_JWT_ISSUER_DOMAIN", "clerk.example");
+    vi.stubEnv("CLERK_JWT_KEY", "jwt_public_key");
+    vi.stubEnv("CLERK_AUTHORIZED_PARTIES", "http://localhost:3000");
 
     const html = renderToStaticMarkup(
       <RootLayout>
