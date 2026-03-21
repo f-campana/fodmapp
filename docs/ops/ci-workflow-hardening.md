@@ -301,7 +301,7 @@ Contract:
   - a current `api_v0_phase3` publish release exists
   - `api_food_rollups_current` exposes the expected `42` rollups
   - `api_food_subtypes_current` is populated
-  - `api_swaps_current` matches the active swap-rule count
+  - `api_swaps_current` matches the full active publishable swap source count, while the seeded MVP fixture itself still stays pinned at `11` active and `1` draft rows
 
 Semantics:
 
