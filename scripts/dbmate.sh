@@ -43,6 +43,28 @@ check_ordered_migrations() {
   done
 }
 
+normalize_schema_dump_headers() {
+  if [[ ! -f "${SCHEMA_FILE}" ]]; then
+    return 0
+  fi
+
+  perl -0pi -e '
+    s/^-- Dumped from database version ([^\n(]+?)(?: \([^)]+\))?$/-- Dumped from database version $1/mg;
+    s/^-- Dumped by pg_dump version ([^\n(]+?)(?: \([^)]+\))?$/-- Dumped by pg_dump version $1/mg;
+  ' "${SCHEMA_FILE}"
+}
+
+run_dbmate_write_command() {
+  local status=0
+
+  pnpm exec dbmate -e API_DB_URL -d "${MIGRATIONS_DIR}" -s "${SCHEMA_FILE}" --wait "${command_name}" "$@" || status=$?
+  if [[ "${status}" -ne 0 ]]; then
+    return "${status}"
+  fi
+
+  normalize_schema_dump_headers
+}
+
 command_name="${1:-}"
 if [[ -z "${command_name}" ]]; then
   usage >&2
@@ -56,8 +78,11 @@ case "${command_name}" in
   wait)
     exec pnpm exec dbmate -e API_DB_URL -d "${MIGRATIONS_DIR}" -s "${SCHEMA_FILE}" wait "$@"
     ;;
-  status|migrate|up|dump)
+  status)
     exec pnpm exec dbmate -e API_DB_URL -d "${MIGRATIONS_DIR}" -s "${SCHEMA_FILE}" --wait "${command_name}" "$@"
+    ;;
+  migrate|up|dump)
+    run_dbmate_write_command "$@"
     ;;
   new|n)
     if [[ "$#" -eq 0 ]]; then
