@@ -8,7 +8,7 @@
   "fixture_id": "Q-02",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:96ae08052d62c312f56c98ed65cb17855f4f54cf27fb2b5f1ad29952be359580",
+    "api/app/sql.py": "sha256:394ab36f11356e52c47c8711848f5c0938252248501453baf401e39415408d39",
     "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a"
   },

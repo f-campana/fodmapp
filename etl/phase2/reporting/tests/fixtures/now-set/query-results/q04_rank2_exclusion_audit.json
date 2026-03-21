@@ -10,8 +10,8 @@
   "fixture_id": "Q-04",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:96ae08052d62c312f56c98ed65cb17855f4f54cf27fb2b5f1ad29952be359580",
-    "api/tests/test_swaps.py": "sha256:e003c4beeffa779317fdc8fd91498ce604fa6525edbbaf013f11bdc5f06dbea6",
+    "api/app/sql.py": "sha256:394ab36f11356e52c47c8711848f5c0938252248501453baf401e39415408d39",
+    "api/tests/test_swaps.py": "sha256:dc2a1e12de63ba5a412a0da80688de07a7e60d52f8414b240d7f873a219d5e4b",
     "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5",
     "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
     "etl/phase3/sql/phase3_mvp_checks.sql": "sha256:d37cd53d77fd1a3229ad079e8fc581021f54dc54331d0857952df66156c33215"
