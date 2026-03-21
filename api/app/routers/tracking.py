@@ -4,11 +4,12 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Header, Query, Request, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 
 from app import sql, tracking_store
+from app.auth import require_api_user_id
 from app.db import Database
-from app.errors import bad_request, locked
+from app.errors import locked
 from app.models import (
     CustomFood,
     CustomFoodCreateRequest,
@@ -33,15 +34,6 @@ def _get_db(request: Request) -> Database:
     return request.app.state.db
 
 
-def _require_user_id(x_user_id: Optional[str]) -> UUID:
-    if not x_user_id:
-        raise bad_request("Missing X-User-Id header")
-    try:
-        return UUID(x_user_id)
-    except ValueError as exc:
-        raise bad_request("Invalid X-User-Id format") from exc
-
-
 def _next_version(conn, user_id: UUID, entity_type: str, entity_id: str) -> int:
     return tracking_store.get_entity_version(conn, user_id, entity_type, entity_id) + 1
 
@@ -56,9 +48,8 @@ def _require_tracking_write_allowed(conn, user_id: UUID) -> None:
 def get_tracking_feed(
     request: Request,
     limit: int = Query(default=50, ge=1, le=200),
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> TrackingFeedResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -69,9 +60,8 @@ def get_tracking_feed(
 def get_weekly_summary(
     request: Request,
     anchor_date: Optional[date] = Query(default=None),
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> WeeklyTrackingSummaryResponse:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -82,9 +72,8 @@ def get_weekly_summary(
 def list_symptoms(
     request: Request,
     limit: int = Query(default=100, ge=1, le=200),
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> list[SymptomLog]:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -95,9 +84,8 @@ def list_symptoms(
 def create_symptom(
     request: Request,
     payload: SymptomLogCreateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> SymptomLog:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -113,9 +101,8 @@ def update_symptom(
     request: Request,
     symptom_log_id: UUID,
     payload: SymptomLogUpdateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> SymptomLog:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -131,9 +118,8 @@ def update_symptom(
 def delete_symptom(
     request: Request,
     symptom_log_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> Response:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -150,9 +136,8 @@ def delete_symptom(
 def list_meals(
     request: Request,
     limit: int = Query(default=100, ge=1, le=200),
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> list[MealLog]:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -163,9 +148,8 @@ def list_meals(
 def create_meal(
     request: Request,
     payload: MealLogCreateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> MealLog:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -181,9 +165,8 @@ def update_meal(
     request: Request,
     meal_log_id: UUID,
     payload: MealLogUpdateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> MealLog:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -199,9 +182,8 @@ def update_meal(
 def delete_meal(
     request: Request,
     meal_log_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> Response:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -217,9 +199,8 @@ def delete_meal(
 @router.get("/custom-foods", response_model=list[CustomFood])
 def list_custom_foods(
     request: Request,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> list[CustomFood]:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -230,9 +211,8 @@ def list_custom_foods(
 def create_custom_food(
     request: Request,
     payload: CustomFoodCreateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> CustomFood:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -248,9 +228,8 @@ def update_custom_food(
     request: Request,
     custom_food_id: UUID,
     payload: CustomFoodUpdateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> CustomFood:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -266,9 +245,8 @@ def update_custom_food(
 def delete_custom_food(
     request: Request,
     custom_food_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> Response:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -284,9 +262,8 @@ def delete_custom_food(
 @router.get("/saved-meals", response_model=list[SavedMeal])
 def list_saved_meals(
     request: Request,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> list[SavedMeal]:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
@@ -297,9 +274,8 @@ def list_saved_meals(
 def create_saved_meal(
     request: Request,
     payload: SavedMealCreateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> SavedMeal:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -315,9 +291,8 @@ def update_saved_meal(
     request: Request,
     saved_meal_id: UUID,
     payload: SavedMealUpdateRequest,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> SavedMeal:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:
@@ -333,9 +308,8 @@ def update_saved_meal(
 def delete_saved_meal(
     request: Request,
     saved_meal_id: UUID,
-    x_user_id: Optional[str] = Header(default=None),
+    user_id: UUID = Depends(require_api_user_id),
 ) -> Response:
-    user_id = _require_user_id(x_user_id)
     db = _get_db(request)
 
     with db.connection() as conn:

@@ -13,16 +13,33 @@ vi.mock("../lib/auth", () => ({
 
 vi.mock("../app/espace/ConsentRightsClient", () => ({
   __esModule: true,
-  default: ({ userId }: { userId: string }) => (
-    <div>{`consent-rights-client:${userId}`}</div>
+  default: ({
+    auth,
+  }: {
+    auth: { mode: "preview"; userId: string } | { mode: "runtime" };
+  }) => (
+    <div>
+      {`consent-rights-client:${auth.mode === "preview" ? auth.userId : "runtime"}`}
+    </div>
   ),
 }));
 
 vi.mock("../app/espace/suivi/TrackingHubClient", () => ({
   __esModule: true,
-  default: ({ userId }: { userId: string }) => (
-    <div>{`tracking-hub-client:${userId}`}</div>
+  default: ({
+    auth,
+  }: {
+    auth: { mode: "preview"; userId: string } | { mode: "runtime" };
+  }) => (
+    <div>
+      {`tracking-hub-client:${auth.mode === "preview" ? auth.userId : "runtime"}`}
+    </div>
   ),
+}));
+
+vi.mock("../app/espace/RuntimeUserButton", () => ({
+  __esModule: true,
+  default: () => <div>runtime-user-button</div>,
 }));
 
 const mockedGetAuthContext = vi.mocked(getAuthContext);
@@ -90,7 +107,8 @@ describe("apps/app scaffold routes", () => {
       await EspacePage({ searchParams: Promise.resolve({}) }),
     );
 
-    expect(html).toContain("consent-rights-client:user_123");
+    expect(html).toContain("consent-rights-client:runtime");
+    expect(html).toContain("runtime-user-button");
     expect(html).toContain('href="/espace/suivi"');
     expect(html).not.toContain('href="/sign-in"');
   });
@@ -150,7 +168,8 @@ describe("apps/app scaffold routes", () => {
 
     const html = renderToStaticMarkup(await EspaceSuiviPage());
 
-    expect(html).toContain("tracking-hub-client:user_456");
+    expect(html).toContain("tracking-hub-client:runtime");
+    expect(html).toContain("runtime-user-button");
     expect(html).toContain("Journal descriptif, sans interprétation clinique.");
     expect(html).toContain('href="/espace"');
   });
@@ -171,6 +190,40 @@ describe("apps/app scaffold routes", () => {
     expect(html).toContain("user_preview_456");
     expect(html).toContain("tracking-hub-client:user_preview_456");
     expect(html).not.toContain('href="/sign-in"');
+  });
+
+  it("renders sign-in CTA on espace when Clerk runtime is configured but user is anonymous", async () => {
+    mockedGetAuthContext.mockResolvedValue({
+      state: "anonymous",
+      provider: "clerk",
+      mode: "runtime",
+      isAuthenticated: false,
+      configured: true,
+      userId: null,
+    });
+
+    const html = renderToStaticMarkup(
+      await EspacePage({ searchParams: Promise.resolve({}) }),
+    );
+
+    expect(html).toContain('href="/sign-in"');
+    expect(html).toContain("Se connecter");
+  });
+
+  it("renders sign-in CTA on suivi when Clerk runtime is configured but user is anonymous", async () => {
+    mockedGetAuthContext.mockResolvedValue({
+      state: "anonymous",
+      provider: "clerk",
+      mode: "runtime",
+      isAuthenticated: false,
+      configured: true,
+      userId: null,
+    });
+
+    const html = renderToStaticMarkup(await EspaceSuiviPage());
+
+    expect(html).toContain('href="/sign-in"');
+    expect(html).toContain("Se connecter");
   });
 
   it("renders suivi loading route", () => {

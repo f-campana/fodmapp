@@ -1,5 +1,9 @@
 import { buildApiUrl, resolveApiBase } from "./api/base";
 import { getClientRuntimeEnv } from "./env.client";
+import {
+  buildProtectedApiHeaders,
+  type ProtectedApiAuth,
+} from "./protectedApiAuth";
 const API_PATHS = {
   consent: "/me/consent",
   export: "/me/export",
@@ -121,13 +125,13 @@ type ConsentStatePayload = {
 
 async function callMeApi<T>(
   path: string,
-  userId: string,
+  auth: ProtectedApiAuth,
   options: RequestInit = {},
   apiBase?: string | null,
 ): Promise<T> {
-  const headers = new Headers(options.headers ?? {});
-  headers.set("Content-Type", "application/json");
-  headers.set("X-User-Id", userId);
+  const headers = await buildProtectedApiHeaders(auth, options.headers, {
+    json: true,
+  });
 
   const url = buildApiUrl(path, apiBase ?? getClientRuntimeEnv().apiBaseUrl);
   if (!url) {
@@ -188,14 +192,14 @@ export function canTrackWithConsent(
 }
 
 export async function getConsentRecord(
-  userId: string,
+  auth: ProtectedApiAuth,
   apiBase?: string | null,
 ): Promise<ConsentRecord | null> {
   try {
     const payload = await callMeApi<{
       consent_state: ConsentStatePayload;
       history: Array<Record<string, unknown>>;
-    }>(API_PATHS.consent, userId, { method: "GET" }, apiBase);
+    }>(API_PATHS.consent, auth, { method: "GET" }, apiBase);
 
     return {
       consentId: String(payload.consent_state.consent_id ?? ""),
@@ -231,7 +235,7 @@ export async function getConsentRecord(
 }
 
 export async function grantOrRevokeConsent(params: {
-  userId: string;
+  auth: ProtectedApiAuth;
   action: "grant" | "revoke";
   scope: ConsentScope;
   policyVersion: string;
@@ -263,7 +267,7 @@ export async function grantOrRevokeConsent(params: {
     evidence_hash?: string | null;
   }>(
     API_PATHS.consent,
-    params.userId,
+    params.auth,
     {
       method: "POST",
       body: JSON.stringify(body),
@@ -298,7 +302,7 @@ export async function grantOrRevokeConsent(params: {
 }
 
 export async function requestExport(params: {
-  userId: string;
+  auth: ProtectedApiAuth;
   request: ExportRequest;
   apiBase?: string | null;
 }): Promise<ExportAccepted> {
@@ -311,7 +315,7 @@ export async function requestExport(params: {
     status_uri: string;
   }>(
     API_PATHS.export,
-    params.userId,
+    params.auth,
     {
       method: "POST",
       body: JSON.stringify({
@@ -337,20 +341,20 @@ export async function requestExport(params: {
 }
 
 export async function pollExportStatus(params: {
-  userId: string;
+  auth: ProtectedApiAuth;
   exportId: string;
   apiBase?: string | null;
 }): Promise<Record<string, unknown>> {
   return callMeApi(
     `${API_PATHS.export}/${params.exportId}`,
-    params.userId,
+    params.auth,
     { method: "GET" },
     params.apiBase,
   );
 }
 
 export async function requestDelete(params: {
-  userId: string;
+  auth: ProtectedApiAuth;
   request: DeleteRequest;
   apiBase?: string | null;
 }): Promise<DeleteAccepted> {
@@ -366,7 +370,7 @@ export async function requestDelete(params: {
     status_uri: string;
   }>(
     API_PATHS.delete,
-    params.userId,
+    params.auth,
     {
       method: "POST",
       body: JSON.stringify({
@@ -395,13 +399,13 @@ export async function requestDelete(params: {
 }
 
 export async function pollDeleteStatus(params: {
-  userId: string;
+  auth: ProtectedApiAuth;
   deleteRequestId: string;
   apiBase?: string | null;
 }): Promise<Record<string, unknown>> {
   return callMeApi(
     `${API_PATHS.delete}/${params.deleteRequestId}`,
-    params.userId,
+    params.auth,
     { method: "GET" },
     params.apiBase,
   );

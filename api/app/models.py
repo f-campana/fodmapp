@@ -744,7 +744,7 @@ class SyncV1MutationBatchRequest(BaseModel):
     client_device_id: str
     sync_session_id: str
     client_time_utc: datetime
-    user_id: str
+    user_id: Optional[str] = None
     items: list[SyncV1MutationItem]
     migration_mode: bool = False
 

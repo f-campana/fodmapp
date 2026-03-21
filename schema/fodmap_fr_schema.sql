@@ -629,6 +629,15 @@ CREATE TABLE user_profiles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE me_auth_identities (
+  user_id UUID PRIMARY KEY,
+  auth_provider TEXT NOT NULL CHECK (auth_provider = 'clerk'),
+  auth_subject TEXT NOT NULL,
+  created_at_utc TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_authenticated_at_utc TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uq_me_auth_identities_provider_subject UNIQUE (auth_provider, auth_subject)
+);
+
 CREATE TABLE user_fodmap_tolerances (
   user_profile_id UUID NOT NULL REFERENCES user_profiles (user_profile_id) ON DELETE CASCADE,
   fodmap_subtype_id SMALLINT NOT NULL REFERENCES fodmap_subtypes (fodmap_subtype_id),

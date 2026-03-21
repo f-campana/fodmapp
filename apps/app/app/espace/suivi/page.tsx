@@ -4,6 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 
 import { getAuthContext } from "../../../lib/auth";
 import { getMedicalSafetyCopy } from "../../../lib/medicalSafetyCopy";
+import RuntimeUserButton from "../RuntimeUserButton";
 import TrackingHubClient from "./TrackingHubClient";
 
 export default async function EspaceSuiviPage() {
@@ -13,6 +14,7 @@ export default async function EspaceSuiviPage() {
   const authenticatedUserId =
     auth.isAuthenticated && auth.userId ? auth.userId : null;
   const isPreviewMode = auth.mode === "preview" && authenticatedUserId !== null;
+  const isRuntimeMode = auth.mode === "runtime";
   const fallbackTitle =
     auth.mode === "disabled"
       ? copy("screens.runtime.authUnavailableTitle")
@@ -42,6 +44,7 @@ export default async function EspaceSuiviPage() {
 
       {authenticatedUserId ? (
         <>
+          {isRuntimeMode ? <RuntimeUserButton /> : null}
           {isPreviewMode ? (
             <Alert>
               <AlertTitle>
@@ -54,12 +57,23 @@ export default async function EspaceSuiviPage() {
               </AlertDescription>
             </Alert>
           ) : null}
-          <TrackingHubClient userId={authenticatedUserId} />
+          <TrackingHubClient
+            auth={
+              isPreviewMode
+                ? { mode: "preview", userId: authenticatedUserId }
+                : { mode: "runtime" }
+            }
+          />
         </>
       ) : (
         <Alert>
           <AlertTitle>{fallbackTitle}</AlertTitle>
           <AlertDescription>{fallbackBody}</AlertDescription>
+          {isRuntimeMode ? (
+            <p className="app-shell__text">
+              <Link href="/sign-in">{copy("screens.runtime.signInCta")}</Link>
+            </p>
+          ) : null}
         </Alert>
       )}
 

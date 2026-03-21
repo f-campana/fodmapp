@@ -394,6 +394,25 @@ ORDER BY granted_at_utc DESC
 LIMIT 1
 """
 
+SQL_UPSERT_AUTH_IDENTITY = """
+INSERT INTO me_auth_identities (
+  user_id,
+  auth_provider,
+  auth_subject,
+  last_authenticated_at_utc
+)
+VALUES (
+  %(user_id)s,
+  'clerk',
+  %(auth_subject)s,
+  NOW()
+)
+ON CONFLICT (auth_provider, auth_subject)
+DO UPDATE SET
+  last_authenticated_at_utc = NOW()
+RETURNING user_id, auth_provider, auth_subject
+"""
+
 SQL_GET_CONSENT_HISTORY = """
 SELECT
   e.event_type AS event,
