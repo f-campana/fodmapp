@@ -94,7 +94,7 @@ jobs:
       - name: Install system PostgreSQL client
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y postgresql-client-16
 
       - name: Run dbmate migrate
         run: |
@@ -169,7 +169,7 @@ jobs:
       - name: Install system PostgreSQL client
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          sudo apt-get install -y postgresql-client-16
 
       - name: Install dependencies for seed + API tests
         run: |

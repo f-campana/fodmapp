@@ -107,6 +107,7 @@ Contract:
 Semantics:
 
 - `API_DB_URL` is reused as the migration target DSN; no second runtime DSN is introduced.
+- `.github/workflows/api.yml` pins `postgresql-client-16` in API jobs so `pg_dump` output stays aligned with the Postgres 16 CI service and the checked-in dbmate schema dump remains deterministic.
 - local disposable Postgres URLs should explicitly set `sslmode=disable` so `dbmate` can connect to non-TLS local services; hosted Neon URLs keep the provider-managed SSL mode.
 - `schema/dbmate/schema.sql` is generated schema dump only and is not the full bootstrap source of truth.
 - `schema/fodmap_fr_schema.sql` remains the curated bootstrap for disposable replay/local CI databases.
