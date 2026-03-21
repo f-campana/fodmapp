@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@fodmapp/ui/card";
-import { Chip } from "@fodmapp/ui/chip";
 import { ScoreBar } from "@fodmapp/ui/score-bar";
 
 import { getFoodDetail, getFoodRollup, getSwaps } from "../../../lib/api";
@@ -64,6 +63,21 @@ export default async function AlimentDetailPage({
           actives disponibles aujourd&apos;hui.
         </p>
       </section>
+
+      <nav aria-label="Raccourcis aliment">
+        <ul className="product-page__link-list">
+          <li>
+            <Link className="product-page__link-pill" href="/aliments">
+              Retour à la recherche
+            </Link>
+          </li>
+          <li>
+            <Link className="product-page__link-pill" href="/decouvrir">
+              Voir les bases compatibles
+            </Link>
+          </li>
+        </ul>
+      </nav>
 
       <Card>
         <CardHeader>
@@ -124,8 +138,16 @@ export default async function AlimentDetailPage({
               substitutions.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Link href="/decouvrir">Explorer les bases alimentaires</Link>
+          <CardContent className="product-page__stack">
+            <p className="product-page__note">
+              Explore les bases simples déjà vérifiées pour préparer une option
+              de repli.
+            </p>
+            <div>
+              <Link className="product-page__link-pill" href="/decouvrir">
+                Explorer les bases alimentaires
+              </Link>
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -145,10 +167,10 @@ export default async function AlimentDetailPage({
                     Niveau cible: {formatFoodLevel(item.to_overall_level)}
                   </Badge>
                   {item.coverage_ratio < 0.5 ? (
-                    <Chip>Données partielles</Chip>
+                    <Badge variant="secondary">Données partielles</Badge>
                   ) : null}
                   {item.to_overall_level === "unknown" ? (
-                    <Chip>Niveau non vérifié</Chip>
+                    <Badge variant="secondary">Niveau non vérifié</Badge>
                   ) : null}
                 </div>
                 <ScoreBar

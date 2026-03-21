@@ -1,13 +1,10 @@
 import Link from "next/link";
 
-import type { components } from "@fodmapp/types";
-import { Badge } from "@fodmapp/ui/badge";
 import { Button } from "@fodmapp/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@fodmapp/ui/card";
@@ -25,14 +22,6 @@ import {
   captureArchitectureEvent,
   getMonitoringBootstrapStatus,
 } from "../lib/monitoring";
-
-type HealthResponse = components["schemas"]["HealthResponse"];
-
-const HEALTH_CONTRACT_SAMPLE: HealthResponse = {
-  status: "ok",
-  service: "fodmapp-api",
-  version: "v0",
-};
 
 function normalizeLocale(raw: string | string[] | undefined): {
   locale: MedicalLocale;
@@ -78,6 +67,32 @@ export default async function HomePage({
   const consentModeNotice = consent.runtimeEnabled
     ? copy("screens.consentMode.downgradeWarning")
     : copy("screens.consentMode.upgradeSubtext");
+  const routeCards = [
+    {
+      href: "/aliments",
+      title: "Aliments",
+      description:
+        "Recherche un aliment de la base pour consulter son niveau FODMAP et les substitutions actives disponibles aujourd’hui.",
+      cta: "Rechercher un aliment",
+      variant: "default",
+    },
+    {
+      href: "/decouvrir",
+      title: "Découvrir",
+      description:
+        "Quand un aliment n’a pas encore de substitut documenté, cette page propose des bases simples pour continuer à cuisiner sans impasse.",
+      cta: "Explorer les bases",
+      variant: "outline",
+    },
+    {
+      href: "/espace",
+      title: "Espace",
+      description:
+        "Gérez le consentement, les exports et un suivi descriptif sans transformer l’app en outil clinique.",
+      cta: "Ouvrir mon espace",
+      variant: "secondary",
+    },
+  ] as const;
 
   captureArchitectureEvent("app_shell_rendered", {
     route: "/",
@@ -97,186 +112,89 @@ export default async function HomePage({
         route="/"
       />
 
-      <div className="app-shell__meta">
-        <Badge variant="secondary">
-          {`[${locale.toUpperCase()}] ${HEALTH_CONTRACT_SAMPLE.service}@${HEALTH_CONTRACT_SAMPLE.version}`}
-        </Badge>
+      <section className="app-shell__header">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">FODMAPP App</p>
+          <p className="app-shell__status">{consentModeLabel}</p>
+        </div>
+        <h1 className="app-shell__title">
+          Repères alimentaires et suivi personnel
+        </h1>
+        <p className="app-shell__description">
+          {copy("screens.onboarding.safetyPositioningBanner")}
+        </p>
+        <p className="app-shell__text">
+          {copy("screens.onboarding.dataModeIntro")}
+        </p>
+        <div className="app-shell__actions">
+          <Button asChild>
+            <Link href="/aliments">Rechercher un aliment</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/decouvrir">Explorer les bases</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href="/espace">Ouvrir mon espace</Link>
+          </Button>
+        </div>
         {fallback && (
           <p className="app-shell__eyebrow">
             {copy("fallbacks.missingLocale")}
           </p>
         )}
-      </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {copy("screens.onboarding.safetyPositioningBanner")}
-          </CardTitle>
-          <CardDescription>{copy("fallbacks.advisoryFooter")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="app-shell__text">
-            {copy("screens.onboarding.dataModeIntro")}
-          </p>
-          <p className="app-shell__text">
+      <section className="app-shell__section">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Parcours</p>
+          <p className="app-shell__status">
             {copy("screens.onboarding.dataModeTransitionCta")}
           </p>
-          <p className="app-shell__text">
-            {copy("screens.onboarding.dataModeTransitionInfo")}
-          </p>
-        </CardContent>
-        <CardFooter>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button asChild>
-              <Link href="/aliments">Explorer les aliments</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/decouvrir">Voir les substitutions</Link>
-            </Button>
-            <Button asChild variant="ghost">
-              <Link href="/espace">{copy("screens.swapDetail.trialHint")}</Link>
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+        </div>
+        <h2 className="app-shell__section-title">
+          Trois entrées complémentaires
+        </h2>
+        <p className="app-shell__text">
+          Recherche ciblée, bases compatibles et espace personnel restent
+          séparés pour garder une lecture simple de chaque action.
+        </p>
+        <div className="app-shell__grid">
+          {routeCards.map((routeCard) => (
+            <Card key={routeCard.href}>
+              <CardHeader>
+                <CardTitle>{routeCard.title}</CardTitle>
+                <CardDescription>{routeCard.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant={routeCard.variant}>
+                  <Link href={routeCard.href}>{routeCard.cta}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{consentModeLabel}</CardTitle>
-          <CardDescription>
-            {copy("screens.consentMode.transitionSuccess")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="app-shell__text">{consentModeAction}</p>
-          <p className="app-shell__eyebrow">{consentModeNotice}</p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.pauseNow")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.pauseUntilReenabled")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.pauseActiveNotice")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.killSwitchLabel")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.killSwitchHelp")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.notifications.killSwitchConfirm")}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{copy("screens.clinicianShare.title")}</CardTitle>
-          <CardDescription>
-            {copy("screens.clinicianShare.description")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="app-shell__text">
-            {copy("screens.clinicianShare.createCta")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.clinicianShare.exportHint")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.clinicianShare.emptyState")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.clinicianShare.disclaimer")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.deletion.requestOpen")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.deletion.requestHelp")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.deletion.confirmAction")}
-          </p>
-          <p className="app-shell__text">{copy("screens.deletion.success")}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{copy("screens.conflictReview.header")}</CardTitle>
-          <CardDescription>
-            {copy("screens.conflictReview.subtitle")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.optionLabel", { index: "1" })}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.optionLabel", { index: "2" })}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.confirmation")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.choosePrimaryCta")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.deferChoiceCta")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.conflictReview.noChoiceWarning")}
-          </p>
-          <p className="app-shell__eyebrow">
-            {copy("screens.errorStates.offlineNotice")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.errorStates.syncRetry")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.errorStates.conflictRetry")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapDetail.fallbackWarning")}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{copy("screens.swapList.blockedTitle")}</CardTitle>
-          <CardDescription>
-            {copy("screens.swapList.blockedBody")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="app-shell__text">
-            {copy("screens.swapList.blockedAction")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapList.unknownTitle")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapList.unknownBody")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapList.unknownAction")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapList.lowConfidenceTitle")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapList.lowConfidenceBody")}
-          </p>
-          <p className="app-shell__text">
-            {copy("screens.swapDetail.unknownRationale")}
-          </p>
-        </CardContent>
-      </Card>
+      <section className="app-shell__section">
+        <div className="app-shell__meta">
+          <p className="app-shell__eyebrow">Sécurité d’usage</p>
+          <p className="app-shell__status">{consentModeAction}</p>
+        </div>
+        <h2 className="app-shell__section-title">
+          Un appui pratique, pas une conclusion clinique
+        </h2>
+        <p className="app-shell__text">{copy("fallbacks.advisoryFooter")}</p>
+        <p className="app-shell__text">
+          {copy("screens.swapDetail.trialHint")}
+        </p>
+        <p className="app-shell__text">
+          {copy("screens.onboarding.dataModeTransitionInfo")}
+        </p>
+        <p className="app-shell__text">
+          {copy("screens.swapDetail.fallbackWarning")}
+        </p>
+        <p className="app-shell__eyebrow">{consentModeNotice}</p>
+      </section>
     </main>
   );
 }
