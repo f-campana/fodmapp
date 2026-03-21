@@ -27,6 +27,8 @@ This branch does not replace replay/bootstrap. It adds the long-lived migration 
 - It absorbs:
   - the full curated bootstrap from `schema/fodmap_fr_schema.sql`
   - the security schema from `schema/migrations/2026-02-25_security_consent_export_delete.sql`
+  - the tracking schema from `schema/migrations/2026-03-20_symptoms_tracking_v1.sql`
+  - the Clerk identity schema from `schema/migrations/2026-03-21_clerk_auth_identities.sql`
 - Safe Harbor is already present in `schema/fodmap_fr_schema.sql` and is not repeated as a second dbmate migration.
 - `schema/migrations/` remains legacy compatibility only for current tests/docs.
 - New migrations go only under `schema/dbmate/migrations/`.

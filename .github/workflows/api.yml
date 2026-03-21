@@ -111,6 +111,12 @@ jobs:
           consent_table="$(psql "$API_DB_URL" -tA -c "SELECT to_regclass('public.user_consent_ledger');")"
           test "$consent_table" = "user_consent_ledger"
 
+          tracking_table="$(psql "$API_DB_URL" -tA -c "SELECT to_regclass('public.symptom_logs');")"
+          test "$tracking_table" = "symptom_logs"
+
+          auth_table="$(psql "$API_DB_URL" -tA -c "SELECT to_regclass('public.me_auth_identities');")"
+          test "$auth_table" = "me_auth_identities"
+
           baseline_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM schema_migrations WHERE version = '20260321000000';")"
           test "$baseline_count" = "1"
 
@@ -118,7 +124,7 @@ jobs:
         run: |
           status_output="$(pnpm db:status)"
           echo "$status_output"
-          ! echo "$status_output" | grep -qi "pending"
+          echo "$status_output" | grep -Eq '^Pending: 0$'
 
       - name: Verify checked-in schema dump stays in sync
         run: |
