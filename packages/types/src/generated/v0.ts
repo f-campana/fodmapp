@@ -11,7 +11,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Liveness/metadata probe */
+    /** Liveness and publish metadata probe */
     get: operations["getHealth"];
     put?: never;
     post?: never;
@@ -63,8 +63,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Latest full 6-subtype rollup by food slug
-     * @description Returns latest full rollup projection from `v_phase3_rollups_latest_full`.
+     * Current published 6-subtype rollup by food slug
+     * @description Returns the current published rollup projection for the active `publish_id`.
      *     Includes coverage and provenance fields.
      */
     get: operations["getFoodRollupBySlug"];
@@ -485,7 +485,19 @@ export interface components {
       /** @example v0 */
       version: string;
       /** Format: date-time */
-      timestamp?: string;
+      timestamp: string;
+      /** @description Current published release id when the publish boundary is available. */
+      publish_id?: string | null;
+      /**
+       * Format: date-time
+       * @description Timestamp of the current published release.
+       */
+      published_at?: string | null;
+      /**
+       * Format: date-time
+       * @description Max Phase 3 rollup compute timestamp captured in the current published release.
+       */
+      rollup_computed_at_max?: string | null;
     };
     ErrorResponse: {
       error: {
@@ -1317,7 +1329,7 @@ export interface components {
       /** Format: date-time */
       client_time_utc: string;
       /** Format: uuid */
-      user_id?: string;
+      user_id: string;
       items: components["schemas"]["SyncV1MutationItem"][];
       /** @default false */
       migration_mode: boolean;
@@ -1343,6 +1355,8 @@ export interface components {
     };
   };
   parameters: {
+    /** @description Account or user identifier. */
+    MeUserIdHeader: string;
     /** @description Opaque device identifier required for signing lookup. */
     MeDeviceIdHeader: string;
     /** @description Actor UUID when changes are performed by support automation. */
@@ -1566,7 +1580,10 @@ export interface operations {
   getMeConsent: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1587,7 +1604,9 @@ export interface operations {
   postMeConsent: {
     parameters: {
       query?: never;
-      header?: {
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
         /** @description Opaque device identifier required for signing lookup. */
         "X-Device-Id"?: components["parameters"]["MeDeviceIdHeader"];
         /** @description Actor UUID when changes are performed by support automation. */
@@ -1635,7 +1654,10 @@ export interface operations {
   requestMeExport: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1684,7 +1706,10 @@ export interface operations {
   getMeExport: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         export_id: string;
       };
@@ -1716,7 +1741,10 @@ export interface operations {
   requestMeDelete: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1765,7 +1793,10 @@ export interface operations {
   getMeDelete: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         delete_request_id: string;
       };
@@ -1799,7 +1830,10 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1821,7 +1855,10 @@ export interface operations {
       query?: {
         anchor_date?: string;
       };
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1843,7 +1880,10 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1863,7 +1903,10 @@ export interface operations {
   createTrackingSymptom: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1896,7 +1939,10 @@ export interface operations {
   deleteTrackingSymptom: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         symptom_log_id: string;
       };
@@ -1926,7 +1972,10 @@ export interface operations {
   updateTrackingSymptom: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         symptom_log_id: string;
       };
@@ -1964,7 +2013,10 @@ export interface operations {
       query?: {
         limit?: number;
       };
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -1984,7 +2036,10 @@ export interface operations {
   createTrackingMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -2017,7 +2072,10 @@ export interface operations {
   deleteTrackingMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         meal_log_id: string;
       };
@@ -2047,7 +2105,10 @@ export interface operations {
   updateTrackingMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         meal_log_id: string;
       };
@@ -2083,7 +2144,10 @@ export interface operations {
   listTrackingCustomFoods: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -2103,7 +2167,10 @@ export interface operations {
   createTrackingCustomFood: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -2136,7 +2203,10 @@ export interface operations {
   deleteTrackingCustomFood: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         custom_food_id: string;
       };
@@ -2166,7 +2236,10 @@ export interface operations {
   updateTrackingCustomFood: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         custom_food_id: string;
       };
@@ -2202,7 +2275,10 @@ export interface operations {
   listTrackingSavedMeals: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -2222,7 +2298,10 @@ export interface operations {
   createTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };
@@ -2255,7 +2334,10 @@ export interface operations {
   deleteTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         saved_meal_id: string;
       };
@@ -2285,7 +2367,10 @@ export interface operations {
   updateTrackingSavedMeal: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path: {
         saved_meal_id: string;
       };
@@ -2322,6 +2407,8 @@ export interface operations {
     parameters: {
       query?: never;
       header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
         "X-Device-Id": components["parameters"]["SyncDeviceIdHeader"];
       };
       path?: never;
@@ -2374,7 +2461,10 @@ export interface operations {
   postSyncMutationsBatch: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Account or user identifier. */
+        "X-User-Id": components["parameters"]["MeUserIdHeader"];
+      };
       path?: never;
       cookie?: never;
     };

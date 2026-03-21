@@ -24,13 +24,28 @@ run_cmd() {
 }
 
 assert_seeded_state() {
+  local publish_id
   local rollup_count
+  local subtype_count
   local active_count
   local draft_count
+  local published_swap_count
 
-  rollup_count="$("$psql_bin" "$api_db_url" -tA -c "SELECT COUNT(*) FROM v_phase3_rollups_latest_full;")"
+  publish_id="$("$psql_bin" "$api_db_url" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+  if [[ -z "$publish_id" ]]; then
+    echo "[FAIL] expected current publish release in api_publish_meta_current" >&2
+    exit 1
+  fi
+
+  rollup_count="$("$psql_bin" "$api_db_url" -tA -c "SELECT COUNT(*) FROM api_food_rollups_current;")"
   if [[ "$rollup_count" != "42" ]]; then
-    echo "[FAIL] expected 42 rollups, got: $rollup_count" >&2
+    echo "[FAIL] expected 42 published rollups, got: $rollup_count" >&2
+    exit 1
+  fi
+
+  subtype_count="$("$psql_bin" "$api_db_url" -tA -c "SELECT COUNT(*) FROM api_food_subtypes_current;")"
+  if [[ "$subtype_count" == "0" ]]; then
+    echo "[FAIL] expected published subtype rows, got none" >&2
     exit 1
   fi
 
@@ -43,6 +58,12 @@ assert_seeded_state() {
   draft_count="$("$psql_bin" "$api_db_url" -tA -c "SELECT COUNT(*) FROM swap_rules r JOIN sources s ON s.source_id = r.source_id WHERE s.source_slug = 'internal_rules_v1' AND r.notes = 'phase3_mvp_rule' AND r.status = 'draft';")"
   if [[ "$draft_count" != "1" ]]; then
     echo "[FAIL] expected 1 draft phase3_mvp_rule row, got: $draft_count" >&2
+    exit 1
+  fi
+
+  published_swap_count="$("$psql_bin" "$api_db_url" -tA -c "SELECT COUNT(*) FROM api_swaps_current;")"
+  if [[ "$published_swap_count" != "$active_count" ]]; then
+    echo "[FAIL] expected published swap count to match active MVP count ($active_count), got: $published_swap_count" >&2
     exit 1
   fi
 }

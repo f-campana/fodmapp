@@ -114,6 +114,9 @@ class HealthResponse(BaseModel):
     service: str
     version: str
     timestamp: datetime
+    publish_id: Optional[str] = None
+    published_at: Optional[datetime] = None
+    rollup_computed_at_max: Optional[datetime] = None
 
 
 class FoodResponse(BaseModel):

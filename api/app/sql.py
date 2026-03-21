@@ -12,15 +12,9 @@ SELECT
   f.canonical_name_en,
   f.preparation_state::text AS preparation_state,
   f.status,
-  lr.source_slug
+  r.source_slug
 FROM foods f
-LEFT JOIN LATERAL (
-  SELECT r.source_slug
-  FROM v_phase3_rollups_latest_full r
-  WHERE r.food_id = f.food_id
-  ORDER BY r.computed_at DESC
-  LIMIT 1
-) lr ON TRUE
+LEFT JOIN api_food_rollups_current r ON r.food_id = f.food_id
 WHERE f.food_slug = %(food_slug)s
 """
 
@@ -38,20 +32,7 @@ SELECT
   r.source_slug,
   r.computed_at AS rollup_computed_at
 FROM foods f
-LEFT JOIN LATERAL (
-  SELECT
-    rr.rollup_serving_g,
-    rr.overall_level,
-    rr.driver_subtype_code,
-    rr.known_subtypes_count,
-    rr.coverage_ratio,
-    rr.source_slug,
-    rr.computed_at
-  FROM v_phase3_rollups_latest_full rr
-  WHERE rr.food_id = f.food_id
-  ORDER BY rr.computed_at DESC
-  LIMIT 1
-) r ON TRUE
+LEFT JOIN api_food_rollups_current r ON r.food_id = f.food_id
 WHERE f.food_slug = %(food_slug)s
 """
 
@@ -75,17 +56,7 @@ SELECT
   r.coverage_ratio,
   r.computed_at AS rollup_computed_at
 FROM foods f
-LEFT JOIN LATERAL (
-  SELECT
-    rr.overall_level,
-    rr.driver_subtype_code,
-    rr.coverage_ratio,
-    rr.computed_at
-  FROM v_phase3_rollups_latest_full rr
-  WHERE rr.food_id = f.food_id
-  ORDER BY rr.computed_at DESC
-  LIMIT 1
-) r ON TRUE
+LEFT JOIN api_food_rollups_current r ON r.food_id = f.food_id
 WHERE f.food_slug ILIKE %(pattern)s
    OR COALESCE(f.canonical_name_fr, '') ILIKE %(pattern)s
    OR COALESCE(f.canonical_name_en, '') ILIKE %(pattern)s
@@ -166,7 +137,7 @@ SELECT
   v.is_polyol_proxy,
   v.rollup_serving_g,
   v.computed_at
-FROM v_phase3_rollup_subtype_levels_latest v
+FROM api_food_subtypes_current v
 WHERE v.food_id = %(food_id)s
 ORDER BY
   CASE v.subtype_code
@@ -242,62 +213,6 @@ WHERE f.food_slug = %(food_slug)s
 """
 
 SQL_LIST_SWAPS = """
-WITH from_food AS (
-  SELECT food_id
-  FROM foods f
-  WHERE f.food_slug = %(from_slug)s
-),
-active_rules AS (
-  SELECT
-    r.swap_rule_id,
-    f_from.food_slug AS from_food_slug,
-    f_to.food_slug AS to_food_slug,
-    f_from.canonical_name_fr AS from_food_name_fr,
-    f_from.canonical_name_en AS from_food_name_en,
-    f_to.canonical_name_fr AS to_food_name_fr,
-    f_to.canonical_name_en AS to_food_name_en,
-    r.instruction_fr,
-    COALESCE(r.instruction_en, r.instruction_fr) AS instruction_en,
-    r.status::text AS rule_status,
-    rs.fodmap_safety_score,
-    rs.overall_score,
-    rs.scoring_version,
-    src.source_slug,
-    p_from.priority_rank AS from_priority_rank,
-    p_to.priority_rank AS to_priority_rank,
-    COALESCE(vrf.overall_level::text, 'unknown') AS from_overall_level,
-    COALESCE(vrt.overall_level::text, 'unknown') AS to_overall_level,
-    vrt.driver_subtype_code AS driver_subtype,
-    COALESCE(vrt.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
-    COALESCE(vrt.computed_at, vrf.computed_at) AS rollup_computed_at
-  FROM swap_rules r
-  JOIN from_food ff ON ff.food_id = r.from_food_id
-  JOIN foods f_from ON f_from.food_id = r.from_food_id
-  JOIN foods f_to ON f_to.food_id = r.to_food_id
-  JOIN swap_rule_scores rs ON rs.swap_rule_id = r.swap_rule_id
-  JOIN sources src ON src.source_id = r.source_id
-  LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
-  LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
-  LEFT JOIN v_phase3_rollups_latest_full vrf ON vrf.food_id = r.from_food_id
-  LEFT JOIN v_phase3_rollups_latest_full vrt ON vrt.food_id = r.to_food_id
-  WHERE r.status = 'active'
-    AND COALESCE(p_from.priority_rank, 0) <> 2
-    AND COALESCE(p_to.priority_rank, 0) <> 2
-    AND rs.fodmap_safety_score >= %(min_safety_score)s
-),
-with_burden AS (
-  SELECT
-    ar.*,
-    fd.burden_ratio AS from_burden_ratio,
-    td.burden_ratio AS to_burden_ratio
-  FROM active_rules ar
-  LEFT JOIN v_phase3_rollup_subtype_levels_latest fd
-    ON fd.priority_rank = ar.from_priority_rank
-   AND fd.subtype_code = ar.driver_subtype
-  LEFT JOIN v_phase3_rollup_subtype_levels_latest td
-    ON td.priority_rank = ar.to_priority_rank
-   AND td.subtype_code = ar.driver_subtype
-)
 SELECT
   from_food_slug,
   to_food_slug,
@@ -319,7 +234,9 @@ SELECT
   scoring_version,
   source_slug,
   rollup_computed_at
-FROM with_burden
+FROM api_swaps_current
+WHERE from_food_slug = %(from_slug)s
+  AND fodmap_safety_score >= %(min_safety_score)s
 ORDER BY
   fodmap_safety_score DESC,
   overall_score DESC,
@@ -333,6 +250,19 @@ ORDER BY
   coverage_ratio DESC,
   to_food_slug ASC
 LIMIT %(limit)s
+"""
+
+SQL_HAS_API_PUBLISH_META_VIEW = """
+SELECT to_regclass('public.api_publish_meta_current') AS relation_name
+"""
+
+SQL_GET_API_PUBLISH_META = """
+SELECT
+  publish_id,
+  published_at,
+  rollup_computed_at_max
+FROM api_publish_meta_current
+LIMIT 1
 """
 
 SQL_GET_ACTIVE_USER_CONSENT = """
@@ -633,27 +563,20 @@ SELECT
   rs.fodmap_safety_score,
   rs.overall_score,
   rs.scoring_version,
-  COALESCE(vrf.overall_level::text, 'unknown') AS from_overall_level,
-  COALESCE(vrt.overall_level::text, 'unknown') AS to_overall_level,
-  COALESCE(vrf.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
+  COALESCE(ps.from_overall_level::text, 'unknown') AS from_overall_level,
+  COALESCE(ps.to_overall_level::text, 'unknown') AS to_overall_level,
+  COALESCE(ps.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
   p_from.priority_rank AS from_priority_rank,
   p_to.priority_rank AS to_priority_rank,
-  vf_from.burden_ratio AS from_burden_ratio,
-  vf_to.burden_ratio AS to_burden_ratio
+  ps.from_burden_ratio AS from_burden_ratio,
+  ps.to_burden_ratio AS to_burden_ratio
 FROM foods ff
 JOIN foods ft ON TRUE
 JOIN swap_rules r ON r.from_food_id = ff.food_id AND r.to_food_id = ft.food_id
 JOIN swap_rule_scores rs ON rs.swap_rule_id = r.swap_rule_id
 LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
 LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
-LEFT JOIN v_phase3_rollups_latest_full vrf ON vrf.food_id = ff.food_id
-LEFT JOIN v_phase3_rollups_latest_full vrt ON vrt.food_id = ft.food_id
-LEFT JOIN v_phase3_rollup_subtype_levels_latest vf_from
-  ON vf_from.food_id = ff.food_id
- AND vf_from.priority_rank = p_from.priority_rank
-LEFT JOIN v_phase3_rollup_subtype_levels_latest vf_to
-  ON vf_to.food_id = ft.food_id
- AND vf_to.priority_rank = p_to.priority_rank
+LEFT JOIN api_swaps_current ps ON ps.swap_rule_id = r.swap_rule_id
 WHERE ff.food_slug = %(from_food_slug)s
   AND ft.food_slug = %(to_food_slug)s
 LIMIT 1

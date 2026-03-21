@@ -40,6 +40,8 @@ require_file "${PHASE3_SQL_DIR}/phase3_swap_rules_rescore.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_swap_activation_apply.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_swap_activation_checks.sql"
 require_file "${PHASE3_SQL_DIR}/phase3_mvp_checks.sql"
+require_file "${PHASE3_SQL_DIR}/phase3_publish_release_apply.sql"
+require_file "${PHASE3_SQL_DIR}/phase3_publish_release_checks.sql"
 
 python3 - "${REVIEW_CSV}" <<'PY'
 import csv
@@ -99,5 +101,7 @@ PY
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_activation_apply.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_swap_activation_checks.sql"
 run_sql "${PHASE3_SQL_DIR}/phase3_mvp_checks.sql"
+run_sql "${PHASE3_SQL_DIR}/phase3_publish_release_apply.sql"
+run_sql "${PHASE3_SQL_DIR}/phase3_publish_release_checks.sql"
 
 echo "[PASS] Phase3 CI seed completed successfully"

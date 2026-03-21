@@ -271,8 +271,12 @@ Contract:
   - `foods`
   - `safe_harbor_cohorts`
   - `user_consent_ledger`
+  - `publish_releases`
+  - `published_food_rollups`
+  - `api_publish_meta_current`
   - `schema_migrations`
 - asserts the baseline version `20260321000000` is recorded
+- asserts the publish-boundary migration version `20260321143000` is recorded
 - asserts `pnpm db:status` is clean after migrate
 - asserts no working-tree diff remains in `schema/dbmate/schema.sql`
 
@@ -283,6 +287,27 @@ Intent:
 - enforce the split contract:
   - disposable DBs: `schema/fodmap_fr_schema.sql` + replay/seed scripts
   - persistent DBs: `schema/dbmate/` + `pnpm db:*`
+
+## Seeded Publish-Boundary Contract
+
+The seeded API lane now validates the serving boundary instead of reading compiler-owned latest views directly through the API.
+
+Contract:
+
+- `etl/phase3/scripts/phase3_seed_for_api_ci.sh` runs:
+  - `etl/phase3/sql/phase3_publish_release_apply.sql`
+  - `etl/phase3/sql/phase3_publish_release_checks.sql`
+- `.github/scripts/ci-api-pr.sh` and `.github/workflows/api.yml` assert:
+  - a current `api_v0_phase3` publish release exists
+  - `api_food_rollups_current` exposes the expected `42` rollups
+  - `api_food_subtypes_current` is populated
+  - `api_swaps_current` matches the active swap-rule count
+
+Semantics:
+
+- Phase 3 compute is unchanged and still rebuilds the transient `v_phase3_*_latest*` sources first.
+- publish is a separate atomic layer that copies those sources into immutable `publish_id` tables and flips the `api_*_current` views.
+- integration tests therefore exercise the same serving boundary that the hosted API will depend on later.
 
 ## Docs Hygiene Audit Workflow Contract
 

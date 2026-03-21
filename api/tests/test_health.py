@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from pathlib import Path
 
+import pytest
 import yaml
 
 
@@ -15,6 +16,20 @@ def test_health_ok(client) -> None:
     assert payload["service"]
     assert payload["version"]
     assert payload["timestamp"]
+    assert "publish_id" in payload
+    assert "published_at" in payload
+    assert "rollup_computed_at_max" in payload
+
+
+@pytest.mark.integration
+def test_health_seeded_publish_metadata_present(client, integration_guard) -> None:
+    response = client.get("/v0/health")
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["publish_id"]
+    assert payload["published_at"]
+    assert payload["rollup_computed_at_max"]
 
 
 def test_health_db_unavailable_returns_503(client, app_instance, monkeypatch) -> None:

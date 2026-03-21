@@ -1,7 +1,7 @@
 \restrict dbmate
 
 -- Dumped from database version 16.13 (Debian 16.13-1.pgdg13+1)
--- Dumped by pg_dump version 16.13 (Ubuntu 16.13-1.pgdg24.04+1)
+-- Dumped by pg_dump version 16.13 (Debian 16.13-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -145,6 +145,228 @@ CREATE TYPE public.tolerance_level AS ENUM (
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: publish_release_current; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.publish_release_current (
+    release_kind text NOT NULL,
+    publish_id uuid NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT publish_release_current_release_kind_check CHECK ((length(TRIM(BOTH FROM release_kind)) > 0))
+);
+
+
+--
+-- Name: published_food_rollups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.published_food_rollups (
+    publish_id uuid NOT NULL,
+    priority_rank integer NOT NULL,
+    food_id uuid NOT NULL,
+    rollup_serving_g numeric(8,2),
+    overall_level public.fodmap_level NOT NULL,
+    driver_subtype_code text,
+    known_subtypes_count integer NOT NULL,
+    coverage_ratio numeric(6,4) NOT NULL,
+    source_slug text NOT NULL,
+    computed_at timestamp with time zone NOT NULL,
+    CONSTRAINT published_food_rollups_coverage_ratio_check CHECK (((coverage_ratio >= (0)::numeric) AND (coverage_ratio <= (1)::numeric))),
+    CONSTRAINT published_food_rollups_known_subtypes_count_check CHECK (((known_subtypes_count >= 0) AND (known_subtypes_count <= 6))),
+    CONSTRAINT published_food_rollups_priority_rank_check CHECK ((priority_rank > 0)),
+    CONSTRAINT published_food_rollups_rollup_serving_g_check CHECK (((rollup_serving_g IS NULL) OR (rollup_serving_g > (0)::numeric)))
+);
+
+
+--
+-- Name: api_food_rollups_current; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.api_food_rollups_current AS
+ SELECT pfr.publish_id,
+    pfr.priority_rank,
+    pfr.food_id,
+    pfr.rollup_serving_g,
+    pfr.overall_level,
+    pfr.driver_subtype_code,
+    pfr.known_subtypes_count,
+    pfr.coverage_ratio,
+    pfr.source_slug,
+    pfr.computed_at
+   FROM (public.published_food_rollups pfr
+     JOIN public.publish_release_current cur ON ((cur.publish_id = pfr.publish_id)))
+  WHERE (cur.release_kind = 'api_v0_phase3'::text);
+
+
+--
+-- Name: published_food_subtype_levels; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.published_food_subtype_levels (
+    publish_id uuid NOT NULL,
+    priority_rank integer NOT NULL,
+    food_id uuid NOT NULL,
+    rollup_serving_g numeric(8,2),
+    subtype_code text NOT NULL,
+    fodmap_subtype_id smallint,
+    amount_g_per_serving numeric(12,6),
+    comparator public.comparator_code,
+    low_max_g numeric(12,6),
+    moderate_max_g numeric(12,6),
+    subtype_level public.fodmap_level NOT NULL,
+    signal_source_kind text,
+    signal_source_slug text,
+    threshold_source_slug text,
+    is_default_threshold boolean DEFAULT false NOT NULL,
+    is_polyol_proxy boolean DEFAULT false NOT NULL,
+    burden_ratio numeric(12,6),
+    computed_at timestamp with time zone NOT NULL,
+    CONSTRAINT published_food_subtype_levels_priority_rank_check CHECK ((priority_rank > 0)),
+    CONSTRAINT published_food_subtype_levels_rollup_serving_g_check CHECK (((rollup_serving_g IS NULL) OR (rollup_serving_g > (0)::numeric)))
+);
+
+
+--
+-- Name: api_food_subtypes_current; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.api_food_subtypes_current AS
+ SELECT pfs.publish_id,
+    pfs.priority_rank,
+    pfs.food_id,
+    pfs.rollup_serving_g,
+    pfs.subtype_code,
+    pfs.fodmap_subtype_id,
+    pfs.amount_g_per_serving,
+    pfs.comparator,
+    pfs.low_max_g,
+    pfs.moderate_max_g,
+    pfs.subtype_level,
+    pfs.signal_source_kind,
+    pfs.signal_source_slug,
+    pfs.threshold_source_slug,
+    pfs.is_default_threshold,
+    pfs.is_polyol_proxy,
+    pfs.burden_ratio,
+    pfs.computed_at
+   FROM (public.published_food_subtype_levels pfs
+     JOIN public.publish_release_current cur ON ((cur.publish_id = pfs.publish_id)))
+  WHERE (cur.release_kind = 'api_v0_phase3'::text);
+
+
+--
+-- Name: publish_releases; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.publish_releases (
+    publish_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    release_kind text NOT NULL,
+    published_at timestamp with time zone DEFAULT now() NOT NULL,
+    rollup_computed_at_max timestamp with time zone,
+    rollup_row_count integer DEFAULT 0 NOT NULL,
+    subtype_row_count integer DEFAULT 0 NOT NULL,
+    swap_row_count integer DEFAULT 0 NOT NULL,
+    notes text,
+    CONSTRAINT publish_releases_release_kind_check CHECK ((length(TRIM(BOTH FROM release_kind)) > 0)),
+    CONSTRAINT publish_releases_rollup_row_count_check CHECK ((rollup_row_count >= 0)),
+    CONSTRAINT publish_releases_subtype_row_count_check CHECK ((subtype_row_count >= 0)),
+    CONSTRAINT publish_releases_swap_row_count_check CHECK ((swap_row_count >= 0))
+);
+
+
+--
+-- Name: api_publish_meta_current; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.api_publish_meta_current AS
+ SELECT (pr.publish_id)::text AS publish_id,
+    pr.release_kind,
+    pr.published_at,
+    pr.rollup_computed_at_max,
+    pr.rollup_row_count,
+    pr.subtype_row_count,
+    pr.swap_row_count
+   FROM (public.publish_releases pr
+     JOIN public.publish_release_current cur ON ((cur.publish_id = pr.publish_id)))
+  WHERE (cur.release_kind = 'api_v0_phase3'::text);
+
+
+--
+-- Name: published_swaps; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.published_swaps (
+    publish_id uuid NOT NULL,
+    swap_rule_id uuid NOT NULL,
+    from_food_id uuid NOT NULL,
+    to_food_id uuid NOT NULL,
+    from_food_slug text NOT NULL,
+    to_food_slug text NOT NULL,
+    from_food_name_fr text,
+    from_food_name_en text,
+    to_food_name_fr text,
+    to_food_name_en text,
+    instruction_fr text NOT NULL,
+    instruction_en text NOT NULL,
+    rule_status public.swap_status NOT NULL,
+    source_slug text NOT NULL,
+    scoring_version text NOT NULL,
+    fodmap_safety_score numeric(4,3) NOT NULL,
+    overall_score numeric(4,3) NOT NULL,
+    from_priority_rank integer,
+    to_priority_rank integer,
+    from_overall_level public.fodmap_level NOT NULL,
+    to_overall_level public.fodmap_level NOT NULL,
+    driver_subtype text,
+    from_burden_ratio numeric(12,6),
+    to_burden_ratio numeric(12,6),
+    coverage_ratio numeric(6,4) NOT NULL,
+    rollup_computed_at timestamp with time zone NOT NULL,
+    CONSTRAINT published_swaps_coverage_ratio_check CHECK (((coverage_ratio >= (0)::numeric) AND (coverage_ratio <= (1)::numeric))),
+    CONSTRAINT published_swaps_fodmap_safety_score_check CHECK (((fodmap_safety_score >= (0)::numeric) AND (fodmap_safety_score <= (1)::numeric))),
+    CONSTRAINT published_swaps_from_priority_rank_check CHECK (((from_priority_rank IS NULL) OR (from_priority_rank > 0))),
+    CONSTRAINT published_swaps_overall_score_check CHECK (((overall_score >= (0)::numeric) AND (overall_score <= (1)::numeric))),
+    CONSTRAINT published_swaps_to_priority_rank_check CHECK (((to_priority_rank IS NULL) OR (to_priority_rank > 0)))
+);
+
+
+--
+-- Name: api_swaps_current; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.api_swaps_current AS
+ SELECT ps.publish_id,
+    ps.swap_rule_id,
+    ps.from_food_id,
+    ps.to_food_id,
+    ps.from_food_slug,
+    ps.to_food_slug,
+    ps.from_food_name_fr,
+    ps.from_food_name_en,
+    ps.to_food_name_fr,
+    ps.to_food_name_en,
+    ps.instruction_fr,
+    ps.instruction_en,
+    ps.rule_status,
+    ps.source_slug,
+    ps.scoring_version,
+    ps.fodmap_safety_score,
+    ps.overall_score,
+    ps.from_priority_rank,
+    ps.to_priority_rank,
+    ps.from_overall_level,
+    ps.to_overall_level,
+    ps.driver_subtype,
+    ps.from_burden_ratio,
+    ps.to_burden_ratio,
+    ps.coverage_ratio,
+    ps.rollup_computed_at
+   FROM (public.published_swaps ps
+     JOIN public.publish_release_current cur ON ((cur.publish_id = ps.publish_id)))
+  WHERE (cur.release_kind = 'api_v0_phase3'::text);
+
 
 --
 -- Name: cooking_behaviors; Type: TABLE; Schema: public; Owner: -
@@ -1956,6 +2178,54 @@ ALTER TABLE ONLY public.products
 
 
 --
+-- Name: publish_release_current publish_release_current_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publish_release_current
+    ADD CONSTRAINT publish_release_current_pkey PRIMARY KEY (release_kind);
+
+
+--
+-- Name: publish_releases publish_releases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publish_releases
+    ADD CONSTRAINT publish_releases_pkey PRIMARY KEY (publish_id);
+
+
+--
+-- Name: published_food_rollups published_food_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_rollups
+    ADD CONSTRAINT published_food_rollups_pkey PRIMARY KEY (publish_id, food_id);
+
+
+--
+-- Name: published_food_rollups published_food_rollups_publish_id_priority_rank_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_rollups
+    ADD CONSTRAINT published_food_rollups_publish_id_priority_rank_key UNIQUE (publish_id, priority_rank);
+
+
+--
+-- Name: published_food_subtype_levels published_food_subtype_levels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_subtype_levels
+    ADD CONSTRAINT published_food_subtype_levels_pkey PRIMARY KEY (publish_id, food_id, subtype_code);
+
+
+--
+-- Name: published_swaps published_swaps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_swaps
+    ADD CONSTRAINT published_swaps_pkey PRIMARY KEY (publish_id, swap_rule_id);
+
+
+--
 -- Name: recipe_fodmap_assessments recipe_fodmap_assessments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2209,6 +2479,48 @@ CREATE INDEX idx_nutrient_observations_food_nutrient ON public.food_nutrient_obs
 --
 
 CREATE INDEX idx_products_off_code ON public.products USING btree (open_food_facts_code);
+
+
+--
+-- Name: idx_publish_releases_kind_published_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_publish_releases_kind_published_at ON public.publish_releases USING btree (release_kind, published_at DESC);
+
+
+--
+-- Name: idx_published_food_rollups_publish_food; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_published_food_rollups_publish_food ON public.published_food_rollups USING btree (publish_id, food_id);
+
+
+--
+-- Name: idx_published_food_rollups_publish_priority; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_published_food_rollups_publish_priority ON public.published_food_rollups USING btree (publish_id, priority_rank);
+
+
+--
+-- Name: idx_published_food_subtypes_publish_food; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_published_food_subtypes_publish_food ON public.published_food_subtype_levels USING btree (publish_id, food_id);
+
+
+--
+-- Name: idx_published_swaps_publish_from_food; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_published_swaps_publish_from_food ON public.published_swaps USING btree (publish_id, from_food_slug);
+
+
+--
+-- Name: idx_published_swaps_publish_rule_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_published_swaps_publish_rule_status ON public.published_swaps USING btree (publish_id, rule_status, from_food_slug);
 
 
 --
@@ -2792,6 +3104,102 @@ ALTER TABLE ONLY public.products
 
 
 --
+-- Name: publish_release_current publish_release_current_publish_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.publish_release_current
+    ADD CONSTRAINT publish_release_current_publish_id_fkey FOREIGN KEY (publish_id) REFERENCES public.publish_releases(publish_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_food_rollups published_food_rollups_driver_subtype_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_rollups
+    ADD CONSTRAINT published_food_rollups_driver_subtype_code_fkey FOREIGN KEY (driver_subtype_code) REFERENCES public.fodmap_subtypes(code);
+
+
+--
+-- Name: published_food_rollups published_food_rollups_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_rollups
+    ADD CONSTRAINT published_food_rollups_food_id_fkey FOREIGN KEY (food_id) REFERENCES public.foods(food_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_food_rollups published_food_rollups_publish_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_rollups
+    ADD CONSTRAINT published_food_rollups_publish_id_fkey FOREIGN KEY (publish_id) REFERENCES public.publish_releases(publish_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_food_subtype_levels published_food_subtype_levels_fodmap_subtype_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_subtype_levels
+    ADD CONSTRAINT published_food_subtype_levels_fodmap_subtype_id_fkey FOREIGN KEY (fodmap_subtype_id) REFERENCES public.fodmap_subtypes(fodmap_subtype_id);
+
+
+--
+-- Name: published_food_subtype_levels published_food_subtype_levels_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_subtype_levels
+    ADD CONSTRAINT published_food_subtype_levels_food_id_fkey FOREIGN KEY (food_id) REFERENCES public.foods(food_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_food_subtype_levels published_food_subtype_levels_publish_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_subtype_levels
+    ADD CONSTRAINT published_food_subtype_levels_publish_id_fkey FOREIGN KEY (publish_id) REFERENCES public.publish_releases(publish_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_food_subtype_levels published_food_subtype_levels_subtype_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_food_subtype_levels
+    ADD CONSTRAINT published_food_subtype_levels_subtype_code_fkey FOREIGN KEY (subtype_code) REFERENCES public.fodmap_subtypes(code);
+
+
+--
+-- Name: published_swaps published_swaps_driver_subtype_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_swaps
+    ADD CONSTRAINT published_swaps_driver_subtype_fkey FOREIGN KEY (driver_subtype) REFERENCES public.fodmap_subtypes(code);
+
+
+--
+-- Name: published_swaps published_swaps_from_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_swaps
+    ADD CONSTRAINT published_swaps_from_food_id_fkey FOREIGN KEY (from_food_id) REFERENCES public.foods(food_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_swaps published_swaps_publish_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_swaps
+    ADD CONSTRAINT published_swaps_publish_id_fkey FOREIGN KEY (publish_id) REFERENCES public.publish_releases(publish_id) ON DELETE CASCADE;
+
+
+--
+-- Name: published_swaps published_swaps_to_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.published_swaps
+    ADD CONSTRAINT published_swaps_to_food_id_fkey FOREIGN KEY (to_food_id) REFERENCES public.foods(food_id) ON DELETE CASCADE;
+
+
+--
 -- Name: recipe_fodmap_assessments recipe_fodmap_assessments_recipe_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2963,4 +3371,5 @@ ALTER TABLE ONLY public.user_fodmap_tolerances
 --
 
 INSERT INTO public.schema_migrations (version) VALUES
-    ('20260321000000');
+    ('20260321000000'),
+    ('20260321143000');

@@ -193,8 +193,13 @@ Rollups evaluate all six subtypes (`fructan`, `gos`, `sorbitol`, `mannitol`, `fr
 
 Read interfaces:
 
-- `v_phase3_rollup_subtype_levels_latest`
-- `v_phase3_rollups_latest_full`
+- compiler-facing latest views:
+  - `v_phase3_rollup_subtype_levels_latest`
+  - `v_phase3_rollups_latest_full`
+- API-facing published current views:
+  - `api_food_subtypes_current`
+  - `api_food_rollups_current`
+  - `api_swaps_current`
 
 Pipeline-managed snapshot artifacts:
 
@@ -266,13 +271,15 @@ v0 API contracts:
 
 Data freshness / dependency note:
 
-- API rollup fields read from `v_phase3_rollups_latest_full`
-- this view depends on pipeline-managed snapshots:
+- API rollup fields read from `api_food_rollups_current`
+- publish still depends on pipeline-managed snapshots:
   - `phase3_subtype_levels_snapshot`
   - `phase3_rollups_snapshot`
 - preflight before serving refreshed API data:
   - rerun `etl/phase3/sql/phase3_rollups_compute.sql`
   - rerun `etl/phase3/sql/phase3_rollups_6subtype_checks.sql`
+  - rerun `etl/phase3/sql/phase3_publish_release_apply.sql`
+  - rerun `etl/phase3/sql/phase3_publish_release_checks.sql`
 
 Subtype endpoint payload contract:
 

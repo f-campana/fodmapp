@@ -113,6 +113,23 @@ Semantics:
 - `schema/fodmap_fr_schema.sql` remains the curated bootstrap for disposable replay/local CI databases.
 - `schema/migrations/` is legacy compatibility only for current tests/docs and should not receive new migrations after dbmate bootstrap lands.
 - destructive replay/seed scripts must never target a persistent Neon branch.
+- `dbmate-smoke` now also asserts the publish-boundary schema objects (`publish_releases`, `published_food_rollups`, `api_publish_meta_current`) after a fresh migrate, so long-lived DB bootstrap covers the serving boundary as well as the base schema.
+
+## Seeded API Publish Boundary
+
+The seeded API workflow now exercises the publish boundary explicitly.
+
+Contract:
+
+- `.github/workflows/api.yml` and `.github/scripts/ci-api-pr.sh` run `etl/phase3/sql/phase3_publish_release_apply.sql` and `etl/phase3/sql/phase3_publish_release_checks.sql` after Phase 3 compute/activation and before API integration tests.
+- the seeded API lane treats `api_publish_meta_current`, `api_food_rollups_current`, `api_food_subtypes_current`, and `api_swaps_current` as the runtime serving contract for rollups, subtypes, and swaps.
+- no new environment variables are required for publish; CI reuses `API_DB_URL`.
+
+Semantics:
+
+- replay remains destructive/disposable-only and still seeds the compiler-owned latest Phase 3 views first.
+- publish is a separate atomic step layered on top of Phase 3 compute; it must produce a current `api_v0_phase3` release before integration tests run.
+- `/v0/health` can now surface publish freshness without changing the DB connection variable contract.
 
 ## CI Storybook Deploy Variables
 

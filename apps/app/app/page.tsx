@@ -31,6 +31,7 @@ type HealthResponse = components["schemas"]["HealthResponse"];
 const HEALTH_CONTRACT_SAMPLE: HealthResponse = {
   status: "ok",
   service: "fodmapp-api",
+  timestamp: "2026-03-21T00:00:00Z",
   version: "v0",
 };
 
