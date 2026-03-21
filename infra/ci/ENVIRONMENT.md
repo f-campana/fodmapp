@@ -81,6 +81,7 @@ API workflow runtime guardrails are enforced in workflow config (not via environ
 
 - `.github/workflows/api.yml` sets job timeouts to bound runner/container stalls:
   - `api-tests`: `timeout-minutes: 15`
+  - `api-container-smoke`: `timeout-minutes: 15`
   - `dbmate-smoke`: `timeout-minutes: 15`
   - `api-integration-seeded`: `timeout-minutes: 25`
   - `api-gate`: `timeout-minutes: 5`
@@ -143,6 +144,29 @@ Contract:
 - `phase3:promote` preserves activation-era `swap_rule_scores.scoring_version` values, reruns the conservative active-rule safety gate after score refresh, and executes publish apply/checks inside one publish transaction
 - the disposable `phase3-promote-smoke` CI job stamps current dbmate migration versions onto the replay-seeded database before promote runs; this is test harness glue, not a hosted-environment operator step
 - first persistent bootstrap is still a separate follow-up path; the manual promote runner is refresh-only
+
+## Planned Hosted API Contract (Koyeb + Neon)
+
+The first hosted API environment is planned, but not active yet.
+
+Contract:
+
+- runtime target: Koyeb web service
+- database target: Neon
+- canonical future hosted origin: `https://api.fodmapp.fr`
+- reserved future staging origin: `https://staging.api.fodmapp.fr`
+- Koyeb runtime values stay:
+  - `API_DB_URL`
+  - `API_NAME`
+  - `API_VERSION`
+- `NEXT_PUBLIC_API_BASE_URL` must remain an absolute API origin and should only be set to
+  `https://api.fodmapp.fr` when the hosted API actually exists
+
+Semantics:
+
+- deployment remains Git-driven in Koyeb; there is no GitHub-managed API deploy workflow in this phase
+- `.github/workflows/api.yml` adds `api-container-smoke` as a build-only guard for `api/Dockerfile`
+- hosted activation is still blocked on the separate initial persistent data bootstrap track
 
 ## CI Storybook Deploy Variables
 

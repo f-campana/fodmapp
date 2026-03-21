@@ -1,6 +1,6 @@
 # Domains and deployments
 
-Last reviewed: 2026-03-15
+Last reviewed: 2026-03-21
 
 ## Production domain map
 
@@ -8,10 +8,12 @@ Last reviewed: 2026-03-15
 - `app.fodmapp.fr`: product app (`apps/app`)
 - `ui.fodmapp.fr`: design system / Storybook (`apps/storybook`)
 - `lab.fodmapp.fr`: research / reporting site (`apps/research`)
+- `api.fodmapp.fr`: planned hosted API origin (Koyeb; not live yet)
 
 ## Staging domain map
 
 - `staging.app.fodmapp.fr`: staging app (branch domain → `staging` on `fodmapp-app`)
+- `staging.api.fodmapp.fr`: reserved future API origin (not active in this phase)
 
 ## Vercel projects
 
@@ -60,6 +62,24 @@ Research (`lab.fodmapp.fr`):
 
 `fodmapp.fr` uses Vercel DNS nameservers (`ns1.vercel-dns.com`, `ns2.vercel-dns.com`).
 All DNS records and domain routing should be managed in Vercel.
+
+## API Hosting Plan
+
+The API is planned as a separate Koyeb runtime, not a Vercel app. Vercel remains the DNS authority
+for the API subdomain as well as the frontend domains.
+
+Current status:
+
+- `api.fodmapp.fr`: planned canonical hosted API origin
+- `staging.api.fodmapp.fr`: reserved future API origin
+- neither origin is active in this branch
+
+Current blocker:
+
+- first hosted activation is deferred until the repo has a dedicated initial persistent data
+  bootstrap path for Neon
+
+Do not attach the API domains to a live Koyeb service in this phase.
 
 ## Redirect / canonicalization
 
