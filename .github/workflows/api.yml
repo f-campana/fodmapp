@@ -91,10 +91,23 @@ jobs:
           install-command: "pnpm install --frozen-lockfile"
           enable-turbo-cache: "false"
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+
       - name: Install system PostgreSQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client-16
+
+      - name: Install API dependencies for promote checks
+        run: |
+          cd api
+          uv sync --locked
 
       - name: Run dbmate migrate
         run: |
@@ -138,9 +151,257 @@ jobs:
           echo "$status_output"
           echo "$status_output" | grep -Eq '^Pending: 0$'
 
+      - name: Verify phase3 promote preflight fails on schema-only database
+        run: |
+          set +e
+          output="$(pnpm phase3:promote:check 2>&1)"
+          status=$?
+          set -e
+
+          echo "$output"
+          test "$status" -ne 0
+          echo "$output" | grep -F "first persistent bootstrap is out of scope"
+
       - name: Verify checked-in schema dump stays in sync
         run: |
           git diff --exit-code -- schema/dbmate/schema.sql
+
+  phase3-promote-smoke:
+    name: phase3-promote-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fodmapp_api_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d fodmapp_api_ci"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      API_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci?sslmode=disable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-js-workspace
+        with:
+          node-version: "22"
+          pnpm-version: "10.29.3"
+          install-command: "pnpm install --frozen-lockfile"
+          enable-turbo-cache: "false"
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+
+      - name: Install system PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-16
+
+      - name: Install dependencies for seed + promote
+        run: |
+          cd api
+          uv sync --extra dev --extra ci --locked
+
+      - name: Cache CIQUAL data
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/ciqual-data
+          key: ciqual-2025-5555c572-e0b1de25-e216928b
+
+      - name: Fetch CIQUAL files (pinned + checksum-verified)
+        run: |
+          while IFS= read -r line; do
+            case "$line" in
+              CIQUAL_XLSX=*|CIQUAL_ALIM_XML=*|CIQUAL_GRP_XML=*)
+                echo "$line" >> "$GITHUB_ENV"
+                ;;
+            esac
+          done < <(./etl/ciqual/fetch_ciqual_data.sh "$RUNNER_TEMP/ciqual-data")
+
+      - name: Validate replay script syntax
+        run: |
+          bash -n etl/phase2/scripts/phase2_replay_from_zero.sh
+
+      - name: Seed Phase2 via full replay
+        env:
+          REPLAY_DB: fodmapp_api_ci
+          ADMIN_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          REPLAY_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
+          PGUSER: postgres
+          PGHOST: localhost
+          PGPORT: 5432
+          PSQL_BIN: psql
+        run: |
+          uv run --project api bash etl/phase2/scripts/phase2_replay_from_zero.sh
+
+      - name: Seed Phase3 product layer
+        env:
+          SEED_DB_URL: postgresql://postgres:postgres@localhost:5432/fodmapp_api_ci
+          PSQL_BIN: psql
+        run: |
+          uv run --project api bash etl/phase3/scripts/phase3_seed_for_api_ci.sh
+
+      - name: Stamp dbmate migration state for replay-seeded promote smoke
+        run: |
+          psql "$API_DB_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE TABLE IF NOT EXISTS public.schema_migrations (
+            version character varying NOT NULL PRIMARY KEY
+          );
+
+          INSERT INTO public.schema_migrations (version)
+          VALUES
+            ('20260321000000'),
+            ('20260321143000')
+          ON CONFLICT (version) DO NOTHING;
+          SQL
+
+      - name: Verify replay-seeded DB is dbmate-clean for promote smoke
+        run: |
+          status_output="$(pnpm db:status)"
+          echo "$status_output"
+          echo "$status_output" | grep -Eq '^Pending: 0$'
+
+      - name: Capture pre-promote state
+        run: |
+          initial_publish_id="$(psql "$API_DB_URL" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+          test -n "$initial_publish_id"
+          echo "INITIAL_PUBLISH_ID=$initial_publish_id" >> "$GITHUB_ENV"
+
+          initial_rollup_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_rollups_current;")"
+          initial_subtype_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_subtypes_current;")"
+          initial_swap_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_swaps_current;")"
+          initial_active_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'active';")"
+          initial_draft_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'draft';")"
+          initial_active_scoring_versions="$(psql "$API_DB_URL" -tA -c "
+            WITH scoring_distribution AS (
+              SELECT
+                s.scoring_version,
+                COUNT(*)::int AS row_count
+              FROM swap_rule_scores s
+              JOIN swap_rules r ON r.swap_rule_id = s.swap_rule_id
+              LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
+              LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
+              WHERE r.status = 'active'
+                AND COALESCE(p_from.priority_rank, 0) <> 2
+                AND COALESCE(p_to.priority_rank, 0) <> 2
+              GROUP BY s.scoring_version
+            )
+            SELECT COALESCE(string_agg(scoring_version || ':' || row_count, ',' ORDER BY scoring_version), '')
+            FROM scoring_distribution;
+          ")"
+
+          echo "INITIAL_ROLLUP_COUNT=$initial_rollup_count" >> "$GITHUB_ENV"
+          echo "INITIAL_SUBTYPE_COUNT=$initial_subtype_count" >> "$GITHUB_ENV"
+          echo "INITIAL_SWAP_COUNT=$initial_swap_count" >> "$GITHUB_ENV"
+          echo "INITIAL_ACTIVE_COUNT=$initial_active_count" >> "$GITHUB_ENV"
+          echo "INITIAL_DRAFT_COUNT=$initial_draft_count" >> "$GITHUB_ENV"
+          echo "INITIAL_ACTIVE_SCORING_VERSIONS=$initial_active_scoring_versions" >> "$GITHUB_ENV"
+
+      - name: Run first manual promote
+        run: |
+          pnpm phase3:promote -- --manifest-out "$RUNNER_TEMP/phase3-promote-first.json"
+
+      - name: Verify first promote result
+        env:
+          PROMOTE_MANIFEST_PATH: ${{ runner.temp }}/phase3-promote-first.json
+        run: |
+          first_publish_id="$(psql "$API_DB_URL" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+          test -n "$first_publish_id"
+          test "$first_publish_id" != "$INITIAL_PUBLISH_ID"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path(os.environ["PROMOTE_MANIFEST_PATH"]).read_text())
+          assert manifest["publish_id"], manifest
+          assert manifest["publish_id"] != os.environ["INITIAL_PUBLISH_ID"], manifest
+          assert manifest["rollup_row_count"] == int(os.environ["INITIAL_ROLLUP_COUNT"]), manifest
+          assert manifest["subtype_row_count"] == int(os.environ["INITIAL_SUBTYPE_COUNT"]), manifest
+          assert manifest["swap_row_count"] == int(os.environ["INITIAL_SWAP_COUNT"]), manifest
+          assert manifest["active_swap_count"] == int(os.environ["INITIAL_ACTIVE_COUNT"]), manifest
+          assert manifest["draft_swap_count"] == int(os.environ["INITIAL_DRAFT_COUNT"]), manifest
+          PY
+
+          echo "FIRST_PUBLISH_ID=$first_publish_id" >> "$GITHUB_ENV"
+
+      - name: Run second manual promote
+        run: |
+          pnpm phase3:promote -- --manifest-out "$RUNNER_TEMP/phase3-promote-second.json"
+
+      - name: Verify second promote result
+        env:
+          PROMOTE_MANIFEST_PATH: ${{ runner.temp }}/phase3-promote-second.json
+        run: |
+          second_publish_id="$(psql "$API_DB_URL" -tA -c "SELECT publish_id FROM api_publish_meta_current;")"
+          test -n "$second_publish_id"
+          test "$second_publish_id" != "$FIRST_PUBLISH_ID"
+
+          current_rollup_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_rollups_current;")"
+          current_subtype_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_food_subtypes_current;")"
+          current_swap_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM api_swaps_current;")"
+          current_active_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'active';")"
+          current_draft_count="$(psql "$API_DB_URL" -tA -c "SELECT COUNT(*) FROM swap_rules WHERE status = 'draft';")"
+          current_active_scoring_versions="$(psql "$API_DB_URL" -tA -c "
+            WITH scoring_distribution AS (
+              SELECT
+                s.scoring_version,
+                COUNT(*)::int AS row_count
+              FROM swap_rule_scores s
+              JOIN swap_rules r ON r.swap_rule_id = s.swap_rule_id
+              LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
+              LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
+              WHERE r.status = 'active'
+                AND COALESCE(p_from.priority_rank, 0) <> 2
+                AND COALESCE(p_to.priority_rank, 0) <> 2
+              GROUP BY s.scoring_version
+            )
+            SELECT COALESCE(string_agg(scoring_version || ':' || row_count, ',' ORDER BY scoring_version), '')
+            FROM scoring_distribution;
+          ")"
+
+          test "$current_rollup_count" = "$INITIAL_ROLLUP_COUNT"
+          test "$current_subtype_count" = "$INITIAL_SUBTYPE_COUNT"
+          test "$current_swap_count" = "$INITIAL_SWAP_COUNT"
+          test "$current_active_count" = "$INITIAL_ACTIVE_COUNT"
+          test "$current_draft_count" = "$INITIAL_DRAFT_COUNT"
+          test "$current_active_scoring_versions" = "$INITIAL_ACTIVE_SCORING_VERSIONS"
+
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          manifest = json.loads(Path(os.environ["PROMOTE_MANIFEST_PATH"]).read_text())
+          assert manifest["publish_id"], manifest
+          assert manifest["publish_id"] != os.environ["FIRST_PUBLISH_ID"], manifest
+          assert manifest["rollup_row_count"] == int(os.environ["INITIAL_ROLLUP_COUNT"]), manifest
+          assert manifest["subtype_row_count"] == int(os.environ["INITIAL_SUBTYPE_COUNT"]), manifest
+          assert manifest["swap_row_count"] == int(os.environ["INITIAL_SWAP_COUNT"]), manifest
+          assert manifest["active_swap_count"] == int(os.environ["INITIAL_ACTIVE_COUNT"]), manifest
+          assert manifest["draft_swap_count"] == int(os.environ["INITIAL_DRAFT_COUNT"]), manifest
+          PY
+
+      - name: Verify runner left repository clean
+        run: |
+          git diff --exit-code
 
   api-integration-seeded:
     name: api-integration-seeded
@@ -259,6 +520,7 @@ jobs:
     needs:
       - api-tests
       - dbmate-smoke
+      - phase3-promote-smoke
       - api-integration-seeded
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -267,7 +529,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for result in "${{ needs.api-tests.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
+          for result in "${{ needs.api-tests.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.phase3-promote-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
             if [ "$result" != "success" ]; then
               echo "::error::API gate failed because a dependency result was '$result'."
               exit 1

@@ -450,7 +450,7 @@
     "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5",
     "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
     "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:f9162b414cb016bd170642fbfab6fc251bc96e00378bd2372b0d63c11b5a8053",
-    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:5148a61e325120491570602b1f8b1ddc658acfc0f79cfe855fc57ddacaaa23dc",
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:1fea3c7ec6e7618d256e881c4301586717a27638294a8d3bd3b89e6caceda732",
     "etl/phase3/sql/phase3_mvp_checks.sql": "sha256:d37cd53d77fd1a3229ad079e8fc581021f54dc54331d0857952df66156c33215",
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a",
     "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:0f82a61fe2c057b46f4b2a3d4ee694331a7e757e2db067b7d6e8ff54b4b505c4"

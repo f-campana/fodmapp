@@ -62,7 +62,10 @@
     "db:status": "./scripts/dbmate.sh status",
     "db:migrate": "./scripts/dbmate.sh migrate",
     "db:up": "./scripts/dbmate.sh up",
-    "db:new": "./scripts/dbmate.sh new"
+    "db:new": "./scripts/dbmate.sh new",
+    "phase3:promote:check": "uv run --project api python api/scripts/phase3_promote.py check",
+    "phase3:promote": "uv run --project api python api/scripts/phase3_promote.py run",
+    "phase3:promote:status": "uv run --project api python api/scripts/phase3_promote.py status"
   },
   "devDependencies": {
     "@changesets/changelog-github": "0.5.2",
