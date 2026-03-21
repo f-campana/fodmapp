@@ -2852,7 +2852,6 @@ components:
           client_device_id,
           sync_session_id,
           client_time_utc,
-          user_id,
           items,
         ]
       properties:

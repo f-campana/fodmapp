@@ -1329,7 +1329,7 @@ export interface components {
       /** Format: date-time */
       client_time_utc: string;
       /** Format: uuid */
-      user_id: string;
+      user_id?: string;
       items: components["schemas"]["SyncV1MutationItem"][];
       /** @default false */
       migration_mode: boolean;

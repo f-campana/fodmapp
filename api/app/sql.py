@@ -557,28 +557,22 @@ LIMIT 1
 
 SQL_GET_SWAP_RULE_FOR_MUTATION = """
 SELECT
-  r.status::text AS rule_status,
-  ff.food_slug AS from_food_slug,
-  ft.food_slug AS to_food_slug,
-  rs.fodmap_safety_score,
-  rs.overall_score,
-  rs.scoring_version,
+  ps.rule_status::text AS rule_status,
+  ps.from_food_slug,
+  ps.to_food_slug,
+  ps.fodmap_safety_score,
+  ps.overall_score,
+  ps.scoring_version,
   COALESCE(ps.from_overall_level::text, 'unknown') AS from_overall_level,
   COALESCE(ps.to_overall_level::text, 'unknown') AS to_overall_level,
   COALESCE(ps.coverage_ratio, 0)::numeric(6,4) AS coverage_ratio,
-  p_from.priority_rank AS from_priority_rank,
-  p_to.priority_rank AS to_priority_rank,
-  ps.from_burden_ratio AS from_burden_ratio,
-  ps.to_burden_ratio AS to_burden_ratio
-FROM foods ff
-JOIN foods ft ON TRUE
-JOIN swap_rules r ON r.from_food_id = ff.food_id AND r.to_food_id = ft.food_id
-JOIN swap_rule_scores rs ON rs.swap_rule_id = r.swap_rule_id
-LEFT JOIN phase2_priority_foods p_from ON p_from.resolved_food_id = r.from_food_id
-LEFT JOIN phase2_priority_foods p_to ON p_to.resolved_food_id = r.to_food_id
-LEFT JOIN api_swaps_current ps ON ps.swap_rule_id = r.swap_rule_id
-WHERE ff.food_slug = %(from_food_slug)s
-  AND ft.food_slug = %(to_food_slug)s
+  ps.from_priority_rank,
+  ps.to_priority_rank,
+  ps.from_burden_ratio,
+  ps.to_burden_ratio
+FROM api_swaps_current ps
+WHERE ps.from_food_slug = %(from_food_slug)s
+  AND ps.to_food_slug = %(to_food_slug)s
 LIMIT 1
 """
 
