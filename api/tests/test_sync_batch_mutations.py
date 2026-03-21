@@ -205,6 +205,81 @@ def _build_batch_request(user_id: uuid.UUID, client_device_id: str, items: list[
     }
 
 
+def test_sync_batch_swap_apply_uses_published_snapshot(client, db_url) -> None:
+    user_id = uuid.uuid4()
+    device_id = "batch-device-published-swap"
+
+    with connect(db_url, row_factory=dict_row) as reader:
+        relation = reader.execute("SELECT to_regclass('public.api_swaps_current') AS regclass").fetchone()
+        if relation is None or relation["regclass"] is None:
+            pytest.skip("publish boundary views are not seeded in this database")
+        published_rule = reader.execute(
+            """
+            SELECT swap_rule_id, from_food_slug, to_food_slug, rule_status
+            FROM api_swaps_current
+            WHERE publish_id IS NOT NULL
+            ORDER BY from_food_slug ASC, to_food_slug ASC
+            LIMIT 1
+            """
+        ).fetchone()
+    if published_rule is None:
+        pytest.skip("no published swap rows available")
+
+    try:
+        _cleanup_account(db_url, user_id)
+        _grant_sync_scope_consent(client, user_id)
+        secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id="swap-k1", seed="published-swap")
+
+        with connect(db_url, row_factory=dict_row) as writer:
+            with writer.transaction():
+                writer.execute(
+                    """
+                    UPDATE swap_rules
+                    SET status = 'draft'
+                    WHERE swap_rule_id = %(swap_rule_id)s
+                    """,
+                    {"swap_rule_id": published_rule["swap_rule_id"]},
+                )
+
+        swap_item = _build_mutation_item(
+            "SWAP_APPLY",
+            entity_type="swap_history",
+            client_seq=1,
+            idempotency_key="swap-published-01",
+            payload_extra={
+                "from_food_slug": published_rule["from_food_slug"],
+                "to_food_slug": published_rule["to_food_slug"],
+            },
+        )
+        _sign_mutation_item(secret, swap_item)
+
+        response = client.post(
+            "/v0/sync/mutations:batch",
+            headers={"X-User-Id": str(user_id)},
+            json=_build_batch_request(user_id, device_id, [swap_item]),
+        )
+        assert response.status_code == 200
+
+        payload = response.json()
+        assert payload["items"][0]["status"] == "APPLIED"
+        assert payload["items"][0]["result_code"] == "OK"
+    finally:
+        with connect(db_url, row_factory=dict_row) as writer:
+            with writer.transaction():
+                writer.execute(
+                    """
+                    UPDATE swap_rules
+                    SET status = %(status)s
+                    WHERE swap_rule_id = %(swap_rule_id)s
+                    """,
+                    {
+                        "status": published_rule["rule_status"],
+                        "swap_rule_id": published_rule["swap_rule_id"],
+                    },
+                )
+        _cleanup_account(db_url, user_id)
+
+
 def test_sync_batch_withdraw_consent_cancels_following_mutations(client, db_url) -> None:
     user_id = uuid.uuid4()
     device_id = "batch-device-withdraw"

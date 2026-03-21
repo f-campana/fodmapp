@@ -11,7 +11,7 @@ def _first_rollup_slug(db_conn) -> str:
     row = db_conn.execute(
         """
         SELECT f.food_slug
-        FROM v_phase3_rollups_latest_full v
+        FROM api_food_rollups_current v
         JOIN foods f ON f.food_id = v.food_id
         ORDER BY v.priority_rank
         LIMIT 1
@@ -41,7 +41,7 @@ def _slug_without_rollup(db_conn) -> Optional[str]:
         FROM foods f
         WHERE NOT EXISTS (
           SELECT 1
-          FROM v_phase3_rollups_latest_full v
+          FROM api_food_rollups_current v
           WHERE v.food_id = f.food_id
         )
         ORDER BY f.food_slug
@@ -59,7 +59,7 @@ def _search_query_with_mixed_rollup_results(db_conn) -> Optional[str]:
             LOWER(SPLIT_PART(f.food_slug, '-', 1)) AS token,
             EXISTS (
               SELECT 1
-              FROM v_phase3_rollups_latest_full v
+              FROM api_food_rollups_current v
               WHERE v.food_id = f.food_id
             ) AS has_rollup
           FROM foods f
@@ -85,7 +85,7 @@ def _search_query_without_rollup_results(db_conn) -> Optional[str]:
             LOWER(SPLIT_PART(f.food_slug, '-', 1)) AS token,
             EXISTS (
               SELECT 1
-              FROM v_phase3_rollups_latest_full v
+              FROM api_food_rollups_current v
               WHERE v.food_id = f.food_id
             ) AS has_rollup
           FROM foods f
@@ -124,7 +124,7 @@ def _rollup_food_subtypes_count(db_conn, food_slug: str) -> int:
     row = db_conn.execute(
         """
         SELECT COUNT(*)::int AS subtype_count
-        FROM v_phase3_rollup_subtype_levels_latest v
+        FROM api_food_subtypes_current v
         JOIN foods f ON f.food_id = v.food_id
         WHERE f.food_slug = %s
         """,

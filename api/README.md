@@ -78,3 +78,10 @@ Safe-Harbor V1 uses a dedicated endpoint (`GET /v0/safe-harbors`) so browse
 discovery does not weaken the required `/v0/foods?q=...` search contract. The
 endpoint only returns foods backed by explicit Safe-Harbor V1 `6/6` zero packs
 materialized from CIQUAL-linked foods and internal rules.
+
+Rollup, subtype, and swap serving now go through the Phase 3 publish boundary:
+
+- Phase 3 compute still rebuilds internal snapshot artifacts.
+- `etl/phase3/sql/phase3_publish_release_apply.sql` copies the current compiler outputs into immutable `publish_id` tables and flips the `api_*_current` views atomically.
+- API reads use the published current views rather than the compiler-owned `v_phase3_*_latest*` views directly.
+- The publish-boundary dbmate migration backfills one `api_v0_phase3` release when an upgraded database already has Phase 3 rollups and active swaps. Fresh databases stay unpublished until the explicit publish step runs.

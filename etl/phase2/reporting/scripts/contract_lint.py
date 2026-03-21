@@ -425,15 +425,43 @@ def validate_api_sql_rank2_contract(repo_root: pathlib.Path) -> None:
         fail(f"missing required API SQL file: {api_sql_path}")
 
     sql_text = api_sql_path.read_text(encoding="utf-8")
-    required_fragments = [
+    legacy_required_fragments = [
         "WHERE r.status = 'active'",
         "COALESCE(p_from.priority_rank, 0) <> 2",
         "COALESCE(p_to.priority_rank, 0) <> 2",
         "rs.fodmap_safety_score >= %(min_safety_score)s",
     ]
-    missing = [fragment for fragment in required_fragments if fragment not in sql_text]
-    if missing:
-        fail(f"api/app/sql.py missing required swap SQL clauses: {missing}")
+    legacy_missing = [fragment for fragment in legacy_required_fragments if fragment not in sql_text]
+    if not legacy_missing:
+        return
+
+    published_api_required_fragments = [
+        "FROM api_swaps_current",
+        "fodmap_safety_score >= %(min_safety_score)s",
+    ]
+    api_missing = [fragment for fragment in published_api_required_fragments if fragment not in sql_text]
+    if api_missing:
+        fail(f"api/app/sql.py missing required published swap SQL clauses: {api_missing}")
+
+    publish_sql_path = repo_root / "etl/phase3/sql/phase3_publish_release_apply.sql"
+    if not publish_sql_path.exists():
+        fail(
+            "etl/phase3/sql/phase3_publish_release_apply.sql is required when "
+            "api/app/sql.py serves swaps from published views"
+        )
+
+    publish_sql_text = publish_sql_path.read_text(encoding="utf-8")
+    publish_required_fragments = [
+        "WHERE r.status = 'active'",
+        "COALESCE(p_from.priority_rank, 0) <> 2",
+        "COALESCE(p_to.priority_rank, 0) <> 2",
+    ]
+    publish_missing = [fragment for fragment in publish_required_fragments if fragment not in publish_sql_text]
+    if publish_missing:
+        fail(
+            "etl/phase3/sql/phase3_publish_release_apply.sql missing required "
+            f"published swap safety clauses: {publish_missing}"
+        )
 
 
 def main() -> int:

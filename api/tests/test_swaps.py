@@ -10,12 +10,10 @@ pytestmark = pytest.mark.integration
 def _from_slug_with_active_swaps(db_conn) -> Optional[Tuple[str, int]]:
     row = db_conn.execute(
         """
-        SELECT f.food_slug, COUNT(*)::int AS rule_count
-        FROM swap_rules r
-        JOIN foods f ON f.food_id = r.from_food_id
-        WHERE r.status = 'active'
-        GROUP BY f.food_slug
-        ORDER BY rule_count DESC, f.food_slug ASC
+        SELECT from_food_slug AS food_slug, COUNT(*)::int AS rule_count
+        FROM api_swaps_current
+        GROUP BY from_food_slug
+        ORDER BY rule_count DESC, from_food_slug ASC
         LIMIT 1
         """
     ).fetchone()

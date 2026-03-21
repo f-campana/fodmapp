@@ -436,8 +436,8 @@
   },
   "source_db_ref": "db://localhost/fodmap_reporting_ci",
   "source_file_hashes": {
-    "api/app/sql.py": "sha256:ce7650603610c39699dc60cc818342934ea99432bcb9d99e59a39dc0df22ae58",
-    "api/tests/test_swaps.py": "sha256:e003c4beeffa779317fdc8fd91498ce604fa6525edbbaf013f11bdc5f06dbea6",
+    "api/app/sql.py": "sha256:699c2a3dbaec122512e3c8b0a908cd9a19c6e49ad4cd2a5c4f7faaa108fcdbe0",
+    "api/tests/test_swaps.py": "sha256:dc2a1e12de63ba5a412a0da80688de07a7e60d52f8414b240d7f873a219d5e4b",
     "etl/phase2/POD_WAVES_RUNBOOK.md": "sha256:c7a6c8eee28f9d561005c57669ff55e0877674984d8b4e7bbfbe76e17362fa8b",
     "etl/phase2/decisions/phase2_wave_manifest.csv": "sha256:0103e828a5a8131f934dadad81883b6582a34ef848a923145a4420d6abeda06e",
     "etl/phase2/sql/phase2_fructan_wave01_checks.sql": "sha256:6ca454f9ff037ffd3c38fb81bfddb0677217131b04aa7279fde3bbc1bd70c1a3",
@@ -450,7 +450,7 @@
     "etl/phase2/sql/phase2_post_quarantine_checks.sql": "sha256:34663117e64545e759ad07b40fcd445c56f4119a196ec721a0b6dfe00a0648f5",
     "etl/phase2/sql/phase2_replay_final_checks.sql": "sha256:51955a732d1966ede37723e359becfeeb271415edc60aebd034edb0bcfa8e42f",
     "etl/phase2/sql/phase2_scaffold_views.sql": "sha256:f9162b414cb016bd170642fbfab6fc251bc96e00378bd2372b0d63c11b5a8053",
-    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:3cd7c653960d4f7cdf8837d75a30cd31d11272df93410ef9a29b8088a62565fe",
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:5148a61e325120491570602b1f8b1ddc658acfc0f79cfe855fc57ddacaaa23dc",
     "etl/phase3/sql/phase3_mvp_checks.sql": "sha256:d37cd53d77fd1a3229ad079e8fc581021f54dc54331d0857952df66156c33215",
     "etl/phase3/sql/phase3_rollups_6subtype_checks.sql": "sha256:54b275151443e15ce6f2c9345468819fd11de75a7435d59a841dd045d80a1a6a",
     "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:0f82a61fe2c057b46f4b2a3d4ee694331a7e757e2db067b7d6e8ff54b4b505c4"

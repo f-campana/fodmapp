@@ -928,8 +928,19 @@ Phase 3.1a upgrades rollups from target-subtype-only to full six-subtype evaluat
 
 Read interfaces:
 
-- `v_phase3_rollup_subtype_levels_latest` (food x subtype detail)
-- `v_phase3_rollups_latest_full` (one row per food with coverage + driver)
+- compiler-facing latest views:
+  - `v_phase3_rollup_subtype_levels_latest`
+  - `v_phase3_rollups_latest_full`
+- API-facing published current views:
+  - `api_food_subtypes_current`
+  - `api_food_rollups_current`
+  - `api_swaps_current`
+- dbmate-compatible bootstrap placeholder views:
+  - `v_phase3_rollup_subtype_levels_latest`
+  - `v_phase3_rollups_latest_full`
+  - these exist as empty compatibility anchors on a fresh migrated database and are replaced by `etl/phase3/sql/phase3_rollups_compute.sql`
+- the publish-boundary dbmate migration backfills one `api_v0_phase3` release when it upgrades a long-lived DB that already has Phase 3 rollups and active swaps
+- after that backfill or any later explicit publish, serving is release-boundary only
 
 Pipeline-managed snapshot artifacts:
 
@@ -1062,9 +1073,10 @@ Swap sorting contract:
 
 Rollup freshness contract:
 
-- API rollup projections come from `v_phase3_rollups_latest_full`
-- this depends on pipeline-managed snapshots rebuilt by:
+- API rollup projections come from `api_food_rollups_current`
+- publish is a separate step after compute:
   - `etl/phase3/sql/phase3_rollups_compute.sql`
+  - `etl/phase3/sql/phase3_publish_release_apply.sql`
 - API responses expose freshness/provenance fields:
   - `rollup_computed_at`
   - `scoring_version`
@@ -1072,7 +1084,7 @@ Rollup freshness contract:
 
 Subtype informative contract (`/v0/foods/{food_slug}/subtypes`):
 
-- one row per subtype from `v_phase3_rollup_subtype_levels_latest`
+- one row per subtype from `api_food_subtypes_current`
 - required analysis fields:
   - `subtype_code`, `subtype_level`
   - `amount_g_per_serving`, `comparator`
@@ -1238,7 +1250,7 @@ Execution sequence:
 
 ### 11.9 API health readiness hardening (Phase 3.5)
 
-`GET /v0/health` is readiness-aware:
+`GET /v0/health` is readiness-aware and publish-aware:
 
 - `200` only when DB ping succeeds
 - `503` with `service_unavailable` error code when DB is unavailable
