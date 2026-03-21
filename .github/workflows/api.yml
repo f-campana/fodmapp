@@ -57,6 +57,19 @@ jobs:
         run: |
           uv run --project api pytest -m "not integration" api/tests
 
+  api-container-smoke:
+    name: api-container-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build API container
+        run: |
+          docker build -f api/Dockerfile api
+
   dbmate-smoke:
     name: dbmate-smoke
     runs-on: ubuntu-latest
@@ -519,6 +532,7 @@ jobs:
     if: ${{ always() }}
     needs:
       - api-tests
+      - api-container-smoke
       - dbmate-smoke
       - phase3-promote-smoke
       - api-integration-seeded
@@ -529,7 +543,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          for result in "${{ needs.api-tests.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.phase3-promote-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
+          for result in "${{ needs.api-tests.result }}" "${{ needs.api-container-smoke.result }}" "${{ needs.dbmate-smoke.result }}" "${{ needs.phase3-promote-smoke.result }}" "${{ needs.api-integration-seeded.result }}"; do
             if [ "$result" != "success" ]; then
               echo "::error::API gate failed because a dependency result was '$result'."
               exit 1

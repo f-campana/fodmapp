@@ -23,6 +23,7 @@ This runbook documents operations controls introduced by CI workflow hardening:
 - explicit non-Turbo exceptions for CI commands that are not Turbo-cache candidates
 - path-scoped Storybook deployment to Vercel production lane on `main`
 - API workflow job timeouts to fail fast on stalled runner container initialization
+- API container smoke validation for the planned Git-driven Koyeb runtime
 - dbmate smoke validation for the long-lived migration lane without weakening replay/seed CI
 - explicit local Postgres `sslmode=disable` wiring for dbmate/API smoke jobs while hosted Neon keeps provider SSL settings
 - manual Phase 3 promote smoke validation for the non-destructive persistent-db refresh lane
@@ -247,6 +248,7 @@ UX contract:
 `.github/workflows/api.yml` now enforces explicit job-level fail-fast bounds to prevent indefinite hangs during service-container bootstrap on GitHub-hosted runners:
 
 - `api-tests`: `timeout-minutes: 15`
+- `api-container-smoke`: `timeout-minutes: 15`
 - `dbmate-smoke`: `timeout-minutes: 15`
 - `phase3-promote-smoke`: `timeout-minutes: 25`
 - `api-integration-seeded`: `timeout-minutes: 25`
@@ -258,6 +260,24 @@ Operational behavior:
 - if container initialization or test execution stalls beyond these bounds, the job is force-failed by Actions
 - `api-gate` remains authoritative and fails the required `API` check when either upstream job times out
 - push-to-`main` API runs remain the source of truth after merge; stale PR runs should be canceled if still running
+
+## API Container Smoke Contract
+
+The `API` workflow now includes a dedicated `api-container-smoke` job for the planned Git-driven
+Koyeb deployment path.
+
+Contract:
+
+- checks out the repo on GitHub-hosted Ubuntu
+- runs `docker build -f api/Dockerfile api`
+- fails the PR before merge if the committed container bootstrap is broken
+- is included in the aggregate `API` required check
+
+Semantics:
+
+- this is a build-only validation lane, not a deploy workflow
+- no cloud credentials, deploy secrets, or domain wiring are introduced here
+- local `quality-gate.sh` stays unchanged; container build validation remains CI-only for portability
 
 ## API DBMate Smoke Contract
 

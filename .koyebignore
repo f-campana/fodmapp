@@ -1,0 +1,27 @@
+# Do not trigger a Koyeb rebuild for non-API changes.
+#
+# Koyeb still clones the full repository during deployment.
+# This file only suppresses redeploys for paths that do not affect the API runtime.
+
+# Repository docs and governance
+docs/**
+.github/**
+AGENTS.md
+CONTRIBUTING.md
+README.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+LICENSE
+.env.example
+
+# Monorepo surfaces unrelated to the API runtime
+apps/**
+packages/**
+etl/**
+infra/**
+schema/**
+scripts/**
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+turbo.json

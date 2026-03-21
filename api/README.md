@@ -4,7 +4,7 @@ Status: Implemented
 Audience: Contributor or engineer; Data or workflow operator
 Scope: Setup, local execution, test flow, and OpenAPI contract entry point for the read-only API.
 Related docs: [docs/foundation/project-definition.md](../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../docs/foundation/documentation-personas.md), [docs/README.md](../docs/README.md)
-Last reviewed: 2026-03-08
+Last reviewed: 2026-03-21
 
 Read-only FastAPI service exposing Phase 3 product-layer data:
 
@@ -85,3 +85,25 @@ Rollup, subtype, and swap serving now go through the Phase 3 publish boundary:
 - `etl/phase3/sql/phase3_publish_release_apply.sql` copies the current compiler outputs into immutable `publish_id` tables and flips the `api_*_current` views atomically.
 - API reads use the published current views rather than the compiler-owned `v_phase3_*_latest*` views directly.
 - The publish-boundary dbmate migration backfills one `api_v0_phase3` release when an upgraded database already has Phase 3 rollups and active swaps. Fresh databases stay unpublished until the explicit publish step runs.
+
+## Planned Hosted Runtime
+
+The first hosted API target is planned as:
+
+- Koyeb for the FastAPI runtime
+- Neon for PostgreSQL
+- `https://api.fodmapp.fr` as the canonical hosted origin
+
+The hosted API is not live from this branch. Current blockers are:
+
+- the initial persistent Neon data bootstrap path is still unimplemented
+- hosted activation remains a later operator track
+
+Container bootstrap artifacts for that later hosting track are now committed:
+
+- `api/Dockerfile`
+- `api/.dockerignore`
+- `docs/ops/api-koyeb-neon-bootstrap.md`
+
+The runtime remains read-only and stateless. `API_DB_URL`, `API_NAME`, and `API_VERSION` are the
+planned Koyeb runtime values once the hosted track resumes.
