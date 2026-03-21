@@ -41,9 +41,9 @@ export function getServerFeatureFlags(
     sentryConfigured: Boolean(env.sentryDsnApp),
     clerkConfigured: Boolean(
       env.clerkSecretKey &&
-        env.clerkJwtIssuerDomain &&
-        env.clerkJwtKey &&
-        env.clerkAuthorizedParties,
+      env.clerkJwtIssuerDomain &&
+      env.clerkJwtKey &&
+      env.clerkAuthorizedParties,
     ),
   };
 }
