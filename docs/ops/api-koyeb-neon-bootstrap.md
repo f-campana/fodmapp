@@ -1,10 +1,10 @@
 # API Koyeb + Neon Bootstrap
 
-Status: Planned
+Status: Ready for operator execution
 Audience: Maintainer or operator; Contributor or engineer
 Scope: First hosted API environment on Koyeb with a Neon-backed Postgres connection.
 
-Last reviewed: 2026-03-21
+Last reviewed: 2026-03-22
 
 ## Current decision
 
@@ -21,25 +21,25 @@ This remains intentionally a single hosted environment only:
 
 Do not create a persistent staging API or staging Neon branch in this phase.
 
-## Current blockers
+## Current platform state
 
-The platform prerequisites that are already on `main` are:
+The platform prerequisites that are now on `main` are:
 
 - `dbmate` for long-lived schema migrations
 - published `api_*_current` read models for Phase 3 serving
 - `pnpm phase3:promote` for refresh-only persistent-db publish reruns
+- `pnpm phase3:bootstrap` for first-time persistent data load on a schema-only database
 
-This branch adds the missing first-time persistent bootstrap operator path:
+What is still not done:
 
-- `pnpm phase3:bootstrap:check`
-- `pnpm phase3:bootstrap`
-- `pnpm phase3:bootstrap:status`
+- the real Neon project is not created yet
+- the real Koyeb service is not created yet
+- `api.fodmapp.fr` is not live yet
 
-Until this bootstrap branch lands on `main`:
+Operational rule:
 
-- keep CI replay/seed scripts on disposable databases only
+- keep destructive replay/seed scripts on disposable databases only
 - do not point destructive replay scripts at a persistent Neon branch
-- do not claim `api.fodmapp.fr` is live
 
 ## Planned Koyeb service settings
 
@@ -76,9 +76,15 @@ Git trigger behavior:
 When hosted activation resumes:
 
 - create one Neon project
-- use only the `main` branch for the first hosted environment
+- use one canonical production branch only for the first hosted environment
 - leave `staging` reserved for later
 - use `pr-*` branches only for later validation if needed
+
+Provider note:
+
+- repo planning originally assumed a Neon `main` branch
+- Neon docs now indicate that projects created after **April 18, 2025** may default to `production` and `development` instead of a single `main`
+- for a brand-new Neon project created now, prefer the provider default production branch and record that choice in the operator guide rather than renaming repo contracts around a historical assumption
 
 Before the API is exposed publicly, the hosted-activation track must run:
 
@@ -107,3 +113,9 @@ Before calling the hosted environment ready in the later activation track:
 4. `https://api.fodmapp.fr/v0/foods?q=a&limit=1` returns a valid response.
 5. Docs-only commits do not trigger redeploys because of `.koyebignore`.
 6. The target Neon database was first loaded through `pnpm phase3:bootstrap`, then refreshed through `pnpm phase3:promote`.
+
+## Operator Guide
+
+Use the detailed execution checklist in:
+
+- `docs/ops/api-first-hosted-activation.md`

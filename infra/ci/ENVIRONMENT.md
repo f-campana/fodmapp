@@ -185,7 +185,8 @@ Semantics:
 
 - deployment remains Git-driven in Koyeb; there is no GitHub-managed API deploy workflow in this phase
 - `.github/workflows/api.yml` adds `api-container-smoke` as a build-only guard for `api/Dockerfile`
-- hosted activation now depends on running `pnpm phase3:bootstrap` after `pnpm db:migrate` on the target Neon branch; until this bootstrap branch lands on `main`, first hosted activation remains deferred
+- hosted activation now depends on running `pnpm phase3:bootstrap` after `pnpm db:migrate` on the target Neon branch
+- first hosted activation is now an operator execution task, not a missing repo-capability blocker
 
 ## CI Storybook Deploy Variables
 

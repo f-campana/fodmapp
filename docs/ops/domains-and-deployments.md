@@ -1,6 +1,6 @@
 # Domains and deployments
 
-Last reviewed: 2026-03-21
+Last reviewed: 2026-03-22
 
 ## Production domain map
 
@@ -74,12 +74,14 @@ Current status:
 - `staging.api.fodmapp.fr`: reserved future API origin
 - neither origin is active in this branch
 
-Current blocker:
+Current status:
 
-- first hosted activation is deferred until the repo has a dedicated initial persistent data
-  bootstrap path for Neon
+- the repo now has a dedicated initial persistent bootstrap path for Neon
+- `api.fodmapp.fr` is still not live because operator activation has not been executed yet
 
-Do not attach the API domains to a live Koyeb service in this phase.
+Do not attach the API domains until you are executing the first hosted activation runbook:
+
+- `docs/ops/api-first-hosted-activation.md`
 
 ## Redirect / canonicalization
 
