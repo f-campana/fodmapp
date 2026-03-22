@@ -81,7 +81,7 @@ if ! command -v "$psql_bin" >/dev/null 2>&1; then
   exit 1
 fi
 
-run_cmd "Install API dependencies (dev+ci)" bash -c "cd api && uv sync --extra dev --extra ci --locked"
+run_cmd "Install API dependencies (dev+bootstrap)" bash -c "cd api && uv sync --extra dev --extra bootstrap --locked"
 run_cmd "Run API contract/unit tests" uv run --project api pytest -m "not integration" api/tests
 
 mkdir -p "$ciqual_cache_dir"

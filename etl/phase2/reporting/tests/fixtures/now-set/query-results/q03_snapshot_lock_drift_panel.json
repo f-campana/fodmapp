@@ -7,8 +7,8 @@
   "fixture_id": "Q-03",
   "mode": "fixture_smoke",
   "source_file_hashes": {
-    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:1fea3c7ec6e7618d256e881c4301586717a27638294a8d3bd3b89e6caceda732",
-    "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:0f82a61fe2c057b46f4b2a3d4ee694331a7e757e2db067b7d6e8ff54b4b505c4"
+    "etl/phase3/PRODUCT_LAYER_RUNBOOK.md": "sha256:0961a0905e97120220c67f4de9dc41710726c5680e9e3a8465c69da4469e675f",
+    "etl/phase3/sql/phase3_swap_activation_apply.sql": "sha256:31c45710c9878265aa015a4047785b14b3a2b63357ef9a2be0a1c3a27243c51f"
   },
   "source_rows": {
     "approve_for_ineligible_rows": 0,

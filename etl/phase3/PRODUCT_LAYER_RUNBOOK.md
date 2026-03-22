@@ -4,7 +4,7 @@ Status: Implemented
 Audience: Data or workflow operator; Maintainer or operator; Reviewer or auditor
 Scope: SQL-first execution, activation gates, API read-layer dependencies, and validation contracts for the Phase 3 product layer.
 Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)
-Last reviewed: 2026-03-08
+Last reviewed: 2026-03-21
 
 This runbook defines the SQL-first product-layer execution on top of completed Phase 2 data.
 
@@ -239,13 +239,17 @@ CSV handoff contract:
 
 - Gate A writes:
   `etl/phase3/decisions/phase3_swap_activation_review_v1.csv`
-  via `\copy (SELECT ...) TO ... CSV HEADER`
+  by default for manual human-review flows
 - reviewer updates in place:
   - `review_decision` (`approve` or `reject`)
   - `review_notes`
   - `reviewed_by`
   - `reviewed_at`
-- Gate B reads via `\copy ... FROM` and enforces snapshot lock against current score/version.
+- Gate B reads the reviewed packet and enforces snapshot lock against current score/version.
+- operator and CI lanes may override the packet paths through:
+  - `PHASE3_REVIEW_EXPORT_PATH`
+  - `PHASE3_REVIEW_CSV_PATH`
+- `etl/phase3/scripts/phase3_seed_for_api_ci.sh` and `pnpm phase3:bootstrap` use those overrides plus `api/scripts/phase3_review_packet_overlay.py` to synthesize temporary reviewed packets without mutating tracked review CSVs or depending on git restore.
 
 ## 3.2a API Read Layer
 
@@ -311,13 +315,50 @@ Manual promote semantics:
 
 - refresh-only for already-loaded persistent databases
 - requires an existing current `api_v0_phase3` publish release before refresh
-- does not define first-time persistent bootstrap
+- first-time persistent bootstrap is a separate `pnpm phase3:bootstrap` lane
 - never exports or restores review CSVs
 - never calls `*_activation_apply.sql`
 - never mutates `swap_rules.status`
 - preserves activation-era `swap_rule_scores.scoring_version` values while recomputing live active-rule `fodmap_safety_score`
 - reruns the conservative active-rule safety gate after score refresh and fails closed if any active rule becomes ineligible
 - executes `phase3_publish_release_apply.sql` and `phase3_publish_release_checks.sql` inside one publish transaction so a failed publish check cannot leave `api_*_current` on a partially validated release
+
+## Initial Persistent Bootstrap Lane
+
+Long-lived Neon databases now have a separate first-load operator path.
+
+Execution order:
+
+1. `pnpm db:migrate`
+2. `pnpm phase3:bootstrap:check`
+3. `pnpm phase3:bootstrap`
+4. later refreshes via `pnpm phase3:promote`
+
+`phase3:bootstrap` runs:
+
+1. preflight checks (`dbmate status`, schema-only validation, explicit CIQUAL file validation)
+2. CIQUAL load
+3. the Phase 2 replay SQL chain without database recreate or schema apply
+4. `phase3_traits_apply.sql`
+5. `phase3_safe_harbor_v1_apply.sql`
+6. `phase3_safe_harbor_v1_checks.sql`
+7. `phase3_rollups_compute.sql`
+8. `phase3_rollups_6subtype_checks.sql`
+9. `phase3_swap_rules_apply.sql`
+10. `phase3_swap_rules_rescore.sql`
+11. temporary review-packet synthesis from the committed MVP decisions
+12. `phase3_swap_activation_apply.sql`
+13. `phase3_swap_activation_checks.sql`
+14. `phase3_mvp_checks.sql`
+15. `phase3_publish_release_apply.sql`
+16. `phase3_publish_release_checks.sql`
+
+Bootstrap semantics:
+
+- schema-only only: partially loaded or already-bootstrapped databases are out of scope and fail preflight
+- non-destructive: no database drop/recreate and no git restore
+- Gate A / Gate B semantics remain intact because only `*_activation_apply.sql` changes `swap_rules.status`
+- the runner emits a JSON manifest with Phase 2, publish, and swap counts so operators can verify the first load before handing off to `phase3:promote`
 
 Subtype endpoint payload contract:
 

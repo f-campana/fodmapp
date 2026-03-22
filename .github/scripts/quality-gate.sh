@@ -207,7 +207,10 @@ run_cmd "docs hygiene audit tests syntax" node --check .github/scripts/docs-hygi
 run_cmd "dbmate wrapper syntax" bash -n scripts/dbmate.sh
 run_cmd "API operator python script syntax" python3 -m py_compile \
   api/scripts/repair_consent_event_chain.py \
+  api/scripts/phase3_bootstrap.py \
   api/scripts/phase3_promote.py
+run_cmd "API review packet helper syntax" python3 -m py_compile \
+  api/scripts/phase3_review_packet_overlay.py
 run_cmd "reporting python script syntax" python3 -m py_compile \
   etl/phase2/reporting/scripts/collect_reporting.py \
   etl/phase2/reporting/scripts/compare_baselines.py \
