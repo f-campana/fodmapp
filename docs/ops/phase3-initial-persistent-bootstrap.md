@@ -1,10 +1,10 @@
 # Phase 3 Initial Persistent Bootstrap
 
-Status: Implemented on branch
+Status: Implemented on main
 Audience: Maintainer or operator
 Scope: First-time Phase 2 / Phase 3 data load for a dbmate-migrated persistent database.
 
-Last reviewed: 2026-03-21
+Last reviewed: 2026-03-22
 
 ## Purpose
 

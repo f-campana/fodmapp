@@ -4,7 +4,7 @@ Status: Implemented
 Audience: Contributor or engineer; Data or workflow operator
 Scope: Setup, local execution, test flow, and OpenAPI contract entry point for the read-only API.
 Related docs: [docs/foundation/project-definition.md](../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../docs/foundation/documentation-personas.md), [docs/README.md](../docs/README.md)
-Last reviewed: 2026-03-21
+Last reviewed: 2026-03-22
 
 Read-only FastAPI service exposing Phase 3 product-layer data:
 
@@ -101,14 +101,16 @@ The first hosted API target is planned as:
 - Neon for PostgreSQL
 - `https://api.fodmapp.fr` as the canonical hosted origin
 
-The hosted API is not live from this branch. First hosted activation now depends on this operator sequence:
+The hosted API is not live yet. First hosted activation now depends on this operator sequence:
 
 1. `pnpm db:migrate`
 2. `pnpm phase3:bootstrap`
 3. later refreshes via `pnpm phase3:promote`
 4. only then attach `https://api.fodmapp.fr`
 
-Hosted activation remains a later operator track until this bootstrap branch lands on `main`.
+The concrete operator runbook now lives in:
+
+- `docs/ops/api-first-hosted-activation.md`
 
 Container bootstrap artifacts for that later hosting track are now committed:
 
