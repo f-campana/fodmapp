@@ -355,7 +355,8 @@ The `API` workflow now includes a dedicated `phase3-promote-smoke` job for the p
 Contract:
 
 - seeds a disposable Postgres 16 database with the existing replay + `phase3_seed_for_api_ci.sh` path first
-- stamps the current dbmate migration versions into that replay-seeded disposable database with `./scripts/dbmate.sh stamp-replay`, deriving versions from the migration lane instead of a hardcoded list, so the preflight contract stays strict while replay/bootstrap remains the disposable setup lane
+- replay bootstrap now applies the absorbed legacy schema migrations that `20260321000000_current_state_baseline.sql` claims to cover before promote smoke runs
+- `./scripts/dbmate.sh stamp-replay` stamps only the dbmate migration versions whose schema markers are actually present in that replay-seeded disposable database, so replay/bootstrap stays the disposable setup lane without pretending unapplied dbmate migrations already ran
 - captures the current `api_v0_phase3` `publish_id` plus published row counts and active/draft swap counts
 - captures the active publishable-rule `scoring_version` distribution before the first promote run
 - runs `pnpm phase3:promote` twice with JSON manifests

@@ -54,9 +54,65 @@ normalize_schema_dump_headers() {
   ' "${SCHEMA_FILE}"
 }
 
-emit_migration_versions() {
+replay_schema_has_version() {
+  local psql_bin="$1"
+  local version="$2"
+  local sql=""
+
+  case "${version}" in
+    20260321000000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.me_mutation_queue\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.symptom_logs\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.me_auth_identities\') IS NOT NULL\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    20260321120000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.product_assessments\') IS NOT NULL\n'
+      sql+=$'   AND EXISTS (\n'
+      sql+=$'     SELECT 1\n'
+      sql+=$'     FROM information_schema.columns\n'
+      sql+=$'     WHERE table_schema = \'public\'\n'
+      sql+=$'       AND table_name = \'products\'\n'
+      sql+=$'       AND column_name = \'product_name_en\'\n'
+      sql+=$'   )\n'
+      sql+=$'   AND EXISTS (\n'
+      sql+=$'     SELECT 1\n'
+      sql+=$'     FROM information_schema.columns\n'
+      sql+=$'     WHERE table_schema = \'public\'\n'
+      sql+=$'       AND table_name = \'products\'\n'
+      sql+=$'       AND column_name = \'updated_at\'\n'
+      sql+=$'   )\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    20260321143000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.publish_releases\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.publish_release_current\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_food_rollups\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_food_subtype_levels\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_swaps\') IS NOT NULL\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  local result
+  result="$("${psql_bin}" "${API_DB_URL}" -tA -v ON_ERROR_STOP=1 -c "${sql}")"
+  [[ "${result}" == "1" ]]
+}
+
+emit_bootstrap_mirrored_versions() {
+  local psql_bin="$1"
   local file=""
   local base=""
+  local version=""
 
   shopt -s nullglob
   local files=("${MIGRATIONS_DIR}"/*.sql)
@@ -69,12 +125,17 @@ emit_migration_versions() {
 
   for file in "${files[@]}"; do
     base="$(basename "${file}")"
-    echo "${base%%_*}"
+    version="${base%%_*}"
+    if replay_schema_has_version "${psql_bin}" "${version}"; then
+      echo "${version}"
+    fi
   done
 }
 
 stamp_replay_migration_state() {
   local psql_bin="${PSQL_BIN:-psql}"
+  local -a mirrored_versions=()
+  local version=""
 
   if [[ -z "${API_DB_URL:-}" ]]; then
     echo "[FAIL] API_DB_URL is required for stamp-replay." >&2
@@ -86,15 +147,24 @@ stamp_replay_migration_state() {
     exit 1
   fi
 
+  while IFS= read -r version; do
+    mirrored_versions+=("${version}")
+  done < <(emit_bootstrap_mirrored_versions "${psql_bin}")
+
+  if [[ "${#mirrored_versions[@]}" -eq 0 ]]; then
+    echo "[FAIL] no bootstrap-mirrored dbmate migrations were detected in the replay database." >&2
+    exit 1
+  fi
+
   {
     cat <<'SQL'
 CREATE TABLE IF NOT EXISTS public.schema_migrations (
   version character varying NOT NULL PRIMARY KEY
 );
 SQL
-    while IFS= read -r version; do
+    for version in "${mirrored_versions[@]}"; do
       printf "INSERT INTO public.schema_migrations (version) VALUES ('%s') ON CONFLICT (version) DO NOTHING;\n" "${version}"
-    done < <(emit_migration_versions)
+    done
   } | "${psql_bin}" "${API_DB_URL}" -v ON_ERROR_STOP=1
 }
 

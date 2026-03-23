@@ -6,7 +6,15 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 from etl.products.barcodes import BarcodeValidationError, normalize_retail_barcode
-from etl.products.compiler import _build_assessment_payload, process_refresh_request
+from etl.products.compiler import (
+    CompileSettings,
+    _build_assessment_payload,
+    _get_food_rollup,
+    _get_food_subtypes,
+    _replace_product_links,
+    drain_refresh_requests,
+    process_refresh_request,
+)
 from etl.products.ingredients import ParsedIngredient, parse_ingredients
 from etl.products.off_client import OpenFoodFactsFetchResult
 from etl.products.scoring import ScoredCandidate, choose_selected_candidate
@@ -297,12 +305,135 @@ def test_build_assessment_payload_ignores_non_substantive_matches() -> None:
     assert payload["numeric_guidance_status"] == "available"
 
 
+def test_build_assessment_payload_prefers_more_restrictive_subtype_on_severity_tie() -> None:
+    parsed_ingredients = [
+        ParsedIngredient(1, "sirop de glucose 60%", "sirop de glucose", 60.0, 0.96, True),
+        ParsedIngredient(2, "miel 40%", "miel", 40.0, 0.96, True),
+    ]
+    selected_rows = [
+        {
+            "line_no": 1,
+            "declared_share_pct": 60.0,
+            "is_substantive": True,
+            "ingredient_text_fr": "sirop de glucose 60%",
+            "food_id": "food-a",
+            "food_slug": "sirop",
+            "canonical_name_fr": "Sirop",
+            "canonical_name_en": "Syrup",
+            "score": 0.9,
+            "confidence_tier": "high",
+        },
+        {
+            "line_no": 2,
+            "declared_share_pct": 40.0,
+            "is_substantive": True,
+            "ingredient_text_fr": "miel 40%",
+            "food_id": "food-b",
+            "food_slug": "miel",
+            "canonical_name_fr": "Miel",
+            "canonical_name_en": "Honey",
+            "score": 0.86,
+            "confidence_tier": "medium",
+        },
+    ]
+    payload = _build_assessment_payload(
+        parsed_ingredients,
+        selected_rows,
+        {
+            "food-a": {"overall_level": "moderate", "rollup_serving_g": 40.0},
+            "food-b": {"overall_level": "moderate", "rollup_serving_g": 30.0},
+        },
+        {
+            "food-a": [
+                {
+                    "subtype_code": "fructose",
+                    "subtype_level": "moderate",
+                    "low_max_g": 70.0,
+                    "moderate_max_g": 90.0,
+                    "burden_ratio": 0.55,
+                }
+            ],
+            "food-b": [
+                {
+                    "subtype_code": "fructose",
+                    "subtype_level": "moderate",
+                    "low_max_g": 35.0,
+                    "moderate_max_g": 55.0,
+                    "burden_ratio": 0.85,
+                }
+            ],
+        },
+    )
+
+    fructose = next(subtype for subtype in payload["subtypes"] if subtype["subtype_code"] == "fructose")
+    assert fructose["source_food_id"] == "food-b"
+    assert fructose["low_max_g"] == 35.0
+    assert fructose["moderate_max_g"] == 55.0
+    assert fructose["burden_ratio"] == 0.85
+
+
+class _RecordingCursor:
+    def __init__(self, result):
+        self._result = result
+
+    def fetchone(self):
+        return self._result
+
+    def fetchall(self):
+        return self._result
+
+
+class _RecordingConnection:
+    def __init__(self, result):
+        self.result = result
+        self.queries: list[str] = []
+
+    def execute(self, query, params):
+        self.queries.append(" ".join(query.split()))
+        return _RecordingCursor(self.result)
+
+
+def test_food_rollup_reads_published_api_view() -> None:
+    conn = _RecordingConnection({"food_id": "food-riz", "overall_level": "low"})
+
+    _get_food_rollup(conn, "food-riz")
+
+    assert "FROM api_food_rollups_current" in conn.queries[0]
+    assert "v_phase3_rollups_latest_full" not in conn.queries[0]
+
+
+def test_food_subtypes_read_published_api_view() -> None:
+    conn = _RecordingConnection([])
+
+    _get_food_subtypes(conn, "food-riz")
+
+    assert "FROM api_food_subtypes_current" in conn.queries[0]
+    assert "v_phase3_rollup_subtype_levels_latest" not in conn.queries[0]
+
+
 class _StubOpenFoodFactsClient:
     def __init__(self, fetch_result: OpenFoodFactsFetchResult) -> None:
         self._fetch_result = fetch_result
 
     def fetch_product(self, normalized_code: str) -> OpenFoodFactsFetchResult:
         return self._fetch_result
+
+
+class _StatusCheckingOpenFoodFactsClient(_StubOpenFoodFactsClient):
+    def __init__(self, db_url: str, watched_code: str, fetch_result: OpenFoodFactsFetchResult) -> None:
+        super().__init__(fetch_result)
+        self._db_url = db_url
+        self._watched_code = watched_code
+        self.seen_status: str | None = None
+
+    def fetch_product(self, normalized_code: str) -> OpenFoodFactsFetchResult:
+        with psycopg.connect(self._db_url, row_factory=dict_row) as conn:
+            row = conn.execute(
+                "SELECT status FROM product_refresh_requests WHERE normalized_code = %s",
+                (self._watched_code,),
+            ).fetchone()
+        self.seen_status = row["status"] if row is not None else None
+        return super().fetch_product(normalized_code)
 
 
 def _source_id(conn: psycopg.Connection, source_slug: str) -> str:
@@ -312,14 +443,18 @@ def _source_id(conn: psycopg.Connection, source_slug: str) -> str:
 
 
 def _sample_food(conn: psycopg.Connection) -> dict[str, str]:
+    rollup_view = "api_food_rollups_current"
+    relation_row = conn.execute("SELECT to_regclass('public.api_food_rollups_current') AS relation_name").fetchone()
+    if relation_row["relation_name"] is None:
+        rollup_view = "v_phase3_rollups_latest_full"
     row = conn.execute(
-        """
+        f"""
         SELECT
           f.food_id,
           f.food_slug,
           COALESCE(f.canonical_name_fr, f.food_slug) AS canonical_name_fr,
           COALESCE(f.canonical_name_en, COALESCE(f.canonical_name_fr, f.food_slug)) AS canonical_name_en
-        FROM v_phase3_rollups_latest_full v
+        FROM {rollup_view} v
         JOIN foods f ON f.food_id = v.food_id
         WHERE v.overall_level <> 'unknown'
         ORDER BY v.coverage_ratio DESC, f.food_slug ASC
@@ -336,15 +471,19 @@ def _sample_food(conn: psycopg.Connection) -> dict[str, str]:
 
 
 def _sample_subtype_row(conn: psycopg.Connection, food_id: str) -> dict[str, object]:
+    subtype_view = "api_food_subtypes_current"
+    relation_row = conn.execute("SELECT to_regclass('public.api_food_subtypes_current') AS relation_name").fetchone()
+    if relation_row["relation_name"] is None:
+        subtype_view = "v_phase3_rollup_subtype_levels_latest"
     row = conn.execute(
-        """
+        f"""
         SELECT
           subtype_code,
           subtype_level::text AS subtype_level,
           low_max_g,
           moderate_max_g,
           burden_ratio
-        FROM v_phase3_rollup_subtype_levels_latest
+        FROM {subtype_view}
         WHERE food_id = %s
         ORDER BY (low_max_g IS NULL) ASC, subtype_code ASC
         LIMIT 1
@@ -736,6 +875,129 @@ def test_product_lookup_queues_refresh_and_dedupes_within_cooldown(
 
 
 @pytest.mark.integration
+def test_stale_product_detail_does_not_requeue_processing_refresh(
+    client,
+    db_url: str,
+    integration_guard,
+    products_schema,
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("PRODUCTS_FEATURE_ENABLED", "true")
+    normalized_code = _ean13("990123456783")
+    _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+    product_id = _seed_product_bundle(db_url, normalized_code=normalized_code, stale=True)
+    assert product_id is not None
+
+    old_requested_at = datetime(2026, 3, 1, 9, 0, tzinfo=timezone.utc)
+    try:
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            source_id = _source_id(conn, "open_food_facts")
+            conn.execute(
+                """
+                INSERT INTO product_refresh_requests (
+                  normalized_code,
+                  canonical_format,
+                  provider_source_id,
+                  product_id,
+                  status,
+                  requested_at,
+                  last_requested_at,
+                  refresh_after,
+                  cooldown_until,
+                  updated_at
+                ) VALUES (
+                  %s,
+                  'EAN13',
+                  %s,
+                  %s,
+                  'processing',
+                  %s,
+                  %s,
+                  %s,
+                  %s,
+                  %s
+                )
+                ON CONFLICT (normalized_code) DO UPDATE SET
+                  product_id = EXCLUDED.product_id,
+                  status = 'processing',
+                  requested_at = EXCLUDED.requested_at,
+                  last_requested_at = EXCLUDED.last_requested_at,
+                  refresh_after = EXCLUDED.refresh_after,
+                  cooldown_until = EXCLUDED.cooldown_until,
+                  updated_at = EXCLUDED.updated_at
+                """,
+                (
+                    normalized_code,
+                    source_id,
+                    product_id,
+                    old_requested_at,
+                    old_requested_at,
+                    old_requested_at,
+                    old_requested_at,
+                    old_requested_at,
+                ),
+            )
+
+        response = client.get(f"/v0/products/{product_id}")
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["sync_state"] == "refreshing"
+        assert payload["refresh_enqueued"] is False
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            refresh = conn.execute(
+                """
+                SELECT status, last_requested_at
+                FROM product_refresh_requests
+                WHERE normalized_code = %s
+                """,
+                (normalized_code,),
+            ).fetchone()
+        assert refresh is not None
+        assert refresh["status"] == "processing"
+        assert refresh["last_requested_at"] == old_requested_at
+    finally:
+        _cleanup_product_bundle(db_url, normalized_code=normalized_code, product_id=product_id)
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("suffix", ["ingredients", "assessment"])
+def test_stale_product_subresource_enqueues_refresh(
+    client,
+    db_url: str,
+    integration_guard,
+    products_schema,
+    monkeypatch,
+    suffix: str,
+) -> None:
+    monkeypatch.setenv("PRODUCTS_FEATURE_ENABLED", "true")
+    normalized_code = _ean13("990123456784")
+    _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+    product_id = _seed_product_bundle(db_url, normalized_code=normalized_code, stale=True)
+    assert product_id is not None
+
+    try:
+        response = client.get(f"/v0/products/{product_id}/{suffix}")
+        assert response.status_code == 200
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            refresh = conn.execute(
+                """
+                SELECT status, product_id
+                FROM product_refresh_requests
+                WHERE normalized_code = %s
+                """,
+                (normalized_code,),
+            ).fetchone()
+
+        assert refresh is not None
+        assert refresh["status"] == "queued"
+        assert str(refresh["product_id"]) == str(product_id)
+    finally:
+        _cleanup_product_bundle(db_url, normalized_code=normalized_code, product_id=product_id)
+
+
+@pytest.mark.integration
 def test_guided_product_endpoints_return_compiled_state(
     client,
     db_url: str,
@@ -929,6 +1191,7 @@ def test_process_refresh_request_clears_stale_product_mapping_on_not_found(
                     normalized_code=normalized_code,
                     canonical_format="EAN13",
                     stale_after_hours=72,
+                    refresh_cooldown_seconds=900,
                     client=client_stub,
                 )
 
@@ -955,6 +1218,244 @@ def test_process_refresh_request_clears_stale_product_mapping_on_not_found(
 
         product = client.get(f"/v0/products/{product_id}")
         assert product.status_code == 404
+    finally:
+        _cleanup_product_bundle(db_url, normalized_code=normalized_code, product_id=product_id)
+
+
+@pytest.mark.integration
+def test_drain_refresh_requests_claims_processing_before_fetch(
+    db_url: str,
+    integration_guard,
+    products_schema,
+) -> None:
+    normalized_code = _ean13("990123456782")
+    _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+    now = datetime.now(timezone.utc)
+
+    try:
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            source_id = _source_id(conn, "open_food_facts")
+            conn.execute(
+                """
+                INSERT INTO product_refresh_requests (
+                  normalized_code,
+                  canonical_format,
+                  provider_source_id,
+                  product_id,
+                  status,
+                  requested_at,
+                  last_requested_at,
+                  refresh_after,
+                  cooldown_until,
+                  updated_at
+                ) VALUES (
+                  %s,
+                  'EAN13',
+                  %s,
+                  NULL,
+                  'queued',
+                  %s,
+                  %s,
+                  %s,
+                  %s,
+                  %s
+                )
+                """,
+                (normalized_code, source_id, now, now, now, now, now),
+            )
+
+        client_stub = _StatusCheckingOpenFoodFactsClient(
+            db_url=db_url,
+            watched_code=normalized_code,
+            fetch_result=OpenFoodFactsFetchResult(
+                provider_status="not_found",
+                fetched_at=now,
+                payload={"status": 0, "code": normalized_code},
+                source_code=normalized_code,
+                product_name_fr=None,
+                product_name_en=None,
+                brand=None,
+                ingredients_text_fr=None,
+                categories_tags=[],
+                countries_tags=[],
+                last_error_code=None,
+            ),
+        )
+
+        results = drain_refresh_requests(
+            CompileSettings(
+                db_url=db_url,
+                stale_after_hours=72,
+                refresh_cooldown_seconds=3600,
+            ),
+            client=client_stub,
+            limit=1,
+        )
+
+        assert results[0]["status"] == "not_found"
+        assert client_stub.seen_status == "processing"
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            refresh = conn.execute(
+                "SELECT status FROM product_refresh_requests WHERE normalized_code = %s",
+                (normalized_code,),
+            ).fetchone()
+        assert refresh is not None
+        assert refresh["status"] == "completed"
+    finally:
+        _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+
+
+@pytest.mark.integration
+def test_process_refresh_request_backoffs_failed_refreshes(
+    db_url: str,
+    integration_guard,
+    products_schema,
+) -> None:
+    normalized_code = _ean13("990123456780")
+    _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+    now = datetime(2026, 3, 22, 12, 0, tzinfo=timezone.utc)
+
+    try:
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            source_id = _source_id(conn, "open_food_facts")
+            conn.execute(
+                """
+                INSERT INTO product_refresh_requests (
+                  normalized_code,
+                  canonical_format,
+                  provider_source_id,
+                  status,
+                  requested_at,
+                  last_requested_at,
+                  refresh_after,
+                  cooldown_until,
+                  updated_at
+                ) VALUES (
+                  %s,
+                  'EAN13',
+                  %s,
+                  'queued',
+                  %s,
+                  %s,
+                  %s,
+                  %s,
+                  %s
+                )
+                """,
+                (normalized_code, source_id, now, now, now, now, now),
+            )
+
+        client_stub = _StubOpenFoodFactsClient(
+            OpenFoodFactsFetchResult(
+                provider_status="error",
+                fetched_at=now,
+                payload={"status": 0, "code": normalized_code},
+                source_code=normalized_code,
+                product_name_fr=None,
+                product_name_en=None,
+                brand=None,
+                ingredients_text_fr=None,
+                categories_tags=[],
+                countries_tags=[],
+                last_error_code="upstream_timeout",
+            )
+        )
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            with conn.transaction():
+                result = process_refresh_request(
+                    conn,
+                    normalized_code=normalized_code,
+                    canonical_format="EAN13",
+                    stale_after_hours=72,
+                    refresh_cooldown_seconds=900,
+                    client=client_stub,
+                )
+
+        assert result["status"] == "failed"
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            refresh = conn.execute(
+                """
+                SELECT status, last_error_code, refresh_after, cooldown_until
+                FROM product_refresh_requests
+                WHERE normalized_code = %s
+                """,
+                (normalized_code,),
+            ).fetchone()
+
+        assert refresh is not None
+        assert refresh["status"] == "failed"
+        assert refresh["last_error_code"] == "upstream_timeout"
+        assert refresh["refresh_after"] == now + timedelta(seconds=900)
+        assert refresh["cooldown_until"] == now + timedelta(seconds=900)
+    finally:
+        _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+
+
+@pytest.mark.integration
+def test_replace_product_links_preserves_curated_link_for_same_food(
+    db_url: str,
+    integration_guard,
+    products_schema,
+) -> None:
+    normalized_code = _ean13("990123456781")
+    _cleanup_product_bundle(db_url, normalized_code=normalized_code)
+    product_id = _seed_product_bundle(db_url, normalized_code=normalized_code, include_assessment=False)
+    assert product_id is not None
+
+    try:
+        with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+            food = _sample_food(conn)
+            conn.execute("DELETE FROM product_food_links WHERE product_id = %s", (product_id,))
+            conn.execute(
+                """
+                INSERT INTO product_food_links (
+                  product_id,
+                  food_id,
+                  link_method,
+                  link_confidence
+                ) VALUES (%s, %s, 'manual', 1.000)
+                """,
+                (product_id, food["food_id"]),
+            )
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            with conn.transaction():
+                _replace_product_links(
+                    conn,
+                    str(product_id),
+                    [
+                        {
+                            "line_no": 1,
+                            "declared_share_pct": 100.0,
+                            "is_substantive": True,
+                            "ingredient_text_fr": "riz 100%",
+                            "food_id": food["food_id"],
+                            "food_slug": food["food_slug"],
+                            "canonical_name_fr": food["canonical_name_fr"],
+                            "canonical_name_en": food["canonical_name_en"],
+                            "score": 0.91,
+                            "confidence_tier": "high",
+                        }
+                    ],
+                )
+
+        with psycopg.connect(db_url, row_factory=dict_row) as conn:
+            link = conn.execute(
+                """
+                SELECT link_method, link_confidence
+                FROM product_food_links
+                WHERE product_id = %s
+                  AND food_id = %s
+                """,
+                (product_id, food["food_id"]),
+            ).fetchone()
+
+        assert link is not None
+        assert link["link_method"] == "manual"
+        assert float(link["link_confidence"]) == pytest.approx(1.0)
     finally:
         _cleanup_product_bundle(db_url, normalized_code=normalized_code, product_id=product_id)
 

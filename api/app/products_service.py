@@ -59,13 +59,8 @@ class ProductsService:
         if row is None:
             raise not_found("Product not found")
 
-        refresh_enqueued = False
-        if self._is_stale(row) and row.get("primary_normalized_code"):
-            refresh_enqueued = self._queue_refresh(
-                normalized_code=row["primary_normalized_code"],
-                canonical_format=row.get("canonical_format") or "EAN13",
-                product_id=row["product_id"],
-            )
+        refresh_enqueued = self._maybe_enqueue_product_refresh(row)
+        if refresh_enqueued:
             row = self._get_product_row(product_id)
             if row is None:
                 raise not_found("Product not found")
@@ -99,6 +94,7 @@ class ProductsService:
         product = self._get_product_row(product_id)
         if product is None:
             raise not_found("Product not found")
+        self._maybe_enqueue_product_refresh(product)
 
         with self._db.readonly_connection() as conn:
             rows = sql.fetch_all(conn, sql.SQL_GET_PRODUCT_INGREDIENT_ROWS, {"product_id": product_id})
@@ -149,6 +145,7 @@ class ProductsService:
         product = self._get_product_row(product_id)
         if product is None:
             raise not_found("Product not found")
+        self._maybe_enqueue_product_refresh(product)
 
         with self._db.readonly_connection() as conn:
             assessment = sql.fetch_one(conn, sql.SQL_GET_PRODUCT_ASSESSMENT, {"product_id": product_id})
@@ -185,18 +182,7 @@ class ProductsService:
     def _get_lookup_row(self, normalized_code: str) -> dict[str, Any] | None:
         with self._db.readonly_connection() as conn:
             row = sql.fetch_one(conn, sql.SQL_GET_PRODUCT_LOOKUP, {"normalized_code": normalized_code})
-        if row is None:
-            return None
-        if not any(
-            (
-                row.get("product_id"),
-                row.get("provider_status"),
-                row.get("refresh_status"),
-                row.get("provider_last_synced_at"),
-            )
-        ):
-            return None
-        return row
+        return self._normalize_lookup_row(row)
 
     def _get_product_row(self, product_id: UUID) -> dict[str, Any] | None:
         with self._db.readonly_connection() as conn:
@@ -258,6 +244,28 @@ class ProductsService:
         now = _now_utc()
         cooldown_until = now + timedelta(seconds=self._settings.products_refresh_cooldown_seconds)
         with self._db.connection() as conn:
+            current_row = self._normalize_lookup_row(
+                sql.fetch_one(conn, sql.SQL_GET_PRODUCT_LOOKUP, {"normalized_code": normalized_code})
+            )
+            if not self._should_queue_refresh(current_row):
+                existing = sql.fetch_one(
+                    conn,
+                    sql.SQL_GET_PRODUCT_REFRESH_REQUEST,
+                    {"normalized_code": normalized_code},
+                )
+                if existing is not None:
+                    sql.fetch_one(
+                        conn,
+                        sql.SQL_TOUCH_PRODUCT_REFRESH_REQUEST,
+                        {
+                            "normalized_code": normalized_code,
+                            "canonical_format": canonical_format,
+                            "product_id": product_id,
+                            "now": now,
+                        },
+                    )
+                return False
+
             existing = sql.fetch_one(conn, sql.SQL_GET_PRODUCT_REFRESH_REQUEST, {"normalized_code": normalized_code})
             if existing is None:
                 sql.fetch_one(
@@ -312,6 +320,32 @@ class ProductsService:
                 },
             )
             return False
+
+    def _maybe_enqueue_product_refresh(self, row: dict[str, Any]) -> bool:
+        if not self._is_stale(row):
+            return False
+        normalized_code = row.get("primary_normalized_code")
+        if not normalized_code:
+            return False
+        return self._queue_refresh(
+            normalized_code=normalized_code,
+            canonical_format=row.get("canonical_format") or "EAN13",
+            product_id=row["product_id"],
+        )
+
+    def _normalize_lookup_row(self, row: dict[str, Any] | None) -> dict[str, Any] | None:
+        if row is None:
+            return None
+        if not any(
+            (
+                row.get("product_id"),
+                row.get("provider_status"),
+                row.get("refresh_status"),
+                row.get("provider_last_synced_at"),
+            )
+        ):
+            return None
+        return row
 
 
 def _now_utc() -> datetime:

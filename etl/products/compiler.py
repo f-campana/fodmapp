@@ -29,20 +29,33 @@ def process_refresh_request(
     normalized_code: str,
     canonical_format: str,
     stale_after_hours: int,
+    refresh_cooldown_seconds: int,
     client: OpenFoodFactsClient,
+    *,
+    request_claimed: bool = False,
 ) -> dict[str, Any]:
     source_id = _get_source_id(conn, "open_food_facts")
-    request_row = conn.execute(
-        """
-        UPDATE product_refresh_requests
-        SET status = 'processing',
-            attempt_count = attempt_count + 1,
-            updated_at = now()
-        WHERE normalized_code = %(normalized_code)s
-        RETURNING normalized_code, canonical_format
-        """,
-        {"normalized_code": normalized_code},
-    ).fetchone()
+    if request_claimed:
+        request_row = conn.execute(
+            """
+            SELECT normalized_code, canonical_format
+            FROM product_refresh_requests
+            WHERE normalized_code = %(normalized_code)s
+            """,
+            {"normalized_code": normalized_code},
+        ).fetchone()
+    else:
+        request_row = conn.execute(
+            """
+            UPDATE product_refresh_requests
+            SET status = 'processing',
+                attempt_count = attempt_count + 1,
+                updated_at = now()
+            WHERE normalized_code = %(normalized_code)s
+            RETURNING normalized_code, canonical_format
+            """,
+            {"normalized_code": normalized_code},
+        ).fetchone()
     if request_row is None:
         raise ValueError(f"refresh request missing for {normalized_code}")
 
@@ -108,7 +121,16 @@ def process_refresh_request(
     ).fetchone()["product_provider_snapshot_id"]
 
     if fetch_result.provider_status == "error":
-        _finish_refresh_request(conn, normalized_code, "failed", None, fetch_result.last_error_code)
+        retry_after = fetch_result.fetched_at + timedelta(seconds=refresh_cooldown_seconds)
+        _finish_refresh_request(
+            conn,
+            normalized_code,
+            "failed",
+            None,
+            fetch_result.last_error_code,
+            refresh_after=retry_after,
+            cooldown_until=retry_after,
+        )
         _insert_review_event(conn, None, normalized_code, "refresh_failed", {"error_code": fetch_result.last_error_code})
         return {"normalized_code": normalized_code, "snapshot_id": snapshot_id, "status": "failed", "product_id": None}
 
@@ -179,31 +201,51 @@ def drain_refresh_requests(
     results: list[dict[str, Any]] = []
     with psycopg.connect(settings.db_url, row_factory=dict_row) as conn:
         with conn.transaction():
-            rows = conn.execute(
-                """
-                SELECT normalized_code, canonical_format
-                FROM product_refresh_requests
-                WHERE status IN ('queued', 'failed')
-                  AND refresh_after <= %(now)s
-                ORDER BY last_requested_at ASC
-                LIMIT %(limit)s
-                FOR UPDATE
-                """,
-                {"now": now, "limit": limit},
-            ).fetchall()
+            rows = _claim_refresh_requests(conn, now, limit)
 
-            for row in rows:
+        for row in rows:
+            with conn.transaction():
                 results.append(
                     process_refresh_request(
                         conn,
                         normalized_code=row["normalized_code"],
                         canonical_format=row["canonical_format"],
                         stale_after_hours=settings.stale_after_hours,
+                        refresh_cooldown_seconds=settings.refresh_cooldown_seconds,
                         client=client,
+                        request_claimed=True,
                     )
                 )
 
     return results
+
+
+def _claim_refresh_requests(
+    conn: psycopg.Connection,
+    now: datetime,
+    limit: int,
+) -> list[dict[str, Any]]:
+    return conn.execute(
+        """
+        WITH claimable AS (
+          SELECT normalized_code
+          FROM product_refresh_requests
+          WHERE status IN ('queued', 'failed')
+            AND refresh_after <= %(now)s
+          ORDER BY last_requested_at ASC
+          LIMIT %(limit)s
+          FOR UPDATE SKIP LOCKED
+        )
+        UPDATE product_refresh_requests pr
+        SET status = 'processing',
+            attempt_count = pr.attempt_count + 1,
+            updated_at = now()
+        FROM claimable
+        WHERE pr.normalized_code = claimable.normalized_code
+        RETURNING pr.normalized_code, pr.canonical_format
+        """,
+        {"now": now, "limit": limit},
+    ).fetchall()
 
 
 def _get_source_id(conn: psycopg.Connection, source_slug: str) -> str:
@@ -527,6 +569,15 @@ def _replace_product_links(conn: psycopg.Connection, product_id: str, selected_r
               'heuristic',
               %(link_confidence)s
             )
+            ON CONFLICT (product_id, food_id) DO UPDATE
+            SET link_method = CASE
+                  WHEN product_food_links.link_method = 'heuristic' THEN EXCLUDED.link_method
+                  ELSE product_food_links.link_method
+                END,
+                link_confidence = CASE
+                  WHEN product_food_links.link_method = 'heuristic' THEN EXCLUDED.link_confidence
+                  ELSE product_food_links.link_confidence
+                END
             """,
             {
                 "product_id": product_id,
@@ -714,14 +765,17 @@ def _build_assessment_payload(
 
         for subtype in food_subtype_cache[selected["food_id"]]:
             existing = subtype_best.get(subtype["subtype_code"])
-            if existing is None or SEVERITY_ORDER[subtype["subtype_level"]] > SEVERITY_ORDER[existing["subtype_level"]]:
+            candidate = {
+                "subtype_code": subtype["subtype_code"],
+                "subtype_level": subtype["subtype_level"],
+                "source_food_id": selected["food_id"],
+                "low_max_g": subtype.get("low_max_g"),
+                "moderate_max_g": subtype.get("moderate_max_g"),
+                "burden_ratio": subtype.get("burden_ratio"),
+            }
+            if existing is None or _should_replace_subtype(existing, candidate):
                 subtype_best[subtype["subtype_code"]] = {
-                    "subtype_code": subtype["subtype_code"],
-                    "subtype_level": subtype["subtype_level"],
-                    "source_food_id": selected["food_id"],
-                    "low_max_g": subtype.get("low_max_g"),
-                    "moderate_max_g": subtype.get("moderate_max_g"),
-                    "burden_ratio": subtype.get("burden_ratio"),
+                    **candidate
                 }
 
     if not any_known:
@@ -868,10 +922,8 @@ def _get_food_rollup(conn: psycopg.Connection, food_id: str) -> dict[str, Any] |
           rollup_serving_g,
           coverage_ratio,
           known_subtypes_count
-        FROM v_phase3_rollups_latest_full
+        FROM api_food_rollups_current
         WHERE food_id = %(food_id)s
-        ORDER BY computed_at DESC
-        LIMIT 1
         """,
         {"food_id": food_id},
     ).fetchone()
@@ -886,7 +938,7 @@ def _get_food_subtypes(conn: psycopg.Connection, food_id: str) -> list[dict[str,
           low_max_g,
           moderate_max_g,
           burden_ratio
-        FROM v_phase3_rollup_subtype_levels_latest
+        FROM api_food_subtypes_current
         WHERE food_id = %(food_id)s
         ORDER BY subtype_code ASC
         """,
@@ -900,6 +952,9 @@ def _finish_refresh_request(
     status: str,
     product_id: str | None,
     last_error_code: str | None,
+    *,
+    refresh_after: datetime | None = None,
+    cooldown_until: datetime | None = None,
 ) -> None:
     conn.execute(
         """
@@ -908,6 +963,8 @@ def _finish_refresh_request(
             product_id = %(product_id)s,
             last_processed_at = now(),
             last_error_code = %(last_error_code)s,
+            refresh_after = COALESCE(%(refresh_after)s, refresh_after),
+            cooldown_until = COALESCE(%(cooldown_until)s, cooldown_until),
             updated_at = now()
         WHERE normalized_code = %(normalized_code)s
         """,
@@ -916,8 +973,49 @@ def _finish_refresh_request(
             "status": status,
             "product_id": product_id,
             "last_error_code": last_error_code,
+            "refresh_after": refresh_after,
+            "cooldown_until": cooldown_until,
         },
     )
+
+
+def _should_replace_subtype(existing: dict[str, Any], candidate: dict[str, Any]) -> bool:
+    existing_severity = SEVERITY_ORDER[existing["subtype_level"]]
+    candidate_severity = SEVERITY_ORDER[candidate["subtype_level"]]
+    if candidate_severity != existing_severity:
+        return candidate_severity > existing_severity
+
+    low_max_cmp = _compare_optional_numeric(candidate.get("low_max_g"), existing.get("low_max_g"), prefer="lower")
+    if low_max_cmp != 0:
+        return low_max_cmp > 0
+
+    moderate_max_cmp = _compare_optional_numeric(
+        candidate.get("moderate_max_g"),
+        existing.get("moderate_max_g"),
+        prefer="lower",
+    )
+    if moderate_max_cmp != 0:
+        return moderate_max_cmp > 0
+
+    burden_cmp = _compare_optional_numeric(candidate.get("burden_ratio"), existing.get("burden_ratio"), prefer="higher")
+    return burden_cmp > 0
+
+
+def _compare_optional_numeric(candidate_value: Any, existing_value: Any, *, prefer: str) -> int:
+    if candidate_value is None and existing_value is None:
+        return 0
+    if candidate_value is None:
+        return -1
+    if existing_value is None:
+        return 1
+
+    candidate_float = float(candidate_value)
+    existing_float = float(existing_value)
+    if candidate_float == existing_float:
+        return 0
+    if prefer == "lower":
+        return 1 if candidate_float < existing_float else -1
+    return 1 if candidate_float > existing_float else -1
 
 
 def _insert_review_event(

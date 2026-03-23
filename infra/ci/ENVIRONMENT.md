@@ -154,7 +154,7 @@ Contract:
 - the runner uses `PSQL_BIN` for SQL execution and does not introduce a second DSN
 - `phase3:promote:check` is expected to fail on a schema-only dbmate database, a bootstrap-only database, or any database that has never produced a current `api_v0_phase3` publish release, with the explicit bootstrap-out-of-scope message
 - `phase3:promote` preserves activation-era `swap_rule_scores.scoring_version` values, reruns the conservative active-rule safety gate after score refresh, and executes publish apply/checks inside one publish transaction
-- the disposable `phase3-promote-smoke` CI job stamps current dbmate migration versions onto the replay-seeded database before promote runs; this is test harness glue, not a hosted-environment operator step
+- the disposable `phase3-promote-smoke` CI job first reapplies the absorbed legacy schema migrations that belong to the current-state baseline, then stamps only dbmate migrations whose schema markers are already present on the replay-seeded database before promote runs; this is test harness glue, not a hosted-environment operator step
 - first persistent bootstrap now uses `pnpm phase3:bootstrap`; the manual promote runner stays refresh-only
 
 ## Initial Persistent Bootstrap Contract

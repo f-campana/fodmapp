@@ -80,6 +80,7 @@ def main() -> int:
                 normalized_code=normalized_code,
                 canonical_format=canonical_format,
                 stale_after_hours=settings.stale_after_hours,
+                refresh_cooldown_seconds=settings.refresh_cooldown_seconds,
                 client=client,
             )
             print(f"{result['normalized_code']} status={result['status']} product_id={result['product_id']}")
