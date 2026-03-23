@@ -150,6 +150,22 @@ run_cmd_parallel() {
   return "$fail"
 }
 
+run_reporting_fixture_smoke() {
+  local temp_dir
+  local status=0
+
+  temp_dir="$(mktemp -d)"
+  python3 etl/phase2/reporting/scripts/collect_reporting.py \
+    --mode smoke \
+    --figures now \
+    --source fixture \
+    --fixture-dir etl/phase2/reporting/tests/fixtures/now-set/query-results \
+    --out-dir "$temp_dir" \
+    --trigger pr_smoke || status=$?
+  rm -rf "$temp_dir"
+  return "$status"
+}
+
 resolve_quality_gate_scope() {
   local scope_output
   scope_output="$(mktemp)"
@@ -235,6 +251,8 @@ if [[ "$run_full" == "true" ]]; then
   quality_scope_app_scaffold="true"
   quality_scope_content_scaffolds="true"
   resolve_quality_gate_scope
+
+  run_cmd "reporting fixture smoke" run_reporting_fixture_smoke
 
   full_gate_tasks=(
     "format check::pnpm format:check"

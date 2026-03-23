@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Fodmapp API (v0)
   version: 0.1.0
-  summary: SQL-backed read API for food rollups, traits, and active swaps.
+  summary: Canonical food API plus an opt-in guided packaged-product lane.
   description: |
     Canonical v0 read contract implemented by the FastAPI service.
 
@@ -11,6 +11,7 @@ info:
     - Responses include both FR/EN fields (no locale negotiation in v0).
     - Swap results include only active rules.
     - Rollup, subtype, and swap reads come from published current views.
+    - `/v0/products/*` is a separate guided/discovery lane with lower confidence than canonical food contracts.
 
     Data freshness note:
     Phase 3 compute still rebuilds internal snapshot artifacts, then the publish
@@ -24,6 +25,7 @@ servers:
 tags:
   - name: health
   - name: foods
+  - name: products
   - name: safe-harbors
   - name: swaps
   - name: me
@@ -133,6 +135,83 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FoodTraitsResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v0/products/barcodes/{code}:
+    get:
+      tags: [products]
+      summary: Lookup a packaged product by barcode
+      operationId: getProductByBarcode
+      description: |
+        Guided/discovery barcode lookup. Reads compiled product state and may enqueue
+        a bounded refresh request when the product is missing or stale.
+      parameters:
+        - $ref: "#/components/parameters/BarcodePath"
+      responses:
+        "200":
+          description: Product lookup result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductLookupResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          description: Invalid barcode format or check digit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /v0/products/{product_id}:
+    get:
+      tags: [products]
+      summary: Guided packaged-product detail
+      operationId: getProductById
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "200":
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v0/products/{product_id}/ingredients:
+    get:
+      tags: [products]
+      summary: Parsed ingredient rows and canonical food candidates
+      operationId: getProductIngredients
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "200":
+          description: Parsed ingredients
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductIngredientsResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v0/products/{product_id}/assessment:
+    get:
+      tags: [products]
+      summary: Guided heuristic packaged-product assessment
+      operationId: getProductAssessment
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "200":
+          description: Guided product assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductAssessmentResponse"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -1016,6 +1095,23 @@ components:
         minimum: 1
         maximum: 50
         default: 20
+    BarcodePath:
+      name: code
+      in: path
+      required: true
+      description: Retail barcode (EAN-8, UPC-A, or EAN-13).
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 13
+    ProductIdPath:
+      name: product_id
+      in: path
+      required: true
+      description: Guided packaged-product identifier.
+      schema:
+        type: string
+        format: uuid
     FromSlugQuery:
       name: from
       in: query
@@ -1061,6 +1157,37 @@ components:
     RuleStatus:
       type: string
       enum: [active, draft]
+
+    BarcodeCanonicalFormat:
+      type: string
+      enum: [EAN8, EAN13]
+
+    ProductContractTier:
+      type: string
+      enum: [guided]
+
+    ProductLookupStatus:
+      type: string
+      enum: [ready, queued, refreshing, stale, not_found, failed]
+
+    ProductSyncState:
+      type: string
+      enum: [fresh, stale, refreshing, failed]
+
+    ProductConfidenceTier:
+      type: string
+      enum: [high, medium, low, insufficient]
+
+    ProductNumericGuidanceStatus:
+      type: string
+      enum:
+        [
+          available,
+          insufficient_confidence,
+          mixed_ingredients,
+          unknown_rollup,
+          not_enough_data,
+        ]
 
     HealthResponse:
       type: object
@@ -1327,6 +1454,326 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TraitLabel"
+
+    ProductLookupSummary:
+      type: object
+      required: [product_id, product_name_fr]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        product_name_fr:
+          type: string
+        product_name_en:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          nullable: true
+
+    ProductLookupResponse:
+      type: object
+      required:
+        [
+          query_code,
+          normalized_code,
+          canonical_format,
+          lookup_status,
+          refresh_enqueued,
+          provider,
+        ]
+      properties:
+        query_code:
+          type: string
+        normalized_code:
+          type: string
+        canonical_format:
+          $ref: "#/components/schemas/BarcodeCanonicalFormat"
+        lookup_status:
+          $ref: "#/components/schemas/ProductLookupStatus"
+        refresh_enqueued:
+          type: boolean
+        provider:
+          type: string
+        provider_last_synced_at:
+          type: string
+          format: date-time
+          nullable: true
+        product:
+          allOf:
+            - $ref: "#/components/schemas/ProductLookupSummary"
+          nullable: true
+
+    ProductResponse:
+      type: object
+      required:
+        [
+          product_id,
+          contract_tier,
+          sync_state,
+          refresh_enqueued,
+          provider,
+          product_name_fr,
+          categories_tags,
+          countries_tags,
+          assessment_available,
+        ]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        contract_tier:
+          $ref: "#/components/schemas/ProductContractTier"
+        sync_state:
+          $ref: "#/components/schemas/ProductSyncState"
+        refresh_enqueued:
+          type: boolean
+        provider:
+          type: string
+        provider_status:
+          type: string
+          nullable: true
+        provider_last_synced_at:
+          type: string
+          format: date-time
+          nullable: true
+        stale_after_utc:
+          type: string
+          format: date-time
+          nullable: true
+        refresh_requested_at:
+          type: string
+          format: date-time
+          nullable: true
+        gtin13:
+          type: string
+          nullable: true
+        open_food_facts_code:
+          type: string
+          nullable: true
+        primary_normalized_code:
+          type: string
+          nullable: true
+        canonical_format:
+          allOf:
+            - $ref: "#/components/schemas/BarcodeCanonicalFormat"
+          nullable: true
+        product_name_fr:
+          type: string
+        product_name_en:
+          type: string
+          nullable: true
+        brand:
+          type: string
+          nullable: true
+        categories_tags:
+          type: array
+          items:
+            type: string
+        countries_tags:
+          type: array
+          items:
+            type: string
+        ingredients_text_fr:
+          type: string
+          nullable: true
+        assessment_available:
+          type: boolean
+        assessment_status:
+          type: string
+          nullable: true
+
+    ProductIngredientCandidate:
+      type: object
+      required:
+        [
+          candidate_rank,
+          food_slug,
+          canonical_name_fr,
+          canonical_name_en,
+          score,
+          confidence_tier,
+          match_method,
+          signal_breakdown,
+          is_selected,
+        ]
+      properties:
+        candidate_rank:
+          type: integer
+        food_slug:
+          type: string
+        canonical_name_fr:
+          type: string
+        canonical_name_en:
+          type: string
+        score:
+          type: number
+          minimum: 0
+          maximum: 1
+        confidence_tier:
+          $ref: "#/components/schemas/ProductConfidenceTier"
+        match_method:
+          type: string
+        signal_breakdown:
+          type: object
+          additionalProperties: true
+        is_selected:
+          type: boolean
+
+    ProductIngredientItem:
+      type: object
+      required:
+        [
+          line_no,
+          ingredient_text_fr,
+          normalized_name,
+          parse_confidence,
+          is_substantive,
+          candidates,
+        ]
+      properties:
+        line_no:
+          type: integer
+        ingredient_text_fr:
+          type: string
+        normalized_name:
+          type: string
+        declared_share_pct:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+        parse_confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        is_substantive:
+          type: boolean
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductIngredientCandidate"
+
+    ProductIngredientsResponse:
+      type: object
+      required: [product_id, contract_tier, parser_version, items, total]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        contract_tier:
+          $ref: "#/components/schemas/ProductContractTier"
+        parser_version:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductIngredientItem"
+        total:
+          type: integer
+          minimum: 0
+
+    ProductAssessmentSubtype:
+      type: object
+      required: [subtype_code, subtype_level]
+      properties:
+        subtype_code:
+          type: string
+        subtype_level:
+          $ref: "#/components/schemas/FoodLevel"
+        source_food_slug:
+          type: string
+          nullable: true
+        source_food_name_fr:
+          type: string
+          nullable: true
+        source_food_name_en:
+          type: string
+          nullable: true
+        low_max_g:
+          type: number
+          nullable: true
+        moderate_max_g:
+          type: number
+          nullable: true
+        burden_ratio:
+          type: number
+          nullable: true
+
+    ProductAssessmentResponse:
+      type: object
+      required:
+        [
+          product_id,
+          contract_tier,
+          assessment_mode,
+          assessment_status,
+          confidence_tier,
+          heuristic_overall_level,
+          numeric_guidance_status,
+          limiting_subtypes,
+          caveats,
+          method_version,
+          provider,
+          computed_at,
+          subtypes,
+        ]
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        contract_tier:
+          $ref: "#/components/schemas/ProductContractTier"
+        assessment_mode:
+          type: string
+          enum: [guided]
+        assessment_status:
+          type: string
+        confidence_tier:
+          $ref: "#/components/schemas/ProductConfidenceTier"
+        heuristic_overall_level:
+          $ref: "#/components/schemas/FoodLevel"
+        heuristic_max_low_portion_g:
+          type: number
+          nullable: true
+        numeric_guidance_status:
+          $ref: "#/components/schemas/ProductNumericGuidanceStatus"
+        numeric_guidance_basis:
+          type: string
+          enum: [dominant_matched_food]
+          nullable: true
+        limiting_subtypes:
+          type: array
+          items:
+            type: string
+        caveats:
+          type: array
+          items:
+            type: string
+        method_version:
+          type: string
+        provider:
+          type: string
+        provider_last_synced_at:
+          type: string
+          format: date-time
+          nullable: true
+        computed_at:
+          type: string
+          format: date-time
+        dominant_food_slug:
+          type: string
+          nullable: true
+        dominant_food_name_fr:
+          type: string
+          nullable: true
+        dominant_food_name_en:
+          type: string
+          nullable: true
+        subtypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductAssessmentSubtype"
 
     SafeHarborCohortCode:
       type: string

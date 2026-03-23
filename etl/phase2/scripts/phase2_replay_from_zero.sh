@@ -3,6 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="${ROOT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
 SCHEMA_FILE="$ROOT_DIR/schema/fodmap_fr_schema.sql"
+SECURITY_SCHEMA_MIGRATION="$ROOT_DIR/schema/migrations/2026-02-25_security_consent_export_delete.sql"
+TRACKING_SCHEMA_MIGRATION="$ROOT_DIR/schema/migrations/2026-03-20_symptoms_tracking_v1.sql"
+AUTH_IDENTITY_SCHEMA_MIGRATION="$ROOT_DIR/schema/migrations/2026-03-21_clerk_auth_identities.sql"
 CIQUAL_ETL="$ROOT_DIR/etl/ciqual/ciqual_etl.py"
 PHASE2_SQL_DIR="$ROOT_DIR/etl/phase2/sql"
 
@@ -104,6 +107,9 @@ resolve_psql_bin() {
 }
 
 require_file "$SCHEMA_FILE"
+require_file "$SECURITY_SCHEMA_MIGRATION"
+require_file "$TRACKING_SCHEMA_MIGRATION"
+require_file "$AUTH_IDENTITY_SCHEMA_MIGRATION"
 require_file "$CIQUAL_ETL"
 require_file "$CIQUAL_XLSX"
 require_file "$CIQUAL_ALIM_XML"
@@ -147,6 +153,9 @@ printf '[INFO] CIQUAL ALIM_GRP XML: %s\n' "$CIQUAL_GRP_XML"
 
 run_stage "Drop/create replay database" recreate_db
 run_stage "Apply canonical schema" "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$SCHEMA_FILE"
+run_stage "Apply absorbed security schema migration" "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$SECURITY_SCHEMA_MIGRATION"
+run_stage "Apply absorbed tracking schema migration" "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$TRACKING_SCHEMA_MIGRATION"
+run_stage "Apply absorbed auth identity schema migration" "$PSQL_BIN" "$REPLAY_DB_URL" -v ON_ERROR_STOP=1 -f "$AUTH_IDENTITY_SCHEMA_MIGRATION"
 run_stage "CIQUAL ETL load" run_ciqual_load
 
 run_stage "Phase2 setup table seed" run_psql_file "$PHASE2_SQL_DIR/phase2_priority_foods_setup.sql"

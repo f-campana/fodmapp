@@ -16,6 +16,9 @@ from psycopg.rows import dict_row
 API_ROOT = Path(__file__).resolve().parents[1]
 if str(API_ROOT) not in sys.path:
     sys.path.insert(0, str(API_ROOT))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 os.environ.setdefault("API_ALLOW_PREVIEW_USER_ID_HEADER", "true")
 
@@ -36,6 +39,13 @@ TRACKING_MIGRATION_PATH = (
 )
 AUTH_IDENTITY_MIGRATION_PATH = (
     Path(__file__).resolve().parents[2] / "schema" / "migrations" / "2026-03-21_clerk_auth_identities.sql"
+)
+PRODUCTS_GUIDED_MIGRATION_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "schema"
+    / "dbmate"
+    / "migrations"
+    / "20260321120000_products_guided_discovery_v1.sql"
 )
 
 
@@ -148,6 +158,36 @@ def _ensure_auth_identity_schema(db_url: str) -> None:
         conn.execute(migration_sql)
 
 
+def _ensure_products_guided_schema(db_url: str) -> None:
+    with psycopg.connect(db_url, row_factory=dict_row) as conn:
+        state = conn.execute(
+            """
+            SELECT
+              to_regclass('public.product_assessments') AS assessment_table,
+              EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'products'
+                  AND column_name = 'product_name_en'
+              ) AS has_product_name_en,
+              EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_schema = 'public'
+                  AND table_name = 'products'
+                  AND column_name = 'updated_at'
+              ) AS has_updated_at
+            """
+        ).fetchone()
+        if state and state["assessment_table"] and state["has_product_name_en"] and state["has_updated_at"]:
+            return
+
+    migration_sql = PRODUCTS_GUIDED_MIGRATION_PATH.read_text(encoding="utf-8")
+    with psycopg.connect(db_url, autocommit=True, row_factory=dict_row) as conn:
+        conn.execute(migration_sql)
+
+
 @pytest.fixture(scope="session")
 def me_security_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
@@ -174,6 +214,13 @@ def auth_identity_schema(db_url: str, integration_db_ready: bool) -> None:
     if not integration_db_ready:
         pytest.skip("integration DB is not ready or schema is missing")
     _ensure_auth_identity_schema(db_url)
+
+
+@pytest.fixture(scope="session")
+def products_schema(db_url: str, integration_db_ready: bool) -> None:
+    if not integration_db_ready:
+        pytest.skip("integration DB is not ready or schema is missing")
+    _ensure_products_guided_schema(db_url)
 
 
 @pytest.fixture()

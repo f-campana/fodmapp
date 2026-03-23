@@ -8,6 +8,18 @@ from pydantic import BaseModel, Field, model_validator
 
 FoodLevel = Literal["none", "low", "moderate", "high", "unknown"]
 RuleStatus = Literal["active", "draft"]
+BarcodeCanonicalFormat = Literal["EAN8", "EAN13"]
+ProductContractTier = Literal["guided"]
+ProductLookupStatus = Literal["ready", "queued", "refreshing", "stale", "not_found", "failed"]
+ProductSyncState = Literal["fresh", "stale", "refreshing", "failed"]
+ProductConfidenceTier = Literal["high", "medium", "low", "insufficient"]
+ProductNumericGuidanceStatus = Literal[
+    "available",
+    "insufficient_confidence",
+    "mixed_ingredients",
+    "unknown_rollup",
+    "not_enough_data",
+]
 SafeHarborCohortCode = Literal["cohort_oil_fat", "cohort_plain_protein", "cohort_egg"]
 TrackingItemKind = Literal["canonical_food", "custom_food", "free_text"]
 SymptomType = Literal[
@@ -200,6 +212,111 @@ class FoodTraitsResponse(BaseModel):
     texture_profiles: list[TraitLabel]
     cooking_behaviors: list[TraitLabel]
     cuisine_affinities: list[TraitLabel]
+
+
+class ProductLookupSummary(BaseModel):
+    product_id: UUID
+    product_name_fr: str
+    product_name_en: Optional[str] = None
+    brand: Optional[str] = None
+
+
+class ProductLookupResponse(BaseModel):
+    query_code: str
+    normalized_code: str
+    canonical_format: BarcodeCanonicalFormat
+    lookup_status: ProductLookupStatus
+    refresh_enqueued: bool
+    provider: str
+    provider_last_synced_at: Optional[datetime] = None
+    product: Optional[ProductLookupSummary] = None
+
+
+class ProductResponse(BaseModel):
+    product_id: UUID
+    contract_tier: ProductContractTier
+    sync_state: ProductSyncState
+    refresh_enqueued: bool
+    provider: str
+    provider_status: Optional[str] = None
+    provider_last_synced_at: Optional[datetime] = None
+    stale_after_utc: Optional[datetime] = None
+    refresh_requested_at: Optional[datetime] = None
+    gtin13: Optional[str] = None
+    open_food_facts_code: Optional[str] = None
+    primary_normalized_code: Optional[str] = None
+    canonical_format: Optional[BarcodeCanonicalFormat] = None
+    product_name_fr: str
+    product_name_en: Optional[str] = None
+    brand: Optional[str] = None
+    categories_tags: list[str]
+    countries_tags: list[str]
+    ingredients_text_fr: Optional[str] = None
+    assessment_available: bool
+    assessment_status: Optional[str] = None
+
+
+class ProductIngredientCandidate(BaseModel):
+    candidate_rank: int
+    food_slug: str
+    canonical_name_fr: str
+    canonical_name_en: str
+    score: float = Field(ge=0, le=1)
+    confidence_tier: ProductConfidenceTier
+    match_method: str
+    signal_breakdown: Dict[str, Any]
+    is_selected: bool
+
+
+class ProductIngredientItem(BaseModel):
+    line_no: int
+    ingredient_text_fr: str
+    normalized_name: str
+    declared_share_pct: Optional[float] = Field(default=None, ge=0, le=100)
+    parse_confidence: float = Field(ge=0, le=1)
+    is_substantive: bool
+    candidates: list[ProductIngredientCandidate]
+
+
+class ProductIngredientsResponse(BaseModel):
+    product_id: UUID
+    contract_tier: ProductContractTier
+    parser_version: str
+    items: list[ProductIngredientItem]
+    total: int
+
+
+class ProductAssessmentSubtype(BaseModel):
+    subtype_code: str
+    subtype_level: FoodLevel
+    source_food_slug: Optional[str] = None
+    source_food_name_fr: Optional[str] = None
+    source_food_name_en: Optional[str] = None
+    low_max_g: Optional[float] = Field(default=None, gt=0)
+    moderate_max_g: Optional[float] = Field(default=None, gt=0)
+    burden_ratio: Optional[float] = None
+
+
+class ProductAssessmentResponse(BaseModel):
+    product_id: UUID
+    contract_tier: ProductContractTier
+    assessment_mode: Literal["guided"]
+    assessment_status: str
+    confidence_tier: ProductConfidenceTier
+    heuristic_overall_level: FoodLevel
+    heuristic_max_low_portion_g: Optional[float] = Field(default=None, gt=0)
+    numeric_guidance_status: ProductNumericGuidanceStatus
+    numeric_guidance_basis: Optional[Literal["dominant_matched_food"]] = None
+    limiting_subtypes: list[str]
+    caveats: list[str]
+    method_version: str
+    provider: str
+    provider_last_synced_at: Optional[datetime] = None
+    computed_at: datetime
+    dominant_food_slug: Optional[str] = None
+    dominant_food_name_fr: Optional[str] = None
+    dominant_food_name_en: Optional[str] = None
+    subtypes: list[ProductAssessmentSubtype]
 
 
 class SafeHarborFoodItem(BaseModel):

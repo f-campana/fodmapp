@@ -1170,6 +1170,138 @@ CREATE TABLE public.product_allergens (
 
 
 --
+-- Name: product_assessment_subtypes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_assessment_subtypes (
+    product_assessment_id bigint NOT NULL,
+    subtype_code text NOT NULL,
+    subtype_level public.fodmap_level NOT NULL,
+    source_food_id uuid,
+    low_max_g numeric(8,2),
+    moderate_max_g numeric(8,2),
+    burden_ratio numeric(12,6),
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_assessment_subtypes_low_max_g_check CHECK (((low_max_g IS NULL) OR (low_max_g > (0)::numeric))),
+    CONSTRAINT product_assessment_subtypes_moderate_max_g_check CHECK (((moderate_max_g IS NULL) OR (moderate_max_g > (0)::numeric)))
+);
+
+
+--
+-- Name: product_assessments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_assessments (
+    product_assessment_id bigint NOT NULL,
+    product_id uuid NOT NULL,
+    method_version text NOT NULL,
+    contract_tier text NOT NULL,
+    assessment_mode text NOT NULL,
+    assessment_status text NOT NULL,
+    confidence_tier text NOT NULL,
+    heuristic_overall_level public.fodmap_level NOT NULL,
+    heuristic_max_low_portion_g numeric(8,2),
+    numeric_guidance_status text NOT NULL,
+    numeric_guidance_basis text,
+    dominant_food_id uuid,
+    dominant_ingredient_line_no smallint,
+    limiting_subtypes text[] DEFAULT '{}'::text[] NOT NULL,
+    caveats text[] DEFAULT '{}'::text[] NOT NULL,
+    provider_source_id uuid NOT NULL,
+    provider_last_synced_at timestamp with time zone,
+    computed_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_assessments_assessment_mode_check CHECK ((assessment_mode = 'guided'::text)),
+    CONSTRAINT product_assessments_assessment_status_check CHECK ((assessment_status = ANY (ARRAY['ready'::text, 'insufficient'::text, 'failed'::text]))),
+    CONSTRAINT product_assessments_check CHECK ((((numeric_guidance_status = 'available'::text) AND (heuristic_max_low_portion_g IS NOT NULL) AND (numeric_guidance_basis IS NOT NULL)) OR (numeric_guidance_status <> 'available'::text))),
+    CONSTRAINT product_assessments_confidence_tier_check CHECK ((confidence_tier = ANY (ARRAY['high'::text, 'medium'::text, 'low'::text, 'insufficient'::text]))),
+    CONSTRAINT product_assessments_contract_tier_check CHECK ((contract_tier = 'guided'::text)),
+    CONSTRAINT product_assessments_heuristic_max_low_portion_g_check CHECK (((heuristic_max_low_portion_g IS NULL) OR (heuristic_max_low_portion_g > (0)::numeric))),
+    CONSTRAINT product_assessments_numeric_guidance_basis_check CHECK ((numeric_guidance_basis = 'dominant_matched_food'::text)),
+    CONSTRAINT product_assessments_numeric_guidance_status_check CHECK ((numeric_guidance_status = ANY (ARRAY['available'::text, 'insufficient_confidence'::text, 'mixed_ingredients'::text, 'unknown_rollup'::text, 'not_enough_data'::text])))
+);
+
+
+--
+-- Name: product_assessments_product_assessment_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.product_assessments_product_assessment_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_assessments_product_assessment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.product_assessments_product_assessment_id_seq OWNED BY public.product_assessments.product_assessment_id;
+
+
+--
+-- Name: product_codes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_codes (
+    normalized_code text NOT NULL,
+    product_id uuid NOT NULL,
+    canonical_format text NOT NULL,
+    source_code text NOT NULL,
+    provider_source_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_codes_canonical_format_check CHECK ((canonical_format = ANY (ARRAY['EAN8'::text, 'EAN13'::text]))),
+    CONSTRAINT product_codes_normalized_code_check CHECK (((normalized_code ~ '^[0-9]{8}$'::text) OR (normalized_code ~ '^[0-9]{13}$'::text)))
+);
+
+
+--
+-- Name: product_food_candidates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_food_candidates (
+    product_food_candidate_id bigint NOT NULL,
+    product_id uuid NOT NULL,
+    line_no smallint NOT NULL,
+    food_id uuid NOT NULL,
+    candidate_rank smallint NOT NULL,
+    match_method text NOT NULL,
+    score numeric(4,3) NOT NULL,
+    confidence_tier text NOT NULL,
+    signal_breakdown jsonb DEFAULT '{}'::jsonb NOT NULL,
+    heuristic_version text NOT NULL,
+    is_selected boolean DEFAULT false NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_food_candidates_candidate_rank_check CHECK ((candidate_rank >= 1)),
+    CONSTRAINT product_food_candidates_confidence_tier_check CHECK ((confidence_tier = ANY (ARRAY['high'::text, 'medium'::text, 'low'::text, 'insufficient'::text]))),
+    CONSTRAINT product_food_candidates_match_method_check CHECK ((match_method = ANY (ARRAY['ingredient_name'::text, 'product_name'::text, 'category_overlap'::text, 'heuristic'::text]))),
+    CONSTRAINT product_food_candidates_score_check CHECK (((score >= (0)::numeric) AND (score <= (1)::numeric)))
+);
+
+
+--
+-- Name: product_food_candidates_product_food_candidate_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.product_food_candidates_product_food_candidate_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_food_candidates_product_food_candidate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.product_food_candidates_product_food_candidate_id_seq OWNED BY public.product_food_candidates.product_food_candidate_id;
+
+
+--
 -- Name: product_food_links; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1179,8 +1311,138 @@ CREATE TABLE public.product_food_links (
     link_method text NOT NULL,
     link_confidence numeric(4,3) NOT NULL,
     CONSTRAINT product_food_links_link_confidence_check CHECK (((link_confidence >= (0)::numeric) AND (link_confidence <= (1)::numeric))),
-    CONSTRAINT product_food_links_link_method_check CHECK ((link_method = ANY (ARRAY['exact_name'::text, 'manual'::text, 'nlp'::text])))
+    CONSTRAINT product_food_links_link_method_check CHECK ((link_method = ANY (ARRAY['exact_name'::text, 'manual'::text, 'nlp'::text, 'heuristic'::text])))
 );
+
+
+--
+-- Name: product_ingredients; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_ingredients (
+    product_id uuid NOT NULL,
+    line_no smallint NOT NULL,
+    ingredient_text_fr text NOT NULL,
+    normalized_name text NOT NULL,
+    declared_share_pct numeric(5,2),
+    parser_version text NOT NULL,
+    parse_confidence numeric(4,3) NOT NULL,
+    is_substantive boolean DEFAULT true NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_ingredients_declared_share_pct_check CHECK (((declared_share_pct IS NULL) OR ((declared_share_pct >= (0)::numeric) AND (declared_share_pct <= (100)::numeric)))),
+    CONSTRAINT product_ingredients_line_no_check CHECK ((line_no >= 1)),
+    CONSTRAINT product_ingredients_parse_confidence_check CHECK (((parse_confidence >= (0)::numeric) AND (parse_confidence <= (1)::numeric)))
+);
+
+
+--
+-- Name: product_provider_snapshots; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_provider_snapshots (
+    product_provider_snapshot_id bigint NOT NULL,
+    normalized_code text NOT NULL,
+    product_id uuid,
+    canonical_format text NOT NULL,
+    provider_source_id uuid NOT NULL,
+    fetch_status text NOT NULL,
+    provider_payload jsonb,
+    source_code text,
+    product_name_fr text,
+    product_name_en text,
+    brand text,
+    ingredients_text_fr text,
+    categories_tags text[] DEFAULT '{}'::text[] NOT NULL,
+    countries_tags text[] DEFAULT '{}'::text[] NOT NULL,
+    fetched_at timestamp with time zone DEFAULT now() NOT NULL,
+    expires_at timestamp with time zone NOT NULL,
+    last_error_code text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_provider_snapshots_canonical_format_check CHECK ((canonical_format = ANY (ARRAY['EAN8'::text, 'EAN13'::text]))),
+    CONSTRAINT product_provider_snapshots_fetch_status_check CHECK ((fetch_status = ANY (ARRAY['found'::text, 'not_found'::text, 'error'::text]))),
+    CONSTRAINT product_provider_snapshots_normalized_code_check CHECK (((normalized_code ~ '^[0-9]{8}$'::text) OR (normalized_code ~ '^[0-9]{13}$'::text)))
+);
+
+
+--
+-- Name: product_provider_snapshots_product_provider_snapshot_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.product_provider_snapshots_product_provider_snapshot_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_provider_snapshots_product_provider_snapshot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.product_provider_snapshots_product_provider_snapshot_id_seq OWNED BY public.product_provider_snapshots.product_provider_snapshot_id;
+
+
+--
+-- Name: product_refresh_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_refresh_requests (
+    normalized_code text NOT NULL,
+    canonical_format text NOT NULL,
+    provider_source_id uuid NOT NULL,
+    product_id uuid,
+    status text NOT NULL,
+    requested_at timestamp with time zone DEFAULT now() NOT NULL,
+    last_requested_at timestamp with time zone DEFAULT now() NOT NULL,
+    refresh_after timestamp with time zone DEFAULT now() NOT NULL,
+    cooldown_until timestamp with time zone DEFAULT now() NOT NULL,
+    attempt_count integer DEFAULT 0 NOT NULL,
+    last_processed_at timestamp with time zone,
+    last_error_code text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_refresh_requests_attempt_count_check CHECK ((attempt_count >= 0)),
+    CONSTRAINT product_refresh_requests_canonical_format_check CHECK ((canonical_format = ANY (ARRAY['EAN8'::text, 'EAN13'::text]))),
+    CONSTRAINT product_refresh_requests_normalized_code_check CHECK (((normalized_code ~ '^[0-9]{8}$'::text) OR (normalized_code ~ '^[0-9]{13}$'::text))),
+    CONSTRAINT product_refresh_requests_status_check CHECK ((status = ANY (ARRAY['queued'::text, 'processing'::text, 'completed'::text, 'failed'::text])))
+);
+
+
+--
+-- Name: product_review_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.product_review_events (
+    product_review_event_id bigint NOT NULL,
+    product_id uuid,
+    normalized_code text,
+    event_type text NOT NULL,
+    actor text DEFAULT 'system'::text NOT NULL,
+    payload jsonb,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT product_review_events_event_type_check CHECK ((event_type = ANY (ARRAY['refresh_requested'::text, 'refresh_completed'::text, 'refresh_failed'::text, 'heuristic_selected'::text, 'manual_override'::text]))),
+    CONSTRAINT product_review_events_normalized_code_check CHECK (((normalized_code IS NULL) OR (normalized_code ~ '^[0-9]{8}$'::text) OR (normalized_code ~ '^[0-9]{13}$'::text)))
+);
+
+
+--
+-- Name: product_review_events_product_review_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.product_review_events_product_review_event_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: product_review_events_product_review_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.product_review_events_product_review_event_id_seq OWNED BY public.product_review_events.product_review_event_id;
 
 
 --
@@ -1202,6 +1464,9 @@ CREATE TABLE public.products (
     source_id uuid,
     last_synced_at timestamp with time zone,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
+    product_name_en text,
+    categories_tags text[] DEFAULT '{}'::text[] NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT products_nova_group_check CHECK (((nova_group >= 1) AND (nova_group <= 4))),
     CONSTRAINT products_nutriscore_grade_check CHECK ((nutriscore_grade = ANY (ARRAY['a'::bpchar, 'b'::bpchar, 'c'::bpchar, 'd'::bpchar, 'e'::bpchar])))
 );
@@ -1818,6 +2083,34 @@ ALTER TABLE ONLY public.nutrient_definitions ALTER COLUMN nutrient_id SET DEFAUL
 
 
 --
+-- Name: product_assessments product_assessment_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments ALTER COLUMN product_assessment_id SET DEFAULT nextval('public.product_assessments_product_assessment_id_seq'::regclass);
+
+
+--
+-- Name: product_food_candidates product_food_candidate_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates ALTER COLUMN product_food_candidate_id SET DEFAULT nextval('public.product_food_candidates_product_food_candidate_id_seq'::regclass);
+
+
+--
+-- Name: product_provider_snapshots product_provider_snapshot_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_provider_snapshots ALTER COLUMN product_provider_snapshot_id SET DEFAULT nextval('public.product_provider_snapshots_product_provider_snapshot_id_seq'::regclass);
+
+
+--
+-- Name: product_review_events product_review_event_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_review_events ALTER COLUMN product_review_event_id SET DEFAULT nextval('public.product_review_events_product_review_event_id_seq'::regclass);
+
+
+--
 -- Name: recipe_fodmap_assessments recipe_fodmap_assessment_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2208,11 +2501,107 @@ ALTER TABLE ONLY public.product_allergens
 
 
 --
+-- Name: product_assessment_subtypes product_assessment_subtypes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessment_subtypes
+    ADD CONSTRAINT product_assessment_subtypes_pkey PRIMARY KEY (product_assessment_id, subtype_code);
+
+
+--
+-- Name: product_assessments product_assessments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments
+    ADD CONSTRAINT product_assessments_pkey PRIMARY KEY (product_assessment_id);
+
+
+--
+-- Name: product_assessments product_assessments_product_id_method_version_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments
+    ADD CONSTRAINT product_assessments_product_id_method_version_key UNIQUE (product_id, method_version);
+
+
+--
+-- Name: product_codes product_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_codes
+    ADD CONSTRAINT product_codes_pkey PRIMARY KEY (normalized_code);
+
+
+--
+-- Name: product_codes product_codes_product_id_canonical_format_source_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_codes
+    ADD CONSTRAINT product_codes_product_id_canonical_format_source_code_key UNIQUE (product_id, canonical_format, source_code);
+
+
+--
+-- Name: product_food_candidates product_food_candidates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates
+    ADD CONSTRAINT product_food_candidates_pkey PRIMARY KEY (product_food_candidate_id);
+
+
+--
+-- Name: product_food_candidates product_food_candidates_product_id_line_no_candidate_rank_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates
+    ADD CONSTRAINT product_food_candidates_product_id_line_no_candidate_rank_key UNIQUE (product_id, line_no, candidate_rank);
+
+
+--
+-- Name: product_food_candidates product_food_candidates_product_id_line_no_food_id_heuristi_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates
+    ADD CONSTRAINT product_food_candidates_product_id_line_no_food_id_heuristi_key UNIQUE (product_id, line_no, food_id, heuristic_version);
+
+
+--
 -- Name: product_food_links product_food_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.product_food_links
     ADD CONSTRAINT product_food_links_pkey PRIMARY KEY (product_id, food_id);
+
+
+--
+-- Name: product_ingredients product_ingredients_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_ingredients
+    ADD CONSTRAINT product_ingredients_pkey PRIMARY KEY (product_id, line_no);
+
+
+--
+-- Name: product_provider_snapshots product_provider_snapshots_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_provider_snapshots
+    ADD CONSTRAINT product_provider_snapshots_pkey PRIMARY KEY (product_provider_snapshot_id);
+
+
+--
+-- Name: product_refresh_requests product_refresh_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_refresh_requests
+    ADD CONSTRAINT product_refresh_requests_pkey PRIMARY KEY (normalized_code);
+
+
+--
+-- Name: product_review_events product_review_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_review_events
+    ADD CONSTRAINT product_review_events_pkey PRIMARY KEY (product_review_event_id);
 
 
 --
@@ -2537,6 +2926,69 @@ CREATE INDEX idx_nutrient_observations_food_nutrient ON public.food_nutrient_obs
 
 
 --
+-- Name: idx_product_assessment_subtypes_source_food; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_assessment_subtypes_source_food ON public.product_assessment_subtypes USING btree (source_food_id, subtype_code);
+
+
+--
+-- Name: idx_product_assessments_product; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_assessments_product ON public.product_assessments USING btree (product_id, computed_at DESC);
+
+
+--
+-- Name: idx_product_codes_product_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_codes_product_id ON public.product_codes USING btree (product_id);
+
+
+--
+-- Name: idx_product_food_candidates_lookup; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_food_candidates_lookup ON public.product_food_candidates USING btree (product_id, line_no, candidate_rank);
+
+
+--
+-- Name: idx_product_ingredients_normalized_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_ingredients_normalized_name ON public.product_ingredients USING btree (normalized_name);
+
+
+--
+-- Name: idx_product_provider_snapshots_lookup; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_provider_snapshots_lookup ON public.product_provider_snapshots USING btree (normalized_code, fetched_at DESC);
+
+
+--
+-- Name: idx_product_provider_snapshots_product; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_provider_snapshots_product ON public.product_provider_snapshots USING btree (product_id, fetched_at DESC);
+
+
+--
+-- Name: idx_product_refresh_requests_status_refresh_after; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_refresh_requests_status_refresh_after ON public.product_refresh_requests USING btree (status, refresh_after, last_requested_at DESC);
+
+
+--
+-- Name: idx_product_review_events_product; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_product_review_events_product ON public.product_review_events USING btree (product_id, created_at DESC);
+
+
+--
 -- Name: idx_products_off_code; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2709,6 +3161,13 @@ CREATE UNIQUE INDEX uq_meal_log_items_parent_sort ON public.meal_log_items USING
 --
 
 CREATE UNIQUE INDEX uq_mutation_idempotency_user ON public.me_mutation_queue USING btree (user_id, idempotency_key);
+
+
+--
+-- Name: uq_product_food_candidates_selected; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX uq_product_food_candidates_selected ON public.product_food_candidates USING btree (product_id, line_no) WHERE is_selected;
 
 
 --
@@ -3142,6 +3601,86 @@ ALTER TABLE ONLY public.product_allergens
 
 
 --
+-- Name: product_assessment_subtypes product_assessment_subtypes_product_assessment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessment_subtypes
+    ADD CONSTRAINT product_assessment_subtypes_product_assessment_id_fkey FOREIGN KEY (product_assessment_id) REFERENCES public.product_assessments(product_assessment_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_assessment_subtypes product_assessment_subtypes_source_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessment_subtypes
+    ADD CONSTRAINT product_assessment_subtypes_source_food_id_fkey FOREIGN KEY (source_food_id) REFERENCES public.foods(food_id) ON DELETE SET NULL;
+
+
+--
+-- Name: product_assessment_subtypes product_assessment_subtypes_subtype_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessment_subtypes
+    ADD CONSTRAINT product_assessment_subtypes_subtype_code_fkey FOREIGN KEY (subtype_code) REFERENCES public.fodmap_subtypes(code);
+
+
+--
+-- Name: product_assessments product_assessments_dominant_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments
+    ADD CONSTRAINT product_assessments_dominant_food_id_fkey FOREIGN KEY (dominant_food_id) REFERENCES public.foods(food_id) ON DELETE SET NULL;
+
+
+--
+-- Name: product_assessments product_assessments_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments
+    ADD CONSTRAINT product_assessments_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_assessments product_assessments_provider_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_assessments
+    ADD CONSTRAINT product_assessments_provider_source_id_fkey FOREIGN KEY (provider_source_id) REFERENCES public.sources(source_id);
+
+
+--
+-- Name: product_codes product_codes_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_codes
+    ADD CONSTRAINT product_codes_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_codes product_codes_provider_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_codes
+    ADD CONSTRAINT product_codes_provider_source_id_fkey FOREIGN KEY (provider_source_id) REFERENCES public.sources(source_id);
+
+
+--
+-- Name: product_food_candidates product_food_candidates_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates
+    ADD CONSTRAINT product_food_candidates_food_id_fkey FOREIGN KEY (food_id) REFERENCES public.foods(food_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_food_candidates product_food_candidates_product_id_line_no_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_food_candidates
+    ADD CONSTRAINT product_food_candidates_product_id_line_no_fkey FOREIGN KEY (product_id, line_no) REFERENCES public.product_ingredients(product_id, line_no) ON DELETE CASCADE;
+
+
+--
 -- Name: product_food_links product_food_links_food_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3155,6 +3694,54 @@ ALTER TABLE ONLY public.product_food_links
 
 ALTER TABLE ONLY public.product_food_links
     ADD CONSTRAINT product_food_links_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_ingredients product_ingredients_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_ingredients
+    ADD CONSTRAINT product_ingredients_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE;
+
+
+--
+-- Name: product_provider_snapshots product_provider_snapshots_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_provider_snapshots
+    ADD CONSTRAINT product_provider_snapshots_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE SET NULL;
+
+
+--
+-- Name: product_provider_snapshots product_provider_snapshots_provider_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_provider_snapshots
+    ADD CONSTRAINT product_provider_snapshots_provider_source_id_fkey FOREIGN KEY (provider_source_id) REFERENCES public.sources(source_id);
+
+
+--
+-- Name: product_refresh_requests product_refresh_requests_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_refresh_requests
+    ADD CONSTRAINT product_refresh_requests_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE SET NULL;
+
+
+--
+-- Name: product_refresh_requests product_refresh_requests_provider_source_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_refresh_requests
+    ADD CONSTRAINT product_refresh_requests_provider_source_id_fkey FOREIGN KEY (provider_source_id) REFERENCES public.sources(source_id);
+
+
+--
+-- Name: product_review_events product_review_events_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.product_review_events
+    ADD CONSTRAINT product_review_events_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(product_id) ON DELETE CASCADE;
 
 
 --
@@ -3434,4 +4021,5 @@ ALTER TABLE ONLY public.user_fodmap_tolerances
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20260321000000'),
+    ('20260321120000'),
     ('20260321143000');

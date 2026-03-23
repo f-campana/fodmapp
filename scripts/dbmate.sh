@@ -7,7 +7,7 @@ SCHEMA_FILE="${ROOT_DIR}/schema/dbmate/schema.sql"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/dbmate.sh <wait|status|migrate|up|new|dump> [args...]
+Usage: ./scripts/dbmate.sh <wait|status|migrate|up|new|dump|stamp-replay> [args...]
 
 Repo contract:
 - long-lived environments use dbmate
@@ -54,6 +54,120 @@ normalize_schema_dump_headers() {
   ' "${SCHEMA_FILE}"
 }
 
+replay_schema_has_version() {
+  local psql_bin="$1"
+  local version="$2"
+  local sql=""
+
+  case "${version}" in
+    20260321000000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.me_mutation_queue\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.symptom_logs\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.me_auth_identities\') IS NOT NULL\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    20260321120000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.product_assessments\') IS NOT NULL\n'
+      sql+=$'   AND EXISTS (\n'
+      sql+=$'     SELECT 1\n'
+      sql+=$'     FROM information_schema.columns\n'
+      sql+=$'     WHERE table_schema = \'public\'\n'
+      sql+=$'       AND table_name = \'products\'\n'
+      sql+=$'       AND column_name = \'product_name_en\'\n'
+      sql+=$'   )\n'
+      sql+=$'   AND EXISTS (\n'
+      sql+=$'     SELECT 1\n'
+      sql+=$'     FROM information_schema.columns\n'
+      sql+=$'     WHERE table_schema = \'public\'\n'
+      sql+=$'       AND table_name = \'products\'\n'
+      sql+=$'       AND column_name = \'updated_at\'\n'
+      sql+=$'   )\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    20260321143000)
+      sql=$'SELECT CASE\n'
+      sql+=$'  WHEN to_regclass(\'public.publish_releases\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.publish_release_current\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_food_rollups\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_food_subtype_levels\') IS NOT NULL\n'
+      sql+=$'   AND to_regclass(\'public.published_swaps\') IS NOT NULL\n'
+      sql+=$'  THEN 1 ELSE 0\n'
+      sql+=$'END'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  local result
+  result="$("${psql_bin}" "${API_DB_URL}" -tA -v ON_ERROR_STOP=1 -c "${sql}")"
+  [[ "${result}" == "1" ]]
+}
+
+emit_bootstrap_mirrored_versions() {
+  local psql_bin="$1"
+  local file=""
+  local base=""
+  local version=""
+
+  shopt -s nullglob
+  local files=("${MIGRATIONS_DIR}"/*.sql)
+  shopt -u nullglob
+
+  if [[ "${#files[@]}" -eq 0 ]]; then
+    echo "[FAIL] no dbmate migrations found under ${MIGRATIONS_DIR}" >&2
+    exit 1
+  fi
+
+  for file in "${files[@]}"; do
+    base="$(basename "${file}")"
+    version="${base%%_*}"
+    if replay_schema_has_version "${psql_bin}" "${version}"; then
+      echo "${version}"
+    fi
+  done
+}
+
+stamp_replay_migration_state() {
+  local psql_bin="${PSQL_BIN:-psql}"
+  local -a mirrored_versions=()
+  local version=""
+
+  if [[ -z "${API_DB_URL:-}" ]]; then
+    echo "[FAIL] API_DB_URL is required for stamp-replay." >&2
+    exit 1
+  fi
+
+  if ! command -v "${psql_bin}" >/dev/null 2>&1; then
+    echo "[FAIL] psql binary not found: ${psql_bin}" >&2
+    exit 1
+  fi
+
+  while IFS= read -r version; do
+    mirrored_versions+=("${version}")
+  done < <(emit_bootstrap_mirrored_versions "${psql_bin}")
+
+  if [[ "${#mirrored_versions[@]}" -eq 0 ]]; then
+    echo "[FAIL] no bootstrap-mirrored dbmate migrations were detected in the replay database." >&2
+    exit 1
+  fi
+
+  {
+    cat <<'SQL'
+CREATE TABLE IF NOT EXISTS public.schema_migrations (
+  version character varying NOT NULL PRIMARY KEY
+);
+SQL
+    for version in "${mirrored_versions[@]}"; do
+      printf "INSERT INTO public.schema_migrations (version) VALUES ('%s') ON CONFLICT (version) DO NOTHING;\n" "${version}"
+    done
+  } | "${psql_bin}" "${API_DB_URL}" -v ON_ERROR_STOP=1
+}
+
 run_dbmate_write_command() {
   local status=0
 
@@ -80,6 +194,9 @@ case "${command_name}" in
     ;;
   status)
     exec pnpm exec dbmate -e API_DB_URL -d "${MIGRATIONS_DIR}" -s "${SCHEMA_FILE}" --wait "${command_name}" "$@"
+    ;;
+  stamp-replay)
+    stamp_replay_migration_state "$@"
     ;;
   migrate|up|dump)
     run_dbmate_write_command "$@"
