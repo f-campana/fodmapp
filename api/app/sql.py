@@ -343,7 +343,6 @@ SQL_TOUCH_PRODUCT_REFRESH_REQUEST = """
 UPDATE product_refresh_requests
 SET canonical_format = %(canonical_format)s,
     product_id = COALESCE(%(product_id)s, product_id),
-    last_requested_at = %(now)s,
     updated_at = %(now)s
 WHERE normalized_code = %(normalized_code)s
 RETURNING

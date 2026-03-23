@@ -113,6 +113,7 @@ def process_refresh_request(
         return {"normalized_code": normalized_code, "snapshot_id": snapshot_id, "status": "failed", "product_id": None}
 
     if fetch_result.provider_status == "not_found":
+        _clear_missing_product_mapping(conn, normalized_code)
         _finish_refresh_request(conn, normalized_code, "completed", None, None)
         _insert_review_event(conn, None, normalized_code, "refresh_completed", {"fetch_status": "not_found"})
         return {"normalized_code": normalized_code, "snapshot_id": snapshot_id, "status": "not_found", "product_id": None}
@@ -315,6 +316,37 @@ def _upsert_product_code(
             "provider_source_id": source_id,
         },
     )
+
+
+def _clear_missing_product_mapping(conn: psycopg.Connection, normalized_code: str) -> None:
+    row = conn.execute(
+        """
+        SELECT
+          pc.product_id,
+          EXISTS (
+            SELECT 1
+            FROM product_codes other
+            WHERE other.product_id = pc.product_id
+              AND other.normalized_code <> pc.normalized_code
+          ) AS has_other_codes
+        FROM product_codes pc
+        WHERE pc.normalized_code = %(normalized_code)s
+        """,
+        {"normalized_code": normalized_code},
+    ).fetchone()
+    if row is None:
+        return
+
+    product_id = str(row["product_id"])
+    conn.execute(
+        "DELETE FROM product_codes WHERE normalized_code = %(normalized_code)s",
+        {"normalized_code": normalized_code},
+    )
+    if not row["has_other_codes"]:
+        conn.execute(
+            "DELETE FROM products WHERE product_id = %(product_id)s",
+            {"product_id": product_id},
+        )
 
 
 def _replace_product_ingredients(
@@ -620,6 +652,13 @@ def _build_assessment_payload(
     food_rollup_cache: dict[str, dict[str, Any]],
     food_subtype_cache: dict[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
+    substantive_selected = [row for row in selected_rows if row["is_substantive"]]
+    unmatched_substantive = [
+        ingredient
+        for ingredient in parsed_ingredients
+        if ingredient.is_substantive and ingredient.line_no not in {row["line_no"] for row in substantive_selected}
+    ]
+
     if not selected_rows:
         return {
             "assessment_status": "insufficient",
@@ -638,13 +677,34 @@ def _build_assessment_payload(
             "subtypes": [],
         }
 
+    if not substantive_selected:
+        caveats = [
+            "Guided assessment based on product ingredient matching.",
+            "No substantive ingredient match was strong enough for a guided verdict.",
+        ]
+        if unmatched_substantive:
+            caveats.append("Some substantive ingredients could not be matched to canonical foods.")
+        return {
+            "assessment_status": "insufficient",
+            "confidence_tier": "insufficient",
+            "heuristic_overall_level": "unknown",
+            "heuristic_max_low_portion_g": None,
+            "numeric_guidance_status": "not_enough_data",
+            "numeric_guidance_basis": None,
+            "dominant_food_id": None,
+            "dominant_ingredient_line_no": None,
+            "limiting_subtypes": [],
+            "caveats": caveats,
+            "subtypes": [],
+        }
+
     max_overall_level = "none"
     any_known = False
     subtype_best: dict[str, dict[str, Any]] = {}
     limiting_subtypes: list[str] = []
     caveats = ["Guided assessment based on product ingredient matching."]
 
-    for selected in selected_rows:
+    for selected in substantive_selected:
         rollup = food_rollup_cache[selected["food_id"]]
         level = rollup["overall_level"] if rollup else "unknown"
         if level != "unknown":
@@ -666,13 +726,6 @@ def _build_assessment_payload(
 
     if not any_known:
         max_overall_level = "unknown"
-
-    substantive_selected = [row for row in selected_rows if row["is_substantive"]]
-    unmatched_substantive = [
-        ingredient
-        for ingredient in parsed_ingredients
-        if ingredient.is_substantive and ingredient.line_no not in {row["line_no"] for row in substantive_selected}
-    ]
     if len(substantive_selected) > 1:
         caveats.append("Multiple substantive ingredients reduce confidence and numeric guidance reliability.")
     if unmatched_substantive:
