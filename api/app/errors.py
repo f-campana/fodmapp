@@ -50,6 +50,10 @@ def bad_request(message: str = "Bad request") -> ApiError:
     return ApiError(code="bad_request", message=message, status_code=400)
 
 
+def invalid_barcode(message: str = "Invalid barcode") -> ApiError:
+    return ApiError(code="invalid_barcode", message=message, status_code=422)
+
+
 def request_not_readable(message: str = "Request could not be read") -> ApiError:
     return ApiError(code="request_unreadable", message=message, status_code=422)
 

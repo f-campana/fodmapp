@@ -78,6 +78,299 @@ ORDER BY
 LIMIT %(limit)s
 """
 
+SQL_GET_PRODUCT_LOOKUP = """
+SELECT
+  %(normalized_code)s AS normalized_code,
+  pc.product_id,
+  COALESCE(pc.canonical_format, latest_snapshot.canonical_format, refresh.canonical_format) AS canonical_format,
+  p.product_name_fr,
+  p.product_name_en,
+  p.brand,
+  provider.source_slug AS provider_slug,
+  provider.source_name AS provider_name,
+  latest_snapshot.fetch_status AS provider_status,
+  latest_snapshot.fetched_at AS provider_last_synced_at,
+  latest_snapshot.expires_at AS snapshot_expires_at,
+  latest_snapshot.last_error_code,
+  refresh.status AS refresh_status,
+  refresh.last_requested_at AS refresh_requested_at,
+  refresh.cooldown_until,
+  assessment.assessment_status
+FROM (SELECT 1) AS stub
+LEFT JOIN product_codes pc
+  ON pc.normalized_code = %(normalized_code)s
+LEFT JOIN products p
+  ON p.product_id = pc.product_id
+LEFT JOIN LATERAL (
+  SELECT
+    canonical_format,
+    provider_source_id,
+    fetch_status,
+    fetched_at,
+    expires_at,
+    last_error_code
+  FROM product_provider_snapshots
+  WHERE normalized_code = %(normalized_code)s
+  ORDER BY fetched_at DESC
+  LIMIT 1
+) latest_snapshot ON TRUE
+LEFT JOIN product_refresh_requests refresh
+  ON refresh.normalized_code = %(normalized_code)s
+LEFT JOIN sources provider
+  ON provider.source_id = COALESCE(
+    pc.provider_source_id,
+    latest_snapshot.provider_source_id,
+    refresh.provider_source_id,
+    p.source_id
+  )
+LEFT JOIN LATERAL (
+  SELECT assessment_status
+  FROM product_assessments
+  WHERE product_id = pc.product_id
+    AND method_version = 'products_guided_v1'
+  LIMIT 1
+) assessment ON TRUE
+"""
+
+SQL_GET_PRODUCT = """
+SELECT
+  p.product_id,
+  p.gtin13,
+  p.open_food_facts_code,
+  p.product_name_fr,
+  p.product_name_en,
+  p.brand,
+  p.categories_tags,
+  p.countries_tags,
+  p.ingredients_text_fr,
+  p.last_synced_at,
+  p.updated_at,
+  provider.source_slug AS provider_slug,
+  provider.source_name AS provider_name,
+  code.normalized_code AS primary_normalized_code,
+  code.canonical_format,
+  latest_snapshot.fetch_status AS provider_status,
+  latest_snapshot.fetched_at AS provider_last_synced_at,
+  latest_snapshot.expires_at AS snapshot_expires_at,
+  latest_snapshot.last_error_code,
+  refresh.status AS refresh_status,
+  refresh.last_requested_at AS refresh_requested_at,
+  assessment.assessment_status
+FROM products p
+LEFT JOIN sources provider
+  ON provider.source_id = p.source_id
+LEFT JOIN LATERAL (
+  SELECT
+    normalized_code,
+    canonical_format
+  FROM product_codes
+  WHERE product_id = p.product_id
+  ORDER BY updated_at DESC, normalized_code ASC
+  LIMIT 1
+) code ON TRUE
+LEFT JOIN LATERAL (
+  SELECT
+    fetch_status,
+    fetched_at,
+    expires_at,
+    last_error_code
+  FROM product_provider_snapshots
+  WHERE product_id = p.product_id
+  ORDER BY fetched_at DESC
+  LIMIT 1
+) latest_snapshot ON TRUE
+LEFT JOIN product_refresh_requests refresh
+  ON refresh.normalized_code = code.normalized_code
+LEFT JOIN LATERAL (
+  SELECT assessment_status
+  FROM product_assessments
+  WHERE product_id = p.product_id
+    AND method_version = 'products_guided_v1'
+  LIMIT 1
+) assessment ON TRUE
+WHERE p.product_id = %(product_id)s
+"""
+
+SQL_GET_PRODUCT_INGREDIENT_ROWS = """
+SELECT
+  pi.product_id,
+  pi.line_no,
+  pi.ingredient_text_fr,
+  pi.normalized_name,
+  pi.declared_share_pct,
+  pi.parse_confidence,
+  pi.is_substantive,
+  pi.parser_version,
+  pfc.candidate_rank,
+  pfc.match_method,
+  pfc.score,
+  pfc.confidence_tier,
+  pfc.signal_breakdown,
+  pfc.is_selected,
+  f.food_slug,
+  COALESCE(f.canonical_name_fr, f.food_slug) AS canonical_name_fr,
+  COALESCE(f.canonical_name_en, COALESCE(f.canonical_name_fr, f.food_slug)) AS canonical_name_en
+FROM product_ingredients pi
+LEFT JOIN product_food_candidates pfc
+  ON pfc.product_id = pi.product_id
+ AND pfc.line_no = pi.line_no
+LEFT JOIN foods f
+  ON f.food_id = pfc.food_id
+WHERE pi.product_id = %(product_id)s
+ORDER BY pi.line_no ASC, pfc.candidate_rank ASC NULLS LAST
+"""
+
+SQL_GET_PRODUCT_ASSESSMENT = """
+SELECT
+  pa.product_assessment_id,
+  pa.product_id,
+  pa.method_version,
+  pa.contract_tier,
+  pa.assessment_mode,
+  pa.assessment_status,
+  pa.confidence_tier,
+  pa.heuristic_overall_level::text AS heuristic_overall_level,
+  pa.heuristic_max_low_portion_g,
+  pa.numeric_guidance_status,
+  pa.numeric_guidance_basis,
+  pa.limiting_subtypes,
+  pa.caveats,
+  pa.provider_last_synced_at,
+  pa.computed_at,
+  provider.source_slug AS provider_slug,
+  dominant.food_slug AS dominant_food_slug,
+  COALESCE(dominant.canonical_name_fr, dominant.food_slug) AS dominant_food_name_fr,
+  COALESCE(
+    dominant.canonical_name_en,
+    COALESCE(dominant.canonical_name_fr, dominant.food_slug)
+  ) AS dominant_food_name_en
+FROM product_assessments pa
+JOIN sources provider
+  ON provider.source_id = pa.provider_source_id
+LEFT JOIN foods dominant
+  ON dominant.food_id = pa.dominant_food_id
+WHERE pa.product_id = %(product_id)s
+  AND pa.method_version = 'products_guided_v1'
+"""
+
+SQL_GET_PRODUCT_ASSESSMENT_SUBTYPES = """
+SELECT
+  pas.subtype_code,
+  pas.subtype_level::text AS subtype_level,
+  source_food.food_slug AS source_food_slug,
+  COALESCE(source_food.canonical_name_fr, source_food.food_slug) AS source_food_name_fr,
+  COALESCE(
+    source_food.canonical_name_en,
+    COALESCE(source_food.canonical_name_fr, source_food.food_slug)
+  ) AS source_food_name_en,
+  pas.low_max_g,
+  pas.moderate_max_g,
+  pas.burden_ratio
+FROM product_assessment_subtypes pas
+LEFT JOIN foods source_food
+  ON source_food.food_id = pas.source_food_id
+WHERE pas.product_assessment_id = %(product_assessment_id)s
+ORDER BY pas.subtype_code ASC
+"""
+
+SQL_GET_PRODUCT_REFRESH_REQUEST = """
+SELECT
+  normalized_code,
+  status,
+  last_requested_at,
+  refresh_after,
+  cooldown_until,
+  product_id
+FROM product_refresh_requests
+WHERE normalized_code = %(normalized_code)s
+"""
+
+SQL_INSERT_PRODUCT_REFRESH_REQUEST = """
+INSERT INTO product_refresh_requests (
+  normalized_code,
+  canonical_format,
+  provider_source_id,
+  product_id,
+  status,
+  requested_at,
+  last_requested_at,
+  refresh_after,
+  cooldown_until,
+  created_at,
+  updated_at
+) VALUES (
+  %(normalized_code)s,
+  %(canonical_format)s,
+  (SELECT source_id FROM sources WHERE source_slug = 'open_food_facts'),
+  %(product_id)s,
+  'queued',
+  %(now)s,
+  %(now)s,
+  %(now)s,
+  %(cooldown_until)s,
+  %(now)s,
+  %(now)s
+)
+RETURNING
+  normalized_code,
+  status,
+  last_requested_at,
+  refresh_after,
+  cooldown_until,
+  product_id
+"""
+
+SQL_QUEUE_PRODUCT_REFRESH_REQUEST = """
+UPDATE product_refresh_requests
+SET canonical_format = %(canonical_format)s,
+    product_id = COALESCE(%(product_id)s, product_id),
+    status = 'queued',
+    last_requested_at = %(now)s,
+    refresh_after = %(now)s,
+    cooldown_until = %(cooldown_until)s,
+    updated_at = %(now)s
+WHERE normalized_code = %(normalized_code)s
+RETURNING
+  normalized_code,
+  status,
+  last_requested_at,
+  refresh_after,
+  cooldown_until,
+  product_id
+"""
+
+SQL_TOUCH_PRODUCT_REFRESH_REQUEST = """
+UPDATE product_refresh_requests
+SET canonical_format = %(canonical_format)s,
+    product_id = COALESCE(%(product_id)s, product_id),
+    last_requested_at = %(now)s,
+    updated_at = %(now)s
+WHERE normalized_code = %(normalized_code)s
+RETURNING
+  normalized_code,
+  status,
+  last_requested_at,
+  refresh_after,
+  cooldown_until,
+  product_id
+"""
+
+SQL_INSERT_PRODUCT_REVIEW_EVENT = """
+INSERT INTO product_review_events (
+  product_id,
+  normalized_code,
+  event_type,
+  actor,
+  payload
+) VALUES (
+  %(product_id)s,
+  %(normalized_code)s,
+  %(event_type)s,
+  %(actor)s,
+  %(payload)s
+)
+"""
+
 SQL_LIST_SAFE_HARBORS = """
 SELECT
   c.cohort_code,

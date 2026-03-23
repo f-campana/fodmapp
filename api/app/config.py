@@ -14,6 +14,12 @@ class Settings:
     api_db_url: str
     api_name: str
     api_version: str
+    products_feature_enabled: bool
+    products_stale_after_hours: int
+    products_refresh_cooldown_seconds: int
+    off_api_base_url: str
+    off_user_agent: str
+    off_timeout_seconds: float
     clerk_jwt_key: str | None
     clerk_jwt_issuer_domain: str | None
     clerk_authorized_parties: tuple[str, ...]
@@ -30,6 +36,13 @@ def get_settings() -> Settings:
         api_db_url=os.getenv("API_DB_URL", default_db_url),
         api_name=os.getenv("API_NAME", "fodmapp-api"),
         api_version=os.getenv("API_VERSION", "v0"),
+        products_feature_enabled=os.getenv("PRODUCTS_FEATURE_ENABLED", "false").strip().lower()
+        in {"1", "true", "yes", "on"},
+        products_stale_after_hours=int(os.getenv("PRODUCTS_STALE_AFTER_HOURS", "72")),
+        products_refresh_cooldown_seconds=int(os.getenv("PRODUCTS_REFRESH_COOLDOWN_SECONDS", "900")),
+        off_api_base_url=os.getenv("OFF_API_BASE_URL", "https://world.openfoodfacts.org"),
+        off_user_agent=os.getenv("OFF_USER_AGENT", "FODMAPP/0.1 (contact@fodmapp.local)"),
+        off_timeout_seconds=float(os.getenv("OFF_TIMEOUT_SECONDS", "3")),
         clerk_jwt_key=os.getenv("CLERK_JWT_KEY"),
         clerk_jwt_issuer_domain=os.getenv("CLERK_JWT_ISSUER_DOMAIN"),
         clerk_authorized_parties=_split_csv_env(os.getenv("CLERK_AUTHORIZED_PARTIES", "")),

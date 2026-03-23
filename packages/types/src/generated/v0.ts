@@ -110,6 +110,78 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/v0/products/barcodes/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Lookup a packaged product by barcode
+     * @description Guided/discovery barcode lookup. Reads compiled product state and may enqueue
+     *     a bounded refresh request when the product is missing or stale.
+     */
+    get: operations["getProductByBarcode"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/products/{product_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Guided packaged-product detail */
+    get: operations["getProductById"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/products/{product_id}/ingredients": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Parsed ingredient rows and canonical food candidates */
+    get: operations["getProductIngredients"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/v0/products/{product_id}/assessment": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Guided heuristic packaged-product assessment */
+    get: operations["getProductAssessment"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/v0/safe-harbors": {
     parameters: {
       query?: never;
@@ -477,6 +549,29 @@ export interface components {
     FoodLevel: "none" | "low" | "moderate" | "high" | "unknown";
     /** @enum {string} */
     RuleStatus: "active" | "draft";
+    /** @enum {string} */
+    BarcodeCanonicalFormat: "EAN8" | "EAN13";
+    /** @enum {string} */
+    ProductContractTier: "guided";
+    /** @enum {string} */
+    ProductLookupStatus:
+      | "ready"
+      | "queued"
+      | "refreshing"
+      | "stale"
+      | "not_found"
+      | "failed";
+    /** @enum {string} */
+    ProductSyncState: "fresh" | "stale" | "refreshing" | "failed";
+    /** @enum {string} */
+    ProductConfidenceTier: "high" | "medium" | "low" | "insufficient";
+    /** @enum {string} */
+    ProductNumericGuidanceStatus:
+      | "available"
+      | "insufficient_confidence"
+      | "mixed_ingredients"
+      | "unknown_rollup"
+      | "not_enough_data";
     HealthResponse: {
       /** @enum {string} */
       status: "ok";
@@ -585,6 +680,117 @@ export interface components {
       texture_profiles?: components["schemas"]["TraitLabel"][];
       cooking_behaviors?: components["schemas"]["TraitLabel"][];
       cuisine_affinities?: components["schemas"]["TraitLabel"][];
+    };
+    ProductLookupSummary: {
+      /** Format: uuid */
+      product_id: string;
+      product_name_fr: string;
+      product_name_en?: string | null;
+      brand?: string | null;
+    };
+    ProductLookupResponse: {
+      query_code: string;
+      normalized_code: string;
+      canonical_format: components["schemas"]["BarcodeCanonicalFormat"];
+      lookup_status: components["schemas"]["ProductLookupStatus"];
+      refresh_enqueued: boolean;
+      provider: string;
+      /** Format: date-time */
+      provider_last_synced_at?: string | null;
+      product?: components["schemas"]["ProductLookupSummary"] | null;
+    };
+    ProductResponse: {
+      /** Format: uuid */
+      product_id: string;
+      contract_tier: components["schemas"]["ProductContractTier"];
+      sync_state: components["schemas"]["ProductSyncState"];
+      refresh_enqueued: boolean;
+      provider: string;
+      provider_status?: string | null;
+      /** Format: date-time */
+      provider_last_synced_at?: string | null;
+      /** Format: date-time */
+      stale_after_utc?: string | null;
+      /** Format: date-time */
+      refresh_requested_at?: string | null;
+      gtin13?: string | null;
+      open_food_facts_code?: string | null;
+      primary_normalized_code?: string | null;
+      canonical_format?: components["schemas"]["BarcodeCanonicalFormat"] | null;
+      product_name_fr: string;
+      product_name_en?: string | null;
+      brand?: string | null;
+      categories_tags: string[];
+      countries_tags: string[];
+      ingredients_text_fr?: string | null;
+      assessment_available: boolean;
+      assessment_status?: string | null;
+    };
+    ProductIngredientCandidate: {
+      candidate_rank: number;
+      food_slug: string;
+      canonical_name_fr: string;
+      canonical_name_en: string;
+      score: number;
+      confidence_tier: components["schemas"]["ProductConfidenceTier"];
+      match_method: string;
+      signal_breakdown: {
+        [key: string]: unknown;
+      };
+      is_selected: boolean;
+    };
+    ProductIngredientItem: {
+      line_no: number;
+      ingredient_text_fr: string;
+      normalized_name: string;
+      declared_share_pct?: number | null;
+      parse_confidence: number;
+      is_substantive: boolean;
+      candidates: components["schemas"]["ProductIngredientCandidate"][];
+    };
+    ProductIngredientsResponse: {
+      /** Format: uuid */
+      product_id: string;
+      contract_tier: components["schemas"]["ProductContractTier"];
+      parser_version: string;
+      items: components["schemas"]["ProductIngredientItem"][];
+      total: number;
+    };
+    ProductAssessmentSubtype: {
+      subtype_code: string;
+      subtype_level: components["schemas"]["FoodLevel"];
+      source_food_slug?: string | null;
+      source_food_name_fr?: string | null;
+      source_food_name_en?: string | null;
+      low_max_g?: number | null;
+      moderate_max_g?: number | null;
+      burden_ratio?: number | null;
+    };
+    ProductAssessmentResponse: {
+      /** Format: uuid */
+      product_id: string;
+      contract_tier: components["schemas"]["ProductContractTier"];
+      /** @enum {string} */
+      assessment_mode: "guided";
+      assessment_status: string;
+      confidence_tier: components["schemas"]["ProductConfidenceTier"];
+      heuristic_overall_level: components["schemas"]["FoodLevel"];
+      heuristic_max_low_portion_g?: number | null;
+      numeric_guidance_status: components["schemas"]["ProductNumericGuidanceStatus"];
+      /** @enum {string|null} */
+      numeric_guidance_basis?: "dominant_matched_food" | null;
+      limiting_subtypes: string[];
+      caveats: string[];
+      method_version: string;
+      provider: string;
+      /** Format: date-time */
+      provider_last_synced_at?: string | null;
+      /** Format: date-time */
+      computed_at: string;
+      dominant_food_slug?: string | null;
+      dominant_food_name_fr?: string | null;
+      dominant_food_name_en?: string | null;
+      subtypes: components["schemas"]["ProductAssessmentSubtype"][];
     };
     /** @enum {string} */
     SafeHarborCohortCode:
@@ -1368,6 +1574,10 @@ export interface components {
     FoodSearchQuery: string;
     /** @description Maximum number of food results. */
     FoodSearchLimitQuery: number;
+    /** @description Retail barcode (EAN-8, UPC-A, or EAN-13). */
+    BarcodePath: string;
+    /** @description Guided packaged-product identifier. */
+    ProductIdPath: string;
     /** @description Source food slug. */
     FromSlugQuery: string;
     LimitQuery: number;
@@ -1525,6 +1735,111 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["FoodTraitsResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  getProductByBarcode: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Retail barcode (EAN-8, UPC-A, or EAN-13). */
+        code: components["parameters"]["BarcodePath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Product lookup result */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProductLookupResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+      /** @description Invalid barcode format or check digit */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorResponse"];
+        };
+      };
+    };
+  };
+  getProductById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Guided packaged-product identifier. */
+        product_id: components["parameters"]["ProductIdPath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Product detail */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProductResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  getProductIngredients: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Guided packaged-product identifier. */
+        product_id: components["parameters"]["ProductIdPath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Parsed ingredients */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProductIngredientsResponse"];
+        };
+      };
+      404: components["responses"]["NotFound"];
+    };
+  };
+  getProductAssessment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Guided packaged-product identifier. */
+        product_id: components["parameters"]["ProductIdPath"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Guided product assessment */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProductAssessmentResponse"];
         };
       };
       404: components["responses"]["NotFound"];
