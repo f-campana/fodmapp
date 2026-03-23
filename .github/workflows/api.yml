@@ -457,17 +457,7 @@ jobs:
 
       - name: Stamp dbmate migration state for replay-seeded promote smoke
         run: |
-          psql "$API_DB_URL" -v ON_ERROR_STOP=1 <<'SQL'
-          CREATE TABLE IF NOT EXISTS public.schema_migrations (
-            version character varying NOT NULL PRIMARY KEY
-          );
-
-          INSERT INTO public.schema_migrations (version)
-          VALUES
-            ('20260321000000'),
-            ('20260321143000')
-          ON CONFLICT (version) DO NOTHING;
-          SQL
+          ./scripts/dbmate.sh stamp-replay
 
       - name: Verify replay-seeded DB is dbmate-clean for promote smoke
         run: |

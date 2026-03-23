@@ -136,6 +136,14 @@ This prevents non-deterministic pre-push failures caused by stale worktree insta
 
 This prevents shared-worktree output races on local pre-push runs, especially around `packages/ui/dist`.
 
+### Local Reporting Fixture Smoke Contract
+
+`quality-gate.sh --full` now runs fixture-mode reporting smoke locally before the heavier lanes:
+
+- command: `python3 etl/phase2/reporting/scripts/collect_reporting.py --mode smoke --figures now --source fixture ...`
+- fixture source hashes must match current allowlisted contract files
+- stale reporting fixture digests fail locally before push, instead of surfacing only in the `figure-collect-smoke` workflow
+
 ### Local Lint Import Contract
 
 Local full-gate JS lint now mirrors CI's dist-import preparation before `pnpm lint:js:ci`:
@@ -347,7 +355,7 @@ The `API` workflow now includes a dedicated `phase3-promote-smoke` job for the p
 Contract:
 
 - seeds a disposable Postgres 16 database with the existing replay + `phase3_seed_for_api_ci.sh` path first
-- stamps the current dbmate migration versions into that replay-seeded disposable database before promote runs, so the preflight contract stays strict while replay/bootstrap remains the disposable setup lane
+- stamps the current dbmate migration versions into that replay-seeded disposable database with `./scripts/dbmate.sh stamp-replay`, deriving versions from the migration lane instead of a hardcoded list, so the preflight contract stays strict while replay/bootstrap remains the disposable setup lane
 - captures the current `api_v0_phase3` `publish_id` plus published row counts and active/draft swap counts
 - captures the active publishable-rule `scoring_version` distribution before the first promote run
 - runs `pnpm phase3:promote` twice with JSON manifests

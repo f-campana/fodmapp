@@ -82,7 +82,7 @@ if ! command -v "$psql_bin" >/dev/null 2>&1; then
 fi
 
 run_cmd "Install API dependencies (dev+bootstrap)" bash -c "cd api && uv sync --extra dev --extra bootstrap --locked"
-run_cmd "Run API contract/unit tests" uv run --project api pytest -m "not integration" api/tests
+run_cmd "Run API contract/unit tests" env -u API_DB_URL uv run --project api pytest -m "not integration" api/tests
 
 mkdir -p "$ciqual_cache_dir"
 while IFS= read -r line; do
@@ -107,6 +107,13 @@ run_cmd "Seed Phase3 product layer" env \
   SEED_DB_URL="$api_db_url" \
   PSQL_BIN="$psql_bin" \
   uv run --project api bash etl/phase3/scripts/phase3_seed_for_api_ci.sh
+run_cmd "Stamp replay DB with dbmate migration state" env \
+  API_DB_URL="$api_db_url" \
+  PSQL_BIN="$psql_bin" \
+  ./scripts/dbmate.sh stamp-replay
+run_cmd "Verify replay-seeded DB is dbmate-clean" env \
+  API_DB_URL="$api_db_url" \
+  bash -lc 'status_output="$(pnpm db:status)"; echo "$status_output"; echo "$status_output" | grep -Eq "^Pending: 0$"'
 run_cmd "Sanity assert seeded state" assert_seeded_state
 run_cmd "Run API integration tests" env API_DB_URL="$api_db_url" uv run --project api pytest -m integration api/tests
 

@@ -7,7 +7,7 @@ SCHEMA_FILE="${ROOT_DIR}/schema/dbmate/schema.sql"
 
 usage() {
   cat <<'EOF'
-Usage: ./scripts/dbmate.sh <wait|status|migrate|up|new|dump> [args...]
+Usage: ./scripts/dbmate.sh <wait|status|migrate|up|new|dump|stamp-replay> [args...]
 
 Repo contract:
 - long-lived environments use dbmate
@@ -54,6 +54,50 @@ normalize_schema_dump_headers() {
   ' "${SCHEMA_FILE}"
 }
 
+emit_migration_versions() {
+  local file=""
+  local base=""
+
+  shopt -s nullglob
+  local files=("${MIGRATIONS_DIR}"/*.sql)
+  shopt -u nullglob
+
+  if [[ "${#files[@]}" -eq 0 ]]; then
+    echo "[FAIL] no dbmate migrations found under ${MIGRATIONS_DIR}" >&2
+    exit 1
+  fi
+
+  for file in "${files[@]}"; do
+    base="$(basename "${file}")"
+    echo "${base%%_*}"
+  done
+}
+
+stamp_replay_migration_state() {
+  local psql_bin="${PSQL_BIN:-psql}"
+
+  if [[ -z "${API_DB_URL:-}" ]]; then
+    echo "[FAIL] API_DB_URL is required for stamp-replay." >&2
+    exit 1
+  fi
+
+  if ! command -v "${psql_bin}" >/dev/null 2>&1; then
+    echo "[FAIL] psql binary not found: ${psql_bin}" >&2
+    exit 1
+  fi
+
+  {
+    cat <<'SQL'
+CREATE TABLE IF NOT EXISTS public.schema_migrations (
+  version character varying NOT NULL PRIMARY KEY
+);
+SQL
+    while IFS= read -r version; do
+      printf "INSERT INTO public.schema_migrations (version) VALUES ('%s') ON CONFLICT (version) DO NOTHING;\n" "${version}"
+    done < <(emit_migration_versions)
+  } | "${psql_bin}" "${API_DB_URL}" -v ON_ERROR_STOP=1
+}
+
 run_dbmate_write_command() {
   local status=0
 
@@ -80,6 +124,9 @@ case "${command_name}" in
     ;;
   status)
     exec pnpm exec dbmate -e API_DB_URL -d "${MIGRATIONS_DIR}" -s "${SCHEMA_FILE}" --wait "${command_name}" "$@"
+    ;;
+  stamp-replay)
+    stamp_replay_migration_state "$@"
     ;;
   migrate|up|dump)
     run_dbmate_write_command "$@"
