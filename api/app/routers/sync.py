@@ -318,6 +318,56 @@ def _reject_with_conflict(
     )
 
 
+def _reject_invalid_payload(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    queue_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    error_detail: str,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a permanent invalid-payload rejection."""
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        queue_hash,
+        signature_key_id,
+        "FAILED_PERMANENT",
+        signature_valid,
+        "INVALID_PAYLOAD",
+        error_detail,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        "FAILED_PERMANENT",
+        "INVALID_PAYLOAD",
+        received_at,
+        processing_ms,
+        queue_hash,
+        signature_valid,
+        None,
+        None,
+        0,
+        False,
+    )
+
+
 def _finalize_applied(
     conn,
     payload: SyncV1MutationBatchRequest,
@@ -1572,36 +1622,13 @@ def sync_mutations_batch(
                 continue
 
             if normalized.depends_on_mutation_id and normalized.depends_on_mutation_id not in applied_ids:
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    base_hash,
-                    signature_key_id,
-                    "FAILED_PERMANENT",
-                    signature_valid,
-                    "INVALID_PAYLOAD",
-                    "depends_on_mutation_not_applied",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        "FAILED_PERMANENT",
-                        "INVALID_PAYLOAD",
-                        received_at,
+                    _reject_invalid_payload(
+                        conn, payload, normalized, user_id, entity_type, entity_id,
+                        base_hash, signature_key_id, signature_valid,
+                        chain_prev_hash, chain_item_hash, received_at,
                         max(0, _now_ms() - start_ms),
-                        base_hash,
-                        signature_valid,
-                        None,
-                        None,
-                        0,
-                        False,
+                        error_detail="depends_on_mutation_not_applied",
                     )
                 )
                 continue
@@ -1669,36 +1696,13 @@ def sync_mutations_batch(
                         if normalized.base_version is not None:
                             _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
                 except (ValueError, ApiError):
-                    _insert_queue(
-                        conn,
-                        payload,
-                        normalized,
-                        user_id,
-                        entity_type,
-                        entity_id,
-                        signature_hash,
-                        signature_key_id,
-                        "FAILED_PERMANENT",
-                        signature_valid,
-                        "INVALID_PAYLOAD",
-                        "tracking_apply_failed",
-                        chain_prev_hash,
-                        chain_item_hash,
-                    )
                     results.append(
-                        _build_result(
-                            payload,
-                            normalized,
-                            "FAILED_PERMANENT",
-                            "INVALID_PAYLOAD",
-                            received_at,
+                        _reject_invalid_payload(
+                            conn, payload, normalized, user_id, entity_type, entity_id,
+                            signature_hash, signature_key_id, signature_valid,
+                            chain_prev_hash, chain_item_hash, received_at,
                             max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            None,
-                            0,
-                            False,
+                            error_detail="tracking_apply_failed",
                         )
                     )
                     continue
