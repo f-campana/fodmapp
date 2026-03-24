@@ -264,6 +264,160 @@ def _build_result(
     )
 
 
+def _reject_with_conflict(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    signature_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    conflict_code: str,
+    error_detail: str,
+    rule: Optional[dict[str, Any]] = None,
+    applied_version: Optional[int] = None,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a conflict-based rejection."""
+    state, retry_after_ms, conflict = _conflict_for_code(conflict_code, rule)
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        signature_hash,
+        signature_key_id,
+        state,
+        signature_valid,
+        conflict_code,
+        error_detail,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        state,
+        conflict_code,
+        received_at,
+        processing_ms,
+        signature_hash,
+        signature_valid,
+        applied_version,
+        conflict,
+        retry_after_ms,
+        False,
+    )
+
+
+def _reject_invalid_payload(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    queue_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    error_detail: str,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a permanent invalid-payload rejection."""
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        queue_hash,
+        signature_key_id,
+        "FAILED_PERMANENT",
+        signature_valid,
+        "INVALID_PAYLOAD",
+        error_detail,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        "FAILED_PERMANENT",
+        "INVALID_PAYLOAD",
+        received_at,
+        processing_ms,
+        queue_hash,
+        signature_valid,
+        None,
+        None,
+        0,
+        False,
+    )
+
+
+def _finalize_applied(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    signature_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    applied_version: int,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a successfully applied mutation."""
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        signature_hash,
+        signature_key_id,
+        "APPLIED",
+        signature_valid,
+        "OK",
+        None,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        "APPLIED",
+        "OK",
+        received_at,
+        processing_ms,
+        signature_hash,
+        signature_valid,
+        applied_version,
+        None,
+        0,
+        False,
+    )
+
+
 def _build_replay_result(
     payload: SyncV1MutationBatchRequest,
     mutation: SyncV1MutationItem,
@@ -1441,118 +1595,8 @@ def sync_mutations_batch(
                 continue
 
             if not consent_active:
-                state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "CONSENT_REVOKED",
-                    "consent_missing",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "CONSENT_REVOKED",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        conflict,
-                        retry_after_ms,
-                        False,
-                    )
-                )
-                continue
-
-            tracking_scope = tracking_store.tracking_scope_for_entity(entity_type)
-            if tracking_scope is not None and not tracking_store.has_tracking_scope(consent_scope, tracking_scope):
-                state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "CONSENT_REVOKED",
-                    f"{tracking_scope}_missing",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
-                results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "CONSENT_REVOKED",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        conflict,
-                        retry_after_ms,
-                        False,
-                    )
-                )
-                continue
-
-            if normalized.depends_on_mutation_id and normalized.depends_on_mutation_id not in applied_ids:
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    base_hash,
-                    signature_key_id,
-                    "FAILED_PERMANENT",
-                    signature_valid,
-                    "INVALID_PAYLOAD",
-                    "depends_on_mutation_not_applied",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
-                results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        "FAILED_PERMANENT",
-                        "INVALID_PAYLOAD",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        base_hash,
-                        signature_valid,
-                        None,
-                        None,
-                        0,
-                        False,
-                    )
-                )
-                continue
-
-            if op in {"SWAP_APPLY", "SWAP_REVERT"}:
-                rule, conflict_code = _evaluate_swap_rule(conn, normalized)
-                if conflict_code is not None:
-                    state, retry_after_ms, conflict = _conflict_for_code(conflict_code, rule)
-                    _insert_queue(
+                    _reject_with_conflict(
                         conn,
                         payload,
                         normalized,
@@ -1561,64 +1605,106 @@ def sync_mutations_batch(
                         entity_id,
                         signature_hash,
                         signature_key_id,
-                        state,
                         signature_valid,
-                        str(conflict_code),
-                        conflict_code,
                         chain_prev_hash,
                         chain_item_hash,
+                        received_at,
+                        max(0, _now_ms() - start_ms),
+                        conflict_code="CONSENT_REVOKED",
+                        error_detail="consent_missing",
                     )
+                )
+                continue
+
+            tracking_scope = tracking_store.tracking_scope_for_entity(entity_type)
+            if tracking_scope is not None and not tracking_store.has_tracking_scope(consent_scope, tracking_scope):
+                results.append(
+                    _reject_with_conflict(
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
+                        max(0, _now_ms() - start_ms),
+                        conflict_code="CONSENT_REVOKED",
+                        error_detail=f"{tracking_scope}_missing",
+                    )
+                )
+                continue
+
+            if normalized.depends_on_mutation_id and normalized.depends_on_mutation_id not in applied_ids:
+                results.append(
+                    _reject_invalid_payload(
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        base_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
+                        max(0, _now_ms() - start_ms),
+                        error_detail="depends_on_mutation_not_applied",
+                    )
+                )
+                continue
+
+            if op in {"SWAP_APPLY", "SWAP_REVERT"}:
+                swap_rule, swap_conflict_code = _evaluate_swap_rule(conn, normalized)
+                if swap_conflict_code is not None:
                     results.append(
-                        _build_result(
+                        _reject_with_conflict(
+                            conn,
                             payload,
                             normalized,
-                            state,
-                            str(conflict_code),
+                            user_id,
+                            entity_type,
+                            entity_id,
+                            signature_hash,
+                            signature_key_id,
+                            signature_valid,
+                            chain_prev_hash,
+                            chain_item_hash,
                             received_at,
                             max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            conflict,
-                            retry_after_ms,
-                            False,
+                            conflict_code=swap_conflict_code,
+                            error_detail=swap_conflict_code,
+                            rule=swap_rule,
                         )
                     )
                     continue
 
             current_version = _get_entity_version(conn, user_id, entity_type, entity_id)
             if normalized.base_version is not None and normalized.base_version != current_version:
-                state, retry_after_ms, conflict = _conflict_for_code("VERSION_CONFLICT")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "VERSION_CONFLICT",
-                    "base_version_mismatch",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
+                    _reject_with_conflict(
+                        conn,
                         payload,
                         normalized,
-                        state,
-                        "VERSION_CONFLICT",
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
                         received_at,
                         max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        current_version,
-                        conflict,
-                        retry_after_ms,
-                        False,
+                        conflict_code="VERSION_CONFLICT",
+                        error_detail="base_version_mismatch",
+                        applied_version=current_version,
                     )
                 )
                 continue
@@ -1655,36 +1741,22 @@ def sync_mutations_batch(
                         if normalized.base_version is not None:
                             _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
                 except (ValueError, ApiError):
-                    _insert_queue(
-                        conn,
-                        payload,
-                        normalized,
-                        user_id,
-                        entity_type,
-                        entity_id,
-                        signature_hash,
-                        signature_key_id,
-                        "FAILED_PERMANENT",
-                        signature_valid,
-                        "INVALID_PAYLOAD",
-                        "tracking_apply_failed",
-                        chain_prev_hash,
-                        chain_item_hash,
-                    )
                     results.append(
-                        _build_result(
+                        _reject_invalid_payload(
+                            conn,
                             payload,
                             normalized,
-                            "FAILED_PERMANENT",
-                            "INVALID_PAYLOAD",
+                            user_id,
+                            entity_type,
+                            entity_id,
+                            signature_hash,
+                            signature_key_id,
+                            signature_valid,
+                            chain_prev_hash,
+                            chain_item_hash,
                             received_at,
                             max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            None,
-                            0,
-                            False,
+                            error_detail="tracking_apply_failed",
                         )
                     )
                     continue
@@ -1705,36 +1777,22 @@ def sync_mutations_batch(
             }:
                 _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
 
-            _insert_queue(
-                conn,
-                payload,
-                normalized,
-                user_id,
-                entity_type,
-                entity_id,
-                signature_hash,
-                signature_key_id,
-                "APPLIED",
-                signature_valid,
-                "OK",
-                None,
-                chain_prev_hash,
-                chain_item_hash,
-            )
             results.append(
-                _build_result(
+                _finalize_applied(
+                    conn,
                     payload,
                     normalized,
-                    "APPLIED",
-                    "OK",
+                    user_id,
+                    entity_type,
+                    entity_id,
+                    signature_hash,
+                    signature_key_id,
+                    signature_valid,
+                    chain_prev_hash,
+                    chain_item_hash,
                     received_at,
                     max(0, _now_ms() - start_ms),
-                    signature_hash,
-                    signature_valid,
-                    next_version,
-                    None,
-                    0,
-                    False,
+                    applied_version=next_version,
                 )
             )
             applied_ids.add(normalized.mutation_id)
