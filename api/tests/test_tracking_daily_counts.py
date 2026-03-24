@@ -9,7 +9,7 @@ from datetime import date, datetime, timezone
 from uuid import uuid4
 
 from app.models import MealLog, SymptomLog
-from app.tracking_store import _compute_daily_counts
+from app.tracking_store_summary import _compute_daily_counts
 
 _ANCHOR = date(2026, 3, 20)  # Friday
 

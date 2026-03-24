@@ -3,6 +3,7 @@
 Tests the delete job outcome persistence helper using a monkeypatched conn.
 No DB dependency.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
@@ -36,7 +37,8 @@ class TestPersistDeleteOutcome:
         rid = uuid4()
 
         _persist_delete_outcome(
-            conn, rid,
+            conn,
+            rid,
             status="completed",
             summary_dict={"symptom_logs_deleted": 5},
             proof={"receipt_id": "r1"},
@@ -57,7 +59,8 @@ class TestPersistDeleteOutcome:
         rid = uuid4()
 
         _persist_delete_outcome(
-            conn, rid,
+            conn,
+            rid,
             status="failed",
             summary_dict=dict(_EMPTY_DELETE_SUMMARY),
             proof=None,
@@ -77,7 +80,8 @@ class TestPersistDeleteOutcome:
         rid = uuid4()
 
         _persist_delete_outcome(
-            conn, rid,
+            conn,
+            rid,
             status="partial",
             summary_dict=dict(_EMPTY_DELETE_SUMMARY),
             proof={"receipt_id": "r2"},
