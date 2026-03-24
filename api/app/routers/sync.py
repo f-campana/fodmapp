@@ -264,6 +264,58 @@ def _build_result(
     )
 
 
+def _reject_with_conflict(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    signature_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    conflict_code: str,
+    error_detail: str,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a conflict-based rejection."""
+    state, retry_after_ms, conflict = _conflict_for_code(conflict_code)
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        signature_hash,
+        signature_key_id,
+        state,
+        signature_valid,
+        conflict_code,
+        error_detail,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        state,
+        conflict_code,
+        received_at,
+        processing_ms,
+        signature_hash,
+        signature_valid,
+        None,
+        conflict,
+        retry_after_ms,
+        False,
+    )
+
+
 def _build_replay_result(
     payload: SyncV1MutationBatchRequest,
     mutation: SyncV1MutationItem,
@@ -1441,74 +1493,28 @@ def sync_mutations_batch(
                 continue
 
             if not consent_active:
-                state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "CONSENT_REVOKED",
-                    "consent_missing",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "CONSENT_REVOKED",
-                        received_at,
+                    _reject_with_conflict(
+                        conn, payload, normalized, user_id, entity_type, entity_id,
+                        signature_hash, signature_key_id, signature_valid,
+                        chain_prev_hash, chain_item_hash, received_at,
                         max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        conflict,
-                        retry_after_ms,
-                        False,
+                        conflict_code="CONSENT_REVOKED",
+                        error_detail="consent_missing",
                     )
                 )
                 continue
 
             tracking_scope = tracking_store.tracking_scope_for_entity(entity_type)
             if tracking_scope is not None and not tracking_store.has_tracking_scope(consent_scope, tracking_scope):
-                state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "CONSENT_REVOKED",
-                    f"{tracking_scope}_missing",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "CONSENT_REVOKED",
-                        received_at,
+                    _reject_with_conflict(
+                        conn, payload, normalized, user_id, entity_type, entity_id,
+                        signature_hash, signature_key_id, signature_valid,
+                        chain_prev_hash, chain_item_hash, received_at,
                         max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        conflict,
-                        retry_after_ms,
-                        False,
+                        conflict_code="CONSENT_REVOKED",
+                        error_detail=f"{tracking_scope}_missing",
                     )
                 )
                 continue
