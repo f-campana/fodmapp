@@ -43,7 +43,8 @@ from app.models import (
     SyncMutationResponse,
 )
 
-router = APIRouter(prefix="/v0", tags=["me", "sync"])
+router = APIRouter(prefix="/v0", tags=["account"])
+legacy_router = APIRouter(prefix="/v0", tags=["legacy"])
 
 EXPORT_CONFIRM_TEXT = "SUPPRIMER MES DONNÉES"
 logger = logging.getLogger(__name__)
@@ -957,7 +958,7 @@ def get_delete_status(
     )
 
 
-@router.post("/sync/mutations", response_model=SyncMutationResponse, deprecated=True)
+@legacy_router.post("/sync/mutations", response_model=SyncMutationResponse, deprecated=True)
 def sync_mutations(
     request: Request,
     response: Response,

@@ -10,6 +10,7 @@ from app.db import Database
 from app.errors import register_error_handlers
 from app.routers.foods import router as foods_router
 from app.routers.health import router as health_router
+from app.routers.me import legacy_router as legacy_router
 from app.routers.me import router as me_router
 from app.routers.products import router as products_router
 from app.routers.safe_harbors import router as safe_harbors_router
@@ -40,6 +41,44 @@ def create_app() -> FastAPI:
             "Canonical food rollup freshness depends on phase3 snapshot tables rebuilt by "
             "etl/phase3/sql/phase3_rollups_compute.sql."
         ),
+        openapi_tags=[
+            {
+                "name": "health",
+                "description": "Liveness and publish-metadata checks for the live API.",
+            },
+            {
+                "name": "foods",
+                "description": "Read-only food catalog lookups, rollups, subtypes, and traits.",
+            },
+            {
+                "name": "products",
+                "description": "Guided packaged-product lookup and assessment endpoints.",
+            },
+            {
+                "name": "safe-harbors",
+                "description": "Safe-Harbor V1 cohort discovery and food eligibility lists.",
+            },
+            {
+                "name": "swaps",
+                "description": "Active swap recommendations derived from the published Phase 3 views.",
+            },
+            {
+                "name": "account",
+                "description": "Consent, export, and delete controls for the signed-in user.",
+            },
+            {
+                "name": "tracking",
+                "description": "Symptoms, meals, custom foods, saved meals, and tracking summaries.",
+            },
+            {
+                "name": "sync",
+                "description": "Current mutation sync API for clients that mirror local writes.",
+            },
+            {
+                "name": "legacy",
+                "description": "Deprecated compatibility endpoints retained for existing clients.",
+            },
+        ],
         lifespan=lifespan,
     )
 
@@ -60,6 +99,7 @@ def create_app() -> FastAPI:
     app.include_router(safe_harbors_router)
     app.include_router(swaps_router)
     app.include_router(me_router)
+    app.include_router(legacy_router)
     app.include_router(tracking_router)
     app.include_router(sync_router)
 

@@ -27,7 +27,7 @@ from app.models import (
     WeeklyTrackingSummaryResponse,
 )
 
-router = APIRouter(prefix="/v0/me/tracking", tags=["me", "tracking"])
+router = APIRouter(prefix="/v0/me/tracking", tags=["tracking"])
 
 
 def _get_db(request: Request) -> Database:
