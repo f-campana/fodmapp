@@ -1,7 +1,7 @@
 # FODMAPP Documentation Personas
 
-Status: Implemented
-Owner: Maintainer
+Status: Implemented  
+Owner: Maintainer  
 Last reviewed: 2026-03-08
 
 ## Purpose

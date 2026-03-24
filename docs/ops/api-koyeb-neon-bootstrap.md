@@ -1,7 +1,7 @@
 # API Koyeb + Neon Bootstrap
 
-Status: Ready for operator execution
-Audience: Maintainer or operator; Contributor or engineer
+Status: Ready for operator execution  
+Audience: Maintainer or operator; Contributor or engineer  
 Scope: First hosted API environment on Koyeb with a Neon-backed Postgres connection.
 
 Last reviewed: 2026-03-22

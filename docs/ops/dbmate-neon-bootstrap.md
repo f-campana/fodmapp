@@ -1,9 +1,9 @@
 # DBMate + Neon Bootstrap
 
-Status: In progress
-Audience: Maintainer or operator; Contributor or engineer
-Scope: Forward-only schema migrations for long-lived databases while preserving the disposable replay/bootstrap path.
-Related docs: [infra/ci/ENVIRONMENT.md](../../infra/ci/ENVIRONMENT.md), [docs/ops/ci-workflow-hardening.md](./ci-workflow-hardening.md), [docs/architecture/decision-register.md](../architecture/decision-register.md)
+Status: In progress  
+Audience: Maintainer or operator; Contributor or engineer  
+Scope: Forward-only schema migrations for long-lived databases while preserving the disposable replay/bootstrap path.  
+Related docs: [infra/ci/ENVIRONMENT.md](../../infra/ci/ENVIRONMENT.md), [docs/ops/ci-workflow-hardening.md](./ci-workflow-hardening.md), [docs/architecture/decision-register.md](../architecture/decision-register.md)  
 Last reviewed: 2026-03-21
 
 ## Split Contract

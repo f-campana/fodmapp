@@ -1,9 +1,9 @@
 # Tailwind v4 Token Architecture
 
-Status: Accepted direction, pending implementation cleanup
-Audience: Contributor or engineer; Reviewer or auditor
-Scope: Styling package boundaries for Tailwind-based apps and `@fodmapp/ui`
-Related docs: [docs/frontend/strategy.md](./strategy.md), [docs/architecture/decision-register.md](../architecture/decision-register.md), [packages/ui/README.md](../../packages/ui/README.md)
+Status: Accepted direction, pending implementation cleanup  
+Audience: Contributor or engineer; Reviewer or auditor  
+Scope: Styling package boundaries for Tailwind-based apps and `@fodmapp/ui`  
+Related docs: [docs/frontend/strategy.md](./strategy.md), [docs/architecture/decision-register.md](../architecture/decision-register.md), [packages/ui/README.md](../../packages/ui/README.md)  
 Last reviewed: 2026-03-17
 
 ## Summary

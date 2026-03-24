@@ -1,7 +1,7 @@
 # FODMAPP Project Definition
 
-Status: Implemented
-Owner: Maintainer / Product
+Status: Implemented  
+Owner: Maintainer / Product  
 Last reviewed: 2026-03-08
 
 ## One-line definition

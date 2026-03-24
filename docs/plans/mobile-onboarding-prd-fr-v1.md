@@ -1,7 +1,7 @@
 # Mobile Onboarding PRD (France V1)
 
-Last updated: 2026-02-27
-Owner: Product + Mobile + Data + Legal
+Last updated: 2026-02-27  
+Owner: Product + Mobile + Data + Legal  
 Status: Draft for implementation planning
 
 ## 1. Objective

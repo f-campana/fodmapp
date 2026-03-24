@@ -1,6 +1,6 @@
 # Mobile Original Instruction Tracker
 
-Status: Active decision source
+Status: Active decision source  
 Last reviewed: 2026-03-08
 
 ## 1. Purpose

@@ -1,9 +1,9 @@
 # Phase 3 Manual Promote
 
-Status: In progress
-Audience: Maintainer or operator; Contributor or engineer
-Scope: Non-destructive Phase 3 refresh + publish for already-loaded persistent databases.
-Related docs: [docs/ops/dbmate-neon-bootstrap.md](./dbmate-neon-bootstrap.md), [etl/phase3/PRODUCT_LAYER_RUNBOOK.md](../../etl/phase3/PRODUCT_LAYER_RUNBOOK.md), [infra/ci/ENVIRONMENT.md](../../infra/ci/ENVIRONMENT.md)
+Status: In progress  
+Audience: Maintainer or operator; Contributor or engineer  
+Scope: Non-destructive Phase 3 refresh + publish for already-loaded persistent databases.  
+Related docs: [docs/ops/dbmate-neon-bootstrap.md](./dbmate-neon-bootstrap.md), [etl/phase3/PRODUCT_LAYER_RUNBOOK.md](../../etl/phase3/PRODUCT_LAYER_RUNBOOK.md), [infra/ci/ENVIRONMENT.md](../../infra/ci/ENVIRONMENT.md)  
 Last reviewed: 2026-03-21
 
 ## Scope Contract
