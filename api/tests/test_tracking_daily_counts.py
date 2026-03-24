@@ -2,6 +2,7 @@
 
 Pure-computation helper — no DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
@@ -119,9 +120,7 @@ class TestSymptomTypeCounts:
         assert symptom_counts == {}
 
     def test_single_type(self):
-        _, symptom_counts, _ = _compute_daily_counts(
-            [], [_symptom(_ANCHOR, symptom_type="bloating")], _ANCHOR
-        )
+        _, symptom_counts, _ = _compute_daily_counts([], [_symptom(_ANCHOR, symptom_type="bloating")], _ANCHOR)
         assert symptom_counts == {"bloating": 1}
 
     def test_multiple_types(self):

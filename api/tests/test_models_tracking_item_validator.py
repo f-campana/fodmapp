@@ -3,6 +3,7 @@
 Covers the cross-field validator that enforces item_kind-specific field
 constraints.  No DB or FastAPI dependency — pure Pydantic model validation.
 """
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -28,8 +29,10 @@ class TestCanonicalFood:
 
     def test_valid_with_optional_fields(self):
         item = TrackingItemInput(
-            item_kind="canonical_food", food_slug="tomato",
-            quantity_text="100g", note="fresh",
+            item_kind="canonical_food",
+            food_slug="tomato",
+            quantity_text="100g",
+            note="fresh",
         )
         assert item.quantity_text == "100g"
         assert item.note == "fresh"
@@ -63,8 +66,10 @@ class TestCustomFood:
 
     def test_valid_with_optional_fields(self):
         item = TrackingItemInput(
-            item_kind="custom_food", custom_food_id=_CID,
-            quantity_text="1 cup", note="homemade",
+            item_kind="custom_food",
+            custom_food_id=_CID,
+            quantity_text="1 cup",
+            note="homemade",
         )
         assert item.quantity_text == "1 cup"
 
@@ -93,8 +98,10 @@ class TestFreeText:
 
     def test_valid_with_optional_fields(self):
         item = TrackingItemInput(
-            item_kind="free_text", free_text_label="coffee",
-            quantity_text="2 cups", note="decaf",
+            item_kind="free_text",
+            free_text_label="coffee",
+            quantity_text="2 cups",
+            note="decaf",
         )
         assert item.quantity_text == "2 cups"
 

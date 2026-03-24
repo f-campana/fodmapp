@@ -3,6 +3,7 @@
 Pure function that converts a DB row dict + items list to a MealLog model.
 No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

@@ -3,6 +3,7 @@
 Pure function that converts a raw proof JSON dict to a Receipt model.
 No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

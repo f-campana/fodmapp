@@ -3,6 +3,7 @@
 Pure functions that map conflict codes to (state, retry_ms, conflict) tuples.
 No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from app.models import SyncV1MutationConflict
@@ -15,6 +16,7 @@ from app.routers.sync import (
 )
 
 # -- _rule_float / _rule_str helpers ------------------------------------------
+
 
 class TestRuleFloat:
     def test_returns_float(self):

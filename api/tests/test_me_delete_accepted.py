@@ -3,6 +3,7 @@
 Pure function that builds a DeleteAcceptedResponse with deterministic
 URIs. No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

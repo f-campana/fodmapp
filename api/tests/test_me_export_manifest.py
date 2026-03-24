@@ -3,6 +3,7 @@
 Pure function that builds requested_scope, manifest, and initial
 rows_by_domain from an ExportRequest payload. No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

@@ -2,6 +2,7 @@
 
 Pure-function module — no DB or FastAPI app dependency.
 """
+
 from __future__ import annotations
 
 import base64
@@ -16,6 +17,7 @@ from app.crypto_utils import canonical_json, hmac_signature, hmac_verify, sha256
 # ---------------------------------------------------------------------------
 # canonical_json
 # ---------------------------------------------------------------------------
+
 
 class TestCanonicalJson:
     def test_sorts_keys(self):
@@ -45,6 +47,7 @@ class TestCanonicalJson:
 # ---------------------------------------------------------------------------
 # sha256_hex
 # ---------------------------------------------------------------------------
+
 
 class TestSha256Hex:
     def test_known_digest(self):
@@ -92,9 +95,7 @@ class TestHmacSignature:
 
     def test_matches_manual_computation(self):
         payload = "test-payload"
-        expected_raw = hmac.new(
-            _TEST_SECRET_RAW, payload.encode("utf-8"), hashlib.sha256
-        ).digest()
+        expected_raw = hmac.new(_TEST_SECRET_RAW, payload.encode("utf-8"), hashlib.sha256).digest()
         expected = base64.urlsafe_b64encode(expected_raw).decode("ascii")
         assert hmac_signature(_TEST_SECRET_B64, payload) == expected
 
@@ -106,6 +107,7 @@ class TestHmacSignature:
 # ---------------------------------------------------------------------------
 # hmac_verify
 # ---------------------------------------------------------------------------
+
 
 class TestHmacVerify:
     def test_valid_signature_returns_true(self):

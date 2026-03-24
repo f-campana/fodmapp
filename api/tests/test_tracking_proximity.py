@@ -3,6 +3,7 @@
 Pure-computation helper — no DB or FastAPI dependency.  Tests use
 hand-built SymptomLog / MealLog model instances.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

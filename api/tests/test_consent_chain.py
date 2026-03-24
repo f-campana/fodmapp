@@ -3,6 +3,7 @@
 Pure-function tests exercise logic directly.  DB-dependent functions use
 lightweight mocks for the connection and sql helpers — no real database needed.
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
@@ -224,28 +225,48 @@ class TestVerifyUserConsentChain:
 
         # Event 1
         p1 = build_event_payload(
-            consent_id=cid, event_type="grant", actor_type="user",
-            actor_id=None, reason=None, metadata={}, prev_hash=None,
+            consent_id=cid,
+            event_type="grant",
+            actor_type="user",
+            actor_id=None,
+            reason=None,
+            metadata={},
+            prev_hash=None,
         )
         h1 = compute_event_hash(p1)
 
         # Event 2 — chains from event 1
         p2 = build_event_payload(
-            consent_id=cid, event_type="revoke", actor_type="user",
-            actor_id=None, reason="changed mind", metadata={}, prev_hash=h1,
+            consent_id=cid,
+            event_type="revoke",
+            actor_type="user",
+            actor_id=None,
+            reason="changed mind",
+            metadata={},
+            prev_hash=h1,
         )
         h2 = compute_event_hash(p2)
 
         rows = [
             {
-                "consent_id": cid, "event_type": "grant", "actor_type": "user",
-                "actor_id": None, "reason": None, "metadata_json": {},
-                "event_hash": h1, "prev_hash": None,
+                "consent_id": cid,
+                "event_type": "grant",
+                "actor_type": "user",
+                "actor_id": None,
+                "reason": None,
+                "metadata_json": {},
+                "event_hash": h1,
+                "prev_hash": None,
             },
             {
-                "consent_id": cid, "event_type": "revoke", "actor_type": "user",
-                "actor_id": None, "reason": "changed mind", "metadata_json": {},
-                "event_hash": h2, "prev_hash": h1,
+                "consent_id": cid,
+                "event_type": "revoke",
+                "actor_type": "user",
+                "actor_id": None,
+                "reason": "changed mind",
+                "metadata_json": {},
+                "event_hash": h2,
+                "prev_hash": h1,
             },
         ]
 
@@ -257,14 +278,23 @@ class TestVerifyUserConsentChain:
         """Tampered event_hash triggers ConsentChainInvalidError (line 112)."""
         cid = uuid4()
         payload = build_event_payload(
-            consent_id=cid, event_type="grant", actor_type="user",
-            actor_id=None, reason=None, metadata={}, prev_hash=None,
+            consent_id=cid,
+            event_type="grant",
+            actor_type="user",
+            actor_id=None,
+            reason=None,
+            metadata={},
+            prev_hash=None,
         )
         _real_hash = compute_event_hash(payload)
 
         row = {
-            "consent_id": cid, "event_type": "grant", "actor_type": "user",
-            "actor_id": None, "reason": None, "metadata_json": {},
+            "consent_id": cid,
+            "event_type": "grant",
+            "actor_type": "user",
+            "actor_id": None,
+            "reason": None,
+            "metadata_json": {},
             "event_hash": "tampered-hash",  # does not match computed hash
             "prev_hash": None,
         }
@@ -279,29 +309,49 @@ class TestVerifyUserConsentChain:
         cid = uuid4()
 
         p1 = build_event_payload(
-            consent_id=cid, event_type="grant", actor_type="user",
-            actor_id=None, reason=None, metadata={}, prev_hash=None,
+            consent_id=cid,
+            event_type="grant",
+            actor_type="user",
+            actor_id=None,
+            reason=None,
+            metadata={},
+            prev_hash=None,
         )
         h1 = compute_event_hash(p1)
 
         # Build event 2 with correct prev_hash for hash computation,
         # but store a wrong prev_hash in the row.
         p2 = build_event_payload(
-            consent_id=cid, event_type="revoke", actor_type="user",
-            actor_id=None, reason=None, metadata={}, prev_hash=h1,
+            consent_id=cid,
+            event_type="revoke",
+            actor_type="user",
+            actor_id=None,
+            reason=None,
+            metadata={},
+            prev_hash=h1,
         )
         h2 = compute_event_hash(p2)
 
         rows = [
             {
-                "consent_id": cid, "event_type": "grant", "actor_type": "user",
-                "actor_id": None, "reason": None, "metadata_json": {},
-                "event_hash": h1, "prev_hash": None,
+                "consent_id": cid,
+                "event_type": "grant",
+                "actor_type": "user",
+                "actor_id": None,
+                "reason": None,
+                "metadata_json": {},
+                "event_hash": h1,
+                "prev_hash": None,
             },
             {
-                "consent_id": cid, "event_type": "revoke", "actor_type": "user",
-                "actor_id": None, "reason": None, "metadata_json": {},
-                "event_hash": h2, "prev_hash": "wrong-prev",  # mismatch
+                "consent_id": cid,
+                "event_type": "revoke",
+                "actor_type": "user",
+                "actor_id": None,
+                "reason": None,
+                "metadata_json": {},
+                "event_hash": h2,
+                "prev_hash": "wrong-prev",  # mismatch
             },
         ]
 
@@ -314,15 +364,25 @@ class TestVerifyUserConsentChain:
         """Row with metadata_json=None uses empty dict (line 107 falsy branch)."""
         cid = uuid4()
         payload = build_event_payload(
-            consent_id=cid, event_type="grant", actor_type="user",
-            actor_id=None, reason=None, metadata={}, prev_hash=None,
+            consent_id=cid,
+            event_type="grant",
+            actor_type="user",
+            actor_id=None,
+            reason=None,
+            metadata={},
+            prev_hash=None,
         )
         event_hash = compute_event_hash(payload)
 
         row = {
-            "consent_id": cid, "event_type": "grant", "actor_type": "user",
-            "actor_id": None, "reason": None, "metadata_json": None,
-            "event_hash": event_hash, "prev_hash": None,
+            "consent_id": cid,
+            "event_type": "grant",
+            "actor_type": "user",
+            "actor_id": None,
+            "reason": None,
+            "metadata_json": None,
+            "event_hash": event_hash,
+            "prev_hash": None,
         }
 
         conn = MagicMock()

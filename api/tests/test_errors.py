@@ -3,6 +3,7 @@
 Tests all factory functions and the three registered exception handlers
 without requiring a database or the full application stack.
 """
+
 from __future__ import annotations
 
 import pytest

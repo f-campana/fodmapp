@@ -2,6 +2,7 @@
 
 Tests use monkeypatched tracking_store calls — no DB dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

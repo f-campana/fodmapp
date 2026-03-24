@@ -3,6 +3,7 @@
 Pure functions that convert DB row dicts to Pydantic models.
 No DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

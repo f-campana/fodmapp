@@ -4,6 +4,7 @@ Covers MealLogUpdateRequest, SymptomLogUpdateRequest, CustomFoodUpdateRequest,
 and SavedMealUpdateRequest validate_update methods.  Pure Pydantic validation,
 no DB or FastAPI dependency.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone

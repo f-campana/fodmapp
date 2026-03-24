@@ -6,6 +6,7 @@ apply_fn. No DB dependency.
 
 The integration backstop for this area is test_sync_batch_mutations.py.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -64,9 +65,7 @@ class TestExecuteGlobalOpAlreadyTerminal:
     @patch("app.routers.sync._build_result")
     @patch("app.routers.sync._insert_queue")
     @patch("app.routers.sync._conflict_for_code")
-    def test_conflict_path_calls_conflict_for_code(
-        self, mock_conflict, mock_insert, mock_build
-    ):
+    def test_conflict_path_calls_conflict_for_code(self, mock_conflict, mock_insert, mock_build):
         mock_conflict.return_value = (
             "CANCELLED_BY_CONSENT",
             0,
@@ -82,9 +81,19 @@ class TestExecuteGlobalOpAlreadyTerminal:
         apply_fn = MagicMock()
 
         result, was_applied = _execute_global_op(
-            MagicMock(), _make_batch_payload(), _make_mutation(), _USER_ID,
-            "__global__", "__global__", _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            MagicMock(),
+            _make_batch_payload(),
+            _make_mutation(),
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=True,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",
@@ -99,9 +108,7 @@ class TestExecuteGlobalOpAlreadyTerminal:
     @patch("app.routers.sync._build_result")
     @patch("app.routers.sync._insert_queue")
     @patch("app.routers.sync._conflict_for_code")
-    def test_conflict_path_inserts_queue_with_terminal_detail(
-        self, mock_conflict, mock_insert, mock_build
-    ):
+    def test_conflict_path_inserts_queue_with_terminal_detail(self, mock_conflict, mock_insert, mock_build):
         mock_conflict.return_value = (
             "CANCELLED_BY_DELETE",
             0,
@@ -118,9 +125,19 @@ class TestExecuteGlobalOpAlreadyTerminal:
         mut = _make_mutation(operation_type="DELETE_ACCOUNT")
 
         _execute_global_op(
-            conn, bp, mut, _USER_ID, "__global__", "__global__",
-            _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            conn,
+            bp,
+            mut,
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=True,
             conflict_code="ACCOUNT_DELETED",
             terminal_detail="already_deleted",
@@ -144,9 +161,19 @@ class TestExecuteGlobalOpApplied:
         conn = MagicMock()
 
         result, was_applied = _execute_global_op(
-            conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-            "__global__", "__global__", _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            conn,
+            _make_batch_payload(),
+            _make_mutation(),
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=False,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",
@@ -163,9 +190,19 @@ class TestExecuteGlobalOpApplied:
         mock_build.return_value = MagicMock()
 
         _execute_global_op(
-            MagicMock(), _make_batch_payload(), _make_mutation(), _USER_ID,
-            "__global__", "__global__", _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            MagicMock(),
+            _make_batch_payload(),
+            _make_mutation(),
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=False,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",
@@ -186,9 +223,19 @@ class TestExecuteGlobalOpApplied:
         mock_build.return_value = sentinel
 
         result, _ = _execute_global_op(
-            MagicMock(), _make_batch_payload(), _make_mutation(), _USER_ID,
-            "__global__", "__global__", _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            MagicMock(),
+            _make_batch_payload(),
+            _make_mutation(),
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=False,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",
@@ -211,9 +258,19 @@ class TestExecuteGlobalOpWithdrawConsentIntegration:
         mut = _make_mutation(operation_type="WITHDRAW_CONSENT")
 
         result, was_applied = _execute_global_op(
-            MagicMock(), bp, mut, _USER_ID, "__global__", "__global__",
-            _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            MagicMock(),
+            bp,
+            mut,
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=False,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",
@@ -232,9 +289,19 @@ class TestExecuteGlobalOpWithdrawConsentIntegration:
         mut = _make_mutation(operation_type="WITHDRAW_CONSENT")
 
         result, was_applied = _execute_global_op(
-            MagicMock(), bp, mut, _USER_ID, "__global__", "__global__",
-            _SIG_HASH, _SIG_KEY_ID, True,
-            _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+            MagicMock(),
+            bp,
+            mut,
+            _USER_ID,
+            "__global__",
+            "__global__",
+            _SIG_HASH,
+            _SIG_KEY_ID,
+            True,
+            _CHAIN_PREV,
+            _CHAIN_ITEM,
+            _NOW,
+            5,
             already_terminal=True,
             conflict_code="CONSENT_REVOKED",
             terminal_detail="already_revoked",

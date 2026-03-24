@@ -657,9 +657,7 @@ def request_export(
     db = _get_db(request)
     include = _normalize_include(payload.include)
     idempotency_key = payload.idempotency_key or str(uuid4())
-    requested_scope, manifest, rows_by_domain = _prepare_export_manifest(
-        payload, include, _now().isoformat()
-    )
+    requested_scope, manifest, rows_by_domain = _prepare_export_manifest(payload, include, _now().isoformat())
 
     with db.connection() as conn:
         _assert_security_tables(conn)

@@ -747,10 +747,7 @@ def list_meal_logs(conn: Connection, user_id: UUID, limit: int = 100) -> list[Me
     ).fetchall()
     meal_ids = [row["meal_log_id"] for row in rows]
     items_by_meal = _fetch_meal_items(conn, meal_ids)
-    return [
-        _meal_log_row_to_model(row, items_by_meal.get(row["meal_log_id"], []))
-        for row in rows
-    ]
+    return [_meal_log_row_to_model(row, items_by_meal.get(row["meal_log_id"], [])) for row in rows]
 
 
 def create_meal_log(
@@ -907,10 +904,7 @@ def list_saved_meals(conn: Connection, user_id: UUID) -> list[SavedMeal]:
     ).fetchall()
     saved_meal_ids = [row["saved_meal_id"] for row in rows]
     items_by_saved_meal = _fetch_saved_meal_items(conn, saved_meal_ids)
-    return [
-        _saved_meal_row_to_model(row, items_by_saved_meal.get(row["saved_meal_id"], []))
-        for row in rows
-    ]
+    return [_saved_meal_row_to_model(row, items_by_saved_meal.get(row["saved_meal_id"], [])) for row in rows]
 
 
 def create_saved_meal(
@@ -1180,10 +1174,7 @@ def build_weekly_summary(
     meal_ids = [row["meal_log_id"] for row in meal_rows]
     meal_items = _fetch_meal_items(conn, meal_ids)
     symptoms = [_symptom_row_to_model(dict(row)) for row in symptom_rows]
-    meals = [
-        _meal_log_row_to_model(row, meal_items.get(row["meal_log_id"], []))
-        for row in meal_rows
-    ]
+    meals = [_meal_log_row_to_model(row, meal_items.get(row["meal_log_id"], [])) for row in meal_rows]
 
     daily_counts, symptom_counts, severities = _compute_daily_counts(meals, symptoms, anchor)
 

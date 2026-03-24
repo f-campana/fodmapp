@@ -3,6 +3,7 @@
 Tests use monkeypatched tracking_store calls — no DB dependency.
 The integration backstop for this area is test_sync_batch_mutations.py.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
