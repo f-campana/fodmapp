@@ -228,6 +228,30 @@ def _saved_meal_item_row_to_model(row: Dict[str, Any]) -> SavedMealItem:
     )
 
 
+def _custom_food_row_to_model(row: Dict[str, Any]) -> CustomFood:
+    return CustomFood(
+        custom_food_id=row["custom_food_id"],
+        label=row["label"],
+        note=row["note"],
+        version=int(row["version"]),
+        created_at_utc=row["created_at_utc"],
+        updated_at_utc=row["updated_at_utc"],
+    )
+
+
+def _meal_log_row_to_model(row: Dict[str, Any], items: list[MealLogItem]) -> MealLog:
+    return MealLog(
+        meal_log_id=row["meal_log_id"],
+        title=row["title"],
+        occurred_at_utc=row["occurred_at_utc"],
+        note=row["note"],
+        version=int(row["version"]),
+        created_at_utc=row["created_at_utc"],
+        updated_at_utc=row["updated_at_utc"],
+        items=items,
+    )
+
+
 def _fetch_meal_items(conn: Connection, meal_ids: Iterable[UUID]) -> dict[UUID, list[MealLogItem]]:
     ids = list(meal_ids)
     if not ids:
@@ -254,6 +278,18 @@ def _fetch_meal_items(conn: Connection, meal_ids: Iterable[UUID]) -> dict[UUID, 
     for row in rows:
         grouped[row["meal_log_id"]].append(_meal_item_row_to_model(dict(row)))
     return grouped
+
+
+def _saved_meal_row_to_model(row: Dict[str, Any], items: list[SavedMealItem]) -> SavedMeal:
+    return SavedMeal(
+        saved_meal_id=row["saved_meal_id"],
+        label=row["label"],
+        note=row["note"],
+        version=int(row["version"]),
+        created_at_utc=row["created_at_utc"],
+        updated_at_utc=row["updated_at_utc"],
+        items=items,
+    )
 
 
 def _fetch_saved_meal_items(conn: Connection, saved_meal_ids: Iterable[UUID]) -> dict[UUID, list[SavedMealItem]]:
@@ -454,17 +490,7 @@ def list_custom_foods(conn: Connection, user_id: UUID) -> list[CustomFood]:
         """,
         {"user_id": user_id},
     ).fetchall()
-    return [
-        CustomFood(
-            custom_food_id=row["custom_food_id"],
-            label=row["label"],
-            note=row["note"],
-            version=int(row["version"]),
-            created_at_utc=row["created_at_utc"],
-            updated_at_utc=row["updated_at_utc"],
-        )
-        for row in rows
-    ]
+    return [_custom_food_row_to_model(dict(row)) for row in rows]
 
 
 def create_custom_food(
@@ -509,14 +535,7 @@ def create_custom_food(
     ).fetchone()
     if row is None:
         raise bad_request("Could not create custom food")
-    return CustomFood(
-        custom_food_id=row["custom_food_id"],
-        label=row["label"],
-        note=row["note"],
-        version=int(row["version"]),
-        created_at_utc=row["created_at_utc"],
-        updated_at_utc=row["updated_at_utc"],
-    )
+    return _custom_food_row_to_model(dict(row))
 
 
 def update_custom_food(
@@ -570,14 +589,7 @@ def update_custom_food(
     ).fetchone()
     if row is None:
         raise bad_request("Could not update custom food")
-    return CustomFood(
-        custom_food_id=row["custom_food_id"],
-        label=row["label"],
-        note=row["note"],
-        version=int(row["version"]),
-        created_at_utc=row["created_at_utc"],
-        updated_at_utc=row["updated_at_utc"],
-    )
+    return _custom_food_row_to_model(dict(row))
 
 
 def delete_custom_food(conn: Connection, user_id: UUID, custom_food_id: UUID, *, version: int) -> None:
@@ -711,16 +723,7 @@ def _fetch_meal_log(conn: Connection, user_id: UUID, meal_log_id: UUID) -> MealL
     if row is None:
         raise not_found("Meal log not found")
     items = _fetch_meal_items(conn, [meal_log_id]).get(meal_log_id, [])
-    return MealLog(
-        meal_log_id=row["meal_log_id"],
-        title=row["title"],
-        occurred_at_utc=row["occurred_at_utc"],
-        note=row["note"],
-        version=int(row["version"]),
-        created_at_utc=row["created_at_utc"],
-        updated_at_utc=row["updated_at_utc"],
-        items=items,
-    )
+    return _meal_log_row_to_model(row, items)
 
 
 def list_meal_logs(conn: Connection, user_id: UUID, limit: int = 100) -> list[MealLog]:
@@ -745,16 +748,7 @@ def list_meal_logs(conn: Connection, user_id: UUID, limit: int = 100) -> list[Me
     meal_ids = [row["meal_log_id"] for row in rows]
     items_by_meal = _fetch_meal_items(conn, meal_ids)
     return [
-        MealLog(
-            meal_log_id=row["meal_log_id"],
-            title=row["title"],
-            occurred_at_utc=row["occurred_at_utc"],
-            note=row["note"],
-            version=int(row["version"]),
-            created_at_utc=row["created_at_utc"],
-            updated_at_utc=row["updated_at_utc"],
-            items=items_by_meal.get(row["meal_log_id"], []),
-        )
+        _meal_log_row_to_model(row, items_by_meal.get(row["meal_log_id"], []))
         for row in rows
     ]
 
@@ -891,15 +885,7 @@ def _fetch_saved_meal(conn: Connection, user_id: UUID, saved_meal_id: UUID) -> S
     if row is None:
         raise not_found("Saved meal not found")
     items = _fetch_saved_meal_items(conn, [saved_meal_id]).get(saved_meal_id, [])
-    return SavedMeal(
-        saved_meal_id=row["saved_meal_id"],
-        label=row["label"],
-        note=row["note"],
-        version=int(row["version"]),
-        created_at_utc=row["created_at_utc"],
-        updated_at_utc=row["updated_at_utc"],
-        items=items,
-    )
+    return _saved_meal_row_to_model(row, items)
 
 
 def list_saved_meals(conn: Connection, user_id: UUID) -> list[SavedMeal]:
@@ -922,15 +908,7 @@ def list_saved_meals(conn: Connection, user_id: UUID) -> list[SavedMeal]:
     saved_meal_ids = [row["saved_meal_id"] for row in rows]
     items_by_saved_meal = _fetch_saved_meal_items(conn, saved_meal_ids)
     return [
-        SavedMeal(
-            saved_meal_id=row["saved_meal_id"],
-            label=row["label"],
-            note=row["note"],
-            version=int(row["version"]),
-            created_at_utc=row["created_at_utc"],
-            updated_at_utc=row["updated_at_utc"],
-            items=items_by_saved_meal.get(row["saved_meal_id"], []),
-        )
+        _saved_meal_row_to_model(row, items_by_saved_meal.get(row["saved_meal_id"], []))
         for row in rows
     ]
 
@@ -1081,6 +1059,75 @@ def build_tracking_feed(conn: Connection, user_id: UUID, limit: int = 50) -> Tra
     return TrackingFeedResponse(total=total, limit=limit, items=limited)
 
 
+def _compute_daily_counts(
+    meals: list[MealLog],
+    symptoms: list[SymptomLog],
+    anchor: date,
+) -> tuple[list[DailyTrackingCount], dict[str, int], list[int]]:
+    """Aggregate per-day meal/symptom counts, symptom-type tallies, and severities.
+
+    Returns ``(daily_counts, symptom_type_counts, severities)``
+    where *daily_counts* is a 7-element list from ``anchor - 6 days`` to *anchor*.
+    """
+    daily_meals: dict[date, int] = defaultdict(int)
+    daily_symptoms: dict[date, int] = defaultdict(int)
+    symptom_type_counts: dict[str, int] = defaultdict(int)
+    severities: list[int] = []
+
+    for meal in meals:
+        daily_meals[meal.occurred_at_utc.date()] += 1
+    for symptom in symptoms:
+        daily_symptoms[symptom.noted_at_utc.date()] += 1
+        symptom_type_counts[symptom.symptom_type] += 1
+        severities.append(symptom.severity)
+
+    daily_counts = [
+        DailyTrackingCount(
+            date=anchor - timedelta(days=6 - offset),
+            meal_count=daily_meals[anchor - timedelta(days=6 - offset)],
+            symptom_count=daily_symptoms[anchor - timedelta(days=6 - offset)],
+        )
+        for offset in range(7)
+    ]
+
+    return daily_counts, dict(symptom_type_counts), severities
+
+
+def _compute_proximity_groups(
+    symptoms: list[SymptomLog],
+    meals: list[MealLog],
+) -> list[SymptomProximityGroup]:
+    """Find meals within 6 hours before each symptom."""
+    groups: list[SymptomProximityGroup] = []
+    for symptom in symptoms:
+        nearby_meals = []
+        for meal in meals:
+            if meal.occurred_at_utc > symptom.noted_at_utc:
+                continue
+            delta = symptom.noted_at_utc - meal.occurred_at_utc
+            if delta > timedelta(hours=6):
+                continue
+            nearby_meals.append(
+                ProximityMeal(
+                    meal_log_id=meal.meal_log_id,
+                    title=meal.title,
+                    occurred_at_utc=meal.occurred_at_utc,
+                    hours_before_symptom=round(delta.total_seconds() / 3600, 2),
+                    item_labels=[item.label for item in meal.items],
+                )
+            )
+        groups.append(
+            SymptomProximityGroup(
+                symptom_log_id=symptom.symptom_log_id,
+                symptom_type=symptom.symptom_type,
+                severity=symptom.severity,
+                noted_at_utc=symptom.noted_at_utc,
+                nearby_meals=sorted(nearby_meals, key=lambda m: m.occurred_at_utc, reverse=True),
+            )
+        )
+    return groups
+
+
 def build_weekly_summary(
     conn: Connection,
     user_id: UUID,
@@ -1134,69 +1181,13 @@ def build_weekly_summary(
     meal_items = _fetch_meal_items(conn, meal_ids)
     symptoms = [_symptom_row_to_model(dict(row)) for row in symptom_rows]
     meals = [
-        MealLog(
-            meal_log_id=row["meal_log_id"],
-            title=row["title"],
-            occurred_at_utc=row["occurred_at_utc"],
-            note=row["note"],
-            version=int(row["version"]),
-            created_at_utc=row["created_at_utc"],
-            updated_at_utc=row["updated_at_utc"],
-            items=meal_items.get(row["meal_log_id"], []),
-        )
+        _meal_log_row_to_model(row, meal_items.get(row["meal_log_id"], []))
         for row in meal_rows
     ]
 
-    daily_meals = defaultdict(int)
-    daily_symptoms = defaultdict(int)
-    symptom_counts = defaultdict(int)
-    severities: list[int] = []
+    daily_counts, symptom_counts, severities = _compute_daily_counts(meals, symptoms, anchor)
 
-    for meal in meals:
-        daily_meals[meal.occurred_at_utc.date()] += 1
-    for symptom in symptoms:
-        daily_symptoms[symptom.noted_at_utc.date()] += 1
-        symptom_counts[symptom.symptom_type] += 1
-        severities.append(symptom.severity)
-
-    daily_counts = []
-    for offset in range(7):
-        current_date = anchor - timedelta(days=6 - offset)
-        daily_counts.append(
-            DailyTrackingCount(
-                date=current_date,
-                meal_count=daily_meals[current_date],
-                symptom_count=daily_symptoms[current_date],
-            )
-        )
-
-    proximity_groups: list[SymptomProximityGroup] = []
-    for symptom in symptoms:
-        nearby_meals = []
-        for meal in meals:
-            if meal.occurred_at_utc > symptom.noted_at_utc:
-                continue
-            delta = symptom.noted_at_utc - meal.occurred_at_utc
-            if delta > timedelta(hours=6):
-                continue
-            nearby_meals.append(
-                ProximityMeal(
-                    meal_log_id=meal.meal_log_id,
-                    title=meal.title,
-                    occurred_at_utc=meal.occurred_at_utc,
-                    hours_before_symptom=round(delta.total_seconds() / 3600, 2),
-                    item_labels=[item.label for item in meal.items],
-                )
-            )
-        proximity_groups.append(
-            SymptomProximityGroup(
-                symptom_log_id=symptom.symptom_log_id,
-                symptom_type=symptom.symptom_type,
-                severity=symptom.severity,
-                noted_at_utc=symptom.noted_at_utc,
-                nearby_meals=sorted(nearby_meals, key=lambda meal: meal.occurred_at_utc, reverse=True),
-            )
-        )
+    proximity_groups = _compute_proximity_groups(symptoms, meals)
 
     average = None
     if severities:
