@@ -1597,9 +1597,18 @@ def sync_mutations_batch(
             if not consent_active:
                 results.append(
                     _reject_with_conflict(
-                        conn, payload, normalized, user_id, entity_type, entity_id,
-                        signature_hash, signature_key_id, signature_valid,
-                        chain_prev_hash, chain_item_hash, received_at,
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
                         max(0, _now_ms() - start_ms),
                         conflict_code="CONSENT_REVOKED",
                         error_detail="consent_missing",
@@ -1611,9 +1620,18 @@ def sync_mutations_batch(
             if tracking_scope is not None and not tracking_store.has_tracking_scope(consent_scope, tracking_scope):
                 results.append(
                     _reject_with_conflict(
-                        conn, payload, normalized, user_id, entity_type, entity_id,
-                        signature_hash, signature_key_id, signature_valid,
-                        chain_prev_hash, chain_item_hash, received_at,
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
                         max(0, _now_ms() - start_ms),
                         conflict_code="CONSENT_REVOKED",
                         error_detail=f"{tracking_scope}_missing",
@@ -1624,9 +1642,18 @@ def sync_mutations_batch(
             if normalized.depends_on_mutation_id and normalized.depends_on_mutation_id not in applied_ids:
                 results.append(
                     _reject_invalid_payload(
-                        conn, payload, normalized, user_id, entity_type, entity_id,
-                        base_hash, signature_key_id, signature_valid,
-                        chain_prev_hash, chain_item_hash, received_at,
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        base_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
                         max(0, _now_ms() - start_ms),
                         error_detail="depends_on_mutation_not_applied",
                     )
@@ -1638,9 +1665,18 @@ def sync_mutations_batch(
                 if swap_conflict_code is not None:
                     results.append(
                         _reject_with_conflict(
-                            conn, payload, normalized, user_id, entity_type, entity_id,
-                            signature_hash, signature_key_id, signature_valid,
-                            chain_prev_hash, chain_item_hash, received_at,
+                            conn,
+                            payload,
+                            normalized,
+                            user_id,
+                            entity_type,
+                            entity_id,
+                            signature_hash,
+                            signature_key_id,
+                            signature_valid,
+                            chain_prev_hash,
+                            chain_item_hash,
+                            received_at,
                             max(0, _now_ms() - start_ms),
                             conflict_code=swap_conflict_code,
                             error_detail=swap_conflict_code,
@@ -1653,9 +1689,18 @@ def sync_mutations_batch(
             if normalized.base_version is not None and normalized.base_version != current_version:
                 results.append(
                     _reject_with_conflict(
-                        conn, payload, normalized, user_id, entity_type, entity_id,
-                        signature_hash, signature_key_id, signature_valid,
-                        chain_prev_hash, chain_item_hash, received_at,
+                        conn,
+                        payload,
+                        normalized,
+                        user_id,
+                        entity_type,
+                        entity_id,
+                        signature_hash,
+                        signature_key_id,
+                        signature_valid,
+                        chain_prev_hash,
+                        chain_item_hash,
+                        received_at,
                         max(0, _now_ms() - start_ms),
                         conflict_code="VERSION_CONFLICT",
                         error_detail="base_version_mismatch",
@@ -1698,9 +1743,18 @@ def sync_mutations_batch(
                 except (ValueError, ApiError):
                     results.append(
                         _reject_invalid_payload(
-                            conn, payload, normalized, user_id, entity_type, entity_id,
-                            signature_hash, signature_key_id, signature_valid,
-                            chain_prev_hash, chain_item_hash, received_at,
+                            conn,
+                            payload,
+                            normalized,
+                            user_id,
+                            entity_type,
+                            entity_id,
+                            signature_hash,
+                            signature_key_id,
+                            signature_valid,
+                            chain_prev_hash,
+                            chain_item_hash,
+                            received_at,
                             max(0, _now_ms() - start_ms),
                             error_detail="tracking_apply_failed",
                         )
@@ -1725,9 +1779,18 @@ def sync_mutations_batch(
 
             results.append(
                 _finalize_applied(
-                    conn, payload, normalized, user_id, entity_type, entity_id,
-                    signature_hash, signature_key_id, signature_valid,
-                    chain_prev_hash, chain_item_hash, received_at,
+                    conn,
+                    payload,
+                    normalized,
+                    user_id,
+                    entity_type,
+                    entity_id,
+                    signature_hash,
+                    signature_key_id,
+                    signature_valid,
+                    chain_prev_hash,
+                    chain_item_hash,
+                    received_at,
                     max(0, _now_ms() - start_ms),
                     applied_version=next_version,
                 )

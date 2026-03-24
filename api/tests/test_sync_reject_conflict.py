@@ -5,6 +5,7 @@ _insert_queue, _build_result, and _conflict_for_code. No DB dependency.
 
 The integration backstop for this area is test_sync_batch_mutations.py.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -67,9 +68,19 @@ def test_calls_conflict_for_code_with_given_code(mock_conflict, mock_queue, mock
     mutation = _make_mutation()
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 42,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        42,
         conflict_code="CONSENT_REVOKED",
         error_detail="consent_missing",
     )
@@ -88,9 +99,19 @@ def test_inserts_queue_with_correct_state_and_detail(mock_conflict, mock_queue, 
     mutation = _make_mutation()
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 42,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        42,
         conflict_code="CONSENT_REVOKED",
         error_detail="symptom_missing",
     )
@@ -118,9 +139,19 @@ def test_builds_result_with_no_applied_version(mock_conflict, mock_queue, mock_b
     mutation = _make_mutation()
 
     result = _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 42,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        42,
         conflict_code="CONSENT_REVOKED",
         error_detail="consent_missing",
     )
@@ -147,9 +178,19 @@ def test_passes_signature_fields_through(mock_conflict, mock_queue, mock_build):
     mutation = _make_mutation()
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, False,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 0,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        False,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        0,
         conflict_code="CONSENT_REVOKED",
         error_detail="consent_missing",
     )
@@ -177,9 +218,19 @@ def test_passes_chain_hashes_to_queue(mock_conflict, mock_queue, mock_build):
     mutation = _make_mutation()
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        "prev-abc", "item-xyz", _NOW, 0,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        "prev-abc",
+        "item-xyz",
+        _NOW,
+        0,
         conflict_code="CONSENT_REVOKED",
         error_detail="consent_missing",
     )
@@ -202,9 +253,19 @@ def test_works_with_different_conflict_code(mock_conflict, mock_queue, mock_buil
     mutation = _make_mutation()
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 10,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        10,
         conflict_code="ENDPOINT_UNKNOWN",
         error_detail="unknown_op",
     )
@@ -230,9 +291,19 @@ def test_passes_rule_to_conflict_for_code(mock_conflict, mock_queue, mock_build)
     swap_rule = {"from_food_slug": "wheat", "to_food_slug": "spelt"}
 
     _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        5,
         conflict_code="RULE_INACTIVE",
         error_detail="RULE_INACTIVE",
         rule=swap_rule,
@@ -254,9 +325,19 @@ def test_passes_applied_version_to_build_result(mock_conflict, mock_queue, mock_
     mutation = _make_mutation()
 
     result = _reject_with_conflict(
-        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
-        _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 7,
+        conn,
+        payload,
+        mutation,
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        7,
         conflict_code="VERSION_CONFLICT",
         error_detail="base_version_mismatch",
         applied_version=42,

@@ -5,6 +5,7 @@ _build_result. No DB dependency.
 
 The integration backstop for this area is test_sync_batch_mutations.py.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -62,9 +63,19 @@ def test_returns_build_result_value(mock_queue, mock_build):
     conn = MagicMock()
 
     result = _finalize_applied(
-        conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-        "symptom_log", "ent-1", _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conn,
+        _make_batch_payload(),
+        _make_mutation(),
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        5,
         applied_version=3,
     )
 
@@ -79,16 +90,26 @@ def test_inserts_queue_with_applied_state(mock_queue, mock_build):
     conn = MagicMock()
 
     _finalize_applied(
-        conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-        "symptom_log", "ent-1", _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conn,
+        _make_batch_payload(),
+        _make_mutation(),
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        5,
         applied_version=3,
     )
 
     queue_args = mock_queue.call_args[0]
-    assert queue_args[8] == "APPLIED"   # state
-    assert queue_args[10] == "OK"       # error_code
-    assert queue_args[11] is None       # error_detail
+    assert queue_args[8] == "APPLIED"  # state
+    assert queue_args[10] == "OK"  # error_code
+    assert queue_args[11] is None  # error_detail
 
 
 @patch(f"{_PATCH_PREFIX}._build_result")
@@ -99,19 +120,29 @@ def test_builds_result_with_applied_state_and_version(mock_queue, mock_build):
     conn = MagicMock()
 
     _finalize_applied(
-        conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-        "symptom_log", "ent-1", _SIG_HASH, _SIG_KEY_ID, True,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conn,
+        _make_batch_payload(),
+        _make_mutation(),
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        5,
         applied_version=7,
     )
 
     build_args = mock_build.call_args[0]
     assert build_args[2] == "APPLIED"  # state
-    assert build_args[3] == "OK"       # result_code
-    assert build_args[8] == 7          # applied_version
-    assert build_args[9] is None       # conflict
-    assert build_args[10] == 0         # retry_after_ms
-    assert build_args[11] is False     # is_idempotent
+    assert build_args[3] == "OK"  # result_code
+    assert build_args[8] == 7  # applied_version
+    assert build_args[9] is None  # conflict
+    assert build_args[10] == 0  # retry_after_ms
+    assert build_args[11] is False  # is_idempotent
 
 
 @patch(f"{_PATCH_PREFIX}._build_result")
@@ -122,20 +153,30 @@ def test_forwards_signature_fields(mock_queue, mock_build):
     conn = MagicMock()
 
     _finalize_applied(
-        conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-        "symptom_log", "ent-1", "sha256:xyz", "key-99", False,
-        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conn,
+        _make_batch_payload(),
+        _make_mutation(),
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        "sha256:xyz",
+        "key-99",
+        False,
+        _CHAIN_PREV,
+        _CHAIN_ITEM,
+        _NOW,
+        5,
         applied_version=1,
     )
 
     queue_args = mock_queue.call_args[0]
-    assert queue_args[6] == "sha256:xyz"   # signature_hash in queue
-    assert queue_args[7] == "key-99"       # signature_key_id in queue
-    assert queue_args[9] is False          # signature_valid in queue
+    assert queue_args[6] == "sha256:xyz"  # signature_hash in queue
+    assert queue_args[7] == "key-99"  # signature_key_id in queue
+    assert queue_args[9] is False  # signature_valid in queue
 
     build_args = mock_build.call_args[0]
-    assert build_args[6] == "sha256:xyz"   # signature_hash in build
-    assert build_args[7] is False          # signature_valid in build
+    assert build_args[6] == "sha256:xyz"  # signature_hash in build
+    assert build_args[7] is False  # signature_valid in build
 
 
 @patch(f"{_PATCH_PREFIX}._build_result")
@@ -146,9 +187,19 @@ def test_forwards_chain_hashes(mock_queue, mock_build):
     conn = MagicMock()
 
     _finalize_applied(
-        conn, _make_batch_payload(), _make_mutation(), _USER_ID,
-        "symptom_log", "ent-1", _SIG_HASH, _SIG_KEY_ID, True,
-        "chain-prev-abc", "chain-item-xyz", _NOW, 5,
+        conn,
+        _make_batch_payload(),
+        _make_mutation(),
+        _USER_ID,
+        "symptom_log",
+        "ent-1",
+        _SIG_HASH,
+        _SIG_KEY_ID,
+        True,
+        "chain-prev-abc",
+        "chain-item-xyz",
+        _NOW,
+        5,
         applied_version=1,
     )
 
