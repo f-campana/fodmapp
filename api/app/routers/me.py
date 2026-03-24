@@ -262,6 +262,91 @@ def _parse_iso_datetime(value: str | datetime) -> datetime:
     return datetime.fromisoformat(value)
 
 
+def _proof_to_receipt(raw: Dict[str, Any]) -> Receipt:
+    """Convert a raw proof JSON dict from DB into a Receipt model."""
+    return Receipt(
+        receipt_id=UUID(str(raw["receipt_id"])),
+        issued_at_utc=_parse_iso_datetime(raw["issued_at_utc"]),
+        actor=raw["actor"],
+        policy_version=raw.get("policy_version"),
+        manifest_hash=raw["manifest_hash"],
+        proof_signature=raw.get("proof_signature"),
+    )
+
+
+def _build_export_accepted(
+    export_id: UUID,
+    status: str,
+    requested_at: datetime,
+    expires_at: datetime,
+    idempotency_key: str,
+) -> ExportAcceptedResponse:
+    """Build an ExportAcceptedResponse with a deterministic status_uri."""
+    return ExportAcceptedResponse(
+        export_id=export_id,
+        status=status,
+        requested_at_utc=requested_at,
+        expiry_at_utc=expires_at,
+        idempotency_key=idempotency_key,
+        status_uri=f"/v0/me/export/{export_id}",
+    )
+
+
+def _prepare_export_manifest(
+    payload: ExportRequest,
+    include: list[str],
+    exported_at_iso: str,
+) -> tuple[Dict[str, Any], Dict[str, Any], Dict[str, int]]:
+    """Build requested_scope, manifest, and initial rows_by_domain for an export.
+
+    Returns (requested_scope, manifest, rows_by_domain) where rows_by_domain
+    is initialised to zero for all domain keys. The caller fills actual counts
+    from the DB.
+    """
+    requested_scope = {
+        "format": payload.format,
+        "from_ts_utc": payload.from_ts_utc.isoformat() if payload.from_ts_utc else None,
+        "to_ts_utc": payload.to_ts_utc.isoformat() if payload.to_ts_utc else None,
+        "anonymize": payload.anonymize,
+        "include": include,
+    }
+    manifest = {
+        "requested_scope": requested_scope,
+        "exported_at_utc": exported_at_iso,
+        "anonymize": payload.anonymize,
+    }
+    rows_by_domain: Dict[str, int] = {
+        "consent": 0,
+        "profile": 0,
+        "symptoms": 0,
+        "diet_logs": 0,
+        "swap_history": 0,
+    }
+    return requested_scope, manifest, rows_by_domain
+
+
+def _build_delete_accepted(
+    delete_request_id: UUID,
+    status: str,
+    requested_at: datetime,
+    scope: str,
+    idempotency_key: Optional[str],
+    proof_uri: Optional[str],
+) -> DeleteAcceptedResponse:
+    """Build a DeleteAcceptedResponse with deterministic URIs."""
+    return DeleteAcceptedResponse(
+        delete_request_id=delete_request_id,
+        status=status,
+        requested_at_utc=requested_at,
+        scope=scope,
+        idempotency_key=idempotency_key,
+        local_effective_ttl_seconds=60,
+        server_effective_at_utc=requested_at,
+        proof_uri=proof_uri,
+        status_uri=f"/v0/me/delete/{delete_request_id}",
+    )
+
+
 def _build_export_receipt(export_id: UUID, user_id: UUID, manifest: Dict[str, Any]) -> Dict[str, Any]:
     issued_at_utc = _now().isoformat().replace("+00:00", "Z")
     receipt = {
@@ -572,27 +657,7 @@ def request_export(
     db = _get_db(request)
     include = _normalize_include(payload.include)
     idempotency_key = payload.idempotency_key or str(uuid4())
-
-    requested_scope = {
-        "format": payload.format,
-        "from_ts_utc": payload.from_ts_utc.isoformat() if payload.from_ts_utc else None,
-        "to_ts_utc": payload.to_ts_utc.isoformat() if payload.to_ts_utc else None,
-        "anonymize": payload.anonymize,
-        "include": include,
-    }
-
-    manifest = {
-        "requested_scope": requested_scope,
-        "exported_at_utc": _now().isoformat(),
-        "anonymize": payload.anonymize,
-    }
-    rows_by_domain = {
-        "consent": 0,
-        "profile": 0,
-        "symptoms": 0,
-        "diet_logs": 0,
-        "swap_history": 0,
-    }
+    requested_scope, manifest, rows_by_domain = _prepare_export_manifest(payload, include, _now().isoformat())
 
     with db.connection() as conn:
         _assert_security_tables(conn)
@@ -607,13 +672,12 @@ def request_export(
             },
         )
         if existing is not None:
-            return ExportAcceptedResponse(
+            return _build_export_accepted(
                 export_id=existing["export_id"],
                 status=existing["status"],
-                requested_at_utc=existing["requested_at"],
-                expiry_at_utc=existing["expires_at"],
+                requested_at=existing["requested_at"],
+                expires_at=existing["expires_at"],
                 idempotency_key=idempotency_key,
-                status_uri=f"/v0/me/export/{existing['export_id']}",
             )
 
         counts_row = sql.fetch_one(conn, sql.SQL_COUNT_CONSENT_RECORDS, {"user_id": user_id})
@@ -667,13 +731,12 @@ def request_export(
         if export_row is None:
             raise bad_request("Export job was not persisted")
 
-    return ExportAcceptedResponse(
+    return _build_export_accepted(
         export_id=export_id,
         status="accepted",
-        requested_at_utc=export_row["requested_at"],
-        expiry_at_utc=export_row["expires_at"],
+        requested_at=export_row["requested_at"],
+        expires_at=export_row["expires_at"],
         idempotency_key=idempotency_key,
-        status_uri=f"/v0/me/export/{export_id}",
     )
 
 
@@ -694,15 +757,7 @@ def get_export_status(
     proof_model = None
     if row["proof"] is not None:
         _verify_export_receipt(export_id, user_id, row)
-        proof = row["proof"]
-        proof_model = Receipt(
-            receipt_id=UUID(str(proof["receipt_id"])) if isinstance(proof["receipt_id"], str) else proof["receipt_id"],
-            issued_at_utc=_parse_iso_datetime(proof["issued_at_utc"]),
-            actor=proof["actor"],
-            policy_version=proof.get("policy_version"),
-            manifest_hash=proof["manifest_hash"],
-            proof_signature=proof.get("proof_signature"),
-        )
+        proof_model = _proof_to_receipt(row["proof"])
 
     return ExportPollResponse(
         export_id=export_id,
@@ -756,16 +811,13 @@ def request_delete(
                 if existing["status"] in {"completed", "partial"}
                 else None
             )
-            return DeleteAcceptedResponse(
+            return _build_delete_accepted(
                 delete_request_id=existing["delete_request_id"],
                 status=existing["status"],
-                requested_at_utc=existing["requested_at"],
+                requested_at=existing["requested_at"],
                 scope=existing["scope"],
                 idempotency_key=idempotency_key,
-                local_effective_ttl_seconds=60,
-                server_effective_at_utc=existing["requested_at"],
                 proof_uri=proof_uri,
-                status_uri=f"/v0/me/delete/{existing['delete_request_id']}",
             )
 
         insert_row = conn.execute(
@@ -863,16 +915,13 @@ def request_delete(
                 },
             )
 
-        return DeleteAcceptedResponse(
+        return _build_delete_accepted(
             delete_request_id=delete_request_id,
             status=status,
-            requested_at_utc=requested_at,
+            requested_at=requested_at,
             scope=payload.scope,
             idempotency_key=idempotency_key,
-            local_effective_ttl_seconds=60,
-            server_effective_at_utc=requested_at,
             proof_uri=f"/v0/me/delete/{delete_request_id}" if status != "processing" else None,
-            status_uri=f"/v0/me/delete/{delete_request_id}",
         )
 
 
@@ -894,15 +943,7 @@ def get_delete_status(
     proof: Optional[Receipt] = None
     if row["proof"] is not None:
         _verify_delete_receipt(delete_request_id, user_id, row, summary)
-        raw = row["proof"]
-        proof = Receipt(
-            receipt_id=UUID(str(raw["receipt_id"])),
-            issued_at_utc=_parse_iso_datetime(raw["issued_at_utc"]),
-            actor=raw["actor"],
-            policy_version=raw.get("policy_version"),
-            manifest_hash=raw["manifest_hash"],
-            proof_signature=raw.get("proof_signature"),
-        )
+        proof = _proof_to_receipt(row["proof"])
 
     return DeletePollResponse(
         delete_request_id=delete_request_id,
