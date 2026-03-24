@@ -318,6 +318,56 @@ def _reject_with_conflict(
     )
 
 
+def _finalize_applied(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    mutation: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    signature_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: Optional[str],
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    applied_version: int,
+) -> SyncV1MutationResult:
+    """Queue-insert and build result for a successfully applied mutation."""
+    _insert_queue(
+        conn,
+        payload,
+        mutation,
+        user_id,
+        entity_type,
+        entity_id,
+        signature_hash,
+        signature_key_id,
+        "APPLIED",
+        signature_valid,
+        "OK",
+        None,
+        chain_prev_hash,
+        chain_item_hash,
+    )
+    return _build_result(
+        payload,
+        mutation,
+        "APPLIED",
+        "OK",
+        received_at,
+        processing_ms,
+        signature_hash,
+        signature_valid,
+        applied_version,
+        None,
+        0,
+        False,
+    )
+
+
 def _build_replay_result(
     payload: SyncV1MutationBatchRequest,
     mutation: SyncV1MutationItem,
@@ -1669,36 +1719,13 @@ def sync_mutations_batch(
             }:
                 _set_entity_version(conn, user_id, entity_type, entity_id, max(next_version, 1))
 
-            _insert_queue(
-                conn,
-                payload,
-                normalized,
-                user_id,
-                entity_type,
-                entity_id,
-                signature_hash,
-                signature_key_id,
-                "APPLIED",
-                signature_valid,
-                "OK",
-                None,
-                chain_prev_hash,
-                chain_item_hash,
-            )
             results.append(
-                _build_result(
-                    payload,
-                    normalized,
-                    "APPLIED",
-                    "OK",
-                    received_at,
+                _finalize_applied(
+                    conn, payload, normalized, user_id, entity_type, entity_id,
+                    signature_hash, signature_key_id, signature_valid,
+                    chain_prev_hash, chain_item_hash, received_at,
                     max(0, _now_ms() - start_ms),
-                    signature_hash,
-                    signature_valid,
-                    next_version,
-                    None,
-                    0,
-                    False,
+                    applied_version=next_version,
                 )
             )
             applied_ids.add(normalized.mutation_id)
