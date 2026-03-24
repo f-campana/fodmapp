@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Request, Response, Security
 from psycopg.types.json import Jsonb
 
-from app import sql, tracking_store
+from app import sql, tracking_store, tracking_store_saved_meals
 from app.auth import require_api_user_id
 from app.config import get_settings
 from app.consent_chain import insert_event as insert_consent_event
@@ -1213,7 +1213,7 @@ def _apply_tracking_mutation(
         return
 
     if op == "SAVED_MEAL_CREATE":
-        tracking_store.create_saved_meal(
+        tracking_store_saved_meals.create_saved_meal(
             conn,
             user_id,
             SavedMealCreateRequest.model_validate(mutation.payload),
@@ -1223,7 +1223,7 @@ def _apply_tracking_mutation(
         return
 
     if op == "SAVED_MEAL_UPDATE":
-        tracking_store.update_saved_meal(
+        tracking_store_saved_meals.update_saved_meal(
             conn,
             user_id,
             entity_uuid,
@@ -1233,7 +1233,7 @@ def _apply_tracking_mutation(
         return
 
     if op == "SAVED_MEAL_DELETE":
-        tracking_store.delete_saved_meal(conn, user_id, entity_uuid, version=next_version)
+        tracking_store_saved_meals.delete_saved_meal(conn, user_id, entity_uuid, version=next_version)
 
 
 def _normalize_mutation(item: SyncV1MutationItem, migration_mode: bool) -> SyncV1MutationItem:
