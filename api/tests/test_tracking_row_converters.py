@@ -12,9 +12,9 @@ from uuid import uuid4
 from app.tracking_store import (
     _custom_food_row_to_model,
     _meal_item_row_to_model,
-    _saved_meal_item_row_to_model,
     _symptom_row_to_model,
 )
+from app.tracking_store_saved_meals import _saved_meal_item_row_to_model
 
 _NOW = datetime.now(tz=timezone.utc)
 

@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.models import SavedMealItem
-from app.tracking_store import _saved_meal_row_to_model
+from app.tracking_store_saved_meals import _saved_meal_row_to_model
 
 _NOW = datetime.now(tz=timezone.utc)
 
