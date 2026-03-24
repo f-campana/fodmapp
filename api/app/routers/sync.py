@@ -281,9 +281,11 @@ def _reject_with_conflict(
     *,
     conflict_code: str,
     error_detail: str,
+    rule: Optional[dict[str, Any]] = None,
+    applied_version: Optional[int] = None,
 ) -> SyncV1MutationResult:
     """Queue-insert and build result for a conflict-based rejection."""
-    state, retry_after_ms, conflict = _conflict_for_code(conflict_code)
+    state, retry_after_ms, conflict = _conflict_for_code(conflict_code, rule)
     _insert_queue(
         conn,
         payload,
@@ -309,7 +311,7 @@ def _reject_with_conflict(
         processing_ms,
         signature_hash,
         signature_valid,
-        None,
+        applied_version,
         conflict,
         retry_after_ms,
         False,
@@ -1555,76 +1557,32 @@ def sync_mutations_batch(
                 continue
 
             if op in {"SWAP_APPLY", "SWAP_REVERT"}:
-                rule, conflict_code = _evaluate_swap_rule(conn, normalized)
-                if conflict_code is not None:
-                    state, retry_after_ms, conflict = _conflict_for_code(conflict_code, rule)
-                    _insert_queue(
-                        conn,
-                        payload,
-                        normalized,
-                        user_id,
-                        entity_type,
-                        entity_id,
-                        signature_hash,
-                        signature_key_id,
-                        state,
-                        signature_valid,
-                        str(conflict_code),
-                        conflict_code,
-                        chain_prev_hash,
-                        chain_item_hash,
-                    )
+                swap_rule, swap_conflict_code = _evaluate_swap_rule(conn, normalized)
+                if swap_conflict_code is not None:
                     results.append(
-                        _build_result(
-                            payload,
-                            normalized,
-                            state,
-                            str(conflict_code),
-                            received_at,
+                        _reject_with_conflict(
+                            conn, payload, normalized, user_id, entity_type, entity_id,
+                            signature_hash, signature_key_id, signature_valid,
+                            chain_prev_hash, chain_item_hash, received_at,
                             max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            conflict,
-                            retry_after_ms,
-                            False,
+                            conflict_code=swap_conflict_code,
+                            error_detail=swap_conflict_code,
+                            rule=swap_rule,
                         )
                     )
                     continue
 
             current_version = _get_entity_version(conn, user_id, entity_type, entity_id)
             if normalized.base_version is not None and normalized.base_version != current_version:
-                state, retry_after_ms, conflict = _conflict_for_code("VERSION_CONFLICT")
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    state,
-                    signature_valid,
-                    "VERSION_CONFLICT",
-                    "base_version_mismatch",
-                    chain_prev_hash,
-                    chain_item_hash,
-                )
                 results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        state,
-                        "VERSION_CONFLICT",
-                        received_at,
+                    _reject_with_conflict(
+                        conn, payload, normalized, user_id, entity_type, entity_id,
+                        signature_hash, signature_key_id, signature_valid,
+                        chain_prev_hash, chain_item_hash, received_at,
                         max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        current_version,
-                        conflict,
-                        retry_after_ms,
-                        False,
+                        conflict_code="VERSION_CONFLICT",
+                        error_detail="base_version_mismatch",
+                        applied_version=current_version,
                     )
                 )
                 continue

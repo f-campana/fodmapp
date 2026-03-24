@@ -74,7 +74,7 @@ def test_calls_conflict_for_code_with_given_code(mock_conflict, mock_queue, mock
         error_detail="consent_missing",
     )
 
-    mock_conflict.assert_called_once_with("CONSENT_REVOKED")
+    mock_conflict.assert_called_once_with("CONSENT_REVOKED", None)
 
 
 @patch(f"{_PATCH_PREFIX}._build_result")
@@ -209,9 +209,59 @@ def test_works_with_different_conflict_code(mock_conflict, mock_queue, mock_buil
         error_detail="unknown_op",
     )
 
-    mock_conflict.assert_called_once_with("ENDPOINT_UNKNOWN")
+    mock_conflict.assert_called_once_with("ENDPOINT_UNKNOWN", None)
     queue_args = mock_queue.call_args[0]
     assert queue_args[10] == "ENDPOINT_UNKNOWN"
     assert queue_args[11] == "unknown_op"
     build_args = mock_build.call_args[0]
     assert build_args[3] == "ENDPOINT_UNKNOWN"
+
+
+@patch(f"{_PATCH_PREFIX}._build_result")
+@patch(f"{_PATCH_PREFIX}._insert_queue")
+@patch(f"{_PATCH_PREFIX}._conflict_for_code")
+def test_passes_rule_to_conflict_for_code(mock_conflict, mock_queue, mock_build):
+    """Verify rule kwarg is forwarded to _conflict_for_code (swap-conflict path)."""
+    mock_conflict.return_value = ("CONFLICT", 0, MagicMock())
+    mock_build.return_value = MagicMock()
+    conn = MagicMock()
+    payload = _make_batch_payload()
+    mutation = _make_mutation()
+    swap_rule = {"from_food_slug": "wheat", "to_food_slug": "spelt"}
+
+    _reject_with_conflict(
+        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
+        _SIG_HASH, _SIG_KEY_ID, True,
+        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 5,
+        conflict_code="RULE_INACTIVE",
+        error_detail="RULE_INACTIVE",
+        rule=swap_rule,
+    )
+
+    mock_conflict.assert_called_once_with("RULE_INACTIVE", swap_rule)
+
+
+@patch(f"{_PATCH_PREFIX}._build_result")
+@patch(f"{_PATCH_PREFIX}._insert_queue")
+@patch(f"{_PATCH_PREFIX}._conflict_for_code")
+def test_passes_applied_version_to_build_result(mock_conflict, mock_queue, mock_build):
+    """Verify applied_version kwarg is forwarded to _build_result (version-conflict path)."""
+    mock_conflict.return_value = ("CONFLICT", 1500, MagicMock())
+    sentinel_result = MagicMock()
+    mock_build.return_value = sentinel_result
+    conn = MagicMock()
+    payload = _make_batch_payload()
+    mutation = _make_mutation()
+
+    result = _reject_with_conflict(
+        conn, payload, mutation, _USER_ID, "symptom_log", "ent-1",
+        _SIG_HASH, _SIG_KEY_ID, True,
+        _CHAIN_PREV, _CHAIN_ITEM, _NOW, 7,
+        conflict_code="VERSION_CONFLICT",
+        error_detail="base_version_mismatch",
+        applied_version=42,
+    )
+
+    assert result is sentinel_result
+    build_args = mock_build.call_args[0]
+    assert build_args[8] == 42  # applied_version
