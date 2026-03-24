@@ -1,9 +1,9 @@
 # CI Workflow Hardening Runbook
 
-Status: Implemented
-Audience: Maintainer or operator; Reviewer or auditor
-Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.
-Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
+Status: Implemented  
+Audience: Maintainer or operator; Reviewer or auditor  
+Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.  
+Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)  
 Last reviewed: 2026-03-21
 
 Last updated: 2026-03-21

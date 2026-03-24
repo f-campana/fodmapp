@@ -1,6 +1,6 @@
 # Docs Full Rewrite Backlog (Deferred)
 
-Last updated: 2026-03-04
+Last updated: 2026-03-04  
 Status: Planned (deferred)
 
 ## Why Deferred

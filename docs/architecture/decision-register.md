@@ -1,9 +1,9 @@
 # Architecture Decision Register
 
-Status: Implemented
-Audience: Reviewer or auditor; Maintainer or operator; Contributor or engineer
-Scope: Current decision status for repo-wide architecture, platform, and operations choices.
-Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
+Status: Implemented  
+Audience: Reviewer or auditor; Maintainer or operator; Contributor or engineer  
+Scope: Current decision status for repo-wide architecture, platform, and operations choices.  
+Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)  
 Last reviewed: 2026-03-21
 
 Status definitions:

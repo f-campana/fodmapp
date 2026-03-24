@@ -1,9 +1,9 @@
 # @fodmapp/app
 
-Status: Implemented
-Audience: Contributor or engineer; Product or design collaborator
-Scope: Current live app slice, runtime integrations, local validation, and zero-credential behavior contract.
-Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/README.md](../../docs/README.md)
+Status: Implemented  
+Audience: Contributor or engineer; Product or design collaborator  
+Scope: Current live app slice, runtime integrations, local validation, and zero-credential behavior contract.  
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/README.md](../../docs/README.md)  
 Last reviewed: 2026-03-20
 
 Next.js product app for the first live web slice.

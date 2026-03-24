@@ -1,9 +1,9 @@
 # Products Guided Discovery V1
 
-Status: Planned
-Audience: Product or design collaborator; Contributor or engineer; Reviewer or auditor
-Scope: Backend-only `/v0/products` guided discovery lane for packaged products.
-Related docs: [docs/architecture/boundaries-and-contracts.md](../architecture/boundaries-and-contracts.md), [docs/research/safe-harbor-mode-framing-2026-03-13.md](../research/safe-harbor-mode-framing-2026-03-13.md), [docs/foundation/project-definition.md](../foundation/project-definition.md)
+Status: Planned  
+Audience: Product or design collaborator; Contributor or engineer; Reviewer or auditor  
+Scope: Backend-only `/v0/products` guided discovery lane for packaged products.  
+Related docs: [docs/architecture/boundaries-and-contracts.md](../architecture/boundaries-and-contracts.md), [docs/research/safe-harbor-mode-framing-2026-03-13.md](../research/safe-harbor-mode-framing-2026-03-13.md), [docs/foundation/project-definition.md](../foundation/project-definition.md)  
 Last reviewed: 2026-03-21
 
 ## Summary

@@ -1,9 +1,9 @@
 # Contributing
 
-Status: Implemented
-Audience: Contributor or engineer; Maintainer or operator
-Scope: Branching, commit, PR, and local validation expectations for repository contributors.
-Related docs: [README.md](./README.md), [docs/foundation/documentation-personas.md](./docs/foundation/documentation-personas.md), [docs/README.md](./docs/README.md)
+Status: Implemented  
+Audience: Contributor or engineer; Maintainer or operator  
+Scope: Branching, commit, PR, and local validation expectations for repository contributors.  
+Related docs: [README.md](./README.md), [docs/foundation/documentation-personas.md](./docs/foundation/documentation-personas.md), [docs/README.md](./docs/README.md)  
 Last reviewed: 2026-03-08
 
 ## Branching

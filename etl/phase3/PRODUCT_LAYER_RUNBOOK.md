@@ -1,9 +1,9 @@
 # Phase 3 Product Layer Runbook (SQL MVP)
 
-Status: Implemented
-Audience: Data or workflow operator; Maintainer or operator; Reviewer or auditor
-Scope: SQL-first execution, activation gates, API read-layer dependencies, and validation contracts for the Phase 3 product layer.
-Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)
+Status: Implemented  
+Audience: Data or workflow operator; Maintainer or operator; Reviewer or auditor  
+Scope: SQL-first execution, activation gates, API read-layer dependencies, and validation contracts for the Phase 3 product layer.  
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)  
 Last reviewed: 2026-03-21
 
 This runbook defines the SQL-first product-layer execution on top of completed Phase 2 data.

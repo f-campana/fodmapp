@@ -1,7 +1,7 @@
 # Safe-Harbor Mode Framing (2026-03-13)
 
-Status: Discussion note for future product framing.
-Audience: Maintainer / Product / Frontend collaborator
+Status: Discussion note for future product framing.  
+Audience: Maintainer / Product / Frontend collaborator  
 Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/frontend/strategy.md](../frontend/strategy.md), [docs/plans/safe-harbor-food-categories-prd-fr-v1.md](../plans/safe-harbor-food-categories-prd-fr-v1.md)
 
 ## Why This Note Exists

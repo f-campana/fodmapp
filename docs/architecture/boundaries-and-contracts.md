@@ -1,9 +1,9 @@
 # System Boundaries And Contracts
 
-Status: Implemented
-Audience: Data or workflow operator; Reviewer or auditor; Contributor or engineer
-Scope: Cross-layer boundaries between evidence workflows, compiled knowledge, and serving surfaces.
-Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)
+Status: Implemented  
+Audience: Data or workflow operator; Reviewer or auditor; Contributor or engineer  
+Scope: Cross-layer boundaries between evidence workflows, compiled knowledge, and serving surfaces.  
+Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)  
 Last reviewed: 2026-03-08
 
 ## Context

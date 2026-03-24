@@ -1,9 +1,9 @@
 # Local App Validation
 
-Status: Implemented
-Audience: Contributor or engineer; Product or design collaborator
-Scope: Local installation, API startup, frontend startup, and manual validation for the first live web product slice.
-Related docs: [`apps/app/README.md`](../../apps/app/README.md), [`api/README.md`](../../api/README.md), [`infra/ci/ENVIRONMENT.md`](../../infra/ci/ENVIRONMENT.md)
+Status: Implemented  
+Audience: Contributor or engineer; Product or design collaborator  
+Scope: Local installation, API startup, frontend startup, and manual validation for the first live web product slice.  
+Related docs: [`apps/app/README.md`](../../apps/app/README.md), [`api/README.md`](../../api/README.md), [`infra/ci/ENVIRONMENT.md`](../../infra/ci/ENVIRONMENT.md)  
 Last reviewed: 2026-03-20
 
 Use this runbook to validate the live app slice locally against a real seeded API.

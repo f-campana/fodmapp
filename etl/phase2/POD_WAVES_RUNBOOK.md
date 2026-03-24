@@ -1,9 +1,9 @@
 # Phase 2 Pod Waves Runbook
 
-Status: Implemented
-Audience: Data or workflow operator; Maintainer or operator
-Scope: Wave-by-wave execution contract for Phase 2 priority-food resolution after rank2 quarantine.
-Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)
+Status: Implemented  
+Audience: Data or workflow operator; Maintainer or operator  
+Scope: Wave-by-wave execution contract for Phase 2 priority-food resolution after rank2 quarantine.  
+Related docs: [docs/foundation/project-definition.md](../../docs/foundation/project-definition.md), [docs/foundation/documentation-personas.md](../../docs/foundation/documentation-personas.md), [docs/architecture/boundaries-and-contracts.md](../../docs/architecture/boundaries-and-contracts.md)  
 Last reviewed: 2026-03-08
 
 This runbook defines pod-wave execution after rank2 garlic powder quarantine.

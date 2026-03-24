@@ -1,7 +1,7 @@
 # First Hosted API Activation
 
-Status: Ready for operator execution
-Audience: Maintainer or operator
+Status: Ready for operator execution  
+Audience: Maintainer or operator  
 Scope: First live Koyeb + Neon activation for `https://api.fodmapp.fr`.
 
 Last reviewed: 2026-03-22
