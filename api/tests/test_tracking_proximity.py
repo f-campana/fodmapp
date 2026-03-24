@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.models import MealLog, MealLogItem, SymptomLog
-from app.tracking_store import _compute_proximity_groups
+from app.tracking_store_summary import _compute_proximity_groups
 
 _BASE = datetime(2026, 3, 20, 12, 0, 0, tzinfo=timezone.utc)
 

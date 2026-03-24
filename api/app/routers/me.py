@@ -887,7 +887,8 @@ def request_delete(
                     status = "completed"
                 summary_dict = summary.model_dump()
                 _persist_delete_outcome(
-                    conn, delete_request_id,
+                    conn,
+                    delete_request_id,
                     status=status,
                     summary_dict=summary_dict,
                     proof=_build_delete_receipt(delete_request_id, user_id, summary),
@@ -895,7 +896,8 @@ def request_delete(
             except Exception as exc:
                 status = "failed"
                 _persist_delete_outcome(
-                    conn, delete_request_id,
+                    conn,
+                    delete_request_id,
                     status=status,
                     summary_dict=dict(_EMPTY_DELETE_SUMMARY),
                     proof=None,
@@ -907,7 +909,8 @@ def request_delete(
             status = "partial"
             empty_summary = DeleteSummary(**_EMPTY_DELETE_SUMMARY)
             _persist_delete_outcome(
-                conn, delete_request_id,
+                conn,
+                delete_request_id,
                 status=status,
                 summary_dict=dict(_EMPTY_DELETE_SUMMARY),
                 proof=_build_delete_receipt(delete_request_id, user_id, empty_summary),

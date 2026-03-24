@@ -26,6 +26,7 @@ from app.models import (
     TrackingFeedResponse,
     WeeklyTrackingSummaryResponse,
 )
+from app.tracking_store_summary import build_tracking_feed, build_weekly_summary
 
 router = APIRouter(prefix="/v0/me/tracking", tags=["tracking"])
 
@@ -53,7 +54,7 @@ def get_tracking_feed(
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
-        return tracking_store.build_tracking_feed(conn, user_id, limit=limit)
+        return build_tracking_feed(conn, user_id, limit=limit)
 
 
 @router.get("/summary/weekly", response_model=WeeklyTrackingSummaryResponse)
@@ -65,7 +66,7 @@ def get_weekly_summary(
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
-        return tracking_store.build_weekly_summary(conn, user_id, anchor_date=anchor_date)
+        return build_weekly_summary(conn, user_id, anchor_date=anchor_date)
 
 
 @router.get("/symptoms", response_model=list[SymptomLog])
