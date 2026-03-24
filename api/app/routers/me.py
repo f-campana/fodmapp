@@ -348,6 +348,40 @@ def _build_delete_accepted(
     )
 
 
+_EMPTY_DELETE_SUMMARY: Dict[str, int] = {
+    "consent_records_touched": 0,
+    "symptom_logs_deleted": 0,
+    "diet_logs_deleted": 0,
+    "swap_history_deleted": 0,
+    "queue_items_dropped": 0,
+    "exports_invalidated": 0,
+}
+
+
+def _persist_delete_outcome(
+    conn,
+    delete_request_id: UUID,
+    *,
+    status: str,
+    summary_dict: Dict[str, Any],
+    proof: Optional[Dict[str, Any]],
+    error_code: Optional[str] = None,
+    error_detail: Optional[str] = None,
+) -> None:
+    """Update the delete job row with the final outcome."""
+    conn.execute(
+        sql.SQL_UPDATE_DELETE_JOB,
+        {
+            "delete_request_id": delete_request_id,
+            "status": status,
+            "summary": _jsonb(summary_dict),
+            "proof": _jsonb(proof),
+            "error_code": error_code,
+            "error_detail": error_detail,
+        },
+    )
+
+
 def _build_export_receipt(export_id: UUID, user_id: UUID, manifest: Dict[str, Any]) -> Dict[str, Any]:
     issued_at_utc = _now().isoformat().replace("+00:00", "Z")
     receipt = {
@@ -832,16 +866,7 @@ def request_delete(
                 "status": "processing",
                 "soft_delete_window_days": payload.soft_delete_window_days,
                 "hard_delete": payload.hard_delete,
-                "summary": _jsonb(
-                    {
-                        "consent_records_touched": 0,
-                        "symptom_logs_deleted": 0,
-                        "diet_logs_deleted": 0,
-                        "swap_history_deleted": 0,
-                        "queue_items_dropped": 0,
-                        "exports_invalidated": 0,
-                    }
-                ),
+                "summary": _jsonb(_EMPTY_DELETE_SUMMARY),
             },
         ).fetchone()
         if insert_row is None:
@@ -850,14 +875,6 @@ def request_delete(
         delete_request_id = insert_row["delete_request_id"]
         requested_at = _now()
         status = "processing"
-        summary = {
-            "consent_records_touched": 0,
-            "symptom_logs_deleted": 0,
-            "diet_logs_deleted": 0,
-            "swap_history_deleted": 0,
-            "queue_items_dropped": 0,
-            "exports_invalidated": 0,
-        }
 
         if payload.hard_delete:
             try:
@@ -869,51 +886,31 @@ def request_delete(
                     )
                     status = "completed"
                 summary_dict = summary.model_dump()
-                conn.execute(
-                    sql.SQL_UPDATE_DELETE_JOB,
-                    {
-                        "delete_request_id": delete_request_id,
-                        "status": status,
-                        "summary": _jsonb(summary_dict),
-                        "proof": _jsonb(_build_delete_receipt(delete_request_id, user_id, summary)),
-                        "error_code": None,
-                        "error_detail": None,
-                    },
+                _persist_delete_outcome(
+                    conn, delete_request_id,
+                    status=status,
+                    summary_dict=summary_dict,
+                    proof=_build_delete_receipt(delete_request_id, user_id, summary),
                 )
             except Exception as exc:
                 status = "failed"
-                summary = {
-                    "consent_records_touched": 0,
-                    "symptom_logs_deleted": 0,
-                    "diet_logs_deleted": 0,
-                    "swap_history_deleted": 0,
-                    "queue_items_dropped": 0,
-                    "exports_invalidated": 0,
-                }
-                conn.execute(
-                    sql.SQL_UPDATE_DELETE_JOB,
-                    {
-                        "delete_request_id": delete_request_id,
-                        "status": status,
-                        "summary": _jsonb(summary),
-                        "proof": _jsonb(None),
-                        "error_code": "delete_processing_failed",
-                        "error_detail": str(exc)[:4000],
-                    },
+                _persist_delete_outcome(
+                    conn, delete_request_id,
+                    status=status,
+                    summary_dict=dict(_EMPTY_DELETE_SUMMARY),
+                    proof=None,
+                    error_code="delete_processing_failed",
+                    error_detail=str(exc)[:4000],
                 )
 
         else:
             status = "partial"
-            conn.execute(
-                sql.SQL_UPDATE_DELETE_JOB,
-                {
-                    "delete_request_id": delete_request_id,
-                    "status": status,
-                    "summary": _jsonb(summary),
-                    "proof": _jsonb(_build_delete_receipt(delete_request_id, user_id, DeleteSummary(**summary))),
-                    "error_code": None,
-                    "error_detail": None,
-                },
+            empty_summary = DeleteSummary(**_EMPTY_DELETE_SUMMARY)
+            _persist_delete_outcome(
+                conn, delete_request_id,
+                status=status,
+                summary_dict=dict(_EMPTY_DELETE_SUMMARY),
+                proof=_build_delete_receipt(delete_request_id, user_id, empty_summary),
             )
 
         return _build_delete_accepted(
