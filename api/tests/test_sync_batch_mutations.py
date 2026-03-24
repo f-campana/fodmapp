@@ -357,9 +357,96 @@ def test_sync_batch_withdraw_consent_cancels_following_mutations(client, db_url)
 
 def test_sync_batch_delete_account_cancels_following_and_future_mutations(client, db_url) -> None:
     user_id = uuid.uuid4()
+    device_id = "batch-device-delete-account"
 
     with connect(db_url, row_factory=dict_row) as db_conn:
         with db_conn.transaction():
+            _cleanup_account(db_url, user_id)
+            _grant_sync_scope_consent(client, user_id)
+            secret = _insert_device_key(db_url, user_id, device_id=device_id)
+
+            # ---- Batch 1: symptom_create → DELETE_ACCOUNT → symptom_update ----
+            symptom_id = str(uuid.uuid4())
+            item_before_delete = _build_mutation_item(
+                "SYMPTOM_CREATE",
+                client_seq=1,
+                idempotency_key="del-01",
+                entity_id=symptom_id,
+                base_version=0,
+            )
+            item_delete_account = _build_mutation_item(
+                "DELETE_ACCOUNT",
+                client_seq=2,
+                idempotency_key="del-02",
+                entity_id=str(uuid.uuid4()),
+                base_version=None,
+                entity_type="global",
+            )
+            item_after_delete = _build_mutation_item(
+                "SYMPTOM_UPDATE",
+                client_seq=3,
+                idempotency_key="del-03",
+                entity_id=symptom_id,
+                base_version=1,
+                payload_extra={"symptom": "cramps"},
+            )
+
+            for item in [item_before_delete, item_delete_account, item_after_delete]:
+                _sign_mutation_item(secret, item)
+
+            response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(
+                    user_id, device_id, [item_before_delete, item_delete_account, item_after_delete]
+                ),
+            )
+            assert response.status_code == 200
+            payload = response.json()
+            assert len(payload["items"]) == 3
+
+            ordered_statuses = [item["status"] for item in payload["items"]]
+            assert ordered_statuses == ["APPLIED", "APPLIED", "CANCELLED_BY_DELETE"]
+
+            # The cancelled mutation should carry the ACCOUNT_DELETED conflict
+            assert payload["items"][2]["result_code"] == "ACCOUNT_DELETED"
+            assert payload["items"][2]["conflict"]["code"] == "ACCOUNT_DELETED"
+
+            # Verify the queue row for the cancelled mutation
+            row = db_conn.execute(
+                """
+                SELECT error_code, status
+                FROM me_mutation_queue
+                WHERE user_id = %(user_id)s
+                  AND idempotency_key = 'del-03'
+                """,
+                {"user_id": user_id},
+            ).fetchone()
+            assert row["status"] == "rejected"
+            assert row["error_code"] == "ACCOUNT_DELETED"
+
+            # ---- Batch 2: future mutations should also be cancelled ----
+            future_symptom_id = str(uuid.uuid4())
+            future_item = _build_mutation_item(
+                "SYMPTOM_CREATE",
+                client_seq=1,
+                idempotency_key="del-future-01",
+                entity_id=future_symptom_id,
+                base_version=0,
+            )
+            _sign_mutation_item(secret, future_item)
+
+            future_response = client.post(
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=_build_batch_request(user_id, device_id, [future_item]),
+            )
+            assert future_response.status_code == 200
+            future_payload = future_response.json()
+            assert len(future_payload["items"]) == 1
+            assert future_payload["items"][0]["status"] == "CANCELLED_BY_DELETE"
+            assert future_payload["items"][0]["result_code"] == "ACCOUNT_DELETED"
+
             _cleanup_account(db_url, user_id)
 
 

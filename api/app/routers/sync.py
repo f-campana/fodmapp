@@ -807,6 +807,59 @@ def _set_entity_version(conn, user_id: UUID, entity_type: str, entity_id: str, n
     )
 
 
+def _execute_global_op(
+    conn,
+    payload: SyncV1MutationBatchRequest,
+    normalized: SyncV1MutationItem,
+    user_id: UUID,
+    entity_type: str,
+    entity_id: str,
+    signature_hash: str,
+    signature_key_id: Optional[str],
+    signature_valid: bool,
+    chain_prev_hash: Optional[str],
+    chain_item_hash: str,
+    received_at: datetime,
+    processing_ms: int,
+    *,
+    already_terminal: bool,
+    conflict_code: SyncV1ConflictCode,
+    terminal_detail: str,
+    apply_fn,
+) -> Tuple[SyncV1MutationResult, bool]:
+    """Execute a global operation (WITHDRAW_CONSENT / DELETE_ACCOUNT).
+
+    If ``already_terminal`` the operation is recorded as a conflict;
+    otherwise ``apply_fn(conn, user_id)`` is called and the result is APPLIED.
+
+    Returns ``(result, was_applied)``.
+    """
+    if already_terminal:
+        state, retry_after_ms, conflict = _conflict_for_code(conflict_code)
+        _insert_queue(
+            conn, payload, normalized, user_id, entity_type, entity_id,
+            signature_hash, signature_key_id, state, signature_valid,
+            conflict_code, terminal_detail, chain_prev_hash, chain_item_hash,
+        )
+        return _build_result(
+            payload, normalized, state, conflict_code, received_at,
+            processing_ms, signature_hash, signature_valid, None,
+            conflict, retry_after_ms, False,
+        ), False
+
+    apply_fn(conn, user_id)
+    _insert_queue(
+        conn, payload, normalized, user_id, entity_type, entity_id,
+        signature_hash, signature_key_id, "APPLIED", signature_valid,
+        "OK", None, chain_prev_hash, chain_item_hash,
+    )
+    return _build_result(
+        payload, normalized, "APPLIED", "OK", received_at,
+        processing_ms, signature_hash, signature_valid, None,
+        None, 0, False,
+    ), True
+
+
 def _coerce_symptom_payload(payload: Dict[str, Any], fallback_noted_at: datetime, *, partial: bool) -> Dict[str, Any]:
     symptom_value = payload.get("symptom_type") or payload.get("symptom")
     allowed = {
@@ -850,6 +903,72 @@ def _coerce_symptom_payload(payload: Dict[str, Any], fallback_noted_at: datetime
     return normalized
 
 
+def _apply_symptom_mutation(
+    conn,
+    user_id: UUID,
+    mutation: SyncV1MutationItem,
+    entity_uuid: UUID,
+    next_version: int,
+) -> None:
+    """Dispatch a SYMPTOM_CREATE/UPDATE/DELETE to tracking_store."""
+    op = mutation.operation_type
+    if op == "SYMPTOM_CREATE":
+        tracking_store.create_symptom_log(
+            conn,
+            user_id,
+            SymptomLogCreateRequest.model_validate(
+                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=False)
+            ),
+            symptom_log_id=entity_uuid,
+            version=next_version,
+        )
+    elif op == "SYMPTOM_UPDATE":
+        tracking_store.update_symptom_log(
+            conn,
+            user_id,
+            entity_uuid,
+            SymptomLogUpdateRequest.model_validate(
+                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=True)
+            ),
+            version=next_version,
+        )
+    elif op == "SYMPTOM_DELETE":
+        tracking_store.delete_symptom_log(conn, user_id, entity_uuid, version=next_version)
+    else:
+        raise ValueError(f"Unknown symptom operation: {op}")
+
+
+def _apply_meal_mutation(
+    conn,
+    user_id: UUID,
+    mutation: SyncV1MutationItem,
+    entity_uuid: UUID,
+    next_version: int,
+) -> None:
+    """Dispatch a MEAL_CREATE/UPDATE/DELETE to tracking_store."""
+    op = mutation.operation_type
+    if op == "MEAL_CREATE":
+        tracking_store.create_meal_log(
+            conn,
+            user_id,
+            MealLogCreateRequest.model_validate(mutation.payload),
+            meal_log_id=entity_uuid,
+            version=next_version,
+        )
+    elif op == "MEAL_UPDATE":
+        tracking_store.update_meal_log(
+            conn,
+            user_id,
+            entity_uuid,
+            MealLogUpdateRequest.model_validate(mutation.payload),
+            version=next_version,
+        )
+    elif op == "MEAL_DELETE":
+        tracking_store.delete_meal_log(conn, user_id, entity_uuid, version=next_version)
+    else:
+        raise ValueError(f"Unknown meal operation: {op}")
+
+
 def _apply_tracking_mutation(
     conn,
     user_id: UUID,
@@ -867,56 +986,12 @@ def _apply_tracking_mutation(
 
     entity_uuid = UUID(entity_id)
 
-    if op == "SYMPTOM_CREATE":
-        tracking_store.create_symptom_log(
-            conn,
-            user_id,
-            SymptomLogCreateRequest.model_validate(
-                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=False)
-            ),
-            symptom_log_id=entity_uuid,
-            version=next_version,
-        )
+    if op in ("SYMPTOM_CREATE", "SYMPTOM_UPDATE", "SYMPTOM_DELETE"):
+        _apply_symptom_mutation(conn, user_id, mutation, entity_uuid, next_version)
         return
 
-    if op == "SYMPTOM_UPDATE":
-        tracking_store.update_symptom_log(
-            conn,
-            user_id,
-            entity_uuid,
-            SymptomLogUpdateRequest.model_validate(
-                _coerce_symptom_payload(mutation.payload, mutation.client_created_at, partial=True)
-            ),
-            version=next_version,
-        )
-        return
-
-    if op == "SYMPTOM_DELETE":
-        tracking_store.delete_symptom_log(conn, user_id, entity_uuid, version=next_version)
-        return
-
-    if op == "MEAL_CREATE":
-        tracking_store.create_meal_log(
-            conn,
-            user_id,
-            MealLogCreateRequest.model_validate(mutation.payload),
-            meal_log_id=entity_uuid,
-            version=next_version,
-        )
-        return
-
-    if op == "MEAL_UPDATE":
-        tracking_store.update_meal_log(
-            conn,
-            user_id,
-            entity_uuid,
-            MealLogUpdateRequest.model_validate(mutation.payload),
-            version=next_version,
-        )
-        return
-
-    if op == "MEAL_DELETE":
-        tracking_store.delete_meal_log(conn, user_id, entity_uuid, version=next_version)
+    if op in ("MEAL_CREATE", "MEAL_UPDATE", "MEAL_DELETE"):
+        _apply_meal_mutation(conn, user_id, mutation, entity_uuid, next_version)
         return
 
     if op == "CUSTOM_FOOD_CREATE":
@@ -1274,151 +1349,37 @@ def sync_mutations_batch(
             op = normalized.operation_type
 
             if op == "WITHDRAW_CONSENT":
-                if not consent_active:
-                    state, retry_after_ms, conflict = _conflict_for_code("CONSENT_REVOKED")
-                    _insert_queue(
-                        conn,
-                        payload,
-                        normalized,
-                        user_id,
-                        entity_type,
-                        entity_id,
-                        signature_hash,
-                        signature_key_id,
-                        state,
-                        signature_valid,
-                        "CONSENT_REVOKED",
-                        "already_revoked",
-                        chain_prev_hash,
-                        chain_item_hash,
-                    )
-                    results.append(
-                        _build_result(
-                            payload,
-                            normalized,
-                            state,
-                            "CONSENT_REVOKED",
-                            received_at,
-                            max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            conflict,
-                            retry_after_ms,
-                            False,
-                        )
-                    )
-                    continue
-
-                _apply_withdraw_consent(conn, user_id)
-                consent_active = False
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    "APPLIED",
-                    signature_valid,
-                    "OK",
-                    None,
-                    chain_prev_hash,
-                    chain_item_hash,
+                result, was_applied = _execute_global_op(
+                    conn, payload, normalized, user_id, entity_type, entity_id,
+                    signature_hash, signature_key_id, signature_valid,
+                    chain_prev_hash, chain_item_hash, received_at,
+                    max(0, _now_ms() - start_ms),
+                    already_terminal=not consent_active,
+                    conflict_code="CONSENT_REVOKED",
+                    terminal_detail="already_revoked",
+                    apply_fn=_apply_withdraw_consent,
                 )
-                results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        "APPLIED",
-                        "OK",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        None,
-                        0,
-                        False,
-                    )
-                )
-                applied_ids.add(normalized.mutation_id)
+                if was_applied:
+                    consent_active = False
+                    applied_ids.add(normalized.mutation_id)
+                results.append(result)
                 continue
 
             if op == "DELETE_ACCOUNT":
-                if account_deleted:
-                    state, retry_after_ms, conflict = _conflict_for_code("ACCOUNT_DELETED")
-                    _insert_queue(
-                        conn,
-                        payload,
-                        normalized,
-                        user_id,
-                        entity_type,
-                        entity_id,
-                        signature_hash,
-                        signature_key_id,
-                        state,
-                        signature_valid,
-                        "ACCOUNT_DELETED",
-                        "already_deleted",
-                        chain_prev_hash,
-                        chain_item_hash,
-                    )
-                    results.append(
-                        _build_result(
-                            payload,
-                            normalized,
-                            state,
-                            "ACCOUNT_DELETED",
-                            received_at,
-                            max(0, _now_ms() - start_ms),
-                            signature_hash,
-                            signature_valid,
-                            None,
-                            conflict,
-                            retry_after_ms,
-                            False,
-                        )
-                    )
-                    continue
-
-                _mark_account_deleted(conn, user_id)
-                account_deleted = True
-                _insert_queue(
-                    conn,
-                    payload,
-                    normalized,
-                    user_id,
-                    entity_type,
-                    entity_id,
-                    signature_hash,
-                    signature_key_id,
-                    "APPLIED",
-                    signature_valid,
-                    "OK",
-                    None,
-                    chain_prev_hash,
-                    chain_item_hash,
+                result, was_applied = _execute_global_op(
+                    conn, payload, normalized, user_id, entity_type, entity_id,
+                    signature_hash, signature_key_id, signature_valid,
+                    chain_prev_hash, chain_item_hash, received_at,
+                    max(0, _now_ms() - start_ms),
+                    already_terminal=account_deleted,
+                    conflict_code="ACCOUNT_DELETED",
+                    terminal_detail="already_deleted",
+                    apply_fn=_mark_account_deleted,
                 )
-                results.append(
-                    _build_result(
-                        payload,
-                        normalized,
-                        "APPLIED",
-                        "OK",
-                        received_at,
-                        max(0, _now_ms() - start_ms),
-                        signature_hash,
-                        signature_valid,
-                        None,
-                        None,
-                        0,
-                        False,
-                    )
-                )
-                applied_ids.add(normalized.mutation_id)
+                if was_applied:
+                    account_deleted = True
+                    applied_ids.add(normalized.mutation_id)
+                results.append(result)
                 continue
 
             if not consent_active:
