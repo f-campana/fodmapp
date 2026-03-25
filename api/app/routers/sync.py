@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Request, Response, Security
 from psycopg.types.json import Jsonb
 
-from app import sql, tracking_store, tracking_store_saved_meals
+from app import sql, tracking_store, tracking_store_meals, tracking_store_saved_meals
 from app.auth import require_api_user_id
 from app.config import get_settings
 from app.consent_chain import insert_event as insert_consent_event
@@ -1142,7 +1142,7 @@ def _apply_meal_mutation(
     """Dispatch a MEAL_CREATE/UPDATE/DELETE to tracking_store."""
     op = mutation.operation_type
     if op == "MEAL_CREATE":
-        tracking_store.create_meal_log(
+        tracking_store_meals.create_meal_log(
             conn,
             user_id,
             MealLogCreateRequest.model_validate(mutation.payload),
@@ -1150,7 +1150,7 @@ def _apply_meal_mutation(
             version=next_version,
         )
     elif op == "MEAL_UPDATE":
-        tracking_store.update_meal_log(
+        tracking_store_meals.update_meal_log(
             conn,
             user_id,
             entity_uuid,
@@ -1158,7 +1158,7 @@ def _apply_meal_mutation(
             version=next_version,
         )
     elif op == "MEAL_DELETE":
-        tracking_store.delete_meal_log(conn, user_id, entity_uuid, version=next_version)
+        tracking_store_meals.delete_meal_log(conn, user_id, entity_uuid, version=next_version)
     else:
         raise ValueError(f"Unknown meal operation: {op}")
 

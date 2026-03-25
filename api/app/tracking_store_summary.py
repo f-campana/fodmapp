@@ -19,14 +19,8 @@ from app.models import (
     TrackingSeveritySummary,
     WeeklyTrackingSummaryResponse,
 )
-from app.tracking_store import (
-    _fetch_meal_items,
-    _meal_log_row_to_model,
-    _now_utc,
-    _symptom_row_to_model,
-    list_meal_logs,
-    list_symptom_logs,
-)
+from app.tracking_store import _now_utc, _symptom_row_to_model, list_symptom_logs
+from app.tracking_store_meals import _fetch_meal_items, _meal_log_row_to_model, list_meal_logs
 
 
 def build_tracking_feed(conn: Connection, user_id: UUID, limit: int = 50) -> TrackingFeedResponse:
