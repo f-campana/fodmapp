@@ -12,6 +12,7 @@ from app.routers.foods import router as foods_router
 from app.routers.health import router as health_router
 from app.routers.me import router as me_router
 from app.routers.me_delete import router as me_delete_router
+from app.routers.me_export import router as me_export_router
 from app.routers.products import router as products_router
 from app.routers.safe_harbors import router as safe_harbors_router
 from app.routers.swaps import router as swaps_router
@@ -96,6 +97,7 @@ def create_app() -> FastAPI:
     app.include_router(swaps_router)
     app.include_router(me_router)
     app.include_router(me_delete_router)
+    app.include_router(me_export_router)
     app.include_router(tracking_router)
     app.include_router(sync_router)
 

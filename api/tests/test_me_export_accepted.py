@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from app.routers.me import _build_export_accepted
+from app.routers.me_export import _build_export_accepted
 
 _NOW = datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
 _EXPIRES = datetime(2025, 6, 22, 12, 0, 0, tzinfo=timezone.utc)
