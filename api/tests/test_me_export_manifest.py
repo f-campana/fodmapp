@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from app.models import ExportRequest
-from app.routers.me import _prepare_export_manifest
+from app.routers.me_export import _prepare_export_manifest
 
 _EXPORTED_AT = "2025-06-15T12:00:00+00:00"
 _FROM = datetime(2025, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
