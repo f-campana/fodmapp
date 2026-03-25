@@ -503,27 +503,6 @@ export interface paths {
     patch: operations["updateTrackingSavedMeal"];
     trace?: never;
   };
-  "/v0/sync/mutations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Push offline mutation envelope(s) (compatibility-only legacy API)
-     * @deprecated
-     * @description Compatibility-only endpoint retained for legacy clients. New implementations must call `/v0/sync/mutations:batch` with signed envelopes and replay-window enforcement.
-     */
-    post: operations["postSyncMutations"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/v0/sync/mutations:batch": {
     parameters: {
       query?: never;
@@ -1305,60 +1284,6 @@ export interface components {
       } | null;
       retained_artifacts?: components["schemas"]["RetainedArtifact"][];
     };
-    MutationEnvelope: {
-      /** Format: uuid */
-      queue_item_id: string;
-      idempotency_key: string;
-      device_id: string;
-      app_install_id: string;
-      op: string;
-      entity_type: string;
-      entity_id?: string | null;
-      client_seq: number;
-      base_version?: number | null;
-      attempt?: number;
-      ttl_seconds: number;
-      /** Format: date-time */
-      created_at_utc: string;
-      payload: {
-        [key: string]: unknown;
-      };
-      aad?: {
-        [key: string]: unknown;
-      };
-      signature: string;
-      signature_kid: string;
-      /** @default hmac-sha256 */
-      signature_algorithm: string;
-      ciphertext?: string | null;
-      nonce?: string | null;
-      tag?: string | null;
-    };
-    MutationResult: {
-      /** Format: uuid */
-      queue_item_id: string;
-      idempotency_key: string;
-      /** @enum {string} */
-      status:
-        | "accepted"
-        | "duplicate"
-        | "conflict"
-        | "replayed"
-        | "rejected"
-        | "error";
-      mutation_status: string;
-      entity_version?: number | null;
-      error_code?: string | null;
-    };
-    SyncMutationRequest: {
-      items: components["schemas"]["MutationEnvelope"][];
-    };
-    SyncMutationResponse: {
-      processed: number;
-      accepted: number;
-      duplicates: number;
-      results: components["schemas"]["MutationResult"][];
-    };
     SyncV1MutationSource: {
       /** @enum {string} */
       platform: "ios" | "android" | "web";
@@ -1567,7 +1492,6 @@ export interface components {
     MeDeviceIdHeader: string;
     /** @description Actor UUID when changes are performed by support automation. */
     MeActorIdHeader: string;
-    SyncDeviceIdHeader: string;
     /** @description Stable unique food slug (`foods.food_slug`). */
     FoodSlugPath: string;
     /** @description Case-insensitive food search string. */
@@ -2708,61 +2632,6 @@ export interface operations {
       };
       404: components["responses"]["NotFound"];
       /** @description Write blocked by consent scope */
-      423: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-    };
-  };
-  postSyncMutations: {
-    parameters: {
-      query?: never;
-      header: {
-        /** @description Preview-only compatibility header. Production callers should use bearer authentication. */
-        "X-User-Id"?: components["parameters"]["MeUserIdHeader"];
-        "X-Device-Id": components["parameters"]["SyncDeviceIdHeader"];
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SyncMutationRequest"];
-      };
-    };
-    responses: {
-      /** @description Mutation ingest result */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SyncMutationResponse"];
-        };
-      };
-      /** @description Signature verification or key missing */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-      /** @description Version conflict detected */
-      412: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ErrorResponse"];
-        };
-      };
-      /** @description Sync disabled due consent/revocation state */
       423: {
         headers: {
           [name: string]: unknown;

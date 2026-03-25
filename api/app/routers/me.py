@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Header, Request, Response, Security
+from fastapi import APIRouter, Header, Request, Security
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store
@@ -20,9 +19,9 @@ from app.consent_chain import (
 from app.consent_chain import (
     insert_event as insert_consent_event,
 )
-from app.crypto_utils import canonical_json, hmac_verify, sha256_hex
+from app.crypto_utils import canonical_json, sha256_hex
 from app.db import Database
-from app.errors import bad_request, conflict, locked, not_found, unauthorized
+from app.errors import bad_request, conflict, locked, not_found
 from app.models import (
     ConsentGetResponse,
     ConsentHistoryEntry,
@@ -36,32 +35,13 @@ from app.models import (
     ExportAcceptedResponse,
     ExportPollResponse,
     ExportRequest,
-    MutationEnvelope,
-    MutationResult,
     Receipt,
-    SyncMutationRequest,
-    SyncMutationResponse,
 )
 
 router = APIRouter(prefix="/v0", tags=["account"])
-legacy_router = APIRouter(prefix="/v0", tags=["legacy"])
 
 EXPORT_CONFIRM_TEXT = "SUPPRIMER MES DONNÉES"
 logger = logging.getLogger(__name__)
-
-
-def _decorate_legacy_sync_headers(response: Response) -> None:
-    response.headers.update(
-        {
-            "Deprecation": "true",
-            "Warning": (
-                '299 - "Compatibility-only endpoint: /v0/sync/mutations is deprecated; use /v0/sync/mutations:batch'
-            ),
-            "Link": '</v0/sync/mutations:batch>; rel="successor-version"; '
-            'title="Batch mutations endpoint required for new clients"',
-            "X-API-Compatibility-Mode": "legacy_migration_route",
-        }
-    )
 
 
 def _get_db(request: Request) -> Database:
@@ -70,17 +50,6 @@ def _get_db(request: Request) -> Database:
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
-
-
-def _compute_mutation_chain_hash(payload_hash: str, chain_prev_hash: str | None) -> str:
-    return sha256_hex(
-        canonical_json(
-            {
-                "payload_hash": payload_hash,
-                "chain_prev_hash": chain_prev_hash or "",
-            }
-        )
-    )
 
 
 def _jsonb(value: Any) -> Any:
@@ -231,28 +200,6 @@ def _normalize_include(include: list[str]) -> list[str]:
         if item not in allowed:
             raise bad_request(f"Invalid export include item: {item}")
     return normalized
-
-
-def _validate_signature(secret_b64: str, env: MutationEnvelope) -> str:
-    if env.signature_algorithm != "hmac-sha256":
-        raise bad_request("Unsupported signature algorithm")
-
-    payload_for_sig = env.model_dump(exclude={"signature"}, by_alias=True, mode="json")
-    payload_for_sig = {key: value for key, value in payload_for_sig.items() if value is not None}
-    signed_payload = canonical_json(payload_for_sig)
-    if hmac_verify(secret_b64, signed_payload, env.signature):
-        return sha256_hex(signed_payload)
-
-    # Compatibility for clients that still sign UTC timestamps with "+00:00".
-    legacy_payload = dict(payload_for_sig)
-    created_at = legacy_payload.get("created_at_utc")
-    if isinstance(created_at, str) and created_at.endswith("Z"):
-        legacy_payload["created_at_utc"] = f"{created_at[:-1]}+00:00"
-        legacy_signed_payload = canonical_json(legacy_payload)
-        if hmac_verify(secret_b64, legacy_signed_payload, env.signature):
-            return sha256_hex(legacy_signed_payload)
-
-    raise unauthorized("Invalid mutation signature")
 
 
 def _parse_iso_datetime(value: str | datetime) -> datetime:
@@ -955,256 +902,4 @@ def get_delete_status(
         proof=proof,
         failure=({"code": row["error_code"], "message": row["error_detail"]} if row["error_code"] else None),
         retained_artifacts=[],
-    )
-
-
-@legacy_router.post("/sync/mutations", response_model=SyncMutationResponse, deprecated=True)
-def sync_mutations(
-    request: Request,
-    response: Response,
-    payload: SyncMutationRequest,
-    user_id: UUID = Security(require_api_user_id),
-    x_device_id: Optional[str] = Header(default=None),
-) -> SyncMutationResponse:
-    _decorate_legacy_sync_headers(response)
-
-    db = _get_db(request)
-
-    if not payload.items:
-        raise bad_request("No mutation items provided")
-
-    if not x_device_id:
-        raise bad_request("Missing X-Device-Id header")
-
-    results: list[MutationResult] = []
-    accepted = 0
-    duplicates = 0
-
-    with db.connection() as conn:
-        _assert_security_tables(conn)
-        _verify_consent_chain(conn, user_id)
-        if _is_account_deleted(conn, user_id):
-            raise locked("Sync mutations are locked after deletion request")
-        _require_sync_consent(conn, user_id)
-
-        for env in payload.items:
-            now = _now()
-            created_at = env.created_at_utc
-            if created_at.tzinfo is None:
-                created_at = created_at.replace(tzinfo=timezone.utc)
-            if env.ttl_seconds < 1 or env.ttl_seconds > 604800:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="rejected",
-                        mutation_status="invalid_ttl",
-                        error_code="invalid_request",
-                    )
-                )
-                continue
-            if created_at + timedelta(seconds=env.ttl_seconds) < now:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="rejected",
-                        mutation_status="expired_ttl",
-                        error_code="expired",
-                    )
-                )
-                continue
-
-            if not env.idempotency_key:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="rejected",
-                        mutation_status="missing_idempotency",
-                        error_code="invalid_request",
-                    )
-                )
-                continue
-
-            device_key_row = sql.fetch_one(
-                conn,
-                sql.SQL_GET_ACTIVE_DEVICE_KEY,
-                {
-                    "user_id": user_id,
-                    "device_id": x_device_id,
-                    "key_id": env.signature_kid,
-                },
-            )
-            if device_key_row is None:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="rejected",
-                        mutation_status="invalid_signature_key",
-                        error_code="unauthorized",
-                    )
-                )
-                continue
-
-            try:
-                payload_hash = _validate_signature(device_key_row["secret_b64"], env)
-            except Exception:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="rejected",
-                        mutation_status="signature_verification_failed",
-                        error_code="unauthorized",
-                    )
-                )
-                continue
-
-            chain_prev_row = sql.fetch_one(
-                conn,
-                sql.SQL_GET_LAST_QUEUE_HASH_FOR_DEVICE,
-                {
-                    "user_id": user_id,
-                    "device_id": x_device_id,
-                },
-            )
-            chain_prev_hash = chain_prev_row["chain_item_hash"] if chain_prev_row else None
-            chain_item_hash = _compute_mutation_chain_hash(payload_hash, chain_prev_hash)
-
-            existing = sql.fetch_one(
-                conn,
-                sql.SQL_GET_QUEUE_BY_IDEMPOTENCY_ANY,
-                {
-                    "user_id": user_id,
-                    "idempotency_key": env.idempotency_key,
-                },
-            )
-
-            if existing is not None:
-                if existing["payload_hash"] == payload_hash:
-                    duplicates += 1
-                    results.append(
-                        MutationResult(
-                            queue_item_id=env.queue_item_id,
-                            idempotency_key=env.idempotency_key,
-                            status="duplicate",
-                            mutation_status="replayed",
-                            error_code=None,
-                        )
-                    )
-                else:
-                    results.append(
-                        MutationResult(
-                            queue_item_id=env.queue_item_id,
-                            idempotency_key=env.idempotency_key,
-                            status="conflict",
-                            mutation_status="payload_conflict",
-                            error_code="replay_conflict",
-                        )
-                    )
-                continue
-
-            entity_id = env.entity_id or "__global__"
-            version_row = sql.fetch_one(
-                conn,
-                sql.SQL_GET_ENTITY_VERSION,
-                {
-                    "user_id": user_id,
-                    "entity_type": env.entity_type,
-                    "entity_id": entity_id,
-                },
-            )
-            current_version = (
-                int(version_row["current_version"]) if version_row and version_row["current_version"] is not None else 0
-            )
-
-            if env.base_version is not None and env.base_version != current_version:
-                results.append(
-                    MutationResult(
-                        queue_item_id=env.queue_item_id,
-                        idempotency_key=env.idempotency_key,
-                        status="conflict",
-                        mutation_status="base_version_mismatch",
-                        error_code="version_conflict",
-                    )
-                )
-                continue
-
-            conn.execute(
-                sql.SQL_INSERT_QUEUE,
-                {
-                    "idempotency_key": env.idempotency_key,
-                    "queue_item_id": env.queue_item_id,
-                    "user_id": user_id,
-                    "device_id": x_device_id,
-                    "app_install_id": env.app_install_id,
-                    "op": env.op,
-                    "entity_type": env.entity_type,
-                    "entity_id": entity_id,
-                    "client_seq": env.client_seq,
-                    "base_version": env.base_version,
-                    "payload_hash": payload_hash,
-                    "aad": _jsonb(env.aad),
-                    "envelope_json": _jsonb(env.model_dump(mode="json")),
-                    "signature_algorithm": env.signature_algorithm,
-                    "signature_kid": env.signature_kid,
-                    "signature": env.signature,
-                    "chain_prev_hash": chain_prev_hash,
-                    "chain_item_hash": chain_item_hash,
-                    "status": "accepted",
-                    "error_code": None,
-                    "error_detail": None,
-                    "ttl_seconds": env.ttl_seconds,
-                },
-            )
-
-            next_version = current_version + 1
-            if env.base_version is None:
-                next_version = current_version
-
-            conn.execute(
-                sql.SQL_UPSERT_ENTITY_VERSION,
-                {
-                    "user_id": user_id,
-                    "entity_type": env.entity_type,
-                    "entity_id": entity_id,
-                    "current_version": next_version,
-                },
-            )
-
-            accepted += 1
-            results.append(
-                MutationResult(
-                    queue_item_id=env.queue_item_id,
-                    idempotency_key=env.idempotency_key,
-                    status="accepted",
-                    mutation_status="applied",
-                    entity_version=next_version,
-                    error_code=None,
-                )
-            )
-
-    conflict_count = sum(1 for item in results if item.status == "conflict")
-    logger.warning(
-        "sync-legacy-compat summary=%s",
-        json.dumps(
-            {
-                "user_id": str(user_id),
-                "device_id": x_device_id,
-                "processed_count": len(payload.items),
-                "accepted_count": accepted,
-                "duplicate_count": duplicates,
-                "conflict_count": conflict_count,
-            },
-            sort_keys=True,
-        ),
-    )
-
-    return SyncMutationResponse(
-        processed=len(payload.items),
-        accepted=accepted,
-        duplicates=duplicates,
-        results=results,
     )

@@ -20,17 +20,6 @@ def _secret_b64(seed: str) -> str:
     return base64.urlsafe_b64encode(seed.encode("utf-8")).decode("ascii")
 
 
-def _sign_mutation(secret_b64: str, envelope: dict[str, Any]) -> str:
-    payload_for_sig = dict(envelope)
-    payload_for_sig.pop("signature")
-    if isinstance(payload_for_sig.get("created_at_utc"), str):
-        payload_for_sig["created_at_utc"] = payload_for_sig["created_at_utc"]
-    else:
-        payload_for_sig["created_at_utc"] = payload_for_sig["created_at_utc"].isoformat()
-    payload_for_sig = {key: value for key, value in payload_for_sig.items() if value is not None}
-    return hmac_signature(secret_b64, canonical_json(payload_for_sig))
-
-
 def _proof_signature(payload: dict[str, Any]) -> str:
     return hmac_signature(proof_secret(), canonical_json(payload))
 
@@ -407,206 +396,71 @@ def test_consent_request_strict_validation(client, db_url) -> None:
             _cleanup_account(db_url, user_id)
 
 
-def _build_mutation_payload(
+def _build_batch_mutation_item(
+    *,
+    secret_b64: str | None = None,
+) -> dict[str, Any]:
+    """Build a single signed mutation item for /v0/sync/mutations:batch.
+
+    Follows the same conventions as test_sync_batch_mutations.py helpers.
+    """
+    item: dict[str, Any] = {
+        "mutation_id": str(uuid.uuid4()),
+        "idempotency_key": str(uuid.uuid4()),
+        "operation_type": "SYMPTOM_CREATE",
+        "entity_type": "symptom_log",
+        "entity_id": str(uuid.uuid4()),
+        "base_version": 0,
+        "client_seq": 1,
+        "client_created_at": datetime.now(timezone.utc).isoformat(),
+        "payload": {"symptom": "bloating"},
+        "depends_on_mutation_id": None,
+        "source": {
+            "platform": "ios",
+            "screen": "symptoms",
+            "actor": "user",
+            "app_build": "1.0.0",
+        },
+    }
+    if secret_b64:
+        sig_payload = {
+            "mutation_id": item["mutation_id"],
+            "idempotency_key": item["idempotency_key"],
+            "operation_type": item["operation_type"],
+            "entity_type": item.get("entity_type"),
+            "entity_id": item.get("entity_id"),
+            "base_version": item.get("base_version"),
+            "client_seq": item["client_seq"],
+            "client_created_at": item["client_created_at"],
+            "payload": item["payload"],
+            "source": item.get("source"),
+            "depends_on_mutation_id": item.get("depends_on_mutation_id"),
+        }
+        item["integrity"] = {
+            "payload_hash": sha256_hex(canonical_json(sig_payload)),
+            "signature_algo": "hmac-sha256",
+            "signature": hmac_signature(secret_b64, canonical_json(sig_payload)),
+            "signature_version": 1,
+        }
+    return item
+
+
+def _build_batch_sync_request(
     *,
     user_id: uuid.UUID,
     device_id: str,
-    key_id: str,
-    queue_item_id: str,
-    idempotency_key: str,
-    client_seq: int,
-    base_version: int | None = 0,
-    payload_extra: dict[str, Any] | None = None,
+    items: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    payload = {
-        "queue_item_id": queue_item_id,
-        "idempotency_key": idempotency_key,
-        "device_id": device_id,
-        "app_install_id": "install-v2",
-        "op": "create_symptom_log",
-        "entity_type": "symptom_log",
-        "entity_id": str(uuid.uuid4()),
-        "client_seq": client_seq,
-        "base_version": base_version,
-        "attempt": 1,
-        "ttl_seconds": 172800,
-        "created_at_utc": datetime.now(timezone.utc).isoformat(),
-        "payload": payload_extra or {"symptom": "bloating"},
-        "aad": {"language": "fr-FR", "user_id": str(user_id)},
-        "signature": "",
-        "signature_kid": key_id,
-        "signature_algorithm": "hmac-sha256",
+    """Build a batch sync request for /v0/sync/mutations:batch."""
+    return {
+        "schema_version": 1,
+        "batch_id": str(uuid.uuid4()),
+        "client_device_id": device_id,
+        "sync_session_id": str(uuid.uuid4()),
+        "client_time_utc": datetime.now(timezone.utc).isoformat(),
+        "user_id": str(user_id),
+        "items": items or [_build_batch_mutation_item()],
     }
-    return payload
-
-
-def test_sync_replay_idempotency_and_tamper_reject(client, db_url) -> None:
-    user_id = uuid.uuid4()
-    device_id = "test-device-sync"
-    key_id = "k1"
-
-    with connect(db_url, row_factory=dict_row) as db_conn:
-        with db_conn.transaction():
-            _cleanup_account(db_url, user_id)
-            _grant_consent(client, user_id)
-            secret = _insert_device_key(db_url, user_id, device_id=device_id, key_id=key_id)
-
-            payload = _build_mutation_payload(
-                user_id=user_id,
-                device_id=device_id,
-                key_id=key_id,
-                queue_item_id=str(uuid.uuid4()),
-                idempotency_key=str(uuid.uuid4()),
-                client_seq=1,
-            )
-            payload["signature"] = _sign_mutation(secret, payload)
-
-            response = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": device_id},
-                json={"items": [payload]},
-            )
-            assert response.status_code == 200
-            assert response.headers.get("Deprecation") == "true"
-            warning_header = response.headers.get("Warning") or ""
-            assert "/v0/sync/mutations is deprecated" in warning_header
-            assert "/v0/sync/mutations:batch" in (response.headers.get("Link") or "")
-            assert response.headers.get("X-API-Compatibility-Mode") == "legacy_migration_route"
-            first = response.json()
-            assert first["accepted"] == 1
-            assert first["results"][0]["status"] == "accepted"
-            version_row = db_conn.execute(
-                """
-                SELECT current_version
-                FROM me_entity_versions
-                WHERE user_id = %(user_id)s
-                  AND entity_type = %(entity_type)s
-                  AND entity_id = %(entity_id)s
-                """,
-                {
-                    "user_id": user_id,
-                    "entity_type": payload["entity_type"],
-                    "entity_id": payload["entity_id"],
-                },
-            ).fetchone()
-            assert version_row is not None
-            first_version = int(version_row["current_version"])
-
-            response = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": device_id},
-                json={"items": [payload]},
-            )
-            assert response.status_code == 200
-            second = response.json()
-            assert second["duplicates"] == 1
-            assert second["results"][0]["status"] == "duplicate"
-            second_version = db_conn.execute(
-                """
-                SELECT current_version
-                FROM me_entity_versions
-                WHERE user_id = %(user_id)s
-                  AND entity_type = %(entity_type)s
-                  AND entity_id = %(entity_id)s
-                """,
-                {
-                    "user_id": user_id,
-                    "entity_type": payload["entity_type"],
-                    "entity_id": payload["entity_id"],
-                },
-            ).fetchone()
-            assert second_version is not None
-            assert int(second_version["current_version"]) == first_version
-
-            collision = dict(payload)
-            collision["payload"] = {"symptom": "other"}
-            collision["signature"] = _sign_mutation(secret, collision)
-            collision["idempotency_key"] = payload["idempotency_key"]
-
-            response = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": device_id},
-                json={"items": [collision]},
-            )
-            assert response.status_code == 200
-            third = response.json()
-            assert third["results"][0]["status"] == "conflict"
-
-            queued_rows = db_conn.execute(
-                "SELECT COUNT(*) AS count FROM me_mutation_queue WHERE user_id = %(user_id)s",
-                {"user_id": user_id},
-            ).fetchone()["count"]
-            assert queued_rows == 1
-            queue_row = db_conn.execute(
-                """
-                SELECT chain_prev_hash, chain_item_hash
-                FROM me_mutation_queue
-                WHERE user_id = %(user_id)s
-                  AND idempotency_key = %(idempotency_key)s
-                """,
-                {"user_id": user_id, "idempotency_key": payload["idempotency_key"]},
-            ).fetchone()
-            assert queue_row is not None
-            assert queue_row["chain_prev_hash"] is None
-            assert queue_row["chain_item_hash"] is not None
-            third_version = db_conn.execute(
-                """
-                SELECT current_version
-                FROM me_entity_versions
-                WHERE user_id = %(user_id)s
-                  AND entity_type = %(entity_type)s
-                  AND entity_id = %(entity_id)s
-                """,
-                {
-                    "user_id": user_id,
-                    "entity_type": payload["entity_type"],
-                    "entity_id": payload["entity_id"],
-                },
-            ).fetchone()
-            assert third_version is not None
-            assert int(third_version["current_version"]) == first_version
-
-            _execute_committed(
-                db_url,
-                """
-                UPDATE me_mutation_queue
-                SET replay_window_expires_at = NOW() - INTERVAL '1 second'
-                WHERE user_id = %(user_id)s
-                  AND idempotency_key = %(idempotency_key)s
-                """,
-                {"user_id": user_id, "idempotency_key": payload["idempotency_key"]},
-            )
-            stale_replay = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": device_id},
-                json={"items": [payload]},
-            )
-            assert stale_replay.status_code == 200
-            stale_payload = stale_replay.json()
-            assert stale_payload["results"][0]["status"] == "duplicate"
-            queued_rows_after_stale = db_conn.execute(
-                "SELECT COUNT(*) AS count FROM me_mutation_queue WHERE user_id = %(user_id)s",
-                {"user_id": user_id},
-            ).fetchone()["count"]
-            assert queued_rows_after_stale == 1
-            stale_version = db_conn.execute(
-                """
-                SELECT current_version
-                FROM me_entity_versions
-                WHERE user_id = %(user_id)s
-                  AND entity_type = %(entity_type)s
-                  AND entity_id = %(entity_id)s
-                """,
-                {
-                    "user_id": user_id,
-                    "entity_type": payload["entity_type"],
-                    "entity_id": payload["entity_id"],
-                },
-            ).fetchone()
-            assert stale_version is not None
-            assert int(stale_version["current_version"]) == first_version
-
-            _cleanup_account(db_url, user_id)
 
 
 def _wait_for_export_completed(client, user_id: uuid.UUID, export_id: str) -> dict[str, Any]:
@@ -674,20 +528,16 @@ def test_export_delete_async_lifecycle_and_sync_reject(client, db_url) -> None:
             assert export_after_payload["failure"] is not None
             assert export_after_payload["failure"]["code"] == "deleted_by_user_request"
 
-            sync_payload = _build_mutation_payload(
-                user_id=user_id,
-                device_id="test-device-sync-delete",
-                key_id="k1",
-                queue_item_id=str(uuid.uuid4()),
-                idempotency_key=str(uuid.uuid4()),
-                client_seq=1,
-            )
+            sync_batch = _build_batch_sync_request(user_id=user_id, device_id="test-device-sync-delete")
             sync_response = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": "test-device-sync-delete"},
-                json={"items": [sync_payload]},
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=sync_batch,
             )
-            assert sync_response.status_code == 423
+            assert sync_response.status_code == 200
+            sync_results = sync_response.json()["items"]
+            assert len(sync_results) >= 1
+            assert sync_results[0]["status"] == "CANCELLED_BY_DELETE"
 
             _cleanup_account(db_url, user_id)
 
@@ -716,21 +566,19 @@ def test_purge_proof_and_negative_queries_after_delete(client, db_url) -> None:
             assert polled_export["status"] in {"ready", "ready_with_redactions"}
             _assert_export_proof(user_id, uuid.UUID(str(export_id)), polled_export)
 
-            mutation = _build_mutation_payload(
+            signed_item = _build_batch_mutation_item(secret_b64=secret)
+            sync_batch = _build_batch_sync_request(
                 user_id=user_id,
                 device_id="proof-device",
-                key_id="k1",
-                queue_item_id=str(uuid.uuid4()),
-                idempotency_key=str(uuid.uuid4()),
-                client_seq=1,
+                items=[signed_item],
             )
-            mutation["signature"] = _sign_mutation(secret, mutation)
             sync_resp = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": "proof-device"},
-                json={"items": [mutation]},
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=sync_batch,
             )
             assert sync_resp.status_code == 200
+            assert sync_resp.json()["items"][0]["status"] == "APPLIED"
 
             delete_resp = client.post(
                 "/v0/me/delete",
@@ -790,24 +638,16 @@ def test_purge_proof_and_negative_queries_after_delete(client, db_url) -> None:
             )
             assert consent_check.status_code == 404
 
+            sync_check_batch = _build_batch_sync_request(user_id=user_id, device_id="proof-device")
             sync_check = client.post(
-                "/v0/sync/mutations",
-                headers={"X-User-Id": str(user_id), "X-Device-Id": "proof-device"},
-                json={
-                    "items": [
-                        _build_mutation_payload(
-                            user_id=user_id,
-                            device_id="proof-device",
-                            key_id="k1",
-                            queue_item_id=str(uuid.uuid4()),
-                            idempotency_key=str(uuid.uuid4()),
-                            client_seq=9,
-                            base_version=0,
-                        )
-                    ]
-                },
+                "/v0/sync/mutations:batch",
+                headers={"X-User-Id": str(user_id)},
+                json=sync_check_batch,
             )
-            assert sync_check.status_code == 423
+            assert sync_check.status_code == 200
+            sync_check_results = sync_check.json()["items"]
+            assert len(sync_check_results) >= 1
+            assert sync_check_results[0]["status"] == "CANCELLED_BY_DELETE"
 
             _cleanup_account(db_url, user_id)
 
