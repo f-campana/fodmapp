@@ -79,7 +79,6 @@ def test_openapi_contract_parity(app_instance) -> None:
         "/v0/me/tracking/custom-foods/{custom_food_id}",
         "/v0/me/tracking/saved-meals",
         "/v0/me/tracking/saved-meals/{saved_meal_id}",
-        "/v0/sync/mutations",
         "/v0/sync/mutations:batch",
     }
 

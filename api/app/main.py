@@ -10,7 +10,6 @@ from app.db import Database
 from app.errors import register_error_handlers
 from app.routers.foods import router as foods_router
 from app.routers.health import router as health_router
-from app.routers.me import legacy_router as legacy_router
 from app.routers.me import router as me_router
 from app.routers.products import router as products_router
 from app.routers.safe_harbors import router as safe_harbors_router
@@ -74,10 +73,6 @@ def create_app() -> FastAPI:
                 "name": "sync",
                 "description": "Current mutation sync API for clients that mirror local writes.",
             },
-            {
-                "name": "legacy",
-                "description": "Deprecated compatibility endpoints retained for existing clients.",
-            },
         ],
         lifespan=lifespan,
     )
@@ -99,7 +94,6 @@ def create_app() -> FastAPI:
     app.include_router(safe_harbors_router)
     app.include_router(swaps_router)
     app.include_router(me_router)
-    app.include_router(legacy_router)
     app.include_router(tracking_router)
     app.include_router(sync_router)
 

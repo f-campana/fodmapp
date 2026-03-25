@@ -15,7 +15,7 @@
   - `/v0/me/export` and `/v0/me/delete` are implemented with idempotency keys, async status polling, signed completion receipts, and summary counts.
   - Hard delete path explicitly purges queue rows, entity versions, and signing keys; exports are invalidated and delete receipt is generated.
 - **Offline queue integrity**
-  - `/v0/sync/mutations` enforces required signatures, idempotency checks, TTL checks, replay-window lookups, and conflict semantics.
+  - `/v0/sync/mutations:batch` enforces required signatures, idempotency checks, TTL checks, replay-window lookups, and conflict semantics.
   - Expired replay cache entries for a key are cleared before accepting a fresh envelope using the same key.
 - **Open items**
   - Account binding and recovery workflows for anonymous mode are defined in policy but still need dedicated key bootstrap/rebind endpoints.
@@ -565,7 +565,7 @@ sequenceDiagram
   participant AS as API Sync Service
 
   A->>Q: Flush batch {item, idempotency_key, signature}
-  Q->>AS: POST /v0/sync/mutations
+  Q->>AS: POST /v0/sync/mutations:batch
   AS->>AS: Verify signature + freshness + replay cache
   AS-->>Q: 409 CONFLICT (base_version mismatch)
   Q->>Q: Move item to conflict queue
@@ -607,14 +607,14 @@ sequenceDiagram
 
 ### 7.1 Implemented-mapping snapshot
 
-| Threat                                     | Control in code                                                                                                                             | Route / artifact                                                                                                      |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Consent forgery via replayed signatures    | Immutable event chain on consent writes (`user_consent_ledger_events.event_hash`) and server-side signature hash fallback for scope payload | `API /v0/me/consent`, `user_consent_ledger`, `user_consent_ledger_events`                                             |
-| Export poisoning / unauthorized extraction | Authenticated `X-User-Id`, consent scope checks, idempotent export jobs, signed export receipts                                             | `API /v0/me/export`, `me_export_jobs`, `_build_export_receipt`                                                        |
-| Delete false completion notice             | Signed deletion receipts, transactional purge summaries, key rotation/invalidation during hard delete                                       | `API /v0/me/delete`, `me_delete_jobs`, `_build_delete_receipt`, `SQL_DELETE_DEVICE_KEYS`                              |
-| Queue key theft / forged payload           | Per-device key lookup + HMAC verification + signature algorithm constraint + replay cache/TTL                                               | `API /v0/sync/mutations`, `me_device_signing_keys`, `me_mutation_queue`                                               |
-| Replay/stale mutation injection            | `idempotency_key` required, duplicate payload hash check, stale-key purge before re-acceptance, base_version guard                          | `API /v0/sync/mutations`, `SQL_GET_QUEUE_BY_IDEMPOTENCY`, `SQL_DELETE_QUEUE_BY_IDEMPOTENCY`, `SQL_GET_ENTITY_VERSION` |
-| Partial legal-hold claims                  | Failed/partial delete status with retained summary counts and proof artifact                                                                | `me_delete_jobs.summary`, `DeletePollResponse.proof`                                                                  |
+| Threat                                     | Control in code                                                                                                                             | Route / artifact                                                                                                            |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Consent forgery via replayed signatures    | Immutable event chain on consent writes (`user_consent_ledger_events.event_hash`) and server-side signature hash fallback for scope payload | `API /v0/me/consent`, `user_consent_ledger`, `user_consent_ledger_events`                                                   |
+| Export poisoning / unauthorized extraction | Authenticated `X-User-Id`, consent scope checks, idempotent export jobs, signed export receipts                                             | `API /v0/me/export`, `me_export_jobs`, `_build_export_receipt`                                                              |
+| Delete false completion notice             | Signed deletion receipts, transactional purge summaries, key rotation/invalidation during hard delete                                       | `API /v0/me/delete`, `me_delete_jobs`, `_build_delete_receipt`, `SQL_DELETE_DEVICE_KEYS`                                    |
+| Queue key theft / forged payload           | Per-device key lookup + HMAC verification + signature algorithm constraint + replay cache/TTL                                               | `API /v0/sync/mutations:batch`, `me_device_signing_keys`, `me_mutation_queue`                                               |
+| Replay/stale mutation injection            | `idempotency_key` required, duplicate payload hash check, stale-key purge before re-acceptance, base_version guard                          | `API /v0/sync/mutations:batch`, `SQL_GET_QUEUE_BY_IDEMPOTENCY`, `SQL_DELETE_QUEUE_BY_IDEMPOTENCY`, `SQL_GET_ENTITY_VERSION` |
+| Partial legal-hold claims                  | Failed/partial delete status with retained summary counts and proof artifact                                                                | `me_delete_jobs.summary`, `DeletePollResponse.proof`                                                                        |
 
 ### 7.2 Immediate follow-ups
 

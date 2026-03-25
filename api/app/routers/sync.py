@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Tuple
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Request, Response, Security
+from fastapi import APIRouter, Request, Security
 from psycopg.types.json import Jsonb
 
 from app import sql, tracking_store, tracking_store_meals, tracking_store_saved_meals, tracking_store_symptoms
@@ -45,7 +45,6 @@ SYNC_QUEUE_TTL_SECONDS = 14 * 24 * 60 * 60
 RETRY_DELAY_MS_VERSION_CONFLICT = 1_500
 RETRY_DELAY_MS_ENDPOINT_UNKNOWN = 5_000
 SEVERITY_ORDER = {"none": 0, "low": 1, "moderate": 2, "high": 3, "unknown": 4}
-SYNC_MIGRATION_MODE_WARNING = "legacy_migration_route"
 logger = logging.getLogger(__name__)
 
 
@@ -59,20 +58,6 @@ def _now_ms() -> int:
 
 def _jsonb(value: Any) -> Any:
     return Jsonb(value) if value is not None else None
-
-
-def _decorate_legacy_sync_headers(response: Response) -> None:
-    response.headers.update(
-        {
-            "Deprecation": "true",
-            "Warning": (
-                '299 - "Compatibility-only endpoint: /v0/sync/mutations is deprecated; use /v0/sync/mutations:batch'
-            ),
-            "Link": '</v0/sync/mutations:batch>; rel="successor-version"; '
-            'title="Batch mutations endpoint required for new clients"',
-            "X-API-Compatibility-Mode": SYNC_MIGRATION_MODE_WARNING,
-        }
-    )
 
 
 def _get_db(request: Request) -> Database:

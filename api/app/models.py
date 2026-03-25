@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any, Dict, List, Literal, Optional, Sequence
+from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -108,7 +108,6 @@ SyncV1ResultCode = Literal[
     "INVALID_PAYLOAD",
     "INTERNAL_ERROR",
 ]
-QueueStatus = Literal["accepted", "duplicate", "conflict", "replayed", "rejected", "error"]
 
 
 class ErrorBody(BaseModel):
@@ -752,49 +751,6 @@ class DeletePollResponse(BaseModel):
     proof: Optional[Receipt] = None
     failure: Optional[Dict[str, str]] = None
     retained_artifacts: list[RetainedArtifact] = Field(default_factory=list)
-
-
-class MutationEnvelope(BaseModel):
-    queue_item_id: UUID
-    idempotency_key: str = Field(min_length=16)
-    device_id: str
-    app_install_id: str
-    op: str
-    entity_type: str
-    entity_id: Optional[str] = None
-    client_seq: int
-    base_version: Optional[int] = None
-    attempt: int = 1
-    ttl_seconds: int = 172800
-    created_at_utc: datetime
-    payload: Dict[str, Any]
-    aad: Dict[str, Any] = Field(default_factory=dict)
-    signature: str
-    signature_kid: str
-    signature_algorithm: Literal["hmac-sha256"] = "hmac-sha256"
-    ciphertext: Optional[str] = None
-    nonce: Optional[str] = None
-    tag: Optional[str] = None
-
-
-class SyncMutationRequest(BaseModel):
-    items: Sequence[MutationEnvelope]
-
-
-class MutationResult(BaseModel):
-    queue_item_id: UUID
-    idempotency_key: str
-    status: QueueStatus
-    mutation_status: str
-    entity_version: Optional[int] = None
-    error_code: Optional[str] = None
-
-
-class SyncMutationResponse(BaseModel):
-    processed: int
-    accepted: int
-    duplicates: int
-    results: list[MutationResult]
 
 
 class SyncV1MutationSource(BaseModel):
