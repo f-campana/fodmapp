@@ -146,7 +146,7 @@ def _make_mutation(**overrides) -> SyncV1MutationItem:
 
 
 class TestApplySymptomMutationCreate:
-    @patch("app.routers.sync.tracking_store")
+    @patch("app.routers.sync.tracking_store_symptoms")
     def test_calls_create_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -160,7 +160,7 @@ class TestApplySymptomMutationCreate:
 
 
 class TestApplySymptomMutationUpdate:
-    @patch("app.routers.sync.tracking_store")
+    @patch("app.routers.sync.tracking_store_symptoms")
     def test_calls_update_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -174,7 +174,7 @@ class TestApplySymptomMutationUpdate:
 
 
 class TestApplySymptomMutationDelete:
-    @patch("app.routers.sync.tracking_store")
+    @patch("app.routers.sync.tracking_store_symptoms")
     def test_calls_delete_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
