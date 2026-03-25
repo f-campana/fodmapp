@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, Request, Response, Security, status
 
-from app import sql, tracking_store, tracking_store_saved_meals
+from app import sql, tracking_store, tracking_store_meals, tracking_store_saved_meals
 from app.auth import require_api_user_id
 from app.db import Database
 from app.errors import locked
@@ -142,7 +142,7 @@ def list_meals(
     db = _get_db(request)
 
     with db.readonly_connection() as conn:
-        return tracking_store.list_meal_logs(conn, user_id, limit=limit)
+        return tracking_store_meals.list_meal_logs(conn, user_id, limit=limit)
 
 
 @router.post("/meals", response_model=MealLog, status_code=status.HTTP_201_CREATED)
@@ -156,7 +156,7 @@ def create_meal(
     with db.connection() as conn:
         _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
-        created = tracking_store.create_meal_log(conn, user_id, payload, version=1)
+        created = tracking_store_meals.create_meal_log(conn, user_id, payload, version=1)
         tracking_store.set_entity_version(conn, user_id, "meal_log", str(created.meal_log_id), created.version)
         return created
 
@@ -174,7 +174,7 @@ def update_meal(
         _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "meal_log", str(meal_log_id))
-        updated = tracking_store.update_meal_log(conn, user_id, meal_log_id, payload, version=version)
+        updated = tracking_store_meals.update_meal_log(conn, user_id, meal_log_id, payload, version=version)
         tracking_store.set_entity_version(conn, user_id, "meal_log", str(meal_log_id), updated.version)
         return updated
 
@@ -191,7 +191,7 @@ def delete_meal(
         _require_tracking_write_allowed(conn, user_id)
         tracking_store.require_tracking_scope(conn, user_id, "diet_logs")
         version = _next_version(conn, user_id, "meal_log", str(meal_log_id))
-        tracking_store.delete_meal_log(conn, user_id, meal_log_id, version=version)
+        tracking_store_meals.delete_meal_log(conn, user_id, meal_log_id, version=version)
         tracking_store.set_entity_version(conn, user_id, "meal_log", str(meal_log_id), version)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
