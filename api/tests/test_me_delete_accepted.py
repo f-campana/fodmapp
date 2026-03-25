@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from app.routers.me import _build_delete_accepted
+from app.routers.me_delete import _build_delete_accepted
 
 _NOW = datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
 

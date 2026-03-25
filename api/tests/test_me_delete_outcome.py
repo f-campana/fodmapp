@@ -9,9 +9,9 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
-from app.routers.me import _EMPTY_DELETE_SUMMARY, _persist_delete_outcome
+from app.routers.me_delete import _EMPTY_DELETE_SUMMARY, _persist_delete_outcome
 
-_PATCH_PREFIX = "app.routers.me"
+_PATCH_PREFIX = "app.routers.me_delete"
 
 
 class TestEmptyDeleteSummary:
