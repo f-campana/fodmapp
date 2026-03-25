@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Request, Response, Security
 from psycopg.types.json import Jsonb
 
-from app import sql, tracking_store, tracking_store_meals, tracking_store_saved_meals
+from app import sql, tracking_store, tracking_store_meals, tracking_store_saved_meals, tracking_store_symptoms
 from app.auth import require_api_user_id
 from app.config import get_settings
 from app.consent_chain import insert_event as insert_consent_event
@@ -1107,7 +1107,7 @@ def _apply_symptom_mutation(
     """Dispatch a SYMPTOM_CREATE/UPDATE/DELETE to tracking_store."""
     op = mutation.operation_type
     if op == "SYMPTOM_CREATE":
-        tracking_store.create_symptom_log(
+        tracking_store_symptoms.create_symptom_log(
             conn,
             user_id,
             SymptomLogCreateRequest.model_validate(
@@ -1117,7 +1117,7 @@ def _apply_symptom_mutation(
             version=next_version,
         )
     elif op == "SYMPTOM_UPDATE":
-        tracking_store.update_symptom_log(
+        tracking_store_symptoms.update_symptom_log(
             conn,
             user_id,
             entity_uuid,
@@ -1127,7 +1127,7 @@ def _apply_symptom_mutation(
             version=next_version,
         )
     elif op == "SYMPTOM_DELETE":
-        tracking_store.delete_symptom_log(conn, user_id, entity_uuid, version=next_version)
+        tracking_store_symptoms.delete_symptom_log(conn, user_id, entity_uuid, version=next_version)
     else:
         raise ValueError(f"Unknown symptom operation: {op}")
 
