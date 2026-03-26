@@ -12,7 +12,7 @@ from uuid import uuid4
 import pytest
 
 from app.models import SyncV1MutationItem
-from app.routers.sync import _apply_symptom_mutation, _coerce_symptom_payload
+from app.routers.sync_dispatch import _apply_symptom_mutation, _coerce_symptom_payload
 
 _NOW = datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -146,7 +146,7 @@ def _make_mutation(**overrides) -> SyncV1MutationItem:
 
 
 class TestApplySymptomMutationCreate:
-    @patch("app.routers.sync.tracking_store_symptoms")
+    @patch("app.routers.sync_dispatch.tracking_store_symptoms")
     def test_calls_create_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -160,7 +160,7 @@ class TestApplySymptomMutationCreate:
 
 
 class TestApplySymptomMutationUpdate:
-    @patch("app.routers.sync.tracking_store_symptoms")
+    @patch("app.routers.sync_dispatch.tracking_store_symptoms")
     def test_calls_update_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -174,7 +174,7 @@ class TestApplySymptomMutationUpdate:
 
 
 class TestApplySymptomMutationDelete:
-    @patch("app.routers.sync.tracking_store_symptoms")
+    @patch("app.routers.sync_dispatch.tracking_store_symptoms")
     def test_calls_delete_symptom_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
