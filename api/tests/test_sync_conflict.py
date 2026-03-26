@@ -7,7 +7,7 @@ No DB or FastAPI dependency.
 from __future__ import annotations
 
 from app.models import SyncV1MutationConflict
-from app.routers.sync import (
+from app.routers.sync_outcomes import (
     RETRY_DELAY_MS_ENDPOINT_UNKNOWN,
     RETRY_DELAY_MS_VERSION_CONFLICT,
     _conflict_for_code,
