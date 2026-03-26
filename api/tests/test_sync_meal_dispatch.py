@@ -13,7 +13,7 @@ from uuid import uuid4
 import pytest
 
 from app.models import SyncV1MutationItem
-from app.routers.sync import _apply_meal_mutation
+from app.routers.sync_dispatch import _apply_meal_mutation
 
 _NOW = datetime(2025, 6, 15, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -52,7 +52,7 @@ def _make_mutation(**overrides) -> SyncV1MutationItem:
 
 
 class TestApplyMealMutationCreate:
-    @patch("app.routers.sync.tracking_store_meals")
+    @patch("app.routers.sync_dispatch.tracking_store_meals")
     def test_calls_create_meal_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -64,7 +64,7 @@ class TestApplyMealMutationCreate:
         assert call_args.kwargs["meal_log_id"] == eid
         assert call_args.kwargs["version"] == 1
 
-    @patch("app.routers.sync.tracking_store_meals")
+    @patch("app.routers.sync_dispatch.tracking_store_meals")
     def test_payload_validated_as_create_request(self, mock_store):
         """The payload dict is validated through MealLogCreateRequest.model_validate."""
         uid = uuid4()
@@ -78,7 +78,7 @@ class TestApplyMealMutationCreate:
 
 
 class TestApplyMealMutationUpdate:
-    @patch("app.routers.sync.tracking_store_meals")
+    @patch("app.routers.sync_dispatch.tracking_store_meals")
     def test_calls_update_meal_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -90,7 +90,7 @@ class TestApplyMealMutationUpdate:
         assert call_args.args[2] == eid
         assert call_args.kwargs["version"] == 2
 
-    @patch("app.routers.sync.tracking_store_meals")
+    @patch("app.routers.sync_dispatch.tracking_store_meals")
     def test_payload_validated_as_update_request(self, mock_store):
         uid = uuid4()
         eid = uuid4()
@@ -102,7 +102,7 @@ class TestApplyMealMutationUpdate:
 
 
 class TestApplyMealMutationDelete:
-    @patch("app.routers.sync.tracking_store_meals")
+    @patch("app.routers.sync_dispatch.tracking_store_meals")
     def test_calls_delete_meal_log(self, mock_store):
         uid = uuid4()
         eid = uuid4()
