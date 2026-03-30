@@ -4,7 +4,7 @@
   "version": "0.1.26",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next dev",
+    "dev": "node ./scripts/app-dev.mjs",
     "build": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next build",
     "analyze": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
     "start": "next start",

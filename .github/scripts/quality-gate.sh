@@ -220,6 +220,7 @@ run_cmd "CI scope helper syntax" node --check .github/scripts/detect-ci-scope.mj
 run_cmd "CI scope tests syntax" node --check .github/scripts/detect-ci-scope.test.mjs
 run_cmd "docs hygiene audit syntax" node --check .github/scripts/docs-hygiene-audit.mjs
 run_cmd "docs hygiene audit tests syntax" node --check .github/scripts/docs-hygiene-audit.test.mjs
+run_cmd "app dev helper syntax" node --check apps/app/scripts/app-dev.mjs
 run_cmd "dbmate wrapper syntax" bash -n scripts/dbmate.sh
 run_cmd "API operator python script syntax" python3 -m py_compile \
   api/scripts/repair_consent_event_chain.py \
