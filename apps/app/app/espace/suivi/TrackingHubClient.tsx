@@ -47,6 +47,8 @@ import {
 } from "../../../lib/dateTimeLocal";
 import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
+  buildSymptomLogCreateRequestFromDraft,
+  buildSymptomLogUpdateRequestFromDraft,
   createTrackingCustomFood,
   createTrackingMeal,
   createTrackingSavedMeal,
@@ -69,8 +71,7 @@ import {
   type SavedMealCreateRequest,
   type SavedMealUpdateRequest,
   type SymptomEntry,
-  type SymptomLogCreateRequest,
-  type SymptomLogUpdateRequest,
+  type SymptomEntryDraft,
   type TrackingFeed,
   type TrackingLoggedItem,
   updateTrackingCustomFood,
@@ -97,7 +98,7 @@ type EditableItem = {
 };
 
 type SymptomFormState = {
-  symptomType: SymptomLogCreateRequest["symptom_type"];
+  symptomType: SymptomEntryDraft["symptomType"];
   severity: string;
   notedAtUtc: string;
   note: string;
@@ -148,7 +149,7 @@ type PendingDelete =
     };
 
 const SYMPTOM_OPTIONS: Array<{
-  value: SymptomLogCreateRequest["symptom_type"];
+  value: SymptomEntryDraft["symptomType"];
   label: string;
 }> = [
   { value: "bloating", label: "Ballonnements" },
@@ -303,6 +304,15 @@ function buildSymptomForm(symptom: SymptomEntry): SymptomFormState {
     severity: String(symptom.severity),
     notedAtUtc: formatUtcIsoForDateTimeLocal(symptom.notedAtUtc),
     note: symptom.note ?? "",
+  };
+}
+
+function buildSymptomDraft(form: SymptomFormState): SymptomEntryDraft {
+  return {
+    symptomType: form.symptomType,
+    severity: Number(form.severity),
+    notedAtUtc: new Date(form.notedAtUtc).toISOString(),
+    note: normalizeText(form.note),
   };
 }
 
@@ -653,21 +663,18 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setSubmitting(true);
     setActionError(null);
     try {
-      const payload: SymptomLogCreateRequest = {
-        symptom_type: symptomForm.symptomType,
-        severity: Number(symptomForm.severity),
-        noted_at_utc: new Date(symptomForm.notedAtUtc).toISOString(),
-        note: normalizeText(symptomForm.note),
-      };
+      const draft = buildSymptomDraft(symptomForm);
       if (editingSymptom) {
-        const updatePayload: SymptomLogUpdateRequest = { ...payload };
         await updateTrackingSymptom(
           auth,
           editingSymptom.symptomLogId,
-          updatePayload,
+          buildSymptomLogUpdateRequestFromDraft(draft),
         );
       } else {
-        await createTrackingSymptom(auth, payload);
+        await createTrackingSymptom(
+          auth,
+          buildSymptomLogCreateRequestFromDraft(draft),
+        );
       }
       await refreshAfterMutation();
     } catch (nextError) {
