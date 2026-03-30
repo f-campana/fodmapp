@@ -607,12 +607,11 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setLoading(true);
     setError(null);
     try {
-      const [readModel, nextCustomFoods, nextSavedMeals] =
-        await Promise.all([
-          getTrackingHubReadModel(auth, { anchorDate, feedLimit: 50 }),
-          listTrackingCustomFoods(auth),
-          listTrackingSavedMeals(auth),
-        ]);
+      const [readModel, nextCustomFoods, nextSavedMeals] = await Promise.all([
+        getTrackingHubReadModel(auth, { anchorDate, feedLimit: 50 }),
+        listTrackingCustomFoods(auth),
+        listTrackingSavedMeals(auth),
+      ]);
       setFeed(readModel.feed);
       setSummary(readModel.summary);
       setCustomFoods(nextCustomFoods);
@@ -1022,9 +1021,8 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
                       <ul className="space-y-2 text-sm">
                         {group.nearbyMeals.map((meal) => (
                           <li key={meal.mealLogId}>
-                            {meal.title ?? "Repas"} ·{" "}
-                            {meal.hoursBeforeSymptom} h avant ·{" "}
-                            {meal.itemLabels.join(", ")}
+                            {meal.title ?? "Repas"} · {meal.hoursBeforeSymptom}{" "}
+                            h avant · {meal.itemLabels.join(", ")}
                           </li>
                         ))}
                       </ul>
