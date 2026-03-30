@@ -3,6 +3,7 @@
 import {
   mapTrackingFeedResponse,
   mapWeeklyTrackingSummaryResponse,
+  type SymptomEntryDraft,
   type TrackingFeed,
   type WeeklyTrackingSummary,
 } from "@fodmapp/domain";
@@ -44,6 +45,7 @@ export type WeeklyTrackingSummaryResponse =
 export type {
   MealEntry,
   SymptomEntry,
+  SymptomEntryDraft,
   TrackingFeed,
   TrackingLoggedItem,
   WeeklyTrackingSummary,
@@ -167,6 +169,28 @@ export function createTrackingSymptom(
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
+}
+
+export function buildSymptomLogCreateRequestFromDraft(
+  draft: SymptomEntryDraft,
+): SymptomLogCreateRequest {
+  return {
+    symptom_type: draft.symptomType,
+    severity: draft.severity,
+    noted_at_utc: draft.notedAtUtc,
+    note: draft.note,
+  };
+}
+
+export function buildSymptomLogUpdateRequestFromDraft(
+  draft: SymptomEntryDraft,
+): SymptomLogUpdateRequest {
+  return {
+    symptom_type: draft.symptomType,
+    severity: draft.severity,
+    noted_at_utc: draft.notedAtUtc,
+    note: draft.note,
+  };
 }
 
 export function updateTrackingSymptom(

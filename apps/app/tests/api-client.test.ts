@@ -12,6 +12,8 @@ import {
 } from "../lib/api";
 import type { ProtectedApiAuth } from "../lib/protectedApiAuth";
 import {
+  buildSymptomLogCreateRequestFromDraft,
+  buildSymptomLogUpdateRequestFromDraft,
   createTrackingSymptom,
   deleteTrackingMeal,
   getTrackingFeed,
@@ -428,6 +430,28 @@ describe("public read client", () => {
 });
 
 describe("tracking client", () => {
+  it("builds symptom transport payloads from a domain draft", () => {
+    const draft = {
+      symptomType: "bloating" as const,
+      severity: 4,
+      notedAtUtc: "2026-03-20T10:00:00Z",
+      note: "Après déjeuner",
+    };
+
+    expect(buildSymptomLogCreateRequestFromDraft(draft)).toEqual({
+      symptom_type: "bloating",
+      severity: 4,
+      noted_at_utc: "2026-03-20T10:00:00Z",
+      note: "Après déjeuner",
+    });
+    expect(buildSymptomLogUpdateRequestFromDraft(draft)).toEqual({
+      symptom_type: "bloating",
+      severity: 4,
+      noted_at_utc: "2026-03-20T10:00:00Z",
+      note: "Après déjeuner",
+    });
+  });
+
   it("sends Authorization bearer headers on runtime feed requests", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
     const fetchMock = vi.fn().mockResolvedValue(
