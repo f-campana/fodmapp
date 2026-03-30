@@ -276,7 +276,7 @@ if [[ "$run_full" == "true" ]]; then
   # so they must stay serialized even when the read-only checks above run in parallel.
   run_cmd \
     "lint (JS dist-backed)" \
-    bash -lc "pnpm exec turbo run build --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm lint:js:ci"
+    bash -lc "pnpm exec turbo run build --filter=@fodmapp/domain --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm lint:js:ci"
 
   if [[ "$quality_scope_ui_foundation" == "true" ]]; then
     run_cmd \

@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@fodmapp/ui/card";
 
-import { searchFoods } from "../../lib/api";
+import { searchCuratedFoods } from "../../lib/api";
 import { formatFoodLevel } from "../../lib/format";
 import SearchForm from "./SearchForm";
 
@@ -26,7 +26,7 @@ export default async function AlimentsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const query = normalizeSearchQuery(resolvedSearchParams?.q);
-  const results = query.length > 0 ? await searchFoods(query, 12) : null;
+  const results = query.length > 0 ? await searchCuratedFoods(query, 12) : null;
 
   return (
     <main className="product-page">
@@ -104,21 +104,19 @@ export default async function AlimentsPage({
             pour « {results.data.query} »
           </p>
           {results.data.items.map((item) => (
-            <Card key={item.food_slug}>
+            <Card key={item.slug}>
               <CardHeader>
                 <CardTitle>
-                  <Link href={`/aliments/${item.food_slug}`}>
-                    {item.canonical_name_fr}
-                  </Link>
+                  <Link href={`/aliments/${item.slug}`}>{item.names.fr}</Link>
                 </CardTitle>
                 <CardDescription>
-                  Niveau global: {formatFoodLevel(item.overall_level)}
+                  Niveau global: {formatFoodLevel(item.overallLevel)}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {item.driver_subtype ? (
+                {item.driverSubtype ? (
                   <p className="product-page__note">
-                    Sous-type conducteur: {item.driver_subtype.toUpperCase()}
+                    Sous-type conducteur: {item.driverSubtype.toUpperCase()}
                   </p>
                 ) : null}
               </CardContent>

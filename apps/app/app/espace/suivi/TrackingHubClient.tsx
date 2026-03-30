@@ -37,7 +37,10 @@ import { Label } from "@fodmapp/ui/label";
 import { NativeSelect } from "@fodmapp/ui/native-select";
 import { Textarea } from "@fodmapp/ui/textarea";
 
-import { searchFoods } from "../../../lib/api";
+import {
+  searchTrackingCanonicalFoods,
+  type TrackingCanonicalFoodOption,
+} from "../../../lib/api";
 import {
   formatUtcIsoForDateTimeLocal,
   nowDateInputValue,
@@ -87,7 +90,7 @@ type EditableItem = {
   quantityText: string;
   note: string;
   searchQuery: string;
-  searchResults: Array<{ food_slug: string; canonical_name_fr: string }>;
+  searchResults: TrackingCanonicalFoodOption[];
   searchError: string | null;
   searchLoading: boolean;
 };
@@ -331,7 +334,7 @@ function TrackingItemEditor({
     }
 
     update({ searchLoading: true, searchError: null });
-    const result = await searchFoods(query, 5);
+    const result = await searchTrackingCanonicalFoods(query, 5);
     if (!result.ok) {
       update({
         searchLoading: false,
@@ -343,10 +346,7 @@ function TrackingItemEditor({
 
     update({
       searchLoading: false,
-      searchResults: result.data.items.map((food) => ({
-        food_slug: food.food_slug,
-        canonical_name_fr: food.canonical_name_fr,
-      })),
+      searchResults: result.data.items,
       searchError: null,
     });
   };
@@ -417,20 +417,20 @@ function TrackingItemEditor({
             <div className="flex flex-wrap gap-2">
               {item.searchResults.map((result) => (
                 <Button
-                  key={result.food_slug}
+                  key={result.slug}
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() =>
                     update({
-                      foodSlug: result.food_slug,
-                      selectedLabel: result.canonical_name_fr,
-                      searchQuery: result.canonical_name_fr,
+                      foodSlug: result.slug,
+                      selectedLabel: result.label,
+                      searchQuery: result.label,
                       searchResults: [],
                     })
                   }
                 >
-                  {result.canonical_name_fr}
+                  {result.label}
                 </Button>
               ))}
             </div>

@@ -4,15 +4,16 @@
   "version": "0.1.26",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @fodmapp/ui build && next dev",
-    "build": "pnpm --filter @fodmapp/ui build && next build",
-    "analyze": "pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
+    "dev": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next dev",
+    "build": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next build",
+    "analyze": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
     "start": "next start",
-    "typecheck": "pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit",
-    "test": "pnpm --filter @fodmapp/ui build && vitest run"
+    "typecheck": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && vitest run"
   },
   "dependencies": {
     "@clerk/nextjs": "6.39.0",
+    "@fodmapp/domain": "workspace:*",
     "@fodmapp/tailwind-config": "workspace:*",
     "@fodmapp/types": "workspace:*",
     "@fodmapp/ui": "workspace:*",

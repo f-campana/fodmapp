@@ -8,26 +8,22 @@ import DecouvrirLoading from "../app/decouvrir/loading";
 import DecouvrirPage from "../app/decouvrir/page";
 import HomePage from "../app/page";
 import {
-  getFoodDetail,
-  getFoodRollup,
+  getCuratedFoodDetailPageData,
   getSafeHarbors,
-  getSwaps,
-  searchFoods,
+  searchCuratedFoods,
 } from "../lib/api";
 
 vi.mock("../lib/api", () => ({
-  getFoodDetail: vi.fn(),
-  getFoodRollup: vi.fn(),
+  getCuratedFoodDetailPageData: vi.fn(),
   getSafeHarbors: vi.fn(),
-  getSwaps: vi.fn(),
-  searchFoods: vi.fn(),
+  searchCuratedFoods: vi.fn(),
 }));
 
+const mockedGetCuratedFoodDetailPageData = vi.mocked(
+  getCuratedFoodDetailPageData,
+);
 const mockedGetSafeHarbors = vi.mocked(getSafeHarbors);
-const mockedSearchFoods = vi.mocked(searchFoods);
-const mockedGetFoodDetail = vi.mocked(getFoodDetail);
-const mockedGetFoodRollup = vi.mocked(getFoodRollup);
-const mockedGetSwaps = vi.mocked(getSwaps);
+const mockedSearchCuratedFoods = vi.mocked(searchCuratedFoods);
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -123,7 +119,7 @@ describe("product routes", () => {
   });
 
   it("renders search results for a URL-driven query", async () => {
-    mockedSearchFoods.mockResolvedValue({
+    mockedSearchCuratedFoods.mockResolvedValue({
       ok: true,
       data: {
         query: "ail",
@@ -131,10 +127,31 @@ describe("product routes", () => {
         total: 1,
         items: [
           {
-            food_slug: "phase2-ail-cru",
-            canonical_name_fr: "Ail cru",
-            canonical_name_en: "Raw garlic",
-            overall_level: "high",
+            kind: "curated_food",
+            slug: "phase2-ail-cru",
+            names: {
+              fr: "Ail cru",
+              en: "Raw garlic",
+            },
+            overallLevel: "high",
+            driverSubtype: null,
+            coverageRatio: null,
+            rollupComputedAt: null,
+            provenance: {
+              kind: "curated_food_catalog",
+              provider: "fodmapp",
+              sourceSlug: null,
+              capturedAt: null,
+            },
+            evidenceTier: "curated",
+            capabilities: {
+              canBeSwapOrigin: true,
+              canBeSwapTarget: true,
+              canAppearInTracking: true,
+              canBeSavedMealItem: true,
+              hasEvidenceBackedGuidance: true,
+              isInformationalOnly: false,
+            },
           },
         ],
       },
@@ -150,7 +167,7 @@ describe("product routes", () => {
   });
 
   it("renders the no-match state when search returns zero results", async () => {
-    mockedSearchFoods.mockResolvedValue({
+    mockedSearchCuratedFoods.mockResolvedValue({
       ok: true,
       data: {
         query: "tomate",
@@ -175,35 +192,67 @@ describe("product routes", () => {
   });
 
   it("renders the empty-swap CTA to /decouvrir", async () => {
-    mockedGetFoodDetail.mockResolvedValue({
-      ok: true,
-      data: {
-        food_slug: "phase2-ail-cru",
-        canonical_name_fr: "Ail cru",
-        canonical_name_en: "Raw garlic",
-        preparation_state: "unknown",
-        status: "draft",
+    mockedGetCuratedFoodDetailPageData.mockResolvedValue({
+      foodResult: {
+        ok: true,
+        data: {
+          kind: "curated_food",
+          slug: "phase2-ail-cru",
+          names: {
+            fr: "Ail cru",
+            en: "Raw garlic",
+          },
+          preparationState: "unknown",
+          status: "draft",
+          sourceSlug: "phase3",
+          profile: {
+            rollupServingGrams: null,
+            overallLevel: "high",
+            driverSubtype: null,
+            knownSubtypesCount: 6,
+            coverageRatio: 1,
+            sourceSlug: "phase3",
+            rollupComputedAt: "2026-03-16T10:00:00Z",
+            scoringVersion: null,
+          },
+          provenance: {
+            kind: "curated_food_catalog",
+            provider: "fodmapp",
+            sourceSlug: "phase3",
+            capturedAt: "2026-03-16T10:00:00Z",
+          },
+          evidenceTier: "curated",
+          capabilities: {
+            canBeSwapOrigin: true,
+            canBeSwapTarget: true,
+            canAppearInTracking: true,
+            canBeSavedMealItem: true,
+            hasEvidenceBackedGuidance: true,
+            isInformationalOnly: false,
+          },
+        },
       },
-    });
-    mockedGetFoodRollup.mockResolvedValue({
-      ok: true,
-      data: {
-        food_slug: "phase2-ail-cru",
-        canonical_name_fr: "Ail cru",
-        canonical_name_en: "Raw garlic",
-        overall_level: "high",
-        known_subtypes_count: 6,
-        coverage_ratio: 1,
-        source_slug: "phase3",
-        rollup_computed_at: "2026-03-16T10:00:00Z",
+      rollupResult: {
+        ok: true,
+        data: {
+          rollupServingGrams: null,
+          overallLevel: "high",
+          driverSubtype: null,
+          knownSubtypesCount: 6,
+          coverageRatio: 1,
+          sourceSlug: "phase3",
+          rollupComputedAt: "2026-03-16T10:00:00Z",
+          scoringVersion: null,
+        },
       },
-    });
-    mockedGetSwaps.mockResolvedValue({
-      ok: true,
-      data: {
-        from_food_slug: "phase2-ail-cru",
-        items: [],
-        total: 0,
+      swapsResult: {
+        ok: true,
+        data: {
+          fromFoodSlug: "phase2-ail-cru",
+          appliedFilters: null,
+          items: [],
+          total: 0,
+        },
       },
     });
 
@@ -222,47 +271,99 @@ describe("product routes", () => {
   });
 
   it("renders swaps while showing a rollup-unavailable state", async () => {
-    mockedGetFoodDetail.mockResolvedValue({
-      ok: true,
-      data: {
-        food_slug: "phase2-ail-cru",
-        canonical_name_fr: "Ail cru",
-        canonical_name_en: "Raw garlic",
-      },
-    });
-    mockedGetFoodRollup.mockResolvedValue({
-      ok: false,
-      status: 500,
-      error: "request_failed",
-    });
-    mockedGetSwaps.mockResolvedValue({
-      ok: true,
-      data: {
-        from_food_slug: "phase2-ail-cru",
-        total: 1,
-        items: [
-          {
-            from_food_slug: "phase2-ail-cru",
-            to_food_slug: "phase2-huile-olive",
-            to_food_name_fr: "Huile d'olive",
-            instruction_fr: "Utiliser l'huile à la place de l'ail.",
-            instruction_en: "Use oil instead of garlic.",
-            from_overall_level: "high",
-            to_overall_level: "low",
-            driver_subtype: "fructan",
-            from_burden_ratio: 4.1,
-            to_burden_ratio: 1.2,
-            coverage_ratio: 0.4,
-            fodmap_safety_score: 0.72,
-            overall_score: 0.7,
-            rule_status: "active",
-            scoring_version: "v2",
-            rollup_computed_at: "2026-03-16T10:00:00Z",
-            from_food_name_fr: "Ail cru",
-            from_food_name_en: "Raw garlic",
-            to_food_name_en: "Olive oil",
+    mockedGetCuratedFoodDetailPageData.mockResolvedValue({
+      foodResult: {
+        ok: true,
+        data: {
+          kind: "curated_food",
+          slug: "phase2-ail-cru",
+          names: {
+            fr: "Ail cru",
+            en: "Raw garlic",
           },
-        ],
+          preparationState: null,
+          status: null,
+          sourceSlug: null,
+          profile: null,
+          provenance: {
+            kind: "curated_food_catalog",
+            provider: "fodmapp",
+            sourceSlug: null,
+            capturedAt: null,
+          },
+          evidenceTier: "curated",
+          capabilities: {
+            canBeSwapOrigin: true,
+            canBeSwapTarget: true,
+            canAppearInTracking: true,
+            canBeSavedMealItem: true,
+            hasEvidenceBackedGuidance: true,
+            isInformationalOnly: false,
+          },
+        },
+      },
+      rollupResult: {
+        ok: false,
+        status: 500,
+        error: "request_failed",
+      },
+      swapsResult: {
+        ok: true,
+        data: {
+          fromFoodSlug: "phase2-ail-cru",
+          appliedFilters: null,
+          total: 1,
+          items: [
+            {
+              kind: "curated_swap",
+              id: "phase2-ail-cru->phase2-huile-olive",
+              from: {
+                slug: "phase2-ail-cru",
+                names: {
+                  fr: "Ail cru",
+                  en: "Raw garlic",
+                },
+                overallLevel: "high",
+              },
+              to: {
+                slug: "phase2-huile-olive",
+                names: {
+                  fr: "Huile d'olive",
+                  en: "Olive oil",
+                },
+                overallLevel: "low",
+              },
+              instruction: {
+                fr: "Utiliser l'huile à la place de l'ail.",
+                en: "Use oil instead of garlic.",
+              },
+              driverSubtype: "fructan",
+              fromBurdenRatio: 4.1,
+              toBurdenRatio: 1.2,
+              coverageRatio: 0.4,
+              fodmapSafetyScore: 0.72,
+              overallScore: 0.7,
+              ruleStatus: "active",
+              scoringVersion: "v2",
+              rollupComputedAt: "2026-03-16T10:00:00Z",
+              provenance: {
+                kind: "curated_swap_rule",
+                provider: "fodmapp",
+                sourceSlug: null,
+                capturedAt: "2026-03-16T10:00:00Z",
+              },
+              evidenceTier: "curated",
+              capabilities: {
+                canBeSwapOrigin: false,
+                canBeSwapTarget: false,
+                canAppearInTracking: false,
+                canBeSavedMealItem: false,
+                hasEvidenceBackedGuidance: true,
+                isInformationalOnly: false,
+              },
+            },
+          ],
+        },
       },
     });
 
@@ -278,20 +379,22 @@ describe("product routes", () => {
   });
 
   it("calls notFound when the food detail endpoint returns 404", async () => {
-    mockedGetFoodDetail.mockResolvedValue({
-      ok: false,
-      status: 404,
-      error: "not_found",
-    });
-    mockedGetFoodRollup.mockResolvedValue({
-      ok: false,
-      status: 404,
-      error: "not_found",
-    });
-    mockedGetSwaps.mockResolvedValue({
-      ok: false,
-      status: 404,
-      error: "not_found",
+    mockedGetCuratedFoodDetailPageData.mockResolvedValue({
+      foodResult: {
+        ok: false,
+        status: 404,
+        error: "not_found",
+      },
+      rollupResult: {
+        ok: false,
+        status: 404,
+        error: "not_found",
+      },
+      swapsResult: {
+        ok: false,
+        status: 404,
+        error: "not_found",
+      },
     });
 
     await expect(

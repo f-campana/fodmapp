@@ -12,7 +12,7 @@ import {
 } from "@fodmapp/ui/card";
 import { ScoreBar } from "@fodmapp/ui/score-bar";
 
-import { getFoodDetail, getFoodRollup, getSwaps } from "../../../lib/api";
+import { getCuratedFoodDetailPageData } from "../../../lib/api";
 import { formatFoodLevel } from "../../../lib/format";
 
 function formatTimestamp(value: string): string {
@@ -28,11 +28,8 @@ export default async function AlimentDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [foodResult, rollupResult, swapsResult] = await Promise.all([
-    getFoodDetail(slug),
-    getFoodRollup(slug),
-    getSwaps(slug),
-  ]);
+  const { foodResult, rollupResult, swapsResult } =
+    await getCuratedFoodDetailPageData(slug);
 
   if (!foodResult.ok && foodResult.status === 404) {
     notFound();
@@ -57,7 +54,7 @@ export default async function AlimentDetailPage({
     <main className="product-page">
       <section className="product-page__header">
         <p className="product-page__eyebrow">Aliment</p>
-        <h1 className="product-page__title">{food.canonical_name_fr}</h1>
+        <h1 className="product-page__title">{food.names.fr}</h1>
         <p className="product-page__description">
           Consulte le niveau global de l&apos;aliment et les substitutions
           actives disponibles aujourd&apos;hui.
@@ -82,7 +79,7 @@ export default async function AlimentDetailPage({
       <Card>
         <CardHeader>
           <CardTitle>Identité</CardTitle>
-          <CardDescription>{food.food_slug}</CardDescription>
+          <CardDescription>{food.slug}</CardDescription>
         </CardHeader>
       </Card>
 
@@ -92,22 +89,22 @@ export default async function AlimentDetailPage({
             <CardTitle>Profil global</CardTitle>
             <CardDescription>
               Dernier calcul du rollup:{" "}
-              {formatTimestamp(rollupResult.data.rollup_computed_at)}
+              {formatTimestamp(rollupResult.data.rollupComputedAt)}
             </CardDescription>
           </CardHeader>
           <CardContent className="product-page__stack">
             <div className="product-page__inline">
               <Badge variant="outline">
-                Niveau: {formatFoodLevel(rollupResult.data.overall_level)}
+                Niveau: {formatFoodLevel(rollupResult.data.overallLevel)}
               </Badge>
               <Badge variant="outline">
-                Couverture: {rollupResult.data.known_subtypes_count}/6
+                Couverture: {rollupResult.data.knownSubtypesCount}/6
               </Badge>
             </div>
-            {rollupResult.data.driver_subtype ? (
+            {rollupResult.data.driverSubtype ? (
               <p className="product-page__note">
                 Sous-type conducteur:{" "}
-                {rollupResult.data.driver_subtype.toUpperCase()}
+                {rollupResult.data.driverSubtype.toUpperCase()}
               </p>
             ) : null}
           </CardContent>
@@ -154,34 +151,32 @@ export default async function AlimentDetailPage({
         <section className="product-page__stack">
           <h2 className="product-page__section-title">Substitutions actives</h2>
           {swapsResult.data.items.map((item) => (
-            <Card key={item.to_food_slug}>
+            <Card key={item.to.slug}>
               <CardHeader>
-                <CardTitle>
-                  {item.to_food_name_fr ?? item.to_food_slug}
-                </CardTitle>
-                <CardDescription>{item.instruction_fr}</CardDescription>
+                <CardTitle>{item.to.names.fr ?? item.to.slug}</CardTitle>
+                <CardDescription>{item.instruction.fr}</CardDescription>
               </CardHeader>
               <CardContent className="product-page__stack">
                 <div className="product-page__inline">
                   <Badge variant="outline">
-                    Niveau cible: {formatFoodLevel(item.to_overall_level)}
+                    Niveau cible: {formatFoodLevel(item.to.overallLevel)}
                   </Badge>
-                  {item.coverage_ratio < 0.5 ? (
+                  {item.coverageRatio < 0.5 ? (
                     <Badge variant="secondary">Données partielles</Badge>
                   ) : null}
-                  {item.to_overall_level === "unknown" ? (
+                  {item.to.overallLevel === "unknown" ? (
                     <Badge variant="secondary">Niveau non vérifié</Badge>
                   ) : null}
                 </div>
                 <ScoreBar
-                  label={`Amélioration FODMAP: ${Math.round(item.fodmap_safety_score * 100)}%`}
-                  value={item.fodmap_safety_score}
+                  label={`Amélioration FODMAP: ${Math.round(item.fodmapSafetyScore * 100)}%`}
+                  value={item.fodmapSafetyScore}
                 />
-                {item.from_burden_ratio !== null &&
-                item.to_burden_ratio !== null ? (
+                {item.fromBurdenRatio !== null &&
+                item.toBurdenRatio !== null ? (
                   <p className="product-page__note">
-                    Charge relative: {item.from_burden_ratio.toFixed(2)} →{" "}
-                    {item.to_burden_ratio.toFixed(2)}
+                    Charge relative: {item.fromBurdenRatio.toFixed(2)} →{" "}
+                    {item.toBurdenRatio.toFixed(2)}
                   </p>
                 ) : null}
               </CardContent>
