@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  mapTrackingFeedResponse,
+  mapWeeklyTrackingSummaryResponse,
+  type TrackingFeed,
+  type WeeklyTrackingSummary,
+} from "@fodmapp/domain";
 import type { components } from "@fodmapp/types";
 
 import { buildApiUrl } from "./api/base";
@@ -35,6 +41,17 @@ export type TrackingFeedResponse =
   components["schemas"]["TrackingFeedResponse"];
 export type WeeklyTrackingSummaryResponse =
   components["schemas"]["WeeklyTrackingSummaryResponse"];
+export type {
+  MealEntry,
+  SymptomEntry,
+  TrackingFeed,
+  TrackingLoggedItem,
+  WeeklyTrackingSummary,
+} from "@fodmapp/domain";
+export interface TrackingHubReadModel {
+  feed: TrackingFeed;
+  summary: WeeklyTrackingSummary;
+}
 
 function getTrackingApiBase(apiBase?: string | null): string | null {
   return apiBase ?? getClientRuntimeEnv().apiBaseUrl;
@@ -104,6 +121,26 @@ export function getWeeklyTrackingSummary(
     { method: "GET" },
     apiBase,
   );
+}
+
+export async function getTrackingHubReadModel(
+  auth: ProtectedApiAuth,
+  options: {
+    anchorDate?: string;
+    feedLimit?: number;
+    apiBase?: string | null;
+  } = {},
+): Promise<TrackingHubReadModel> {
+  const { anchorDate, feedLimit = 50, apiBase } = options;
+  const [feed, summary] = await Promise.all([
+    getTrackingFeed(auth, feedLimit, apiBase),
+    getWeeklyTrackingSummary(auth, anchorDate, apiBase),
+  ]);
+
+  return {
+    feed: mapTrackingFeedResponse(feed),
+    summary: mapWeeklyTrackingSummaryResponse(summary),
+  };
 }
 
 export function listTrackingSymptoms(

@@ -15,6 +15,7 @@ import {
   createTrackingSymptom,
   deleteTrackingMeal,
   getTrackingFeed,
+  getTrackingHubReadModel,
 } from "../lib/tracking";
 
 afterEach(() => {
@@ -464,6 +465,170 @@ describe("tracking client", () => {
       "Bearer token_123",
     );
     expect((init.headers as Headers).has("X-User-Id")).toBe(false);
+  });
+
+  it("maps tracking hub feed and summary responses into domain read models", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            total: 1,
+            limit: 25,
+            items: [
+              {
+                entry_type: "meal",
+                occurred_at_utc: "2026-03-22T10:00:00Z",
+                meal: {
+                  meal_log_id: "meal-1",
+                  title: "Déjeuner",
+                  occurred_at_utc: "2026-03-22T10:00:00Z",
+                  note: null,
+                  version: 1,
+                  created_at_utc: "2026-03-22T10:00:00Z",
+                  updated_at_utc: "2026-03-22T10:05:00Z",
+                  items: [
+                    {
+                      meal_log_item_id: "meal-item-1",
+                      sort_order: 1,
+                      item_kind: "canonical_food",
+                      label: "Ail cru",
+                      food_slug: "phase2-ail-cru",
+                      quantity_text: "10 g",
+                      note: null,
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            anchor_date: "2026-03-22",
+            window_start_utc: "2026-03-15T00:00:00Z",
+            window_end_utc: "2026-03-22T23:59:59Z",
+            daily_counts: [
+              {
+                date: "2026-03-22",
+                meal_count: 1,
+                symptom_count: 1,
+              },
+            ],
+            symptom_counts: [
+              {
+                symptom_type: "bloating",
+                count: 1,
+              },
+            ],
+            severity: {
+              average: 3,
+              maximum: 5,
+            },
+            proximity_groups: [
+              {
+                symptom_log_id: "symptom-1",
+                symptom_type: "bloating",
+                severity: 4,
+                noted_at_utc: "2026-03-22T12:00:00Z",
+                nearby_meals: [
+                  {
+                    meal_log_id: "meal-1",
+                    title: "Déjeuner",
+                    occurred_at_utc: "2026-03-22T10:00:00Z",
+                    hours_before_symptom: 2,
+                    item_labels: ["Ail cru"],
+                  },
+                ],
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const auth: ProtectedApiAuth = {
+      mode: "runtime",
+      getToken: vi.fn().mockResolvedValue("token_123"),
+    };
+
+    const result = await getTrackingHubReadModel(auth, {
+      anchorDate: "2026-03-22",
+      feedLimit: 25,
+    });
+
+    expect(result).toMatchObject({
+      feed: {
+        total: 1,
+        limit: 25,
+        evidenceTier: "derived",
+        provenance: {
+          kind: "tracking_projection",
+          sourceSlug: "tracking_feed",
+        },
+        items: [
+          {
+            entryType: "meal",
+            meal: {
+              mealLogId: "meal-1",
+              occurredAtUtc: "2026-03-22T10:00:00Z",
+              evidenceTier: "user_entered",
+              items: [
+                {
+                  reference: {
+                    kind: "canonical_food",
+                    foodSlug: "phase2-ail-cru",
+                    label: "Ail cru",
+                  },
+                  quantityText: "10 g",
+                },
+              ],
+            },
+          },
+        ],
+      },
+      summary: {
+        anchorDate: "2026-03-22",
+        evidenceTier: "derived",
+        provenance: {
+          kind: "tracking_projection",
+          sourceSlug: "weekly_tracking_summary",
+        },
+        dailyCounts: [
+          {
+            date: "2026-03-22",
+            mealCount: 1,
+            symptomCount: 1,
+          },
+        ],
+        symptomCounts: [
+          {
+            symptomType: "bloating",
+            count: 1,
+          },
+        ],
+        proximityGroups: [
+          {
+            symptomLogId: "symptom-1",
+            nearbyMeals: [
+              {
+                mealLogId: "meal-1",
+                hoursBeforeSymptom: 2,
+                itemLabels: ["Ail cru"],
+              },
+            ],
+          },
+        ],
+      },
+    });
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.fodmap.example/v0/me/tracking/feed?limit=25",
+      "https://api.fodmap.example/v0/me/tracking/summary/weekly?anchor_date=2026-03-22",
+    ]);
   });
 
   it("keeps preview mode on X-User-Id for local validation", async () => {
