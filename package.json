@@ -24,7 +24,7 @@
     "test": "pnpm exec turbo run test --filter=@fodmapp/ui --filter=@fodmapp/app",
     "test:storybook": "pnpm --filter @fodmapp/storybook storybook:test",
     "prepare": "pnpm hook:install",
-    "typecheck": "pnpm exec turbo run typecheck --only --filter=@fodmapp/content-config --filter=@fodmapp/types --filter=@fodmapp/ui --filter=@fodmapp/reporting --filter=@fodmapp/storybook --filter=@fodmapp/app --filter=@fodmapp/marketing --filter=@fodmapp/research",
+    "typecheck": "pnpm exec turbo run typecheck --only --filter=@fodmapp/content-config --filter=@fodmapp/domain --filter=@fodmapp/types --filter=@fodmapp/ui --filter=@fodmapp/reporting --filter=@fodmapp/storybook --filter=@fodmapp/app --filter=@fodmapp/marketing --filter=@fodmapp/research",
     "tokens:generate": "pnpm --filter @fodmapp/design-tokens tokens:generate",
     "tokens:check": "pnpm exec turbo run tokens:check --filter=@fodmapp/design-tokens",
     "tailwind:styles:check": "pnpm exec turbo run styles:check --filter=@fodmapp/tailwind-config",
