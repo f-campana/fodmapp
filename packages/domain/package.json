@@ -17,6 +17,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "pnpm run clean && tsup",
+    "watch": "tsup --watch",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

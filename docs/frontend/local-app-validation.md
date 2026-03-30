@@ -116,6 +116,8 @@ From repo root:
 pnpm --filter @fodmapp/app dev
 ```
 
+This command now keeps `@fodmapp/domain` in watch mode, so edits under `packages/domain/src` rebuild while the app dev server is running.
+
 The app will be available at:
 
 - [http://localhost:3000](http://localhost:3000)
