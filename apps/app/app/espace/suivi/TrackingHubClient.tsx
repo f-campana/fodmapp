@@ -58,25 +58,26 @@ import {
   deleteTrackingMeal,
   deleteTrackingSavedMeal,
   deleteTrackingSymptom,
-  getTrackingFeed,
-  getWeeklyTrackingSummary,
+  getTrackingHubReadModel,
   listTrackingCustomFoods,
   listTrackingSavedMeals,
+  type MealEntry,
   type MealLog,
   type MealLogCreateRequest,
   type MealLogUpdateRequest,
   type SavedMeal,
   type SavedMealCreateRequest,
   type SavedMealUpdateRequest,
-  type SymptomLog,
+  type SymptomEntry,
   type SymptomLogCreateRequest,
   type SymptomLogUpdateRequest,
-  type TrackingFeedResponse,
+  type TrackingFeed,
+  type TrackingLoggedItem,
   updateTrackingCustomFood,
   updateTrackingMeal,
   updateTrackingSavedMeal,
   updateTrackingSymptom,
-  type WeeklyTrackingSummaryResponse,
+  type WeeklyTrackingSummary,
 } from "../../../lib/tracking";
 
 type TrackingItemKind = "canonical_food" | "custom_food" | "free_text";
@@ -123,13 +124,13 @@ type SavedMealFormState = {
 type PendingDelete =
   | {
       kind: "symptom";
-      item: SymptomLog;
+      item: SymptomEntry;
       title: string;
       description: string;
     }
   | {
       kind: "meal";
-      item: MealLog;
+      item: MealEntry;
       title: string;
       description: string;
     }
@@ -214,7 +215,7 @@ function createEmptySavedMealForm(): SavedMealFormState {
   };
 }
 
-function toEditableItem(
+function toEditableItemFromRaw(
   item: MealLog["items"][number] | SavedMeal["items"][number],
 ): EditableItem {
   return {
@@ -232,12 +233,59 @@ function toEditableItem(
   };
 }
 
-function buildMealForm(meal: MealLog): MealFormState {
+function toEditableItemFromLoggedItem(item: TrackingLoggedItem): EditableItem {
+  switch (item.reference.kind) {
+    case "canonical_food":
+      return {
+        itemKind: "canonical_food",
+        foodSlug: item.reference.foodSlug ?? "",
+        selectedLabel: item.reference.label,
+        customFoodId: "",
+        freeTextLabel: "",
+        quantityText: item.quantityText ?? "",
+        note: item.note ?? "",
+        searchQuery: item.reference.foodSlug ?? item.reference.label,
+        searchResults: [],
+        searchError: null,
+        searchLoading: false,
+      };
+    case "custom_food":
+      return {
+        itemKind: "custom_food",
+        foodSlug: "",
+        selectedLabel: item.reference.label,
+        customFoodId: item.reference.customFoodId ?? "",
+        freeTextLabel: "",
+        quantityText: item.quantityText ?? "",
+        note: item.note ?? "",
+        searchQuery: item.reference.label,
+        searchResults: [],
+        searchError: null,
+        searchLoading: false,
+      };
+    default:
+      return {
+        itemKind: "free_text",
+        foodSlug: "",
+        selectedLabel: item.reference.label,
+        customFoodId: "",
+        freeTextLabel: item.reference.label,
+        quantityText: item.quantityText ?? "",
+        note: item.note ?? "",
+        searchQuery: item.reference.label,
+        searchResults: [],
+        searchError: null,
+        searchLoading: false,
+      };
+  }
+}
+
+function buildMealForm(meal: MealEntry): MealFormState {
   return {
     title: meal.title ?? "",
-    occurredAtUtc: formatUtcIsoForDateTimeLocal(meal.occurred_at_utc),
+    occurredAtUtc: formatUtcIsoForDateTimeLocal(meal.occurredAtUtc),
     note: meal.note ?? "",
-    items: meal.items.map(toEditableItem),
+    items: meal.items.map(toEditableItemFromLoggedItem),
   };
 }
 
@@ -245,15 +293,15 @@ function buildSavedMealForm(savedMeal: SavedMeal): SavedMealFormState {
   return {
     label: savedMeal.label,
     note: savedMeal.note ?? "",
-    items: savedMeal.items.map(toEditableItem),
+    items: savedMeal.items.map(toEditableItemFromRaw),
   };
 }
 
-function buildSymptomForm(symptom: SymptomLog): SymptomFormState {
+function buildSymptomForm(symptom: SymptomEntry): SymptomFormState {
   return {
-    symptomType: symptom.symptom_type,
+    symptomType: symptom.symptomType,
     severity: String(symptom.severity),
-    notedAtUtc: formatUtcIsoForDateTimeLocal(symptom.noted_at_utc),
+    notedAtUtc: formatUtcIsoForDateTimeLocal(symptom.notedAtUtc),
     note: symptom.note ?? "",
   };
 }
@@ -522,10 +570,8 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [feed, setFeed] = useState<TrackingFeedResponse | null>(null);
-  const [summary, setSummary] = useState<WeeklyTrackingSummaryResponse | null>(
-    null,
-  );
+  const [feed, setFeed] = useState<TrackingFeed | null>(null);
+  const [summary, setSummary] = useState<WeeklyTrackingSummary | null>(null);
   const [customFoods, setCustomFoods] = useState<CustomFood[]>([]);
   const [savedMeals, setSavedMeals] = useState<SavedMeal[]>([]);
 
@@ -537,8 +583,10 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     null,
   );
 
-  const [editingSymptom, setEditingSymptom] = useState<SymptomLog | null>(null);
-  const [editingMeal, setEditingMeal] = useState<MealLog | null>(null);
+  const [editingSymptom, setEditingSymptom] = useState<SymptomEntry | null>(
+    null,
+  );
+  const [editingMeal, setEditingMeal] = useState<MealEntry | null>(null);
   const [editingCustomFood, setEditingCustomFood] = useState<CustomFood | null>(
     null,
   );
@@ -559,15 +607,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setLoading(true);
     setError(null);
     try {
-      const [nextFeed, nextSummary, nextCustomFoods, nextSavedMeals] =
+      const [readModel, nextCustomFoods, nextSavedMeals] =
         await Promise.all([
-          getTrackingFeed(auth, 50),
-          getWeeklyTrackingSummary(auth, anchorDate),
+          getTrackingHubReadModel(auth, { anchorDate, feedLimit: 50 }),
           listTrackingCustomFoods(auth),
           listTrackingSavedMeals(auth),
         ]);
-      setFeed(nextFeed);
-      setSummary(nextSummary);
+      setFeed(readModel.feed);
+      setSummary(readModel.summary);
       setCustomFoods(nextCustomFoods);
       setSavedMeals(nextSavedMeals);
     } catch (nextError) {
@@ -617,7 +664,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
         const updatePayload: SymptomLogUpdateRequest = { ...payload };
         await updateTrackingSymptom(
           auth,
-          editingSymptom.symptom_log_id,
+          editingSymptom.symptomLogId,
           updatePayload,
         );
       } else {
@@ -643,7 +690,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
       };
       if (editingMeal) {
         const updatePayload: MealLogUpdateRequest = { ...payload };
-        await updateTrackingMeal(auth, editingMeal.meal_log_id, updatePayload);
+        await updateTrackingMeal(auth, editingMeal.mealLogId, updatePayload);
       } else {
         await createTrackingMeal(auth, payload);
       }
@@ -746,7 +793,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     }));
   };
 
-  const requestDeleteSymptom = (symptom: SymptomLog) => {
+  const requestDeleteSymptom = (symptom: SymptomEntry) => {
     setActionError(null);
     setPendingDelete({
       kind: "symptom",
@@ -756,7 +803,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     });
   };
 
-  const requestDeleteMeal = (meal: MealLog) => {
+  const requestDeleteMeal = (meal: MealEntry) => {
     setActionError(null);
     setPendingDelete({
       kind: "meal",
@@ -798,10 +845,10 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       switch (pendingDelete.kind) {
         case "symptom":
-          await deleteTrackingSymptom(auth, pendingDelete.item.symptom_log_id);
+          await deleteTrackingSymptom(auth, pendingDelete.item.symptomLogId);
           break;
         case "meal":
-          await deleteTrackingMeal(auth, pendingDelete.item.meal_log_id);
+          await deleteTrackingMeal(auth, pendingDelete.item.mealLogId);
           break;
         case "custom_food":
           await deleteTrackingCustomFood(
@@ -923,14 +970,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
           <div className="space-y-2">
             <h3 className="font-medium">Par jour</h3>
             <ul className="space-y-2">
-              {summary?.daily_counts.map((day) => (
+              {summary?.dailyCounts.map((day) => (
                 <li
                   key={day.date}
                   className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
                 >
                   <span>{day.date}</span>
                   <span>
-                    {day.meal_count} repas · {day.symptom_count} symptômes
+                    {day.mealCount} repas · {day.symptomCount} symptômes
                   </span>
                 </li>
               ))}
@@ -939,11 +986,11 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
 
           <div className="space-y-2">
             <h3 className="font-medium">Types de symptômes</h3>
-            {summary?.symptom_counts.length ? (
+            {summary?.symptomCounts.length ? (
               <div className="flex flex-wrap gap-2">
-                {summary.symptom_counts.map((item) => (
-                  <Badge key={item.symptom_type} variant="outline">
-                    {item.symptom_type}: {item.count}
+                {summary.symptomCounts.map((item) => (
+                  <Badge key={item.symptomType} variant="outline">
+                    {item.symptomType}: {item.count}
                   </Badge>
                 ))}
               </div>
@@ -956,28 +1003,28 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
 
           <div className="space-y-2">
             <h3 className="font-medium">Repas proches des symptômes</h3>
-            {summary?.proximity_groups.length ? (
+            {summary?.proximityGroups.length ? (
               <div className="space-y-3">
-                {summary.proximity_groups.map((group) => (
+                {summary.proximityGroups.map((group) => (
                   <div
-                    key={group.symptom_log_id}
+                    key={group.symptomLogId}
                     className="space-y-2 rounded-lg border p-3"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-medium">
-                        {group.symptom_type} · intensité {group.severity}
+                        {group.symptomType} · intensité {group.severity}
                       </span>
                       <span className="text-sm text-muted-foreground">
-                        {formatFeedTimestamp(group.noted_at_utc)}
+                        {formatFeedTimestamp(group.notedAtUtc)}
                       </span>
                     </div>
-                    {group.nearby_meals.length ? (
+                    {group.nearbyMeals.length ? (
                       <ul className="space-y-2 text-sm">
-                        {group.nearby_meals.map((meal) => (
-                          <li key={meal.meal_log_id}>
+                        {group.nearbyMeals.map((meal) => (
+                          <li key={meal.mealLogId}>
                             {meal.title ?? "Repas"} ·{" "}
-                            {meal.hours_before_symptom} h avant ·{" "}
-                            {meal.item_labels.join(", ")}
+                            {meal.hoursBeforeSymptom} h avant ·{" "}
+                            {meal.itemLabels.join(", ")}
                           </li>
                         ))}
                       </ul>
@@ -1008,25 +1055,27 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
         <CardContent className="space-y-3">
           {feed?.items.length ? (
             feed.items.map((entry) => {
-              if (entry.entry_type === "meal" && entry.meal) {
+              if (entry.entryType === "meal") {
                 const meal = entry.meal;
 
                 return (
                   <div
-                    key={`meal-${meal.meal_log_id}`}
+                    key={`meal-${meal.mealLogId}`}
                     className="space-y-2 rounded-lg border p-3"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-medium">{meal.title ?? "Repas"}</p>
                         <p className="text-sm text-muted-foreground">
-                          {meal.items.map((item) => item.label).join(", ")}
+                          {meal.items
+                            .map((item) => item.reference.label)
+                            .join(", ")}
                         </p>
                       </div>
                       <Badge variant="outline">Repas</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {formatFeedTimestamp(meal.occurred_at_utc)}
+                      {formatFeedTimestamp(meal.occurredAtUtc)}
                     </p>
                     <div className="flex gap-2">
                       <Button
@@ -1052,18 +1101,18 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
                 );
               }
 
-              if (entry.symptom) {
+              if (entry.entryType === "symptom") {
                 const symptom = entry.symptom;
 
                 return (
                   <div
-                    key={`symptom-${symptom.symptom_log_id}`}
+                    key={`symptom-${symptom.symptomLogId}`}
                     className="space-y-2 rounded-lg border p-3"
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-medium">
-                          {symptom.symptom_type} · intensité {symptom.severity}
+                          {symptom.symptomType} · intensité {symptom.severity}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {symptom.note ?? "Sans note"}
@@ -1072,7 +1121,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
                       <Badge variant="outline">Symptôme</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {formatFeedTimestamp(symptom.noted_at_utc)}
+                      {formatFeedTimestamp(symptom.notedAtUtc)}
                     </p>
                     <div className="flex gap-2">
                       <Button
@@ -1199,7 +1248,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
                           title: savedMeal.label,
                           occurredAtUtc: nowDateInputValue(),
                           note: savedMeal.note ?? "",
-                          items: savedMeal.items.map(toEditableItem),
+                          items: savedMeal.items.map(toEditableItemFromRaw),
                         });
                         setMealDialogOpen(true);
                       }}
