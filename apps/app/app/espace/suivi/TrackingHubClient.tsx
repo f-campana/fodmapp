@@ -49,6 +49,8 @@ import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
   buildMealLogCreateRequestFromDraft,
   buildMealLogUpdateRequestFromDraft,
+  buildSavedMealLogCreateRequestFromDraft,
+  buildSavedMealLogUpdateRequestFromDraft,
   buildSymptomLogCreateRequestFromDraft,
   buildSymptomLogUpdateRequestFromDraft,
   createTrackingCustomFood,
@@ -69,8 +71,7 @@ import {
   type MealEntryDraft,
   type MealLog,
   type SavedMeal,
-  type SavedMealCreateRequest,
-  type SavedMealUpdateRequest,
+  type SavedMealDraft,
   type SymptomEntry,
   type SymptomEntryDraft,
   type TrackingFeed,
@@ -372,42 +373,16 @@ function buildMealDraft(form: MealFormState): MealEntryDraft {
   };
 }
 
-function buildTrackingItemPayload(item: EditableItem) {
-  if (item.itemKind === "canonical_food") {
-    const foodSlug = normalizeText(item.foodSlug);
-    if (!foodSlug) {
-      throw new Error("Sélectionne un aliment référencé pour cet item.");
-    }
-    return {
-      item_kind: "canonical_food" as const,
-      food_slug: foodSlug,
-      quantity_text: normalizeText(item.quantityText),
-      note: normalizeText(item.note),
-    };
+function buildSavedMealDraft(form: SavedMealFormState): SavedMealDraft {
+  const label = normalizeText(form.label);
+  if (!label) {
+    throw new Error("Renseigne un libellé pour ce modèle de repas.");
   }
 
-  if (item.itemKind === "custom_food") {
-    const customFoodId = normalizeText(item.customFoodId);
-    if (!customFoodId) {
-      throw new Error("Sélectionne un aliment personnel pour cet item.");
-    }
-    return {
-      item_kind: "custom_food" as const,
-      custom_food_id: customFoodId,
-      quantity_text: normalizeText(item.quantityText),
-      note: normalizeText(item.note),
-    };
-  }
-
-  const freeTextLabel = normalizeText(item.freeTextLabel);
-  if (!freeTextLabel) {
-    throw new Error("Renseigne un libellé libre pour cet item.");
-  }
   return {
-    item_kind: "free_text" as const,
-    free_text_label: freeTextLabel,
-    quantity_text: normalizeText(item.quantityText),
-    note: normalizeText(item.note),
+    label,
+    note: normalizeText(form.note),
+    items: form.items.map(buildTrackingItemDraft),
   };
 }
 
@@ -795,20 +770,18 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setSubmitting(true);
     setActionError(null);
     try {
-      const payload: SavedMealCreateRequest = {
-        label: savedMealForm.label,
-        note: normalizeText(savedMealForm.note),
-        items: savedMealForm.items.map(buildTrackingItemPayload),
-      };
+      const draft = buildSavedMealDraft(savedMealForm);
       if (editingSavedMeal) {
-        const updatePayload: SavedMealUpdateRequest = { ...payload };
         await updateTrackingSavedMeal(
           auth,
           editingSavedMeal.saved_meal_id,
-          updatePayload,
+          buildSavedMealLogUpdateRequestFromDraft(draft),
         );
       } else {
-        await createTrackingSavedMeal(auth, payload);
+        await createTrackingSavedMeal(
+          auth,
+          buildSavedMealLogCreateRequestFromDraft(draft),
+        );
       }
       await refreshAfterMutation();
     } catch (nextError) {

@@ -14,6 +14,8 @@ import type { ProtectedApiAuth } from "../lib/protectedApiAuth";
 import {
   buildMealLogCreateRequestFromDraft,
   buildMealLogUpdateRequestFromDraft,
+  buildSavedMealLogCreateRequestFromDraft,
+  buildSavedMealLogUpdateRequestFromDraft,
   buildSymptomLogCreateRequestFromDraft,
   buildSymptomLogUpdateRequestFromDraft,
   createTrackingSymptom,
@@ -511,6 +513,88 @@ describe("tracking client", () => {
           item_kind: "free_text",
           free_text_label: "Snack libre",
           quantity_text: "1 portion",
+          note: null,
+        },
+      ],
+    });
+  });
+
+  it("builds saved meal transport payloads from a domain draft", () => {
+    const draft = {
+      label: "Petit-déjeuner type",
+      note: "À réutiliser les jours sensibles",
+      items: [
+        {
+          reference: {
+            kind: "canonical_food" as const,
+            foodSlug: "phase2-pain-blanc",
+          },
+          quantityText: "2 tranches",
+          note: null,
+        },
+        {
+          reference: {
+            kind: "custom_food" as const,
+            customFoodId: "22222222-2222-4222-8222-222222222222",
+          },
+          quantityText: null,
+          note: "Version maison",
+        },
+        {
+          reference: {
+            kind: "free_text" as const,
+            label: "Boisson chaude",
+          },
+          quantityText: "1 tasse",
+          note: null,
+        },
+      ],
+    };
+
+    expect(buildSavedMealLogCreateRequestFromDraft(draft)).toEqual({
+      label: "Petit-déjeuner type",
+      note: "À réutiliser les jours sensibles",
+      items: [
+        {
+          item_kind: "canonical_food",
+          food_slug: "phase2-pain-blanc",
+          quantity_text: "2 tranches",
+          note: null,
+        },
+        {
+          item_kind: "custom_food",
+          custom_food_id: "22222222-2222-4222-8222-222222222222",
+          quantity_text: null,
+          note: "Version maison",
+        },
+        {
+          item_kind: "free_text",
+          free_text_label: "Boisson chaude",
+          quantity_text: "1 tasse",
+          note: null,
+        },
+      ],
+    });
+    expect(buildSavedMealLogUpdateRequestFromDraft(draft)).toEqual({
+      label: "Petit-déjeuner type",
+      note: "À réutiliser les jours sensibles",
+      items: [
+        {
+          item_kind: "canonical_food",
+          food_slug: "phase2-pain-blanc",
+          quantity_text: "2 tranches",
+          note: null,
+        },
+        {
+          item_kind: "custom_food",
+          custom_food_id: "22222222-2222-4222-8222-222222222222",
+          quantity_text: null,
+          note: "Version maison",
+        },
+        {
+          item_kind: "free_text",
+          free_text_label: "Boisson chaude",
+          quantity_text: "1 tasse",
           note: null,
         },
       ],
