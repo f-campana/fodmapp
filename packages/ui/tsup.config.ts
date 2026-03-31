@@ -32,7 +32,11 @@ const entry = {
 export default defineConfig({
   entry,
   format: ["esm"],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      ignoreDeprecations: "6.0",
+    },
+  },
   sourcemap: true,
   clean: false,
   external: [
