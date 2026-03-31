@@ -116,13 +116,12 @@ export async function submitWaitlistSignup(
 
   try {
     const sql = neon(marketingDbUrl);
-    const rows = await sql(
-      `INSERT INTO waitlist_signups (email)
-       VALUES ($1)
-       ON CONFLICT (email) DO NOTHING
-       RETURNING email`,
-      [email],
-    );
+    const rows = await sql`
+      INSERT INTO waitlist_signups (email)
+      VALUES (${email})
+      ON CONFLICT (email) DO NOTHING
+      RETURNING email
+    `;
 
     const wasInserted = Array.isArray(rows) && rows.length > 0;
 
