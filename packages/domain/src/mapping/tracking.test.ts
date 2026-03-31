@@ -4,8 +4,8 @@ import {
   mapCustomFoodUpdateRequestToCustomFoodPatch,
   mapMealLogUpdateRequestToMealEntryPatch,
   mapSavedMealUpdateRequestToSavedMealPatch,
-  mapTrackingFeedResponse,
   mapSymptomLogUpdateRequestToSymptomEntryPatch,
+  mapTrackingFeedResponse,
   mapWeeklyTrackingSummaryResponse,
 } from "./tracking";
 
