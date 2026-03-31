@@ -9,7 +9,11 @@ export default defineConfig({
     validate: "src/validate.ts",
   },
   format: ["esm"],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      ignoreDeprecations: "6.0",
+    },
+  },
   sourcemap: true,
   clean: false,
   outExtension() {
