@@ -12,6 +12,8 @@ import {
 } from "../lib/api";
 import type { ProtectedApiAuth } from "../lib/protectedApiAuth";
 import {
+  buildMealLogCreateRequestFromDraft,
+  buildMealLogUpdateRequestFromDraft,
   buildSymptomLogCreateRequestFromDraft,
   buildSymptomLogUpdateRequestFromDraft,
   createTrackingSymptom,
@@ -430,6 +432,91 @@ describe("public read client", () => {
 });
 
 describe("tracking client", () => {
+  it("builds meal transport payloads from a domain draft", () => {
+    const draft = {
+      title: "Déjeuner",
+      occurredAtUtc: "2026-03-20T12:30:00Z",
+      note: "Test digestif",
+      items: [
+        {
+          reference: {
+            kind: "canonical_food" as const,
+            foodSlug: "phase2-ail-cru",
+          },
+          quantityText: "10 g",
+          note: null,
+        },
+        {
+          reference: {
+            kind: "custom_food" as const,
+            customFoodId: "11111111-1111-4111-8111-111111111111",
+          },
+          quantityText: null,
+          note: "Maison",
+        },
+        {
+          reference: {
+            kind: "free_text" as const,
+            label: "Snack libre",
+          },
+          quantityText: "1 portion",
+          note: null,
+        },
+      ],
+    };
+
+    expect(buildMealLogCreateRequestFromDraft(draft)).toEqual({
+      title: "Déjeuner",
+      occurred_at_utc: "2026-03-20T12:30:00Z",
+      note: "Test digestif",
+      items: [
+        {
+          item_kind: "canonical_food",
+          food_slug: "phase2-ail-cru",
+          quantity_text: "10 g",
+          note: null,
+        },
+        {
+          item_kind: "custom_food",
+          custom_food_id: "11111111-1111-4111-8111-111111111111",
+          quantity_text: null,
+          note: "Maison",
+        },
+        {
+          item_kind: "free_text",
+          free_text_label: "Snack libre",
+          quantity_text: "1 portion",
+          note: null,
+        },
+      ],
+    });
+    expect(buildMealLogUpdateRequestFromDraft(draft)).toEqual({
+      title: "Déjeuner",
+      occurred_at_utc: "2026-03-20T12:30:00Z",
+      note: "Test digestif",
+      items: [
+        {
+          item_kind: "canonical_food",
+          food_slug: "phase2-ail-cru",
+          quantity_text: "10 g",
+          note: null,
+        },
+        {
+          item_kind: "custom_food",
+          custom_food_id: "11111111-1111-4111-8111-111111111111",
+          quantity_text: null,
+          note: "Maison",
+        },
+        {
+          item_kind: "free_text",
+          free_text_label: "Snack libre",
+          quantity_text: "1 portion",
+          note: null,
+        },
+      ],
+    });
+  });
+
   it("builds symptom transport payloads from a domain draft", () => {
     const draft = {
       symptomType: "bloating" as const,

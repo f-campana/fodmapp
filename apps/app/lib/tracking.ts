@@ -3,8 +3,10 @@
 import {
   mapTrackingFeedResponse,
   mapWeeklyTrackingSummaryResponse,
+  type MealEntryDraft,
   type SymptomEntryDraft,
   type TrackingFeed,
+  type TrackingItemDraft,
   type WeeklyTrackingSummary,
 } from "@fodmapp/domain";
 import type { components } from "@fodmapp/types";
@@ -28,6 +30,7 @@ export type MealLogCreateRequest =
   components["schemas"]["MealLogCreateRequest"];
 export type MealLogUpdateRequest =
   components["schemas"]["MealLogUpdateRequest"];
+type TrackingItemInput = components["schemas"]["TrackingItemInput"];
 export type CustomFood = components["schemas"]["CustomFood"];
 export type CustomFoodCreateRequest =
   components["schemas"]["CustomFoodCreateRequest"];
@@ -44,9 +47,11 @@ export type WeeklyTrackingSummaryResponse =
   components["schemas"]["WeeklyTrackingSummaryResponse"];
 export type {
   MealEntry,
+  MealEntryDraft,
   SymptomEntry,
   SymptomEntryDraft,
   TrackingFeed,
+  TrackingItemDraft,
   TrackingLoggedItem,
   WeeklyTrackingSummary,
 } from "@fodmapp/domain";
@@ -244,6 +249,56 @@ export function createTrackingMeal(
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
+}
+
+function buildTrackingItemInputFromDraft(
+  draft: TrackingItemDraft,
+): TrackingItemInput {
+  switch (draft.reference.kind) {
+    case "canonical_food":
+      return {
+        item_kind: "canonical_food",
+        food_slug: draft.reference.foodSlug,
+        quantity_text: draft.quantityText,
+        note: draft.note,
+      };
+    case "custom_food":
+      return {
+        item_kind: "custom_food",
+        custom_food_id: draft.reference.customFoodId,
+        quantity_text: draft.quantityText,
+        note: draft.note,
+      };
+    default:
+      return {
+        item_kind: "free_text",
+        free_text_label: draft.reference.label,
+        quantity_text: draft.quantityText,
+        note: draft.note,
+      };
+  }
+}
+
+export function buildMealLogCreateRequestFromDraft(
+  draft: MealEntryDraft,
+): MealLogCreateRequest {
+  return {
+    title: draft.title,
+    occurred_at_utc: draft.occurredAtUtc,
+    note: draft.note,
+    items: draft.items.map(buildTrackingItemInputFromDraft),
+  };
+}
+
+export function buildMealLogUpdateRequestFromDraft(
+  draft: MealEntryDraft,
+): MealLogUpdateRequest {
+  return {
+    title: draft.title,
+    occurred_at_utc: draft.occurredAtUtc,
+    note: draft.note,
+    items: draft.items.map(buildTrackingItemInputFromDraft),
+  };
 }
 
 export function updateTrackingMeal(

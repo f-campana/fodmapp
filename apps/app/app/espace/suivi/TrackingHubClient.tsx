@@ -47,6 +47,8 @@ import {
 } from "../../../lib/dateTimeLocal";
 import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
+  buildMealLogCreateRequestFromDraft,
+  buildMealLogUpdateRequestFromDraft,
   buildSymptomLogCreateRequestFromDraft,
   buildSymptomLogUpdateRequestFromDraft,
   createTrackingCustomFood,
@@ -64,15 +66,15 @@ import {
   listTrackingCustomFoods,
   listTrackingSavedMeals,
   type MealEntry,
+  type MealEntryDraft,
   type MealLog,
-  type MealLogCreateRequest,
-  type MealLogUpdateRequest,
   type SavedMeal,
   type SavedMealCreateRequest,
   type SavedMealUpdateRequest,
   type SymptomEntry,
   type SymptomEntryDraft,
   type TrackingFeed,
+  type TrackingItemDraft,
   type TrackingLoggedItem,
   updateTrackingCustomFood,
   updateTrackingMeal,
@@ -313,6 +315,60 @@ function buildSymptomDraft(form: SymptomFormState): SymptomEntryDraft {
     severity: Number(form.severity),
     notedAtUtc: new Date(form.notedAtUtc).toISOString(),
     note: normalizeText(form.note),
+  };
+}
+
+function buildTrackingItemDraft(item: EditableItem): TrackingItemDraft {
+  if (item.itemKind === "canonical_food") {
+    const foodSlug = normalizeText(item.foodSlug);
+    if (!foodSlug) {
+      throw new Error("Sélectionne un aliment référencé pour cet item.");
+    }
+    return {
+      reference: {
+        kind: "canonical_food",
+        foodSlug,
+      },
+      quantityText: normalizeText(item.quantityText),
+      note: normalizeText(item.note),
+    };
+  }
+
+  if (item.itemKind === "custom_food") {
+    const customFoodId = normalizeText(item.customFoodId);
+    if (!customFoodId) {
+      throw new Error("Sélectionne un aliment personnel pour cet item.");
+    }
+    return {
+      reference: {
+        kind: "custom_food",
+        customFoodId,
+      },
+      quantityText: normalizeText(item.quantityText),
+      note: normalizeText(item.note),
+    };
+  }
+
+  const freeTextLabel = normalizeText(item.freeTextLabel);
+  if (!freeTextLabel) {
+    throw new Error("Renseigne un libellé libre pour cet item.");
+  }
+  return {
+    reference: {
+      kind: "free_text",
+      label: freeTextLabel,
+    },
+    quantityText: normalizeText(item.quantityText),
+    note: normalizeText(item.note),
+  };
+}
+
+function buildMealDraft(form: MealFormState): MealEntryDraft {
+  return {
+    title: normalizeText(form.title),
+    occurredAtUtc: new Date(form.occurredAtUtc).toISOString(),
+    note: normalizeText(form.note),
+    items: form.items.map(buildTrackingItemDraft),
   };
 }
 
@@ -688,17 +744,18 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setSubmitting(true);
     setActionError(null);
     try {
-      const payload: MealLogCreateRequest = {
-        title: normalizeText(mealForm.title),
-        occurred_at_utc: new Date(mealForm.occurredAtUtc).toISOString(),
-        note: normalizeText(mealForm.note),
-        items: mealForm.items.map(buildTrackingItemPayload),
-      };
+      const draft = buildMealDraft(mealForm);
       if (editingMeal) {
-        const updatePayload: MealLogUpdateRequest = { ...payload };
-        await updateTrackingMeal(auth, editingMeal.mealLogId, updatePayload);
+        await updateTrackingMeal(
+          auth,
+          editingMeal.mealLogId,
+          buildMealLogUpdateRequestFromDraft(draft),
+        );
       } else {
-        await createTrackingMeal(auth, payload);
+        await createTrackingMeal(
+          auth,
+          buildMealLogCreateRequestFromDraft(draft),
+        );
       }
       await refreshAfterMutation();
     } catch (nextError) {
