@@ -66,6 +66,20 @@ function getTrackingApiBase(apiBase?: string | null): string | null {
   return apiBase ?? getClientRuntimeEnv().apiBaseUrl;
 }
 
+function isValidTrackingFeedItem(
+  entry: TrackingFeedResponse["items"][number],
+): boolean {
+  if (entry.entry_type === "meal") {
+    return entry.meal != null;
+  }
+
+  if (entry.entry_type === "symptom") {
+    return entry.symptom != null;
+  }
+
+  return false;
+}
+
 async function callTrackingApi<T>(
   path: string,
   auth: ProtectedApiAuth,
@@ -147,7 +161,10 @@ export async function getTrackingHubReadModel(
   ]);
 
   return {
-    feed: mapTrackingFeedResponse(feed),
+    feed: mapTrackingFeedResponse({
+      ...feed,
+      items: feed.items.filter(isValidTrackingFeedItem),
+    }),
     summary: mapWeeklyTrackingSummaryResponse(summary),
   };
 }

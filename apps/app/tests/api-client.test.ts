@@ -826,6 +826,73 @@ describe("tracking client", () => {
     ]);
   });
 
+  it("skips malformed tracking feed rows instead of failing the hub read", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            total: 2,
+            limit: 25,
+            items: [
+              {
+                entry_type: "meal",
+                occurred_at_utc: "2026-03-22T10:00:00Z",
+                meal: null,
+              },
+              {
+                entry_type: "symptom",
+                occurred_at_utc: "2026-03-22T12:00:00Z",
+                symptom: {
+                  symptom_log_id: "symptom-1",
+                  symptom_type: "bloating",
+                  severity: 4,
+                  noted_at_utc: "2026-03-22T12:00:00Z",
+                  note: null,
+                  version: 1,
+                  created_at_utc: "2026-03-22T12:00:00Z",
+                  updated_at_utc: "2026-03-22T12:10:00Z",
+                },
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            anchor_date: "2026-03-22",
+            window_start_utc: "2026-03-15T00:00:00Z",
+            window_end_utc: "2026-03-22T23:59:59Z",
+            daily_counts: [],
+            symptom_counts: [],
+            severity: {
+              average: null,
+              maximum: null,
+            },
+            proximity_groups: [],
+          }),
+          { status: 200 },
+        ),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    const auth: ProtectedApiAuth = {
+      mode: "runtime",
+      getToken: vi.fn().mockResolvedValue("token_123"),
+    };
+
+    const result = await getTrackingHubReadModel(auth, {
+      anchorDate: "2026-03-22",
+      feedLimit: 25,
+    });
+
+    expect(result.feed.items).toHaveLength(1);
+    expect(result.feed.items[0]?.entryType).toBe("symptom");
+    expect(result.feed.total).toBe(2);
+  });
+
   it("keeps preview mode on X-User-Id for local validation", async () => {
     vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "https://api.fodmap.example");
     const fetchMock = vi.fn().mockResolvedValue(

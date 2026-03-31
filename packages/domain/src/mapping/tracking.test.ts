@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  mapCustomFoodUpdateRequestToCustomFoodPatch,
+  mapMealLogUpdateRequestToMealEntryPatch,
+  mapSavedMealUpdateRequestToSavedMealPatch,
   mapTrackingFeedResponse,
+  mapSymptomLogUpdateRequestToSymptomEntryPatch,
   mapWeeklyTrackingSummaryResponse,
 } from "./tracking";
 
@@ -88,5 +92,57 @@ describe("tracking derived projections", () => {
       capturedAt: "2026-03-22T23:59:59Z",
     });
     expect(summary.evidenceTier).toBe("derived");
+  });
+
+  it("preserves explicit null values in update patch mappers", () => {
+    expect(
+      mapMealLogUpdateRequestToMealEntryPatch({
+        occurred_at_utc: null,
+        title: null,
+        note: null,
+        items: undefined,
+      }),
+    ).toEqual({
+      occurredAtUtc: null,
+      title: null,
+      note: null,
+      items: undefined,
+    });
+
+    expect(
+      mapSymptomLogUpdateRequestToSymptomEntryPatch({
+        symptom_type: "bloating",
+        severity: null,
+        noted_at_utc: null,
+        note: null,
+      }),
+    ).toEqual({
+      symptomType: "bloating",
+      severity: null,
+      notedAtUtc: null,
+      note: null,
+    });
+
+    expect(
+      mapCustomFoodUpdateRequestToCustomFoodPatch({
+        label: null,
+        note: null,
+      }),
+    ).toEqual({
+      label: null,
+      note: null,
+    });
+
+    expect(
+      mapSavedMealUpdateRequestToSavedMealPatch({
+        label: null,
+        note: null,
+        items: undefined,
+      }),
+    ).toEqual({
+      label: null,
+      note: null,
+      items: undefined,
+    });
   });
 });
