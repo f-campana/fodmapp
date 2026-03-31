@@ -4,6 +4,7 @@ import {
   mapTrackingFeedResponse,
   mapWeeklyTrackingSummaryResponse,
   type MealEntryDraft,
+  type SavedMealDraft,
   type SymptomEntryDraft,
   type TrackingFeed,
   type TrackingItemDraft,
@@ -48,6 +49,7 @@ export type WeeklyTrackingSummaryResponse =
 export type {
   MealEntry,
   MealEntryDraft,
+  SavedMealDraft,
   SymptomEntry,
   SymptomEntryDraft,
   TrackingFeed,
@@ -403,6 +405,26 @@ export function createTrackingSavedMeal(
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
+}
+
+export function buildSavedMealLogCreateRequestFromDraft(
+  draft: SavedMealDraft,
+): SavedMealCreateRequest {
+  return {
+    label: draft.label,
+    note: draft.note,
+    items: draft.items.map(buildTrackingItemInputFromDraft),
+  };
+}
+
+export function buildSavedMealLogUpdateRequestFromDraft(
+  draft: SavedMealDraft,
+): SavedMealUpdateRequest {
+  return {
+    label: draft.label,
+    note: draft.note,
+    items: draft.items.map(buildTrackingItemInputFromDraft),
+  };
 }
 
 export function updateTrackingSavedMeal(
