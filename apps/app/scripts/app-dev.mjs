@@ -74,7 +74,8 @@ const domainWatchProcess = runProcess(
   repoRootCwd,
 );
 
-const appProcess = runProcess(pnpmCmd, ["exec", "next", "dev"], appCwd);
+const nextDevArgs = ["exec", "next", "dev", ...process.argv.slice(2)];
+const appProcess = runProcess(pnpmCmd, nextDevArgs, appCwd);
 
 domainWatchProcess.on("exit", (code, signal) => {
   if (isShuttingDown) {

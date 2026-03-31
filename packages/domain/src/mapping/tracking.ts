@@ -193,9 +193,9 @@ export function mapMealLogUpdateRequestToMealEntryPatch(
   payload: MealLogUpdateRequest,
 ): MealEntryPatch {
   return {
-    occurredAtUtc: payload.occurred_at_utc ?? undefined,
-    title: payload.title ?? undefined,
-    note: payload.note ?? undefined,
+    occurredAtUtc: payload.occurred_at_utc,
+    title: payload.title,
+    note: payload.note,
     items: payload.items?.map(mapTrackingItemInputToTrackingItemDraft),
   };
 }
@@ -232,10 +232,10 @@ export function mapSymptomLogUpdateRequestToSymptomEntryPatch(
   payload: SymptomLogUpdateRequest,
 ): SymptomEntryPatch {
   return {
-    symptomType: payload.symptom_type ?? undefined,
-    severity: payload.severity ?? undefined,
-    notedAtUtc: payload.noted_at_utc ?? undefined,
-    note: payload.note ?? undefined,
+    symptomType: payload.symptom_type,
+    severity: payload.severity,
+    notedAtUtc: payload.noted_at_utc,
+    note: payload.note,
   };
 }
 
@@ -272,8 +272,8 @@ export function mapCustomFoodUpdateRequestToCustomFoodPatch(
   payload: CustomFoodUpdateRequest,
 ): CustomFoodPatch {
   return {
-    label: payload.label ?? undefined,
-    note: payload.note ?? undefined,
+    label: payload.label,
+    note: payload.note,
   };
 }
 
@@ -324,8 +324,8 @@ export function mapSavedMealUpdateRequestToSavedMealPatch(
   payload: SavedMealUpdateRequest,
 ): SavedMealPatch {
   return {
-    label: payload.label ?? undefined,
-    note: payload.note ?? undefined,
+    label: payload.label,
+    note: payload.note,
     items: payload.items?.map(mapTrackingItemInputToTrackingItemDraft),
   };
 }
