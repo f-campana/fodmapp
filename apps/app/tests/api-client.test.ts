@@ -12,6 +12,8 @@ import {
 } from "../lib/api";
 import type { ProtectedApiAuth } from "../lib/protectedApiAuth";
 import {
+  buildCustomFoodCreateRequestFromDraft,
+  buildCustomFoodUpdateRequestFromDraft,
   buildMealLogCreateRequestFromDraft,
   buildMealLogUpdateRequestFromDraft,
   buildSavedMealLogCreateRequestFromDraft,
@@ -434,6 +436,22 @@ describe("public read client", () => {
 });
 
 describe("tracking client", () => {
+  it("builds custom food transport payloads from a domain draft", () => {
+    const draft = {
+      label: "Pain maison",
+      note: "Recette perso pauvre en lactose",
+    };
+
+    expect(buildCustomFoodCreateRequestFromDraft(draft)).toEqual({
+      label: "Pain maison",
+      note: "Recette perso pauvre en lactose",
+    });
+    expect(buildCustomFoodUpdateRequestFromDraft(draft)).toEqual({
+      label: "Pain maison",
+      note: "Recette perso pauvre en lactose",
+    });
+  });
+
   it("builds meal transport payloads from a domain draft", () => {
     const draft = {
       title: "Déjeuner",

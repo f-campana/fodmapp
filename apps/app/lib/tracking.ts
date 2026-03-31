@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  type CustomFoodDraft,
   mapTrackingFeedResponse,
   mapWeeklyTrackingSummaryResponse,
   type MealEntryDraft,
@@ -47,6 +48,7 @@ export type TrackingFeedResponse =
 export type WeeklyTrackingSummaryResponse =
   components["schemas"]["WeeklyTrackingSummaryResponse"];
 export type {
+  CustomFoodDraft,
   MealEntry,
   MealEntryDraft,
   SavedMealDraft,
@@ -370,6 +372,24 @@ export function createTrackingCustomFood(
     { method: "POST", body: JSON.stringify(payload) },
     apiBase,
   );
+}
+
+export function buildCustomFoodCreateRequestFromDraft(
+  draft: CustomFoodDraft,
+): CustomFoodCreateRequest {
+  return {
+    label: draft.label,
+    note: draft.note,
+  };
+}
+
+export function buildCustomFoodUpdateRequestFromDraft(
+  draft: CustomFoodDraft,
+): CustomFoodUpdateRequest {
+  return {
+    label: draft.label,
+    note: draft.note,
+  };
 }
 
 export function updateTrackingCustomFood(

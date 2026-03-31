@@ -47,6 +47,8 @@ import {
 } from "../../../lib/dateTimeLocal";
 import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
+  buildCustomFoodCreateRequestFromDraft,
+  buildCustomFoodUpdateRequestFromDraft,
   buildMealLogCreateRequestFromDraft,
   buildMealLogUpdateRequestFromDraft,
   buildSavedMealLogCreateRequestFromDraft,
@@ -58,8 +60,7 @@ import {
   createTrackingSavedMeal,
   createTrackingSymptom,
   type CustomFood,
-  type CustomFoodCreateRequest,
-  type CustomFoodUpdateRequest,
+  type CustomFoodDraft,
   deleteTrackingCustomFood,
   deleteTrackingMeal,
   deleteTrackingSavedMeal,
@@ -383,6 +384,18 @@ function buildSavedMealDraft(form: SavedMealFormState): SavedMealDraft {
     label,
     note: normalizeText(form.note),
     items: form.items.map(buildTrackingItemDraft),
+  };
+}
+
+function buildCustomFoodDraft(form: CustomFoodFormState): CustomFoodDraft {
+  const label = normalizeText(form.label);
+  if (!label) {
+    throw new Error("Renseigne un libellé pour cet aliment personnel.");
+  }
+
+  return {
+    label,
+    note: normalizeText(form.note),
   };
 }
 
@@ -744,19 +757,18 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setSubmitting(true);
     setActionError(null);
     try {
-      const payload: CustomFoodCreateRequest = {
-        label: customFoodForm.label,
-        note: normalizeText(customFoodForm.note),
-      };
+      const draft = buildCustomFoodDraft(customFoodForm);
       if (editingCustomFood) {
-        const updatePayload: CustomFoodUpdateRequest = { ...payload };
         await updateTrackingCustomFood(
           auth,
           editingCustomFood.custom_food_id,
-          updatePayload,
+          buildCustomFoodUpdateRequestFromDraft(draft),
         );
       } else {
-        await createTrackingCustomFood(auth, payload);
+        await createTrackingCustomFood(
+          auth,
+          buildCustomFoodCreateRequestFromDraft(draft),
+        );
       }
       await refreshAfterMutation();
     } catch (nextError) {
