@@ -1,6 +1,7 @@
 ---
 "@fodmapp/mobile-prototype": patch
+"@fodmapp/app": patch
 "@fodmapp/storybook": patch
 ---
 
-chore: bump mobile runtime dependencies and refresh storybook css typings
+chore: bump mobile runtime dependencies and refresh css typings
