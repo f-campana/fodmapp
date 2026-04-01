@@ -16,7 +16,16 @@ export {
 } from "./public/foods";
 export type { CuratedSwapListOptions } from "./public/swaps";
 export { listCuratedSwaps } from "./public/swaps";
+export {
+  createCustomFoodRecord,
+  updateCustomFoodRecord,
+} from "./tracking/custom-foods";
 export { getTrackingFeed } from "./tracking/feed";
+export { createMealEntry, updateMealEntry } from "./tracking/meals";
+export {
+  createSavedMealRecord,
+  updateSavedMealRecord,
+} from "./tracking/saved-meals";
 export type {
   TrackingHubReadModel,
   TrackingHubReadOptions,
@@ -25,6 +34,7 @@ export {
   getTrackingHubReadModel,
   getWeeklyTrackingSummary,
 } from "./tracking/summaries";
+export { createSymptomEntry, updateSymptomEntry } from "./tracking/symptoms";
 export type {
   CuratedFood,
   CuratedFoodProfile,
@@ -32,6 +42,10 @@ export type {
   CuratedFoodSummary,
   CuratedSwap,
   CuratedSwapList,
+  CustomFoodRecord,
+  MealEntry,
+  SavedMealRecord,
+  SymptomEntry,
   TrackingFeed,
   WeeklyTrackingSummary,
 } from "@fodmapp/domain";
