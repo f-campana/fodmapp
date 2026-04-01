@@ -62,10 +62,29 @@ function handleSignal() {
   process.exit(0);
 }
 
+function handleWatchExit(name, child) {
+  child.on("exit", (code, signal) => {
+    if (isShuttingDown) {
+      return;
+    }
+
+    if (code === 0 || signal === "SIGINT" || signal === "SIGTERM") {
+      return;
+    }
+
+    process.stderr.write(
+      `[app-dev] ${name} watch exited unexpectedly. Stopping Next.js dev server.\n`,
+    );
+    shutdownAll();
+    process.exit(code ?? 1);
+  });
+}
+
 process.on("SIGINT", handleSignal);
 process.on("SIGTERM", handleSignal);
 
 runBuild(["--filter", "@fodmapp/domain", "build"]);
+runBuild(["--filter", "@fodmapp/api-client", "build"]);
 runBuild(["--filter", "@fodmapp/ui", "build"]);
 
 const domainWatchProcess = runProcess(
@@ -73,25 +92,17 @@ const domainWatchProcess = runProcess(
   ["--filter", "@fodmapp/domain", "watch"],
   repoRootCwd,
 );
+const apiClientWatchProcess = runProcess(
+  pnpmCmd,
+  ["--filter", "@fodmapp/api-client", "watch"],
+  repoRootCwd,
+);
 
 const nextDevArgs = ["exec", "next", "dev", ...process.argv.slice(2)];
 const appProcess = runProcess(pnpmCmd, nextDevArgs, appCwd);
 
-domainWatchProcess.on("exit", (code, signal) => {
-  if (isShuttingDown) {
-    return;
-  }
-
-  if (code === 0 || signal === "SIGINT" || signal === "SIGTERM") {
-    return;
-  }
-
-  process.stderr.write(
-    "[app-dev] domain watch exited unexpectedly. Stopping Next.js dev server.\n",
-  );
-  shutdownAll();
-  process.exit(code ?? 1);
-});
+handleWatchExit("domain", domainWatchProcess);
+handleWatchExit("api-client", apiClientWatchProcess);
 
 appProcess.on("exit", (code, signal) => {
   shutdownAll();
