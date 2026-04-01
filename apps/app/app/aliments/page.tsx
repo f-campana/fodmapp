@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { searchCuratedFoods } from "@fodmapp/api-client";
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 import {
   Card,
@@ -9,7 +10,7 @@ import {
   CardTitle,
 } from "@fodmapp/ui/card";
 
-import { searchCuratedFoods } from "../../lib/api";
+import { getPublicApiClientConfig } from "../../lib/apiClientConfig";
 import { formatFoodLevel } from "../../lib/format";
 import SearchForm from "./SearchForm";
 
@@ -26,7 +27,10 @@ export default async function AlimentsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const query = normalizeSearchQuery(resolvedSearchParams?.q);
-  const results = query.length > 0 ? await searchCuratedFoods(query, 12) : null;
+  const results =
+    query.length > 0
+      ? await searchCuratedFoods(getPublicApiClientConfig(), query, 12)
+      : null;
 
   return (
     <main className="product-page">

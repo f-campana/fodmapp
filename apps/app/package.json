@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "node ./scripts/app-dev.mjs",
-    "build": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next build",
-    "analyze": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
+    "build": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/api-client build && pnpm --filter @fodmapp/ui build && next build",
+    "analyze": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/api-client build && pnpm --filter @fodmapp/ui build && ANALYZE=true next build --webpack",
     "start": "next start",
-    "typecheck": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit",
-    "test": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/ui build && vitest run"
+    "typecheck": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/api-client build && pnpm --filter @fodmapp/ui build && next typegen && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/api-client build && pnpm --filter @fodmapp/ui build && vitest run"
   },
   "dependencies": {
     "@clerk/nextjs": "6.39.0",
+    "@fodmapp/api-client": "workspace:*",
     "@fodmapp/domain": "workspace:*",
     "@fodmapp/tailwind-config": "workspace:*",
     "@fodmapp/types": "workspace:*",

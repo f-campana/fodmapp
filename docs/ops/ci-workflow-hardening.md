@@ -4,9 +4,9 @@ Status: Implemented
 Audience: Maintainer or operator; Reviewer or auditor  
 Scope: Repo-wide CI, branch-protection, and workflow hardening controls for the public repository.  
 Related docs: [docs/foundation/project-definition.md](../foundation/project-definition.md), [docs/foundation/documentation-personas.md](../foundation/documentation-personas.md), [docs/README.md](../README.md)  
-Last reviewed: 2026-03-21
+Last reviewed: 2026-04-01
 
-Last updated: 2026-03-21
+Last updated: 2026-04-01
 
 ## Scope
 
@@ -148,6 +148,7 @@ This prevents shared-worktree output races on local pre-push runs, especially ar
 
 Local full-gate JS lint now mirrors CI's dist-import preparation before `pnpm lint:js:ci`:
 
+- `pnpm exec turbo run build --filter=@fodmapp/api-client`
 - `pnpm exec turbo run build --filter=@fodmapp/ui`
 - `pnpm exec turbo run build --filter=@fodmapp/reporting`
 
@@ -214,6 +215,7 @@ Lint import contract:
 
 - the `eslint` job must prebuild any internal workspace package whose published imports resolve from `dist`
 - current required prebuilds before `pnpm lint:ci`:
+  - `pnpm exec turbo run build --filter=@fodmapp/api-client`
   - `pnpm exec turbo run build --filter=@fodmapp/ui`
   - `pnpm exec turbo run build --filter=@fodmapp/reporting`
 - this keeps `eslint-plugin-import` resolution deterministic on clean CI checkouts for apps that import workspace subpaths such as `@fodmapp/ui/*` and `@fodmapp/reporting/*`
@@ -437,6 +439,7 @@ Configure `main` to require these checks:
 2. Confirm scoped Turbo jobs are skipped and `CI` still passes.
 3. Open an app-only PR touching `apps/app/**` files.
 4. Confirm `app-scaffold` runs while other scoped Turbo jobs stay skipped.
+   This lane now covers both `@fodmapp/api-client` and `@fodmapp/app`.
 5. Open a PR touching global build/workflow files (for example `package.json`, `turbo.json`, `.github/workflows/ci.yml`).
 6. Confirm all scoped Turbo jobs run.
 7. Confirm required checks are present and pass without missing-status blockers.

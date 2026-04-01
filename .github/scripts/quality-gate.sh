@@ -277,7 +277,7 @@ if [[ "$run_full" == "true" ]]; then
   # so they must stay serialized even when the read-only checks above run in parallel.
   run_cmd \
     "lint (JS dist-backed)" \
-    bash -lc "pnpm exec turbo run build --filter=@fodmapp/domain --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm lint:js:ci"
+    bash -lc "pnpm exec turbo run build --filter=@fodmapp/domain --filter=@fodmapp/api-client --filter=@fodmapp/ui --filter=@fodmapp/reporting && pnpm lint:js:ci"
 
   if [[ "$quality_scope_ui_foundation" == "true" ]]; then
     run_cmd \
@@ -286,8 +286,11 @@ if [[ "$run_full" == "true" ]]; then
   fi
 
   if [[ "$quality_scope_app_scaffold" == "true" ]]; then
+    run_cmd "api-client scope (test)" pnpm exec turbo run test --filter=@fodmapp/api-client
     run_cmd "app scope (test)" pnpm exec turbo run test --filter=@fodmapp/app
+    run_cmd "api-client scope (typecheck)" pnpm exec turbo run typecheck --filter=@fodmapp/api-client
     run_cmd "app scope (typecheck)" pnpm exec turbo run typecheck --filter=@fodmapp/app
+    run_cmd "api-client scope (build)" pnpm exec turbo run build --filter=@fodmapp/api-client
     run_cmd "app scope (build)" pnpm exec turbo run build --filter=@fodmapp/app
   fi
 

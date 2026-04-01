@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { getCuratedFoodDetailPageData } from "@fodmapp/api-client";
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 import { Badge } from "@fodmapp/ui/badge";
 import {
@@ -12,7 +13,7 @@ import {
 } from "@fodmapp/ui/card";
 import { ScoreBar } from "@fodmapp/ui/score-bar";
 
-import { getCuratedFoodDetailPageData } from "../../../lib/api";
+import { getPublicApiClientConfig } from "../../../lib/apiClientConfig";
 import { formatFoodLevel } from "../../../lib/format";
 
 function formatTimestamp(value: string): string {
@@ -29,7 +30,7 @@ export default async function AlimentDetailPage({
 }) {
   const { slug } = await params;
   const { foodResult, rollupResult, swapsResult } =
-    await getCuratedFoodDetailPageData(slug);
+    await getCuratedFoodDetailPageData(getPublicApiClientConfig(), slug);
 
   if (!foodResult.ok && foodResult.status === 404) {
     notFound();

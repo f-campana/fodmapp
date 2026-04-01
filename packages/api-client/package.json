@@ -1,0 +1,34 @@
+{
+  "name": "@fodmapp/api-client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "pnpm --filter @fodmapp/domain build && pnpm run clean && tsup",
+    "watch": "tsup --watch",
+    "test": "pnpm --filter @fodmapp/domain build && vitest run",
+    "typecheck": "pnpm --filter @fodmapp/domain build && tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fodmapp/domain": "workspace:*",
+    "@fodmapp/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0",
+    "tsup": "8.5.1",
+    "typescript": "6.0.2",
+    "vitest": "4.0.18"
+  }
+}

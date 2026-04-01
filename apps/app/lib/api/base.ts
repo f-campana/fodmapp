@@ -1,43 +1,19 @@
+import {
+  buildApiUrl as buildSharedApiUrl,
+  resolveApiBase as resolveSharedApiBase,
+} from "@fodmapp/api-client";
+
 import { getClientRuntimeEnv } from "../env.client";
-
-const API_VERSION_PREFIX = "/v0";
-
-function trimTrailingSlash(value: string): string {
-  return value.endsWith("/") ? value.slice(0, -1) : value;
-}
 
 export function resolveApiBase(
   apiBase: string | null = getClientRuntimeEnv().apiBaseUrl,
 ): string | null {
-  if (!apiBase) {
-    return null;
-  }
-
-  const normalized = trimTrailingSlash(apiBase);
-  return normalized.endsWith(API_VERSION_PREFIX)
-    ? normalized
-    : `${normalized}${API_VERSION_PREFIX}`;
+  return resolveSharedApiBase(apiBase);
 }
 
 export function buildApiUrl(
   path: string,
   apiBase: string | null = getClientRuntimeEnv().apiBaseUrl,
 ): string | null {
-  const base = resolveApiBase(apiBase);
-  if (!base) {
-    return null;
-  }
-
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-  if (/^https?:\/\//i.test(base)) {
-    return `${base}${normalizedPath}`;
-  }
-
-  // Server-rendered routes must use an absolute API origin because `window` is
-  // unavailable when resolving relative URLs on the server.
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return `${window.location.protocol}//${window.location.host}${base}${normalizedPath}`;
+  return buildSharedApiUrl(path, apiBase);
 }
