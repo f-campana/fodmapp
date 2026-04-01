@@ -8,5 +8,6 @@ coverage
 storybook-static
 dist
 packages/design-tokens/src/generated
+apps/marketing/src/styles/layout.generated.css
 pnpm-lock.yaml
 etl/phase2/reporting/contracts/baselines/render/**
