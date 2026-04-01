@@ -4,6 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@clerk/nextjs";
 
+import {
+  getTrackingHubReadModel,
+  type TrackingFeed,
+  type WeeklyTrackingSummary,
+} from "@fodmapp/api-client";
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
 import {
   AlertDialog,
@@ -41,6 +46,7 @@ import {
   searchTrackingCanonicalFoods,
   type TrackingCanonicalFoodOption,
 } from "../../../lib/api";
+import { getProtectedApiClientConfig } from "../../../lib/apiClientConfig";
 import {
   formatUtcIsoForDateTimeLocal,
   nowDateInputValue,
@@ -65,7 +71,6 @@ import {
   deleteTrackingMeal,
   deleteTrackingSavedMeal,
   deleteTrackingSymptom,
-  getTrackingHubReadModel,
   listTrackingCustomFoods,
   listTrackingSavedMeals,
   type MealEntry,
@@ -75,14 +80,12 @@ import {
   type SavedMealDraft,
   type SymptomEntry,
   type SymptomEntryDraft,
-  type TrackingFeed,
   type TrackingItemDraft,
   type TrackingLoggedItem,
   updateTrackingCustomFood,
   updateTrackingMeal,
   updateTrackingSavedMeal,
   updateTrackingSymptom,
-  type WeeklyTrackingSummary,
 } from "../../../lib/tracking";
 
 type TrackingItemKind = "canonical_food" | "custom_food" | "free_text";
@@ -662,7 +665,10 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     setError(null);
     try {
       const [readModel, nextCustomFoods, nextSavedMeals] = await Promise.all([
-        getTrackingHubReadModel(auth, { anchorDate, feedLimit: 50 }),
+        getTrackingHubReadModel(getProtectedApiClientConfig(), auth, {
+          anchorDate,
+          feedLimit: 50,
+        }),
         listTrackingCustomFoods(auth),
         listTrackingSavedMeals(auth),
       ]);
