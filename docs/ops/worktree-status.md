@@ -1,6 +1,6 @@
 # Worktree Status
 
-Last reviewed: 2026-03-31
+Last reviewed: 2026-04-01
 Source of truth: team operational state (live, update as status changes)
 
 ## Rules
@@ -15,6 +15,7 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                                                          | Branch                                       | Status             | Scope                                                                                                                                                                              | Notes / blockers                                                     |
 | -------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`                                               | `main`                                       | active (protected) | Main integration worktree only                                                                                                                                                     | Must remain clean.                                                   |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/api-client-public-read-v1`            | `codex/api-client-public-read-v1`            | active             | First `@fodmapp/api-client` extraction slice: package scaffold, shared client core, and domain-backed public catalog reads for foods search/detail plus swaps                      | Keep tracking transport and non-domain discovery reads out of scope. |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/custom-food-write-domain-v1`          | `codex/custom-food-write-domain-v1`          | active             | Next tracking write adoption slice for `@fodmapp/domain`: route custom food create/update submissions through a domain draft before the raw transport layer                        | In progress. Keep symptom, meal, and saved meal writes unchanged.    |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/saved-meal-write-domain-v1`           | `codex/saved-meal-write-domain-v1`           | merged             | Next tracking write adoption slice for `@fodmapp/domain`: route saved meal create/update submissions through a domain draft before the raw transport layer                         | Merged via PR #328; local worktree removed and branch deleted.       |
 | `/Users/fabiencampana/Documents/Fodmap-worktrees/meal-write-domain-v1`                 | `codex/meal-write-domain-v1`                 | merged             | Next tracking write adoption slice for `@fodmapp/domain`: route meal create/update submissions through a domain draft before the raw transport layer                               | Merged via PR #327; local worktree removed and branch deleted.       |

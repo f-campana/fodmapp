@@ -1,22 +1,25 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import {
+  getCuratedFoodDetailPageData,
+  searchCuratedFoods,
+} from "@fodmapp/api-client";
+
 import FoodDetailPage from "../app/aliments/[slug]/page";
 import FoodsLoading from "../app/aliments/loading";
 import AlimentsPage from "../app/aliments/page";
 import DecouvrirLoading from "../app/decouvrir/loading";
 import DecouvrirPage from "../app/decouvrir/page";
 import HomePage from "../app/page";
-import {
-  getCuratedFoodDetailPageData,
-  getSafeHarbors,
-  searchCuratedFoods,
-} from "../lib/api";
+import { getSafeHarbors } from "../lib/api";
 
-vi.mock("../lib/api", () => ({
+vi.mock("@fodmapp/api-client", () => ({
   getCuratedFoodDetailPageData: vi.fn(),
-  getSafeHarbors: vi.fn(),
   searchCuratedFoods: vi.fn(),
+}));
+vi.mock("../lib/api", () => ({
+  getSafeHarbors: vi.fn(),
 }));
 
 const mockedGetCuratedFoodDetailPageData = vi.mocked(

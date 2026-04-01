@@ -44,6 +44,7 @@ jobs:
       - name: Build dist-backed workspace packages for lint imports
         run: |
           pnpm exec turbo run build --filter=@fodmapp/domain
+          pnpm exec turbo run build --filter=@fodmapp/api-client
           pnpm exec turbo run build --filter=@fodmapp/ui
           pnpm exec turbo run build --filter=@fodmapp/reporting
 
@@ -264,8 +265,11 @@ jobs:
 
       - name: Test, build, and typecheck app scaffold
         run: |
+          pnpm exec turbo run test --filter=@fodmapp/api-client
           pnpm exec turbo run test --filter=@fodmapp/app
+          pnpm exec turbo run typecheck --filter=@fodmapp/api-client
           pnpm exec turbo run typecheck --filter=@fodmapp/app
+          pnpm exec turbo run build --filter=@fodmapp/api-client
           pnpm exec turbo run build --filter=@fodmapp/app
 
       - name: Save Turbo local cache fallback

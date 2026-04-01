@@ -18,6 +18,7 @@ const scopeMap = {
   ],
   app_scaffold: [
     "apps/app/",
+    "packages/api-client/",
     "packages/types/",
     "packages/ui/",
     "packages/tailwind-config/",
