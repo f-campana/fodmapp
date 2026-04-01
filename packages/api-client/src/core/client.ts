@@ -1,3 +1,4 @@
+import { buildProtectedApiHeaders, type ProtectedApiAuth } from "./auth";
 import { type ApiClientConfig, buildApiUrl } from "./config";
 import { parseErrorResponse } from "./errors";
 import type { ApiResult } from "./result";
@@ -50,4 +51,43 @@ export async function requestJson<T>(
       error: "request_failed",
     };
   }
+}
+
+export async function requestProtectedJson<T>(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  path: string,
+  init: RequestInit = {},
+  options: { errorPrefix?: string } = {},
+): Promise<T> {
+  const errorPrefix = options.errorPrefix ?? "protected-api";
+  const headers = await buildProtectedApiHeaders(auth, init.headers, {
+    json: Boolean(init.body),
+  });
+
+  const url = buildApiUrl(path, config.apiBaseUrl);
+  if (!url) {
+    throw new Error(`${errorPrefix} error 0: api_not_configured`);
+  }
+
+  const response = await fetch(url, {
+    ...init,
+    cache: "no-store",
+    headers,
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    const message =
+      typeof body === "object" && body && "error" in body
+        ? JSON.stringify(body)
+        : await response.text().catch(() => "");
+    throw new Error(`${errorPrefix} error ${response.status}: ${message}`);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
 }

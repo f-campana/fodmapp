@@ -16,6 +16,15 @@ export {
 } from "./public/foods";
 export type { CuratedSwapListOptions } from "./public/swaps";
 export { listCuratedSwaps } from "./public/swaps";
+export { getTrackingFeed } from "./tracking/feed";
+export type {
+  TrackingHubReadModel,
+  TrackingHubReadOptions,
+} from "./tracking/summaries";
+export {
+  getTrackingHubReadModel,
+  getWeeklyTrackingSummary,
+} from "./tracking/summaries";
 export type {
   CuratedFood,
   CuratedFoodProfile,
@@ -23,4 +32,6 @@ export type {
   CuratedFoodSummary,
   CuratedSwap,
   CuratedSwapList,
+  TrackingFeed,
+  WeeklyTrackingSummary,
 } from "@fodmapp/domain";

@@ -2,14 +2,10 @@
 
 import {
   type CustomFoodDraft,
-  mapTrackingFeedResponse,
-  mapWeeklyTrackingSummaryResponse,
   type MealEntryDraft,
   type SavedMealDraft,
   type SymptomEntryDraft,
-  type TrackingFeed,
   type TrackingItemDraft,
-  type WeeklyTrackingSummary,
 } from "@fodmapp/domain";
 import type { components } from "@fodmapp/types";
 
@@ -43,10 +39,6 @@ export type SavedMealCreateRequest =
   components["schemas"]["SavedMealCreateRequest"];
 export type SavedMealUpdateRequest =
   components["schemas"]["SavedMealUpdateRequest"];
-export type TrackingFeedResponse =
-  components["schemas"]["TrackingFeedResponse"];
-export type WeeklyTrackingSummaryResponse =
-  components["schemas"]["WeeklyTrackingSummaryResponse"];
 export type {
   CustomFoodDraft,
   MealEntry,
@@ -54,32 +46,12 @@ export type {
   SavedMealDraft,
   SymptomEntry,
   SymptomEntryDraft,
-  TrackingFeed,
   TrackingItemDraft,
   TrackingLoggedItem,
-  WeeklyTrackingSummary,
 } from "@fodmapp/domain";
-export interface TrackingHubReadModel {
-  feed: TrackingFeed;
-  summary: WeeklyTrackingSummary;
-}
 
 function getTrackingApiBase(apiBase?: string | null): string | null {
   return apiBase ?? getClientRuntimeEnv().apiBaseUrl;
-}
-
-function isValidTrackingFeedItem(
-  entry: TrackingFeedResponse["items"][number],
-): boolean {
-  if (entry.entry_type === "meal") {
-    return entry.meal != null;
-  }
-
-  if (entry.entry_type === "symptom") {
-    return entry.symptom != null;
-  }
-
-  return false;
 }
 
 async function callTrackingApi<T>(
@@ -117,58 +89,6 @@ async function callTrackingApi<T>(
   }
 
   return response.json() as Promise<T>;
-}
-
-export function getTrackingFeed(
-  auth: ProtectedApiAuth,
-  limit = 50,
-  apiBase?: string | null,
-): Promise<TrackingFeedResponse> {
-  return callTrackingApi<TrackingFeedResponse>(
-    `${TRACKING_API_ROOT}/feed?limit=${limit}`,
-    auth,
-    { method: "GET" },
-    apiBase,
-  );
-}
-
-export function getWeeklyTrackingSummary(
-  auth: ProtectedApiAuth,
-  anchorDate?: string,
-  apiBase?: string | null,
-): Promise<WeeklyTrackingSummaryResponse> {
-  const suffix = anchorDate
-    ? `${TRACKING_API_ROOT}/summary/weekly?anchor_date=${encodeURIComponent(anchorDate)}`
-    : `${TRACKING_API_ROOT}/summary/weekly`;
-  return callTrackingApi<WeeklyTrackingSummaryResponse>(
-    suffix,
-    auth,
-    { method: "GET" },
-    apiBase,
-  );
-}
-
-export async function getTrackingHubReadModel(
-  auth: ProtectedApiAuth,
-  options: {
-    anchorDate?: string;
-    feedLimit?: number;
-    apiBase?: string | null;
-  } = {},
-): Promise<TrackingHubReadModel> {
-  const { anchorDate, feedLimit = 50, apiBase } = options;
-  const [feed, summary] = await Promise.all([
-    getTrackingFeed(auth, feedLimit, apiBase),
-    getWeeklyTrackingSummary(auth, anchorDate, apiBase),
-  ]);
-
-  return {
-    feed: mapTrackingFeedResponse({
-      ...feed,
-      items: feed.items.filter(isValidTrackingFeedItem),
-    }),
-    summary: mapWeeklyTrackingSummaryResponse(summary),
-  };
 }
 
 export function listTrackingSymptoms(

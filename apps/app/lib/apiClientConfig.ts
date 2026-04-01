@@ -2,8 +2,16 @@ import type { ApiClientConfig } from "@fodmapp/api-client";
 
 import { getClientRuntimeEnv } from "./env.client";
 
-export function getPublicApiClientConfig(): ApiClientConfig {
+function getRuntimeApiClientConfig(): ApiClientConfig {
   return {
     apiBaseUrl: getClientRuntimeEnv().apiBaseUrl,
   };
+}
+
+export function getPublicApiClientConfig(): ApiClientConfig {
+  return getRuntimeApiClientConfig();
+}
+
+export function getProtectedApiClientConfig(): ApiClientConfig {
+  return getRuntimeApiClientConfig();
 }
