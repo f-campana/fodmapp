@@ -44,6 +44,7 @@ jobs:
       - name: Build dist-backed workspace packages for lint imports
         run: |
           pnpm exec turbo run build --filter=@fodmapp/domain
+          pnpm exec turbo run build --filter=@fodmapp/api-client
           pnpm exec turbo run build --filter=@fodmapp/ui
           pnpm exec turbo run build --filter=@fodmapp/reporting
 
