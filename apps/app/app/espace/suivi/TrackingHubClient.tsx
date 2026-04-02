@@ -5,8 +5,16 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 import {
+  createCustomFoodRecord,
+  createMealEntry,
+  createSavedMealRecord,
+  createSymptomEntry,
   getTrackingHubReadModel,
   type TrackingFeed,
+  updateCustomFoodRecord,
+  updateMealEntry,
+  updateSavedMealRecord,
+  updateSymptomEntry,
   type WeeklyTrackingSummary,
 } from "@fodmapp/api-client";
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
@@ -53,18 +61,6 @@ import {
 } from "../../../lib/dateTimeLocal";
 import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
 import {
-  buildCustomFoodCreateRequestFromDraft,
-  buildCustomFoodUpdateRequestFromDraft,
-  buildMealLogCreateRequestFromDraft,
-  buildMealLogUpdateRequestFromDraft,
-  buildSavedMealLogCreateRequestFromDraft,
-  buildSavedMealLogUpdateRequestFromDraft,
-  buildSymptomLogCreateRequestFromDraft,
-  buildSymptomLogUpdateRequestFromDraft,
-  createTrackingCustomFood,
-  createTrackingMeal,
-  createTrackingSavedMeal,
-  createTrackingSymptom,
   type CustomFood,
   type CustomFoodDraft,
   deleteTrackingCustomFood,
@@ -82,10 +78,6 @@ import {
   type SymptomEntryDraft,
   type TrackingItemDraft,
   type TrackingLoggedItem,
-  updateTrackingCustomFood,
-  updateTrackingMeal,
-  updateTrackingSavedMeal,
-  updateTrackingSymptom,
 } from "../../../lib/tracking";
 
 type TrackingItemKind = "canonical_food" | "custom_food" | "free_text";
@@ -715,16 +707,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       const draft = buildSymptomDraft(symptomForm);
       if (editingSymptom) {
-        await updateTrackingSymptom(
+        await updateSymptomEntry(
+          getProtectedApiClientConfig(),
           auth,
           editingSymptom.symptomLogId,
-          buildSymptomLogUpdateRequestFromDraft(draft),
+          draft,
         );
       } else {
-        await createTrackingSymptom(
-          auth,
-          buildSymptomLogCreateRequestFromDraft(draft),
-        );
+        await createSymptomEntry(getProtectedApiClientConfig(), auth, draft);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -740,16 +730,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       const draft = buildMealDraft(mealForm);
       if (editingMeal) {
-        await updateTrackingMeal(
+        await updateMealEntry(
+          getProtectedApiClientConfig(),
           auth,
           editingMeal.mealLogId,
-          buildMealLogUpdateRequestFromDraft(draft),
+          draft,
         );
       } else {
-        await createTrackingMeal(
-          auth,
-          buildMealLogCreateRequestFromDraft(draft),
-        );
+        await createMealEntry(getProtectedApiClientConfig(), auth, draft);
       }
       await refreshAfterMutation();
     } catch (nextError) {
@@ -765,15 +753,17 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       const draft = buildCustomFoodDraft(customFoodForm);
       if (editingCustomFood) {
-        await updateTrackingCustomFood(
+        await updateCustomFoodRecord(
+          getProtectedApiClientConfig(),
           auth,
           editingCustomFood.custom_food_id,
-          buildCustomFoodUpdateRequestFromDraft(draft),
+          draft,
         );
       } else {
-        await createTrackingCustomFood(
+        await createCustomFoodRecord(
+          getProtectedApiClientConfig(),
           auth,
-          buildCustomFoodCreateRequestFromDraft(draft),
+          draft,
         );
       }
       await refreshAfterMutation();
@@ -790,16 +780,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       const draft = buildSavedMealDraft(savedMealForm);
       if (editingSavedMeal) {
-        await updateTrackingSavedMeal(
+        await updateSavedMealRecord(
+          getProtectedApiClientConfig(),
           auth,
           editingSavedMeal.saved_meal_id,
-          buildSavedMealLogUpdateRequestFromDraft(draft),
+          draft,
         );
       } else {
-        await createTrackingSavedMeal(
-          auth,
-          buildSavedMealLogCreateRequestFromDraft(draft),
-        );
+        await createSavedMealRecord(getProtectedApiClientConfig(), auth, draft);
       }
       await refreshAfterMutation();
     } catch (nextError) {
