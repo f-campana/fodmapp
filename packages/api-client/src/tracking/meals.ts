@@ -3,10 +3,14 @@ import type { MealEntry, MealEntryDraft } from "@fodmapp/domain";
 import type { ProtectedApiAuth } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
-import { mapMealLogApiResponse } from "../mapping/tracking";
+import {
+  mapMealLogApiResponse,
+  mapMealLogListApiResponse,
+} from "../mapping/tracking";
 import {
   buildTrackingItemInputFromDraft,
   type MealLogCreateRequest,
+  type MealLogListResponse,
   type MealLogResponse,
   type MealLogUpdateRequest,
   TRACKING_API_ROOT,
@@ -53,6 +57,22 @@ export async function createMealEntry(
   return mapMealLogApiResponse(response);
 }
 
+export async function listMealEntries(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  limit = 100,
+): Promise<MealEntry[]> {
+  const response = await requestProtectedJson<MealLogListResponse>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/meals?limit=${limit}`,
+    { method: "GET" },
+    { errorPrefix: "tracking-api" },
+  );
+
+  return mapMealLogListApiResponse(response);
+}
+
 export async function updateMealEntry(
   config: ApiClientConfig,
   auth: ProtectedApiAuth,
@@ -71,4 +91,18 @@ export async function updateMealEntry(
   );
 
   return mapMealLogApiResponse(response);
+}
+
+export async function deleteMealEntry(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  mealLogId: string,
+): Promise<void> {
+  await requestProtectedJson<void>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/meals/${mealLogId}`,
+    { method: "DELETE" },
+    { errorPrefix: "tracking-api" },
+  );
 }

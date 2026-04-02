@@ -9,8 +9,24 @@ import {
   createMealEntry,
   createSavedMealRecord,
   createSymptomEntry,
+  type CustomFoodDraft,
+  type CustomFoodRecord,
+  deleteCustomFoodRecord,
+  deleteMealEntry,
+  deleteSavedMealRecord,
+  deleteSymptomEntry,
   getTrackingHubReadModel,
+  listCustomFoodRecords,
+  listSavedMealRecords,
+  type MealEntry,
+  type MealEntryDraft,
+  type SavedMealDraft,
+  type SavedMealRecord,
+  type SymptomEntry,
+  type SymptomEntryDraft,
   type TrackingFeed,
+  type TrackingItemDraft,
+  type TrackingLoggedItem,
   updateCustomFoodRecord,
   updateMealEntry,
   updateSavedMealRecord,
@@ -60,25 +76,6 @@ import {
   nowDateInputValue,
 } from "../../../lib/dateTimeLocal";
 import { type ProtectedApiAuth } from "../../../lib/protectedApiAuth";
-import {
-  type CustomFood,
-  type CustomFoodDraft,
-  deleteTrackingCustomFood,
-  deleteTrackingMeal,
-  deleteTrackingSavedMeal,
-  deleteTrackingSymptom,
-  listTrackingCustomFoods,
-  listTrackingSavedMeals,
-  type MealEntry,
-  type MealEntryDraft,
-  type MealLog,
-  type SavedMeal,
-  type SavedMealDraft,
-  type SymptomEntry,
-  type SymptomEntryDraft,
-  type TrackingItemDraft,
-  type TrackingLoggedItem,
-} from "../../../lib/tracking";
 
 type TrackingItemKind = "canonical_food" | "custom_food" | "free_text";
 
@@ -136,13 +133,13 @@ type PendingDelete =
     }
   | {
       kind: "custom_food";
-      item: CustomFood;
+      item: CustomFoodRecord;
       title: string;
       description: string;
     }
   | {
       kind: "saved_meal";
-      item: SavedMeal;
+      item: SavedMealRecord;
       title: string;
       description: string;
     };
@@ -215,24 +212,6 @@ function createEmptySavedMealForm(): SavedMealFormState {
   };
 }
 
-function toEditableItemFromRaw(
-  item: MealLog["items"][number] | SavedMeal["items"][number],
-): EditableItem {
-  return {
-    itemKind: item.item_kind,
-    foodSlug: item.food_slug ?? "",
-    selectedLabel: item.label,
-    customFoodId: item.custom_food_id ?? "",
-    freeTextLabel: item.item_kind === "free_text" ? item.label : "",
-    quantityText: item.quantity_text ?? "",
-    note: item.note ?? "",
-    searchQuery: item.food_slug ?? item.label,
-    searchResults: [],
-    searchError: null,
-    searchLoading: false,
-  };
-}
-
 function toEditableItemFromLoggedItem(item: TrackingLoggedItem): EditableItem {
   switch (item.reference.kind) {
     case "canonical_food":
@@ -289,11 +268,11 @@ function buildMealForm(meal: MealEntry): MealFormState {
   };
 }
 
-function buildSavedMealForm(savedMeal: SavedMeal): SavedMealFormState {
+function buildSavedMealForm(savedMeal: SavedMealRecord): SavedMealFormState {
   return {
     label: savedMeal.label,
     note: savedMeal.note ?? "",
-    items: savedMeal.items.map(toEditableItemFromRaw),
+    items: savedMeal.items.map(toEditableItemFromLoggedItem),
   };
 }
 
@@ -408,7 +387,7 @@ function formatFeedTimestamp(value: string) {
 interface TrackingItemEditorProps {
   item: EditableItem;
   index: number;
-  customFoods: CustomFood[];
+  customFoods: CustomFoodRecord[];
   onChange: (index: number, nextItem: EditableItem) => void;
   onRemove: (index: number) => void;
 }
@@ -544,7 +523,7 @@ function TrackingItemEditor({
             onChange={(event) => {
               const nextValue = event.target.value;
               const selected = customFoods.find(
-                (customFood) => customFood.custom_food_id === nextValue,
+                (customFood) => customFood.customFoodId === nextValue,
               );
               update({
                 customFoodId: nextValue,
@@ -555,8 +534,8 @@ function TrackingItemEditor({
             <option value="">Choisir…</option>
             {customFoods.map((customFood) => (
               <option
-                key={customFood.custom_food_id}
-                value={customFood.custom_food_id}
+                key={customFood.customFoodId}
+                value={customFood.customFoodId}
               >
                 {customFood.label}
               </option>
@@ -621,8 +600,8 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
   const [submitting, setSubmitting] = useState(false);
   const [feed, setFeed] = useState<TrackingFeed | null>(null);
   const [summary, setSummary] = useState<WeeklyTrackingSummary | null>(null);
-  const [customFoods, setCustomFoods] = useState<CustomFood[]>([]);
-  const [savedMeals, setSavedMeals] = useState<SavedMeal[]>([]);
+  const [customFoods, setCustomFoods] = useState<CustomFoodRecord[]>([]);
+  const [savedMeals, setSavedMeals] = useState<SavedMealRecord[]>([]);
 
   const [symptomDialogOpen, setSymptomDialogOpen] = useState(false);
   const [mealDialogOpen, setMealDialogOpen] = useState(false);
@@ -636,12 +615,10 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     null,
   );
   const [editingMeal, setEditingMeal] = useState<MealEntry | null>(null);
-  const [editingCustomFood, setEditingCustomFood] = useState<CustomFood | null>(
-    null,
-  );
-  const [editingSavedMeal, setEditingSavedMeal] = useState<SavedMeal | null>(
-    null,
-  );
+  const [editingCustomFood, setEditingCustomFood] =
+    useState<CustomFoodRecord | null>(null);
+  const [editingSavedMeal, setEditingSavedMeal] =
+    useState<SavedMealRecord | null>(null);
 
   const [symptomForm, setSymptomForm] = useState(createEmptySymptomForm);
   const [mealForm, setMealForm] = useState(createEmptyMealForm);
@@ -661,8 +638,8 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
           anchorDate,
           feedLimit: 50,
         }),
-        listTrackingCustomFoods(auth),
-        listTrackingSavedMeals(auth),
+        listCustomFoodRecords(getProtectedApiClientConfig(), auth),
+        listSavedMealRecords(getProtectedApiClientConfig(), auth),
       ]);
       setFeed(readModel.feed);
       setSummary(readModel.summary);
@@ -756,7 +733,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
         await updateCustomFoodRecord(
           getProtectedApiClientConfig(),
           auth,
-          editingCustomFood.custom_food_id,
+          editingCustomFood.customFoodId,
           draft,
         );
       } else {
@@ -783,7 +760,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
         await updateSavedMealRecord(
           getProtectedApiClientConfig(),
           auth,
-          editingSavedMeal.saved_meal_id,
+          editingSavedMeal.savedMealId,
           draft,
         );
       } else {
@@ -855,7 +832,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     });
   };
 
-  const requestDeleteCustomFood = (customFood: CustomFood) => {
+  const requestDeleteCustomFood = (customFood: CustomFoodRecord) => {
     setActionError(null);
     setPendingDelete({
       kind: "custom_food",
@@ -866,7 +843,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     });
   };
 
-  const requestDeleteSavedMeal = (savedMeal: SavedMeal) => {
+  const requestDeleteSavedMeal = (savedMeal: SavedMealRecord) => {
     setActionError(null);
     setPendingDelete({
       kind: "saved_meal",
@@ -887,19 +864,32 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
     try {
       switch (pendingDelete.kind) {
         case "symptom":
-          await deleteTrackingSymptom(auth, pendingDelete.item.symptomLogId);
+          await deleteSymptomEntry(
+            getProtectedApiClientConfig(),
+            auth,
+            pendingDelete.item.symptomLogId,
+          );
           break;
         case "meal":
-          await deleteTrackingMeal(auth, pendingDelete.item.mealLogId);
+          await deleteMealEntry(
+            getProtectedApiClientConfig(),
+            auth,
+            pendingDelete.item.mealLogId,
+          );
           break;
         case "custom_food":
-          await deleteTrackingCustomFood(
+          await deleteCustomFoodRecord(
+            getProtectedApiClientConfig(),
             auth,
-            pendingDelete.item.custom_food_id,
+            pendingDelete.item.customFoodId,
           );
           break;
         case "saved_meal":
-          await deleteTrackingSavedMeal(auth, pendingDelete.item.saved_meal_id);
+          await deleteSavedMealRecord(
+            getProtectedApiClientConfig(),
+            auth,
+            pendingDelete.item.savedMealId,
+          );
           break;
       }
       await loadData();
@@ -1210,7 +1200,7 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
             {customFoods.length ? (
               customFoods.map((customFood) => (
                 <div
-                  key={customFood.custom_food_id}
+                  key={customFood.customFoodId}
                   className="space-y-2 rounded-lg border p-3"
                 >
                   <p className="font-medium">{customFood.label}</p>
@@ -1261,12 +1251,14 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
             {savedMeals.length ? (
               savedMeals.map((savedMeal) => (
                 <div
-                  key={savedMeal.saved_meal_id}
+                  key={savedMeal.savedMealId}
                   className="space-y-2 rounded-lg border p-3"
                 >
                   <p className="font-medium">{savedMeal.label}</p>
                   <p className="text-sm text-muted-foreground">
-                    {savedMeal.items.map((item) => item.label).join(", ")}
+                    {savedMeal.items
+                      .map((item) => item.reference.label)
+                      .join(", ")}
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -1289,7 +1281,9 @@ function TrackingHubClientInner({ auth }: { auth: ProtectedApiAuth }) {
                           title: savedMeal.label,
                           occurredAtUtc: nowDateInputValue(),
                           note: savedMeal.note ?? "",
-                          items: savedMeal.items.map(toEditableItemFromRaw),
+                          items: savedMeal.items.map(
+                            toEditableItemFromLoggedItem,
+                          ),
                         });
                         setMealDialogOpen(true);
                       }}

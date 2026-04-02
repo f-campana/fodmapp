@@ -3,9 +3,13 @@ import type { CustomFoodDraft, CustomFoodRecord } from "@fodmapp/domain";
 import type { ProtectedApiAuth } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
-import { mapCustomFoodApiResponse } from "../mapping/tracking";
+import {
+  mapCustomFoodApiResponse,
+  mapCustomFoodListApiResponse,
+} from "../mapping/tracking";
 import {
   type CustomFoodCreateRequest,
+  type CustomFoodListResponse,
   type CustomFoodResponse,
   type CustomFoodUpdateRequest,
   TRACKING_API_ROOT,
@@ -48,6 +52,21 @@ export async function createCustomFoodRecord(
   return mapCustomFoodApiResponse(response);
 }
 
+export async function listCustomFoodRecords(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+): Promise<CustomFoodRecord[]> {
+  const response = await requestProtectedJson<CustomFoodListResponse>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/custom-foods`,
+    { method: "GET" },
+    { errorPrefix: "tracking-api" },
+  );
+
+  return mapCustomFoodListApiResponse(response);
+}
+
 export async function updateCustomFoodRecord(
   config: ApiClientConfig,
   auth: ProtectedApiAuth,
@@ -66,4 +85,18 @@ export async function updateCustomFoodRecord(
   );
 
   return mapCustomFoodApiResponse(response);
+}
+
+export async function deleteCustomFoodRecord(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  customFoodId: string,
+): Promise<void> {
+  await requestProtectedJson<void>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/custom-foods/${customFoodId}`,
+    { method: "DELETE" },
+    { errorPrefix: "tracking-api" },
+  );
 }

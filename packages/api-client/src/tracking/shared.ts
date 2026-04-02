@@ -13,6 +13,8 @@ type TrackingItemInput = components["schemas"]["TrackingItemInput"];
 
 export type SymptomLogResponse =
   operations["createTrackingSymptom"]["responses"][201]["content"]["application/json"];
+export type SymptomLogListResponse =
+  operations["listTrackingSymptoms"]["responses"][200]["content"]["application/json"];
 export type SymptomLogCreateRequest =
   operations["createTrackingSymptom"]["requestBody"]["content"]["application/json"];
 export type SymptomLogUpdateRequest =
@@ -20,6 +22,8 @@ export type SymptomLogUpdateRequest =
 
 export type MealLogResponse =
   operations["createTrackingMeal"]["responses"][201]["content"]["application/json"];
+export type MealLogListResponse =
+  operations["listTrackingMeals"]["responses"][200]["content"]["application/json"];
 export type MealLogCreateRequest =
   operations["createTrackingMeal"]["requestBody"]["content"]["application/json"];
 export type MealLogUpdateRequest =
@@ -27,6 +31,8 @@ export type MealLogUpdateRequest =
 
 export type CustomFoodResponse =
   operations["createTrackingCustomFood"]["responses"][201]["content"]["application/json"];
+export type CustomFoodListResponse =
+  operations["listTrackingCustomFoods"]["responses"][200]["content"]["application/json"];
 export type CustomFoodCreateRequest =
   operations["createTrackingCustomFood"]["requestBody"]["content"]["application/json"];
 export type CustomFoodUpdateRequest =
@@ -34,6 +40,8 @@ export type CustomFoodUpdateRequest =
 
 export type SavedMealResponse =
   operations["createTrackingSavedMeal"]["responses"][201]["content"]["application/json"];
+export type SavedMealListResponse =
+  operations["listTrackingSavedMeals"]["responses"][200]["content"]["application/json"];
 export type SavedMealCreateRequest =
   operations["createTrackingSavedMeal"]["requestBody"]["content"]["application/json"];
 export type SavedMealUpdateRequest =
