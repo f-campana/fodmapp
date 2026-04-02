@@ -3,9 +3,13 @@ import type { SymptomEntry, SymptomEntryDraft } from "@fodmapp/domain";
 import type { ProtectedApiAuth } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
-import { mapSymptomLogApiResponse } from "../mapping/tracking";
+import {
+  mapSymptomLogApiResponse,
+  mapSymptomLogListApiResponse,
+} from "../mapping/tracking";
 import {
   type SymptomLogCreateRequest,
+  type SymptomLogListResponse,
   type SymptomLogResponse,
   type SymptomLogUpdateRequest,
   TRACKING_API_ROOT,
@@ -52,6 +56,22 @@ export async function createSymptomEntry(
   return mapSymptomLogApiResponse(response);
 }
 
+export async function listSymptomEntries(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  limit = 100,
+): Promise<SymptomEntry[]> {
+  const response = await requestProtectedJson<SymptomLogListResponse>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/symptoms?limit=${limit}`,
+    { method: "GET" },
+    { errorPrefix: "tracking-api" },
+  );
+
+  return mapSymptomLogListApiResponse(response);
+}
+
 export async function updateSymptomEntry(
   config: ApiClientConfig,
   auth: ProtectedApiAuth,
@@ -70,4 +90,18 @@ export async function updateSymptomEntry(
   );
 
   return mapSymptomLogApiResponse(response);
+}
+
+export async function deleteSymptomEntry(
+  config: ApiClientConfig,
+  auth: ProtectedApiAuth,
+  symptomLogId: string,
+): Promise<void> {
+  await requestProtectedJson<void>(
+    config,
+    auth,
+    `${TRACKING_API_ROOT}/symptoms/${symptomLogId}`,
+    { method: "DELETE" },
+    { errorPrefix: "tracking-api" },
+  );
 }

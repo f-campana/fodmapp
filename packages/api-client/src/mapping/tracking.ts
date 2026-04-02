@@ -14,9 +14,13 @@ import {
 } from "@fodmapp/domain";
 
 import type {
+  CustomFoodListResponse,
   CustomFoodResponse,
+  MealLogListResponse,
   MealLogResponse,
+  SavedMealListResponse,
   SavedMealResponse,
+  SymptomLogListResponse,
   SymptomLogResponse,
   TrackingFeedResponse,
   WeeklyTrackingSummaryResponse,
@@ -55,10 +59,22 @@ export function mapMealLogApiResponse(response: MealLogResponse): MealEntry {
   return mapMealLogToMealEntry(response);
 }
 
+export function mapMealLogListApiResponse(
+  response: MealLogListResponse,
+): MealEntry[] {
+  return response.map(mapMealLogToMealEntry);
+}
+
 export function mapSymptomLogApiResponse(
   response: SymptomLogResponse,
 ): SymptomEntry {
   return mapSymptomLogToSymptomEntry(response);
+}
+
+export function mapSymptomLogListApiResponse(
+  response: SymptomLogListResponse,
+): SymptomEntry[] {
+  return response.map(mapSymptomLogToSymptomEntry);
 }
 
 export function mapCustomFoodApiResponse(
@@ -67,8 +83,20 @@ export function mapCustomFoodApiResponse(
   return mapCustomFoodToCustomFoodRecord(response);
 }
 
+export function mapCustomFoodListApiResponse(
+  response: CustomFoodListResponse,
+): CustomFoodRecord[] {
+  return response.map(mapCustomFoodToCustomFoodRecord);
+}
+
 export function mapSavedMealApiResponse(
   response: SavedMealResponse,
 ): SavedMealRecord {
   return mapSavedMealToSavedMealRecord(response);
+}
+
+export function mapSavedMealListApiResponse(
+  response: SavedMealListResponse,
+): SavedMealRecord[] {
+  return response.map(mapSavedMealToSavedMealRecord);
 }

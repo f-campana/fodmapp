@@ -5,9 +5,17 @@ import {
   createMealEntry,
   createSavedMealRecord,
   createSymptomEntry,
+  deleteCustomFoodRecord,
+  deleteMealEntry,
+  deleteSavedMealRecord,
+  deleteSymptomEntry,
   getTrackingFeed,
   getTrackingHubReadModel,
   getWeeklyTrackingSummary,
+  listCustomFoodRecords,
+  listMealEntries,
+  listSavedMealRecords,
+  listSymptomEntries,
   type ProtectedApiAuth,
   updateCustomFoodRecord,
   updateMealEntry,
@@ -18,6 +26,13 @@ import {
 const apiConfig = {
   apiBaseUrl: "https://api.fodmap.example",
 };
+
+function createRuntimeAuth(): ProtectedApiAuth {
+  return {
+    mode: "runtime",
+    getToken: vi.fn().mockResolvedValue("token_123"),
+  };
+}
 
 function getJsonBody(init: RequestInit | undefined): unknown {
   return JSON.parse(String(init?.body));
@@ -969,5 +984,272 @@ describe("@fodmapp/api-client protected tracking writes", () => {
         },
       ],
     });
+  });
+
+  it("maps symptom list responses into domain entries", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            symptom_log_id: "symptom-1",
+            symptom_type: "bloating",
+            severity: 3,
+            noted_at_utc: "2026-03-21T09:00:00Z",
+            note: "Après le déjeuner",
+            version: 1,
+            created_at_utc: "2026-03-21T09:00:00Z",
+            updated_at_utc: "2026-03-21T09:05:00Z",
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await listSymptomEntries(apiConfig, createRuntimeAuth(), 25);
+
+    expect(result).toMatchObject([
+      {
+        symptomLogId: "symptom-1",
+        symptomType: "bloating",
+        severity: 3,
+        note: "Après le déjeuner",
+      },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.fodmap.example/v0/me/tracking/symptoms?limit=25",
+      expect.objectContaining({
+        method: "GET",
+        cache: "no-store",
+        headers: expect.any(Headers),
+      }),
+    );
+  });
+
+  it("maps meal list responses into domain entries", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            meal_log_id: "meal-1",
+            title: "Déjeuner",
+            occurred_at_utc: "2026-03-21T12:00:00Z",
+            note: null,
+            version: 1,
+            created_at_utc: "2026-03-21T12:00:00Z",
+            updated_at_utc: "2026-03-21T12:10:00Z",
+            items: [
+              {
+                meal_log_item_id: "meal-item-1",
+                sort_order: 1,
+                item_kind: "free_text",
+                label: "Soupe",
+                quantity_text: "1 bol",
+                note: null,
+              },
+            ],
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await listMealEntries(apiConfig, createRuntimeAuth(), 10);
+
+    expect(result).toMatchObject([
+      {
+        mealLogId: "meal-1",
+        title: "Déjeuner",
+        items: [
+          {
+            reference: {
+              kind: "free_text",
+              label: "Soupe",
+            },
+            quantityText: "1 bol",
+          },
+        ],
+      },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.fodmap.example/v0/me/tracking/meals?limit=10",
+      expect.objectContaining({
+        method: "GET",
+        cache: "no-store",
+        headers: expect.any(Headers),
+      }),
+    );
+  });
+
+  it("maps custom food list responses into domain records", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            custom_food_id: "custom-1",
+            label: "Pain du soir",
+            note: null,
+            version: 3,
+            created_at_utc: "2026-03-20T08:00:00Z",
+            updated_at_utc: "2026-03-21T08:00:00Z",
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await listCustomFoodRecords(apiConfig, createRuntimeAuth());
+
+    expect(result).toMatchObject([
+      {
+        kind: "custom_food",
+        customFoodId: "custom-1",
+        label: "Pain du soir",
+      },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.fodmap.example/v0/me/tracking/custom-foods",
+      expect.objectContaining({
+        method: "GET",
+        cache: "no-store",
+        headers: expect.any(Headers),
+      }),
+    );
+  });
+
+  it("maps saved meal list responses into domain records", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            saved_meal_id: "saved-meal-1",
+            label: "Petit-déjeuner type",
+            note: "À réutiliser",
+            version: 1,
+            created_at_utc: "2026-03-20T08:00:00Z",
+            updated_at_utc: "2026-03-20T08:00:00Z",
+            items: [
+              {
+                saved_meal_item_id: "saved-item-1",
+                sort_order: 1,
+                item_kind: "canonical_food",
+                label: "Pain blanc",
+                food_slug: "phase2-pain-blanc",
+                quantity_text: "2 tranches",
+                note: null,
+              },
+            ],
+          },
+        ]),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await listSavedMealRecords(apiConfig, createRuntimeAuth());
+
+    expect(result).toMatchObject([
+      {
+        kind: "saved_meal",
+        savedMealId: "saved-meal-1",
+        label: "Petit-déjeuner type",
+        items: [
+          {
+            reference: {
+              kind: "canonical_food",
+              foodSlug: "phase2-pain-blanc",
+            },
+          },
+        ],
+      },
+    ]);
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.fodmap.example/v0/me/tracking/saved-meals",
+      expect.objectContaining({
+        method: "GET",
+        cache: "no-store",
+        headers: expect.any(Headers),
+      }),
+    );
+  });
+
+  it("deletes symptom entries through the protected client seam", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      deleteSymptomEntry(apiConfig, createRuntimeAuth(), "symptom-1"),
+    ).resolves.toBeUndefined();
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(
+      "https://api.fodmap.example/v0/me/tracking/symptoms/symptom-1",
+    );
+    expect(init.method).toBe("DELETE");
+    expect((init.headers as Headers).get("Authorization")).toBe(
+      "Bearer token_123",
+    );
+  });
+
+  it("deletes meal entries through the protected client seam", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      deleteMealEntry(apiConfig, createRuntimeAuth(), "meal-1"),
+    ).resolves.toBeUndefined();
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://api.fodmap.example/v0/me/tracking/meals/meal-1");
+    expect(init.method).toBe("DELETE");
+    expect((init.headers as Headers).get("Authorization")).toBe(
+      "Bearer token_123",
+    );
+  });
+
+  it("deletes custom food records through the protected client seam", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      deleteCustomFoodRecord(apiConfig, createRuntimeAuth(), "custom-1"),
+    ).resolves.toBeUndefined();
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(
+      "https://api.fodmap.example/v0/me/tracking/custom-foods/custom-1",
+    );
+    expect(init.method).toBe("DELETE");
+    expect((init.headers as Headers).get("Authorization")).toBe(
+      "Bearer token_123",
+    );
+  });
+
+  it("deletes saved meal records through the protected client seam", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      deleteSavedMealRecord(apiConfig, createRuntimeAuth(), "saved-meal-1"),
+    ).resolves.toBeUndefined();
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(
+      "https://api.fodmap.example/v0/me/tracking/saved-meals/saved-meal-1",
+    );
+    expect(init.method).toBe("DELETE");
+    expect((init.headers as Headers).get("Authorization")).toBe(
+      "Bearer token_123",
+    );
   });
 });
