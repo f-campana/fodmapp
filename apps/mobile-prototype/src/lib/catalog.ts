@@ -72,3 +72,17 @@ export function formatCoverageRatio(value?: number | null): string {
 
   return `Couverture ${Math.round(value * 100)}%`;
 }
+
+export function createCatalogSearchRequestTracker() {
+  let currentRequestId = 0;
+
+  return {
+    begin(): number {
+      currentRequestId += 1;
+      return currentRequestId;
+    },
+    isCurrent(requestId: number): boolean {
+      return currentRequestId === requestId;
+    },
+  };
+}

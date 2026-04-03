@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Animated,
@@ -16,6 +16,7 @@ import type { CuratedFoodSummary } from "@fodmapp/domain";
 import { Badge, Card, Screen, StateView } from "../components/ui";
 import { searchCatalogFoods } from "../data/catalogRepository";
 import {
+  createCatalogSearchRequestTracker,
   formatCoverageRatio,
   formatFoodLevel,
   getFoodDisplayName,
@@ -94,6 +95,7 @@ export function FoodsScreen({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [itemAnims] = useState<Animated.Value[]>(() => []);
+  const requestTrackerRef = useRef(createCatalogSearchRequestTracker());
   const hasQuery = query.trim().length > 0;
 
   useEffect(() => {
@@ -103,6 +105,8 @@ export function FoodsScreen({
 
   const load = useCallback(async (input: string) => {
     const normalized = input.trim();
+    const requestId = requestTrackerRef.current.begin();
+
     if (normalized.length === 0) {
       setFoods([]);
       setErrorMessage(null);
@@ -114,6 +118,10 @@ export function FoodsScreen({
     setErrorMessage(null);
     try {
       const result = await searchCatalogFoods(normalized);
+      if (!requestTrackerRef.current.isCurrent(requestId)) {
+        return;
+      }
+
       if (!result.ok) {
         setFoods([]);
         setErrorMessage(
@@ -126,10 +134,16 @@ export function FoodsScreen({
 
       setFoods(result.data.items);
     } catch {
+      if (!requestTrackerRef.current.isCurrent(requestId)) {
+        return;
+      }
+
       setFoods([]);
       setErrorMessage("Could not load foods from the catalog.");
     } finally {
-      setLoading(false);
+      if (requestTrackerRef.current.isCurrent(requestId)) {
+        setLoading(false);
+      }
     }
   }, []);
 
