@@ -40,6 +40,7 @@ function buildSeverityColors(semantic: any) {
     low: { bg: s.warning.bg as string, fg: s.warning.fg as string },
     moderate: { bg: s.warning.bg as string, fg: s.warning.fg as string },
     high: { bg: s.danger.bg as string, fg: s.danger.fg as string },
+    unknown: { bg: s.info.bg as string, fg: s.info.fg as string },
   };
 }
 

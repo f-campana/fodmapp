@@ -11,8 +11,17 @@ import {
   View,
 } from "react-native";
 
+import type { CuratedFoodSummary } from "@fodmapp/domain";
+
 import { Badge, Card, Screen, StateView } from "../components/ui";
-import { type Food, listFoods } from "../data/repository";
+import { searchCatalogFoods } from "../data/catalogRepository";
+import {
+  formatCoverageRatio,
+  formatFoodLevel,
+  getFoodDisplayName,
+  getFoodLevelBadgeVariant,
+  QUICK_SEARCHES,
+} from "../lib/catalog";
 import { rnTheme } from "../theme/rn-adapter";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
@@ -30,7 +39,26 @@ function createStyles(colors: RNColors) {
       fontSize: rnTheme.typography.fontSize["2xl"],
       fontWeight: "800",
       letterSpacing: -0.3,
-      maxWidth: "72%",
+      maxWidth: "78%",
+    },
+    quickSearchButton: {
+      backgroundColor: colors.surfaceMuted,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    quickSearchLabel: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    quickSearchRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: theme.spacing.sm,
+      marginBottom: theme.spacing.sm,
     },
     search: {
       backgroundColor: colors.surface,
@@ -44,6 +72,12 @@ function createStyles(colors: RNColors) {
       paddingHorizontal: 14,
       paddingVertical: 12,
     },
+    searchHelp: {
+      color: colors.textMuted,
+      fontSize: 15,
+      lineHeight: 21,
+      marginBottom: theme.spacing.sm,
+    },
   });
 }
 
@@ -56,10 +90,11 @@ export function FoodsScreen({
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [rawQuery, setRawQuery] = useState("");
   const [query, setQuery] = useState("");
-  const [foods, setFoods] = useState<Food[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [foods, setFoods] = useState<CuratedFoodSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [itemAnims] = useState<Animated.Value[]>(() => []);
+  const hasQuery = query.trim().length > 0;
 
   useEffect(() => {
     const id = setTimeout(() => setQuery(rawQuery), 300);
@@ -67,12 +102,32 @@ export function FoodsScreen({
   }, [rawQuery]);
 
   const load = useCallback(async (input: string) => {
+    const normalized = input.trim();
+    if (normalized.length === 0) {
+      setFoods([]);
+      setErrorMessage(null);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
-    setError(false);
+    setErrorMessage(null);
     try {
-      setFoods(await listFoods(input));
+      const result = await searchCatalogFoods(normalized);
+      if (!result.ok) {
+        setFoods([]);
+        setErrorMessage(
+          result.error === "api_not_configured"
+            ? "Set EXPO_PUBLIC_API_BASE_URL to enable the connected catalog."
+            : "Could not load foods from the catalog.",
+        );
+        return;
+      }
+
+      setFoods(result.data.items);
     } catch {
-      setError(true);
+      setFoods([]);
+      setErrorMessage("Could not load foods from the catalog.");
     } finally {
       setLoading(false);
     }
@@ -104,25 +159,52 @@ export function FoodsScreen({
   }, [foods, itemAnims]);
 
   return (
-    <Screen title="Foods" subtitle="Search by name, category, or trigger tag">
+    <Screen
+      title="Foods"
+      subtitle="Search the live curated catalog used by the shared client"
+    >
       <TextInput
         style={styles.search}
-        placeholder="Search foods or trigger tags"
+        placeholder="Search foods by name"
         value={rawQuery}
         onChangeText={setRawQuery}
         placeholderTextColor={colors.textMuted}
       />
+      <Text style={styles.searchHelp}>
+        The public catalog requires a search term. Start with a known food or
+        use one of the quick searches below.
+      </Text>
+
+      {!hasQuery ? (
+        <Card>
+          <Text style={styles.searchHelp}>Quick searches</Text>
+          <View style={styles.quickSearchRow}>
+            {QUICK_SEARCHES.map((suggestion) => (
+              <Pressable
+                key={suggestion}
+                onPress={() => setRawQuery(suggestion)}
+                style={({ pressed }) => [
+                  styles.quickSearchButton,
+                  pressed ? { opacity: 0.72 } : undefined,
+                ]}
+              >
+                <Text style={styles.quickSearchLabel}>{suggestion}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </Card>
+      ) : null}
 
       {loading ? <StateView loading message="Loading foods..." /> : null}
-      {error ? (
+      {errorMessage ? (
         <StateView
-          message="Could not load foods."
+          message={errorMessage}
           action={() => {
             void load(query);
           }}
         />
       ) : null}
-      {!loading && !error && foods.length === 0 ? (
+      {!loading && !errorMessage && hasQuery && foods.length === 0 ? (
         <StateView
           message="No foods found for this search."
           action={() => setRawQuery("")}
@@ -130,11 +212,11 @@ export function FoodsScreen({
         />
       ) : null}
 
-      {!loading && !error && foods.length > 0 ? (
+      {!loading && !errorMessage && foods.length > 0 ? (
         <ScrollView showsVerticalScrollIndicator={false}>
           {foods.map((food, index) => (
             <Animated.View
-              key={food.id}
+              key={food.slug}
               style={{
                 opacity: itemAnims[index] ?? 1,
                 transform: [
@@ -150,18 +232,32 @@ export function FoodsScreen({
               }}
             >
               <Pressable
-                onPress={() => onSelectFood(food.id, food.name)}
+                onPress={() =>
+                  onSelectFood(food.slug, getFoodDisplayName(food))
+                }
                 style={({ pressed }) =>
                   pressed ? { opacity: 0.72 } : undefined
                 }
               >
                 <Card>
                   <View style={styles.headerRow}>
-                    <Text style={styles.name}>{food.name}</Text>
-                    <Badge label={food.severity} variant={food.severity} />
+                    <Text style={styles.name}>{getFoodDisplayName(food)}</Text>
+                    <Badge
+                      label={formatFoodLevel(food.overallLevel)}
+                      variant={getFoodLevelBadgeVariant(food.overallLevel)}
+                    />
                   </View>
-                  <Text style={styles.meta}>{food.category}</Text>
-                  <Text style={styles.meta}>{food.serving}</Text>
+                  <Text style={styles.meta}>
+                    Niveau global: {formatFoodLevel(food.overallLevel)}
+                  </Text>
+                  <Text style={styles.meta}>
+                    {food.driverSubtype
+                      ? `Sous-type conducteur: ${food.driverSubtype.toUpperCase()}`
+                      : "Sous-type conducteur indisponible"}
+                  </Text>
+                  <Text style={styles.meta}>
+                    {formatCoverageRatio(food.coverageRatio)}
+                  </Text>
                 </Card>
               </Pressable>
             </Animated.View>

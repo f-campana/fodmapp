@@ -12,7 +12,7 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import type { Severity } from "../data/mockData";
+import type { FoodLevelBadgeVariant } from "../lib/catalog";
 import { rnTheme } from "../theme/rn-adapter";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
@@ -212,7 +212,7 @@ export function Badge({
   variant,
 }: {
   label: string;
-  variant?: Severity | "default";
+  variant?: FoodLevelBadgeVariant;
 }) {
   const { colors, severityColors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
