@@ -1,4 +1,5 @@
 ---
+"@fodmapp/mobile-prototype": patch
 "@fodmapp/api-client": patch
 "@fodmapp/domain": patch
 ---
