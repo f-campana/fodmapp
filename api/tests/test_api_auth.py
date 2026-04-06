@@ -39,20 +39,23 @@ def _generate_key_pair() -> tuple[str, str]:
 def _build_session_token(
     private_key_pem: str,
     *,
-    subject: str,
-    azp: str = AUTHORIZED_PARTY,
+    subject: str | None,
+    azp: str | None = AUTHORIZED_PARTY,
     issuer_domain: str = ISSUER_DOMAIN,
     expires_in_seconds: int = 300,
 ) -> str:
     now = datetime.now(timezone.utc)
     payload = {
-        "sub": subject,
         "azp": azp,
         "iss": f"https://{issuer_domain}",
         "iat": int(now.timestamp()),
         "nbf": int(now.timestamp()),
         "exp": int((now + timedelta(seconds=expires_in_seconds)).timestamp()),
     }
+    if subject is not None:
+        payload["sub"] = subject
+    if azp is None:
+        payload.pop("azp")
     return jwt.encode(payload, private_key_pem, algorithm="RS256")
 
 
@@ -160,11 +163,39 @@ def test_valid_bearer_token_provisions_and_reuses_identity(client, db_url, clerk
 
 
 @pytest.mark.usefixtures("me_security_schema", "tracking_schema")
+def test_valid_bearer_token_without_azp_is_accepted(client, db_url, clerk_auth_env):
+    subject = "user_test_auth_subject_no_azp"
+    token = _build_session_token(clerk_auth_env["private_key"], subject=subject, azp=None)
+
+    try:
+        response = client.get("/v0/me/consent", headers={"Authorization": f"Bearer {token}"})
+        assert response.status_code in {200, 404}
+
+        user_id = _fetch_identity_user_id(db_url, subject)
+        assert user_id is not None
+    finally:
+        _cleanup_identity(db_url, _fetch_identity_user_id(db_url, subject), subject)
+
+
+@pytest.mark.usefixtures("me_security_schema", "tracking_schema")
 def test_invalid_authorized_party_is_rejected(client, clerk_auth_env):
     token = _build_session_token(
         clerk_auth_env["private_key"],
         subject="user_test_auth_subject_bad_azp",
         azp="http://malicious.localhost",
+    )
+
+    response = client.get("/v0/me/consent", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "unauthorized"
+
+
+@pytest.mark.usefixtures("me_security_schema", "tracking_schema")
+def test_missing_subject_is_rejected(client, clerk_auth_env):
+    token = _build_session_token(
+        clerk_auth_env["private_key"],
+        subject=None,
     )
 
     response = client.get("/v0/me/consent", headers={"Authorization": f"Bearer {token}"})
@@ -188,6 +219,20 @@ def test_expired_bearer_token_is_rejected(client, clerk_auth_env):
 
 
 @pytest.mark.usefixtures("me_security_schema", "tracking_schema")
+def test_invalid_bearer_issuer_is_rejected(client, clerk_auth_env):
+    token = _build_session_token(
+        clerk_auth_env["private_key"],
+        subject="user_test_auth_subject_bad_issuer",
+        issuer_domain="clerk.other.local",
+    )
+
+    response = client.get("/v0/me/consent", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.status_code == 401
+    assert response.json()["error"]["code"] == "unauthorized"
+
+
+@pytest.mark.usefixtures("me_security_schema", "tracking_schema")
 def test_invalid_bearer_signature_is_rejected(client, clerk_auth_env):
     other_private_key, _ = _generate_key_pair()
     token = _build_session_token(other_private_key, subject="user_test_auth_subject_bad_sig")
@@ -196,6 +241,20 @@ def test_invalid_bearer_signature_is_rejected(client, clerk_auth_env):
 
     assert response.status_code == 401
     assert response.json()["error"]["code"] == "unauthorized"
+
+
+@pytest.mark.usefixtures("me_security_schema", "tracking_schema")
+def test_debug_claim_logging_emits_safe_claim_shape(client, clerk_auth_env, monkeypatch, caplog):
+    monkeypatch.setenv("API_DEBUG_CLERK_CLAIMS", "true")
+    token = _build_session_token(clerk_auth_env["private_key"], subject="user_test_auth_subject_debug", azp=None)
+
+    with caplog.at_level("INFO", logger="app.auth"):
+        response = client.get("/v0/me/consent", headers={"Authorization": f"Bearer {token}"})
+
+    assert response.status_code in {200, 404}
+    assert "Clerk claim debug:" in caplog.text
+    assert "azp=None" in caplog.text
+    assert token not in caplog.text
 
 
 @pytest.mark.usefixtures("me_security_schema", "tracking_schema")

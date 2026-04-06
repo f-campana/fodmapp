@@ -23,6 +23,7 @@ class Settings:
     clerk_jwt_key: str | None
     clerk_jwt_issuer_domain: str | None
     clerk_authorized_parties: tuple[str, ...]
+    api_debug_clerk_claims: bool
     api_cors_allow_origins: tuple[str, ...]
     api_allow_preview_user_id_header: bool
     node_env: str
@@ -46,6 +47,8 @@ def get_settings() -> Settings:
         clerk_jwt_key=os.getenv("CLERK_JWT_KEY"),
         clerk_jwt_issuer_domain=os.getenv("CLERK_JWT_ISSUER_DOMAIN"),
         clerk_authorized_parties=_split_csv_env(os.getenv("CLERK_AUTHORIZED_PARTIES", "")),
+        api_debug_clerk_claims=os.getenv("API_DEBUG_CLERK_CLAIMS", "false").strip().lower()
+        in {"1", "true", "yes", "on"},
         api_cors_allow_origins=_split_csv_env(os.getenv("API_CORS_ALLOW_ORIGINS", "")),
         api_allow_preview_user_id_header=os.getenv("API_ALLOW_PREVIEW_USER_ID_HEADER", "false").strip().lower()
         in {"1", "true", "yes", "on"},
