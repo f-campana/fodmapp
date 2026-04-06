@@ -1,4 +1,4 @@
-import { buildProtectedApiHeaders, type ProtectedApiAuth } from "./auth";
+import { buildProtectedApiHeaders, type ProtectedApiAuthInput } from "./auth";
 import { type ApiClientConfig, buildApiUrl } from "./config";
 import { parseErrorResponse } from "./errors";
 import type { ApiResult } from "./result";
@@ -55,7 +55,7 @@ export async function requestJson<T>(
 
 export async function requestProtectedJson<T>(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   path: string,
   init: RequestInit = {},
   options: { errorPrefix?: string } = {},

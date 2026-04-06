@@ -1,9 +1,19 @@
 import type { ApiClientConfig } from "@fodmapp/api-client";
 
-export function getPublicCatalogApiClientConfig(): ApiClientConfig {
+function getExpoApiBaseUrl(): string | null {
   const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
 
+  return apiBaseUrl ? apiBaseUrl : null;
+}
+
+export function getPublicCatalogApiClientConfig(): ApiClientConfig {
   return {
-    apiBaseUrl: apiBaseUrl ? apiBaseUrl : null,
+    apiBaseUrl: getExpoApiBaseUrl(),
+  };
+}
+
+export function getProtectedApiClientConfig(): ApiClientConfig {
+  return {
+    apiBaseUrl: getExpoApiBaseUrl(),
   };
 }

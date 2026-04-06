@@ -8,15 +8,47 @@ export interface RuntimeProtectedApiAuth {
   getToken: () => Promise<string | null>;
 }
 
+export interface BearerProtectedApiAuth {
+  mode: "bearer";
+  token: string;
+}
+
 export type ProtectedApiAuth =
   | PreviewProtectedApiAuth
-  | RuntimeProtectedApiAuth;
+  | RuntimeProtectedApiAuth
+  | BearerProtectedApiAuth;
+
+export type ProtectedApiAuthInput =
+  | ProtectedApiAuth
+  | RuntimeProtectedApiAuth["getToken"]
+  | string;
+
+export function normalizeProtectedApiAuth(
+  auth: ProtectedApiAuthInput,
+): ProtectedApiAuth {
+  if (typeof auth === "function") {
+    return {
+      mode: "runtime",
+      getToken: auth,
+    };
+  }
+
+  if (typeof auth === "string") {
+    return {
+      mode: "bearer",
+      token: auth,
+    };
+  }
+
+  return auth;
+}
 
 export async function buildProtectedApiHeaders(
-  auth: ProtectedApiAuth,
+  authInput: ProtectedApiAuthInput,
   headersInit?: HeadersInit,
   options: { json?: boolean } = {},
 ): Promise<Headers> {
+  const auth = normalizeProtectedApiAuth(authInput);
   const headers = new Headers(headersInit ?? {});
 
   if (options.json && !headers.has("Content-Type")) {
@@ -25,6 +57,15 @@ export async function buildProtectedApiHeaders(
 
   if (auth.mode === "preview") {
     headers.set("X-User-Id", auth.userId);
+    return headers;
+  }
+
+  if (auth.mode === "bearer") {
+    if (!auth.token.trim()) {
+      throw new Error("protected-api error 0: session_token_unavailable");
+    }
+
+    headers.set("Authorization", `Bearer ${auth.token}`);
     return headers;
   }
 
