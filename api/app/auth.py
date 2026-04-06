@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Optional
 from uuid import UUID, uuid4
@@ -14,6 +15,7 @@ from app.db import Database
 from app.errors import bad_request, unauthorized
 
 _bearer_scheme = HTTPBearer(auto_error=False)
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -39,14 +41,38 @@ def _normalize_issuer_domain(raw_domain: Optional[str]) -> str | None:
     return f"https://{value.rstrip('/')}"
 
 
+def _safe_claim_value(value: object) -> object:
+    if value is None:
+        return None
+    if isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [item if isinstance(item, (str, int, float, bool)) else type(item).__name__ for item in value]
+    return type(value).__name__
+
+
+def _log_clerk_claim_shape(claims: dict[str, object]) -> None:
+    settings = get_settings()
+    if settings.node_env == "production" or not settings.api_debug_clerk_claims:
+        return
+
+    claim_keys = sorted(key for key in claims if isinstance(key, str))
+    logger.info(
+        "Clerk claim debug: iss=%r sub=%r azp=%r aud=%r keys=%s",
+        _safe_claim_value(claims.get("iss")),
+        _safe_claim_value(claims.get("sub")),
+        _safe_claim_value(claims.get("azp")),
+        _safe_claim_value(claims.get("aud")),
+        claim_keys,
+    )
+
+
 def _verify_clerk_session_token(token: str) -> dict[str, object]:
     settings = get_settings()
     if not settings.clerk_jwt_key:
         raise unauthorized("Clerk bearer auth not configured")
     issuer = _normalize_issuer_domain(settings.clerk_jwt_issuer_domain)
     if issuer is None:
-        raise unauthorized("Clerk bearer auth not configured")
-    if not settings.clerk_authorized_parties:
         raise unauthorized("Clerk bearer auth not configured")
 
     try:
@@ -60,12 +86,20 @@ def _verify_clerk_session_token(token: str) -> dict[str, object]:
     except jwt.PyJWTError as exc:
         raise unauthorized("Invalid Clerk session token") from exc
 
+    _log_clerk_claim_shape(claims)
+
     subject = claims.get("sub")
     if not isinstance(subject, str) or not subject.strip():
         raise unauthorized("Invalid Clerk session token subject")
 
     issued_party = claims.get("azp")
-    if not isinstance(issued_party, str) or issued_party not in settings.clerk_authorized_parties:
+    if issued_party is None:
+        return claims
+    if not isinstance(issued_party, str) or not issued_party.strip():
+        raise unauthorized("Invalid Clerk authorized party")
+    if not settings.clerk_authorized_parties:
+        raise unauthorized("Clerk bearer auth not configured")
+    if issued_party not in settings.clerk_authorized_parties:
         raise unauthorized("Invalid Clerk authorized party")
 
     return claims
