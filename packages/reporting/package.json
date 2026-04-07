@@ -48,7 +48,7 @@
     "@fodmapp/design-tokens": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "25.5.0",
+    "@types/node": "25.5.2",
     "tsup": "8.5.1",
     "tsx": "4.21.0",
     "typescript": "6.0.2",
