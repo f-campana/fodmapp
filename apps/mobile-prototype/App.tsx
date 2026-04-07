@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 
 import { StatusBar } from "expo-status-bar";
 
+import { AuthProvider } from "./src/auth/AuthProvider";
+import { useAuth } from "./src/auth/useAuth";
 import { StateView } from "./src/components/ui";
 import { AppNavigator } from "./src/navigation/AppNavigator";
+import { AuthNavigator } from "./src/navigation/AuthNavigator";
 import { OnboardingScreen } from "./src/screens/OnboardingScreen";
 import {
   loadColorScheme,
@@ -20,6 +23,30 @@ import {
 function ThemedStatusBar() {
   const { isDark } = useTheme();
   return <StatusBar style={isDark ? "light" : "dark"} />;
+}
+
+function AppShell({
+  onboardingCompleted,
+  onCompleteOnboarding,
+}: {
+  onboardingCompleted: boolean;
+  onCompleteOnboarding: () => void;
+}) {
+  const auth = useAuth();
+
+  if (!auth.isLoaded) {
+    return <StateView loading message="Restoring your secure session..." />;
+  }
+
+  if (!auth.isSignedIn) {
+    return <AuthNavigator />;
+  }
+
+  if (!onboardingCompleted) {
+    return <OnboardingScreen onComplete={onCompleteOnboarding} />;
+  }
+
+  return <AppNavigator />;
 }
 
 export default function App() {
@@ -48,17 +75,16 @@ export default function App() {
         void saveColorScheme(p);
       }}
     >
-      <ThemedStatusBar />
-      {onboardingCompleted ? (
-        <AppNavigator />
-      ) : (
-        <OnboardingScreen
-          onComplete={() => {
+      <AuthProvider>
+        <ThemedStatusBar />
+        <AppShell
+          onboardingCompleted={onboardingCompleted}
+          onCompleteOnboarding={() => {
             setOnboardingCompleted(true);
             void saveOnboardingCompleted(true);
           }}
         />
-      )}
+      </AuthProvider>
     </ThemeProvider>
   );
 }

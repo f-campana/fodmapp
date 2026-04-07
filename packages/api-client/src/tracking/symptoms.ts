@@ -1,6 +1,6 @@
 import type { SymptomEntry, SymptomEntryDraft } from "@fodmapp/domain";
 
-import type { ProtectedApiAuth } from "../core/auth";
+import type { ProtectedApiAuthInput } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
 import {
@@ -39,7 +39,7 @@ function buildSymptomLogUpdateRequestFromDraft(
 
 export async function createSymptomEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   draft: SymptomEntryDraft,
 ): Promise<SymptomEntry> {
   const response = await requestProtectedJson<SymptomLogResponse>(
@@ -58,7 +58,7 @@ export async function createSymptomEntry(
 
 export async function listSymptomEntries(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   limit = 100,
 ): Promise<SymptomEntry[]> {
   const response = await requestProtectedJson<SymptomLogListResponse>(
@@ -74,7 +74,7 @@ export async function listSymptomEntries(
 
 export async function updateSymptomEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   symptomLogId: string,
   draft: SymptomEntryDraft,
 ): Promise<SymptomEntry> {
@@ -94,7 +94,7 @@ export async function updateSymptomEntry(
 
 export async function deleteSymptomEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   symptomLogId: string,
 ): Promise<void> {
   await requestProtectedJson<void>(

@@ -1,6 +1,6 @@
 import type { MealEntry, MealEntryDraft } from "@fodmapp/domain";
 
-import type { ProtectedApiAuth } from "../core/auth";
+import type { ProtectedApiAuthInput } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
 import {
@@ -40,7 +40,7 @@ function buildMealLogUpdateRequestFromDraft(
 
 export async function createMealEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   draft: MealEntryDraft,
 ): Promise<MealEntry> {
   const response = await requestProtectedJson<MealLogResponse>(
@@ -59,7 +59,7 @@ export async function createMealEntry(
 
 export async function listMealEntries(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   limit = 100,
 ): Promise<MealEntry[]> {
   const response = await requestProtectedJson<MealLogListResponse>(
@@ -75,7 +75,7 @@ export async function listMealEntries(
 
 export async function updateMealEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   mealLogId: string,
   draft: MealEntryDraft,
 ): Promise<MealEntry> {
@@ -95,7 +95,7 @@ export async function updateMealEntry(
 
 export async function deleteMealEntry(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   mealLogId: string,
 ): Promise<void> {
   await requestProtectedJson<void>(

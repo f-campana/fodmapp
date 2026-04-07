@@ -1,6 +1,6 @@
 import type { TrackingFeed, WeeklyTrackingSummary } from "@fodmapp/domain";
 
-import type { ProtectedApiAuth } from "../core/auth";
+import type { ProtectedApiAuthInput } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
 import { mapWeeklyTrackingSummaryApiResponse } from "../mapping/tracking";
@@ -22,7 +22,7 @@ export interface TrackingHubReadOptions {
 
 export async function getWeeklyTrackingSummary(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   anchorDate?: string,
 ): Promise<WeeklyTrackingSummary> {
   const path = anchorDate
@@ -41,7 +41,7 @@ export async function getWeeklyTrackingSummary(
 
 export async function getTrackingHubReadModel(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   options: TrackingHubReadOptions = {},
 ): Promise<TrackingHubReadModel> {
   const { anchorDate, feedLimit = 50 } = options;

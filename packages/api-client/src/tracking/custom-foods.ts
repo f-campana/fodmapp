@@ -1,6 +1,6 @@
 import type { CustomFoodDraft, CustomFoodRecord } from "@fodmapp/domain";
 
-import type { ProtectedApiAuth } from "../core/auth";
+import type { ProtectedApiAuthInput } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
 import {
@@ -35,7 +35,7 @@ function buildCustomFoodUpdateRequestFromDraft(
 
 export async function createCustomFoodRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   draft: CustomFoodDraft,
 ): Promise<CustomFoodRecord> {
   const response = await requestProtectedJson<CustomFoodResponse>(
@@ -54,7 +54,7 @@ export async function createCustomFoodRecord(
 
 export async function listCustomFoodRecords(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
 ): Promise<CustomFoodRecord[]> {
   const response = await requestProtectedJson<CustomFoodListResponse>(
     config,
@@ -69,7 +69,7 @@ export async function listCustomFoodRecords(
 
 export async function updateCustomFoodRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   customFoodId: string,
   draft: CustomFoodDraft,
 ): Promise<CustomFoodRecord> {
@@ -89,7 +89,7 @@ export async function updateCustomFoodRecord(
 
 export async function deleteCustomFoodRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   customFoodId: string,
 ): Promise<void> {
   await requestProtectedJson<void>(

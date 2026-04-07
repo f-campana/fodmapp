@@ -1,9 +1,14 @@
 export type {
+  BearerProtectedApiAuth,
   PreviewProtectedApiAuth,
   ProtectedApiAuth,
+  ProtectedApiAuthInput,
   RuntimeProtectedApiAuth,
 } from "./core/auth";
-export { buildProtectedApiHeaders } from "./core/auth";
+export {
+  buildProtectedApiHeaders,
+  normalizeProtectedApiAuth,
+} from "./core/auth";
 export { requestJson } from "./core/client";
 export type { ApiClientConfig } from "./core/config";
 export { buildApiUrl, resolveApiBase } from "./core/config";

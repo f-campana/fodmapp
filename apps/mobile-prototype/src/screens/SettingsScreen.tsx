@@ -10,7 +10,9 @@ import {
   View,
 } from "react-native";
 
+import { useAuth } from "../auth/useAuth";
 import { Badge, Card, Screen, StateView } from "../components/ui";
+import { probeProtectedTrackingFeed } from "../data/protectedRepository";
 import { type Preferences } from "../data/repository";
 import {
   loadPreferences,
@@ -93,12 +95,15 @@ function createStyles(colors: RNColors) {
 }
 
 export function SettingsScreen() {
+  const auth = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [prefs, setPrefs] = useState<Preferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [authCheckPending, setAuthCheckPending] = useState(false);
+  const [authCheckMessage, setAuthCheckMessage] = useState<string | null>(null);
   const [saveConfirmOpacity] = useState(() => new Animated.Value(1));
 
   const load = useCallback(async () => {
@@ -158,6 +163,16 @@ export function SettingsScreen() {
       scroll
     >
       <Card>
+        <Text style={styles.label}>Account</Text>
+        <Text style={styles.value}>
+          {auth.userId ? `Signed in as ${auth.userId}` : "Signed in"}
+        </Text>
+        <View style={styles.tags}>
+          <Badge label={auth.isSignedIn ? "Session active" : "Signed out"} />
+        </View>
+      </Card>
+
+      <Card>
         <Text style={styles.label}>Household</Text>
         <Text style={styles.value}>{prefs.householdName}</Text>
       </Card>
@@ -200,6 +215,49 @@ export function SettingsScreen() {
           </Text>
         </Animated.View>
       </View>
+
+      <Pressable
+        onPress={() => {
+          setAuthCheckPending(true);
+          setAuthCheckMessage(null);
+          void probeProtectedTrackingFeed(auth.getToken)
+            .then((result) => {
+              setAuthCheckMessage(
+                `Protected request succeeded (${result.itemCount} item(s) loaded, total ${result.total}).`,
+              );
+            })
+            .catch((probeError) => {
+              setAuthCheckMessage(
+                probeError instanceof Error
+                  ? probeError.message
+                  : "Protected request failed.",
+              );
+            })
+            .finally(() => {
+              setAuthCheckPending(false);
+            });
+        }}
+        style={styles.secondaryAction}
+      >
+        <Text style={styles.secondaryActionText}>
+          {authCheckPending ? "Testing protected API…" : "Test protected API"}
+        </Text>
+      </Pressable>
+
+      {authCheckMessage ? (
+        <View style={styles.autosaveIndicator}>
+          <Text style={styles.autosaveText}>{authCheckMessage}</Text>
+        </View>
+      ) : null}
+
+      <Pressable
+        onPress={() => {
+          void auth.signOut();
+        }}
+        style={styles.secondaryAction}
+      >
+        <Text style={styles.secondaryActionText}>Sign out</Text>
+      </Pressable>
 
       <Pressable
         onPress={() => {

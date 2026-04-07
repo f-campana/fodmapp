@@ -1,6 +1,6 @@
 import type { SavedMealDraft, SavedMealRecord } from "@fodmapp/domain";
 
-import type { ProtectedApiAuth } from "../core/auth";
+import type { ProtectedApiAuthInput } from "../core/auth";
 import { requestProtectedJson } from "../core/client";
 import type { ApiClientConfig } from "../core/config";
 import {
@@ -38,7 +38,7 @@ function buildSavedMealUpdateRequestFromDraft(
 
 export async function createSavedMealRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   draft: SavedMealDraft,
 ): Promise<SavedMealRecord> {
   const response = await requestProtectedJson<SavedMealResponse>(
@@ -57,7 +57,7 @@ export async function createSavedMealRecord(
 
 export async function listSavedMealRecords(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
 ): Promise<SavedMealRecord[]> {
   const response = await requestProtectedJson<SavedMealListResponse>(
     config,
@@ -72,7 +72,7 @@ export async function listSavedMealRecords(
 
 export async function updateSavedMealRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   savedMealId: string,
   draft: SavedMealDraft,
 ): Promise<SavedMealRecord> {
@@ -92,7 +92,7 @@ export async function updateSavedMealRecord(
 
 export async function deleteSavedMealRecord(
   config: ApiClientConfig,
-  auth: ProtectedApiAuth,
+  auth: ProtectedApiAuthInput,
   savedMealId: string,
 ): Promise<void> {
   await requestProtectedJson<void>(
