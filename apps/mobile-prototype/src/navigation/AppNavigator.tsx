@@ -7,10 +7,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CreateSymptomScreen } from "../screens/CreateSymptomScreen";
 import { FoodDetailScreen } from "../screens/FoodDetailScreen";
 import { FoodsScreen } from "../screens/FoodsScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
+import { TrackingFeedScreen } from "../screens/TrackingFeedScreen";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
 
@@ -20,6 +22,8 @@ const Tabs = createBottomTabNavigator<TabParamList>();
 export type RootStackParamList = {
   MainTabs: undefined;
   FoodDetail: { foodId: string; foodName?: string };
+  TrackingFeed: undefined;
+  CreateSymptom: undefined;
 };
 
 export type TabParamList = {
@@ -75,7 +79,12 @@ function TabNavigator() {
         }}
         children={({ navigation }) => (
           <ScreenPad>
-            <HomeScreen onBrowse={() => navigation.navigate("FoodsTab")} />
+            <HomeScreen
+              onBrowse={() => navigation.navigate("FoodsTab")}
+              onOpenTracking={() =>
+                navigation.getParent()?.navigate("TrackingFeed")
+              }
+            />
           </ScreenPad>
         )}
       />
@@ -148,6 +157,38 @@ export function AppNavigator() {
           {({ route }) => (
             <ScreenPad>
               <FoodDetailScreen foodId={route.params.foodId} />
+            </ScreenPad>
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="TrackingFeed"
+          options={{
+            title: "Tracking feed",
+            headerBackButtonDisplayMode: "minimal",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: colors.canvas },
+          }}
+        >
+          {({ navigation }) => (
+            <ScreenPad>
+              <TrackingFeedScreen
+                onCreateSymptom={() => navigation.navigate("CreateSymptom")}
+              />
+            </ScreenPad>
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="CreateSymptom"
+          options={{
+            title: "Create symptom",
+            headerBackButtonDisplayMode: "minimal",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: colors.canvas },
+          }}
+        >
+          {({ navigation }) => (
+            <ScreenPad>
+              <CreateSymptomScreen onCreated={() => navigation.goBack()} />
             </ScreenPad>
           )}
         </Stack.Screen>
