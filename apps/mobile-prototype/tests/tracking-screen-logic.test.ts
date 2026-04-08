@@ -4,7 +4,10 @@ import test from "node:test";
 import type { SymptomEntry, TrackingFeedEntry } from "@fodmapp/domain";
 
 import {
+  buildCreateSymptomConsentGate,
   buildTrackingFeedViewModel,
+  canSubmitCreateSymptom,
+  mapCreateSymptomSubmissionError,
   parseSymptomSeverityInput,
   submitCreateSymptomForm,
 } from "../src/screens/trackingScreenLogic.ts";
@@ -41,7 +44,7 @@ function createSymptomEntryFixture(
 }
 
 function createTrackingFeedEntryFixture(
-  overrides: Partial<TrackingFeedEntry> = {},
+  overrides: Partial<Extract<TrackingFeedEntry, { entryType: "symptom" }>> = {},
 ): TrackingFeedEntry {
   return {
     entryType: "symptom",
@@ -84,6 +87,46 @@ void test("parseSymptomSeverityInput only accepts whole numbers from 0 to 10", (
   assert.equal(parseSymptomSeverityInput("11"), null);
   assert.equal(parseSymptomSeverityInput("2.5"), null);
   assert.equal(parseSymptomSeverityInput("pain"), null);
+});
+
+void test("buildCreateSymptomConsentGate reports a locked state when symptom consent is missing", () => {
+  const consentGate = buildCreateSymptomConsentGate({
+    canCreateSymptoms: false,
+    isActive: false,
+    missingScope: "symptom_logs",
+    scope: {},
+    status: null,
+  });
+
+  assert.equal(consentGate.isLocked, true);
+  assert.equal(
+    consentGate.message,
+    "Tracking is disabled until you enable consent.",
+  );
+  assert.equal(
+    canSubmitCreateSymptom(
+      {
+        canCreateSymptoms: false,
+        isActive: false,
+        missingScope: "symptom_logs",
+        scope: {},
+        status: null,
+      },
+      false,
+    ),
+    false,
+  );
+});
+
+void test("mapCreateSymptomSubmissionError replaces raw consent locks with product copy", () => {
+  assert.equal(
+    mapCreateSymptomSubmissionError(
+      new Error(
+        'tracking-api error 423: {"error":{"code":"locked","message":"symptom_logs disabled by consent"}}',
+      ),
+    ),
+    "Tracking is disabled until you enable consent.",
+  );
 });
 
 void test("submitCreateSymptomForm triggers the repository write and completion callback", async () => {

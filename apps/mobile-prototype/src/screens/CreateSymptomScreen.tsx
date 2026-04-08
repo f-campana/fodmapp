@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -7,12 +7,23 @@ import { type SymptomType } from "@fodmapp/domain";
 import { useAuth } from "../auth/useAuth";
 import { Card, Screen, StateView } from "../components/ui";
 import {
+  type ConsentRepository,
+  createConsentRepository,
+  type TrackingConsentState,
+} from "../data/consentRepository";
+import {
   createTrackingRepository,
   type TrackingRepository,
 } from "../data/trackingRepository";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
-import { submitCreateSymptomForm } from "./trackingScreenLogic";
+import {
+  buildCreateSymptomConsentGate,
+  canSubmitCreateSymptom,
+  isConsentLockedError,
+  mapCreateSymptomSubmissionError,
+  submitCreateSymptomForm,
+} from "./trackingScreenLogic";
 
 const SYMPTOM_OPTIONS: Array<{ value: SymptomType; label: string }> = [
   { value: "bloating", label: "Bloating" },
@@ -127,13 +138,19 @@ function createStyles(colors: RNColors) {
 export function CreateSymptomScreen({
   onCreated,
   repository,
+  consentRepository,
 }: {
   onCreated: () => void;
   repository?: TrackingRepository;
+  consentRepository?: ConsentRepository;
 }) {
   const auth = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const consentDataRepository = useMemo(
+    () => consentRepository ?? createConsentRepository(auth.getToken),
+    [auth.getToken, consentRepository],
+  );
   const trackingRepository = useMemo(
     () => repository ?? createTrackingRepository(auth.getToken),
     [auth.getToken, repository],
@@ -141,14 +158,47 @@ export function CreateSymptomScreen({
   const [symptomType, setSymptomType] = useState<SymptomType>("bloating");
   const [severity, setSeverity] = useState("0");
   const [note, setNote] = useState("");
+  const [consentState, setConsentState] = useState<TrackingConsentState | null>(
+    null,
+  );
+  const [consentLoading, setConsentLoading] = useState(true);
+  const [consentError, setConsentError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
+
+  const refreshConsentState = useCallback(async () => {
+    setConsentLoading(true);
+    setConsentError(null);
+
+    try {
+      setConsentState(await consentDataRepository.getConsentState());
+    } catch {
+      setConsentError("Could not verify whether tracking is enabled.");
+    } finally {
+      setConsentLoading(false);
+    }
+  }, [consentDataRepository]);
+
+  useEffect(() => {
+    if (!auth.isSignedIn) {
+      return;
+    }
+
+    void refreshConsentState();
+  }, [auth.isSignedIn, refreshConsentState]);
 
   if (!auth.isSignedIn) {
     return <StateView message="Sign in to create a symptom entry." />;
   }
 
   const handleSubmit = async () => {
+    const canSubmit = canSubmitCreateSymptom(consentState, submitting);
+    if (!canSubmit) {
+      setStatusMessage("Tracking is disabled until you enable consent.");
+      return;
+    }
+
     setSubmitting(true);
     setStatusMessage(null);
 
@@ -164,15 +214,102 @@ export function CreateSymptomScreen({
       );
       setStatusMessage(nextStatusMessage);
     } catch (createError) {
-      setStatusMessage(
-        createError instanceof Error
-          ? createError.message
-          : "Could not create symptom entry.",
-      );
+      if (isConsentLockedError(createError)) {
+        setConsentState({
+          canCreateSymptoms: false,
+          isActive: false,
+          missingScope: "symptom_logs",
+          scope: {},
+          status: "locked",
+        });
+      }
+      setStatusMessage(mapCreateSymptomSubmissionError(createError));
     } finally {
       setSubmitting(false);
     }
   };
+
+  const handleEnableTracking = async () => {
+    setUnlocking(true);
+    setStatusMessage(null);
+
+    try {
+      setConsentState(await consentDataRepository.enableTracking());
+    } catch {
+      setStatusMessage("Could not enable tracking right now. Try again.");
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
+  if (consentLoading && consentState === null && !consentError) {
+    return (
+      <StateView loading message="Checking whether tracking is enabled..." />
+    );
+  }
+
+  if (consentError && consentState === null) {
+    return (
+      <StateView
+        message={consentError}
+        action={() => {
+          void refreshConsentState();
+        }}
+      />
+    );
+  }
+
+  const consentGate = buildCreateSymptomConsentGate(consentState);
+  const canSubmit = canSubmitCreateSymptom(consentState, submitting);
+
+  if (consentGate.isLocked) {
+    return (
+      <Screen
+        title="Create symptom"
+        subtitle="Tracking writes stay locked until this account enables consent."
+        scroll
+      >
+        <Card>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Tracking locked</Text>
+            <Text style={styles.helper}>{consentGate.message}</Text>
+            <Text style={styles.helper}>
+              Enable tracking once, then return here to save your first symptom.
+            </Text>
+          </View>
+        </Card>
+
+        <View style={styles.actions}>
+          <Pressable
+            disabled={unlocking}
+            onPress={() => {
+              void handleEnableTracking();
+            }}
+            style={[
+              styles.primaryAction,
+              unlocking && styles.primaryActionDisabled,
+            ]}
+            testID="enable-tracking-submit"
+          >
+            <Text style={styles.primaryActionLabel}>
+              {unlocking ? "Enabling tracking…" : "Enable tracking"}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={onCreated}
+            style={styles.secondaryAction}
+            testID="create-symptom-cancel"
+          >
+            <Text style={styles.secondaryActionLabel}>Cancel</Text>
+          </Pressable>
+        </View>
+
+        {statusMessage ? (
+          <Text style={styles.status}>{statusMessage}</Text>
+        ) : null}
+      </Screen>
+    );
+  }
 
   return (
     <Screen
@@ -246,13 +383,13 @@ export function CreateSymptomScreen({
 
       <View style={styles.actions}>
         <Pressable
-          disabled={submitting}
+          disabled={!canSubmit}
           onPress={() => {
             void handleSubmit();
           }}
           style={[
             styles.primaryAction,
-            submitting && styles.primaryActionDisabled,
+            !canSubmit && styles.primaryActionDisabled,
           ]}
           testID="create-symptom-submit"
         >
