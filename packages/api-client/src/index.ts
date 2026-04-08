@@ -14,6 +14,12 @@ export type { ApiClientConfig } from "./core/config";
 export { buildApiUrl, resolveApiBase } from "./core/config";
 export type { ApiResult } from "./core/result";
 export { mapApiResult } from "./core/result";
+export type {
+  ConsentPostRequest,
+  ConsentPostResponse,
+  ConsentRecordResponse,
+} from "./me/consent";
+export { getConsentRecord, postConsentRecord } from "./me/consent";
 export type { CuratedFoodDetailPageData } from "./public/foods";
 export {
   getCuratedFoodDetailPageData,
