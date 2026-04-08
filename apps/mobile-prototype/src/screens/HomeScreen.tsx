@@ -48,7 +48,13 @@ function createStyles(colors: RNColors) {
   });
 }
 
-export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
+export function HomeScreen({
+  onBrowse,
+  onOpenTracking,
+}: {
+  onBrowse: () => void;
+  onOpenTracking: () => void;
+}) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [loading, setLoading] = useState(true);
@@ -138,6 +144,7 @@ export function HomeScreen({ onBrowse }: { onBrowse: () => void }) {
             Start by replacing one high-risk staple this week and track how you
             feel.
           </Text>
+          <PrimaryButton label="Open tracking feed" onPress={onOpenTracking} />
         </Card>
       </Screen>
     </Animated.View>
