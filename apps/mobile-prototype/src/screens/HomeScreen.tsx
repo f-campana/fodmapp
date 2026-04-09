@@ -1,152 +1,209 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { Card, PrimaryButton, Screen, StateView } from "../components/ui";
-import { getDashboardSnapshot } from "../data/repository";
-import { rnTheme } from "../theme/rn-adapter";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import type { TrackingFeedEntry } from "@fodmapp/domain";
+
+import { useAuth } from "../auth/useAuth";
+import {
+  Badge,
+  Card,
+  PrimaryButton,
+  Screen,
+  SectionTitle,
+  StateView,
+} from "../components/ui";
+import {
+  createHomeRepository,
+  type HomeRepository,
+} from "../data/homeRepository";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
+import {
+  buildHomeRecentActivityItems,
+  buildHomeRecentActivitySubtitle,
+  formatHomeDate,
+  resolveHomeActivityState,
+} from "./homeScreenLogic";
 
 function createStyles(colors: RNColors) {
   return StyleSheet.create({
-    flex: { flex: 1 },
-    heroCard: {
-      backgroundColor: colors.surfaceRaised,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.accent,
+    activityRow: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      justifyContent: "space-between",
     },
-    kicker: {
-      color: colors.accentStrong,
-      fontSize: 14,
-      fontWeight: "700",
-      textTransform: "uppercase",
-    },
-    metric: {
-      color: colors.text,
-      fontSize: 28,
-      fontWeight: "800",
-      marginBottom: 8,
-      marginTop: 8,
-    },
-    muted: {
+    helper: {
       color: colors.textMuted,
       fontSize: 16,
       lineHeight: 22,
-      marginBottom: theme.spacing.sm,
     },
-    row: { flexDirection: "row", gap: theme.spacing.sm },
-    stat: { color: colors.text, fontSize: 34, fontWeight: "800" },
-    statCard: { justifyContent: "flex-end", minHeight: 130 },
-    tipCard: { backgroundColor: colors.surfaceMuted },
-    tipTitle: {
+    note: {
+      color: colors.textMuted,
+      fontSize: 15,
+      lineHeight: 21,
+      marginTop: theme.spacing.xs,
+    },
+    secondaryAction: {
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      justifyContent: "center",
+      minHeight: 52,
+      paddingHorizontal: theme.spacing.lg,
+      paddingVertical: theme.spacing.sm,
+    },
+    secondaryActionText: {
       color: colors.text,
       fontSize: 18,
+      fontWeight: "600",
+    },
+    sectionSubtitle: {
+      color: colors.textMuted,
+      fontSize: 15,
+      marginBottom: theme.spacing.sm,
+      marginTop: -theme.spacing.xs,
+    },
+    title: {
+      color: colors.text,
+      flex: 1,
+      fontSize: 19,
       fontWeight: "700",
-      marginBottom: 6,
     },
   });
 }
 
 export function HomeScreen({
   onBrowse,
-  onOpenTracking,
+  onCreateSymptom,
+  repository,
 }: {
   onBrowse: () => void;
-  onOpenTracking: () => void;
+  onCreateSymptom: () => void;
+  repository?: HomeRepository;
 }) {
+  const auth = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const homeRepository = useMemo(
+    () => repository ?? createHomeRepository(auth.getToken),
+    [auth.getToken, repository],
+  );
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [data, setData] = useState<{
-    trackedFoods: number;
-    highRiskFoods: number;
-    availableSwaps: number;
-  } | null>(null);
-  const [fadeAnim] = useState(() => new Animated.Value(0));
+  const [error, setError] = useState<string | null>(null);
+  const [recentEntries, setRecentEntries] = useState<TrackingFeedEntry[]>([]);
+  const [totalEntries, setTotalEntries] = useState(0);
+  const dateLabel = useMemo(() => formatHomeDate(), []);
+  const recentActivityItems = useMemo(
+    () => buildHomeRecentActivityItems(recentEntries),
+    [recentEntries],
+  );
+  const activityState = resolveHomeActivityState({
+    loading,
+    error,
+    itemCount: recentActivityItems.length,
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(false);
-    fadeAnim.setValue(0);
+    setError(null);
     try {
-      setData(await getDashboardSnapshot());
-    } catch {
-      setError(true);
+      const homeData = await homeRepository.getHomeData();
+      setRecentEntries(homeData.recentEntries);
+      setTotalEntries(homeData.totalEntries);
+    } catch (homeError) {
+      setError(
+        homeError instanceof Error
+          ? homeError.message
+          : "Could not load your recent activity.",
+      );
     } finally {
       setLoading(false);
     }
-  }, [fadeAnim]);
+  }, [homeRepository]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  useEffect(() => {
-    if (data) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: rnTheme.motion.duration.normal,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [data, fadeAnim]);
+  useFocusEffect(
+    useCallback(() => {
+      void load();
+    }, [load]),
+  );
 
   if (loading) {
-    return <StateView loading message="Building your dashboard..." />;
+    return <StateView loading message="Loading your home..." />;
   }
-  if (error || !data) {
-    return (
-      <StateView
-        message="Unable to load dashboard."
-        action={() => {
-          void load();
-        }}
-      />
-    );
+
+  if (!auth.isSignedIn) {
+    return <StateView message="Sign in to load your home." />;
   }
 
   return (
-    <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-      <Screen
-        title="Today"
-        subtitle="Your personalized low-FODMAP dashboard"
-        scroll
-      >
-        <Card style={styles.heroCard}>
-          <Text style={styles.kicker}>Today&apos;s focus</Text>
-          <Text style={styles.metric}>
-            {data.highRiskFoods} high-risk foods to replace
-          </Text>
-          <Text style={styles.muted}>
-            Tap below to explore swaps with the strongest symptom-relief
-            potential.
-          </Text>
-          <PrimaryButton label="Browse foods" onPress={onBrowse} />
-        </Card>
+    <Screen title="Home" subtitle={dateLabel} scroll>
+      <Card>
+        <Text style={styles.title}>How are you feeling today?</Text>
+        <Text style={styles.helper}>
+          Log a symptom to keep your recent activity real and up to date.
+        </Text>
+        <PrimaryButton label="Log symptom" onPress={onCreateSymptom} />
+      </Card>
 
-        <View style={styles.row}>
-          <Card style={[styles.statCard, styles.flex]}>
-            <Text style={styles.stat}>{data.trackedFoods}</Text>
-            <Text style={styles.muted}>Tracked foods</Text>
-          </Card>
-          <Card style={[styles.statCard, styles.flex]}>
-            <Text style={styles.stat}>{data.availableSwaps}</Text>
-            <Text style={styles.muted}>Available swaps</Text>
-          </Card>
-        </View>
+      <Card>
+        <Text style={styles.title}>Need a food check?</Text>
+        <Text style={styles.helper}>
+          Search foods before your next meal and compare safer options.
+        </Text>
+        <Pressable onPress={onBrowse} style={styles.secondaryAction}>
+          <Text style={styles.secondaryActionText}>Search foods</Text>
+        </Pressable>
+      </Card>
 
-        <Card style={styles.tipCard}>
-          <Text style={styles.tipTitle}>Quick tip</Text>
-          <Text style={styles.muted}>
-            Start by replacing one high-risk staple this week and track how you
-            feel.
+      <SectionTitle>Recent activity</SectionTitle>
+      <Text style={styles.sectionSubtitle}>
+        {buildHomeRecentActivitySubtitle(
+          totalEntries,
+          recentActivityItems.length,
+        )}
+      </Text>
+
+      {activityState === "error" ? (
+        <StateView
+          message={error ?? "Could not load your recent activity."}
+          action={() => {
+            void load();
+          }}
+          actionLabel="Retry"
+        />
+      ) : null}
+
+      {activityState === "empty" ? (
+        <Card>
+          <Text style={styles.title}>No recent activity yet</Text>
+          <Text style={styles.helper}>
+            Log your first symptom to turn Home into a personal activity view.
           </Text>
-          <PrimaryButton label="Open tracking feed" onPress={onOpenTracking} />
+          <PrimaryButton
+            label="Log your first symptom"
+            onPress={onCreateSymptom}
+          />
         </Card>
-      </Screen>
-    </Animated.View>
+      ) : null}
+
+      {activityState === "ready"
+        ? recentActivityItems.map((item) => (
+            <Card key={item.id}>
+              <View style={styles.activityRow}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Badge label={item.entryType} />
+              </View>
+              <Text style={styles.helper}>{item.occurredAtLabel}</Text>
+              {item.note ? <Text style={styles.note}>{item.note}</Text> : null}
+            </Card>
+          ))
+        : null}
+    </Screen>
   );
 }

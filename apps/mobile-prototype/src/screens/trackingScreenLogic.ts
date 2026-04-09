@@ -47,14 +47,20 @@ export function buildTrackingFeedViewModel(
 ): TrackingFeedViewModel {
   return {
     subtitle: `${total} entry${total === 1 ? "" : "ies"} in your recent history`,
-    items: entries.map((entry) => ({
-      id: `${entry.entryType}-${entry.entryId}`,
-      entryType: entry.entryType,
-      title: renderEntryTitle(entry),
-      occurredAtLabel: formatOccurredAt(entry.occurredAtUtc),
-      note: renderEntryNote(entry),
-    })),
+    items: buildTrackingFeedListItems(entries),
   };
+}
+
+export function buildTrackingFeedListItems(
+  entries: TrackingFeedEntry[],
+): TrackingFeedListItem[] {
+  return entries.map((entry) => ({
+    id: `${entry.entryType}-${entry.entryId}`,
+    entryType: entry.entryType,
+    title: renderEntryTitle(entry),
+    occurredAtLabel: formatOccurredAt(entry.occurredAtUtc),
+    note: renderEntryNote(entry),
+  }));
 }
 
 function normalizeNote(note: string): string | null {

@@ -81,8 +81,8 @@ function TabNavigator() {
           <ScreenPad>
             <HomeScreen
               onBrowse={() => navigation.navigate("FoodsTab")}
-              onOpenTracking={() =>
-                navigation.getParent()?.navigate("TrackingFeed")
+              onCreateSymptom={() =>
+                navigation.getParent()?.navigate("CreateSymptom")
               }
             />
           </ScreenPad>
