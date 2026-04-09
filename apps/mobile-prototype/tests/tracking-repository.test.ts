@@ -96,3 +96,58 @@ void test("tracking repository createSymptom posts through the protected api-cli
   assert.equal(symptom.symptomType, "pain");
   assert.equal(symptom.severity, 7);
 });
+
+void test("tracking repository getHubReadModel loads feed and weekly summary through the protected boundary", async () => {
+  process.env.EXPO_PUBLIC_API_BASE_URL = "https://api.fodmap.example";
+
+  const requestUrls: string[] = [];
+  const authorizationHeaders: string[] = [];
+
+  globalThis.fetch = (async (input: URL | RequestInfo, init?: RequestInit) => {
+    requestUrls.push(String(input));
+    authorizationHeaders.push(
+      new Headers(init?.headers).get("Authorization") ?? "",
+    );
+
+    if (requestUrls.length === 1) {
+      return new Response(
+        JSON.stringify({
+          total: 1,
+          limit: 10,
+          items: [],
+        }),
+        { status: 200 },
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        anchor_date: "2026-04-09",
+        window_start_utc: "2026-04-03T00:00:00.000Z",
+        window_end_utc: "2026-04-09T23:59:59.000Z",
+        daily_counts: [],
+        symptom_counts: [],
+        severity: {
+          average: null,
+          maximum: null,
+        },
+        proximity_groups: [],
+      }),
+      { status: 200 },
+    );
+  }) as typeof fetch;
+
+  const repository = createTrackingRepository(async () => "mobile_token");
+  const hubReadModel = await repository.getHubReadModel({ feedLimit: 10 });
+
+  assert.deepEqual(requestUrls, [
+    "https://api.fodmap.example/v0/me/tracking/feed?limit=10",
+    "https://api.fodmap.example/v0/me/tracking/summary/weekly",
+  ]);
+  assert.deepEqual(authorizationHeaders, [
+    "Bearer mobile_token",
+    "Bearer mobile_token",
+  ]);
+  assert.equal(hubReadModel.feed.total, 1);
+  assert.equal(hubReadModel.summary.anchorDate, "2026-04-09");
+});

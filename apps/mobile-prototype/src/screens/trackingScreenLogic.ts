@@ -1,10 +1,26 @@
-import type { SymptomType, TrackingFeedEntry } from "@fodmapp/domain";
+import type {
+  SymptomType,
+  TrackingFeedEntry,
+  WeeklyTrackingSummary,
+} from "@fodmapp/domain";
 
 import type { TrackingConsentState } from "../data/consentRepository";
 import type { TrackingRepository } from "../data/trackingRepository";
 
 function formatOccurredAt(value: string) {
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function formatOccurredAtTime(value: string) {
+  return new Date(value).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function renderEntryTitle(entry: TrackingFeedEntry) {
@@ -31,9 +47,20 @@ export interface TrackingFeedListItem {
   note: string | null;
 }
 
+export interface TrackingFeedSection {
+  key: string;
+  title: string;
+  items: TrackingFeedListItem[];
+}
+
+export interface TrackingWeeklySummaryStat {
+  label: string;
+  value: string;
+}
+
 export interface TrackingFeedViewModel {
   subtitle: string;
-  items: TrackingFeedListItem[];
+  sections: TrackingFeedSection[];
 }
 
 export interface CreateSymptomConsentGate {
@@ -46,8 +73,8 @@ export function buildTrackingFeedViewModel(
   entries: TrackingFeedEntry[],
 ): TrackingFeedViewModel {
   return {
-    subtitle: `${total} entry${total === 1 ? "" : "ies"} in your recent history`,
-    items: buildTrackingFeedListItems(entries),
+    subtitle: `${total} ${total === 1 ? "entry" : "entries"} in your recent history`,
+    sections: buildTrackingFeedSections(entries),
   };
 }
 
@@ -61,6 +88,127 @@ export function buildTrackingFeedListItems(
     occurredAtLabel: formatOccurredAt(entry.occurredAtUtc),
     note: renderEntryNote(entry),
   }));
+}
+
+function getLocalDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function startOfLocalDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function formatTrackingDayHeading(date: Date, now: Date): string {
+  const today = startOfLocalDay(now);
+  const target = startOfLocalDay(date);
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+  const differenceInDays = Math.round(
+    (today.getTime() - target.getTime()) / millisecondsPerDay,
+  );
+
+  if (differenceInDays === 0) {
+    return "Today";
+  }
+
+  if (differenceInDays === 1) {
+    return "Yesterday";
+  }
+
+  return date.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+export function buildTrackingFeedSections(
+  entries: TrackingFeedEntry[],
+  now: Date = new Date(),
+): TrackingFeedSection[] {
+  const sections: TrackingFeedSection[] = [];
+
+  for (const entry of entries) {
+    const occurredAt = new Date(entry.occurredAtUtc);
+    const key = getLocalDateKey(occurredAt);
+    const item: TrackingFeedListItem = {
+      id: `${entry.entryType}-${entry.entryId}`,
+      entryType: entry.entryType,
+      title: renderEntryTitle(entry),
+      occurredAtLabel: formatOccurredAtTime(entry.occurredAtUtc),
+      note: renderEntryNote(entry),
+    };
+    const lastSection = sections.at(-1);
+
+    if (lastSection && lastSection.key === key) {
+      lastSection.items.push(item);
+      continue;
+    }
+
+    sections.push({
+      key,
+      title: formatTrackingDayHeading(occurredAt, now),
+      items: [item],
+    });
+  }
+
+  return sections;
+}
+
+function getWeeklySummaryEntryCount(summary: WeeklyTrackingSummary): number {
+  return summary.dailyCounts.reduce(
+    (total, day) => total + day.mealCount + day.symptomCount,
+    0,
+  );
+}
+
+function getWeeklySummarySymptomCount(summary: WeeklyTrackingSummary): number {
+  return summary.dailyCounts.reduce(
+    (total, day) => total + day.symptomCount,
+    0,
+  );
+}
+
+function formatSummaryValue(value: number | null): string {
+  if (value === null) {
+    return "—";
+  }
+
+  const rounded = Math.round(value * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+export function buildWeeklyTrackingSummarySubtitle(
+  summary: WeeklyTrackingSummary,
+): string {
+  const totalEntries = getWeeklySummaryEntryCount(summary);
+
+  if (totalEntries === 0) {
+    return "No entries recorded in the last 7 days yet.";
+  }
+
+  return `${totalEntries} entr${totalEntries === 1 ? "y" : "ies"} recorded in the last 7 days.`;
+}
+
+export function buildWeeklyTrackingSummaryStats(
+  summary: WeeklyTrackingSummary,
+): TrackingWeeklySummaryStat[] {
+  return [
+    {
+      label: "Entries",
+      value: String(getWeeklySummaryEntryCount(summary)),
+    },
+    {
+      label: "Symptoms",
+      value: String(getWeeklySummarySymptomCount(summary)),
+    },
+    {
+      label: "Avg intensity",
+      value: formatSummaryValue(summary.severity.average),
+    },
+  ];
 }
 
 function normalizeNote(note: string): string | null {

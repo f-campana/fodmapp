@@ -4,7 +4,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import type { TrackingFeedEntry } from "@fodmapp/domain";
+import type { TrackingFeedEntry, WeeklyTrackingSummary } from "@fodmapp/domain";
 
 import { useAuth } from "../auth/useAuth";
 import {
@@ -24,6 +24,7 @@ import { type RNColors, theme } from "../theme/tokens";
 import {
   buildHomeRecentActivityItems,
   buildHomeRecentActivitySubtitle,
+  buildHomeWeeklySummary,
   formatHomeDate,
   resolveHomeActivityState,
 } from "./homeScreenLogic";
@@ -36,10 +37,23 @@ function createStyles(colors: RNColors) {
       gap: theme.spacing.sm,
       justifyContent: "space-between",
     },
+    activitySectionHeader: {
+      alignItems: "flex-end",
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
     helper: {
       color: colors.textMuted,
       fontSize: 16,
       lineHeight: 22,
+    },
+    inlineAction: {
+      paddingVertical: theme.spacing.xs,
+    },
+    inlineActionText: {
+      color: colors.accent,
+      fontSize: 16,
+      fontWeight: "600",
     },
     note: {
       color: colors.textMuted,
@@ -69,6 +83,33 @@ function createStyles(colors: RNColors) {
       marginBottom: theme.spacing.sm,
       marginTop: -theme.spacing.xs,
     },
+    summaryGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: theme.spacing.sm,
+      marginTop: theme.spacing.sm,
+    },
+    summaryStat: {
+      backgroundColor: colors.surfaceMuted,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      flexGrow: 1,
+      minWidth: 92,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.sm,
+    },
+    summaryStatLabel: {
+      color: colors.textMuted,
+      fontSize: 13,
+      fontWeight: "600",
+      marginBottom: 2,
+    },
+    summaryStatValue: {
+      color: colors.text,
+      fontSize: 22,
+      fontWeight: "800",
+    },
     title: {
       color: colors.text,
       flex: 1,
@@ -81,10 +122,12 @@ function createStyles(colors: RNColors) {
 export function HomeScreen({
   onBrowse,
   onCreateSymptom,
+  onOpenTracking,
   repository,
 }: {
   onBrowse: () => void;
   onCreateSymptom: () => void;
+  onOpenTracking: () => void;
   repository?: HomeRepository;
 }) {
   const auth = useAuth();
@@ -98,10 +141,16 @@ export function HomeScreen({
   const [error, setError] = useState<string | null>(null);
   const [recentEntries, setRecentEntries] = useState<TrackingFeedEntry[]>([]);
   const [totalEntries, setTotalEntries] = useState(0);
+  const [weeklySummary, setWeeklySummary] =
+    useState<WeeklyTrackingSummary | null>(null);
   const dateLabel = useMemo(() => formatHomeDate(), []);
   const recentActivityItems = useMemo(
     () => buildHomeRecentActivityItems(recentEntries),
     [recentEntries],
+  );
+  const weeklySummaryViewModel = useMemo(
+    () => (weeklySummary ? buildHomeWeeklySummary(weeklySummary) : null),
+    [weeklySummary],
   );
   const activityState = resolveHomeActivityState({
     loading,
@@ -116,6 +165,7 @@ export function HomeScreen({
       const homeData = await homeRepository.getHomeData();
       setRecentEntries(homeData.recentEntries);
       setTotalEntries(homeData.totalEntries);
+      setWeeklySummary(homeData.weeklySummary);
     } catch (homeError) {
       setError(
         homeError instanceof Error
@@ -161,7 +211,27 @@ export function HomeScreen({
         </Pressable>
       </Card>
 
-      <SectionTitle>Recent activity</SectionTitle>
+      {weeklySummaryViewModel ? (
+        <Card>
+          <Text style={styles.title}>{weeklySummaryViewModel.title}</Text>
+          <Text style={styles.helper}>{weeklySummaryViewModel.subtitle}</Text>
+          <View style={styles.summaryGrid}>
+            {weeklySummaryViewModel.stats.map((stat) => (
+              <View key={stat.label} style={styles.summaryStat}>
+                <Text style={styles.summaryStatLabel}>{stat.label}</Text>
+                <Text style={styles.summaryStatValue}>{stat.value}</Text>
+              </View>
+            ))}
+          </View>
+        </Card>
+      ) : null}
+
+      <View style={styles.activitySectionHeader}>
+        <SectionTitle>Recent activity</SectionTitle>
+        <Pressable onPress={onOpenTracking} style={styles.inlineAction}>
+          <Text style={styles.inlineActionText}>View all</Text>
+        </Pressable>
+      </View>
       <Text style={styles.sectionSubtitle}>
         {buildHomeRecentActivitySubtitle(
           totalEntries,

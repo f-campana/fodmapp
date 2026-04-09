@@ -1,13 +1,22 @@
-import type { TrackingFeedEntry } from "@fodmapp/domain";
+import type { TrackingFeedEntry, WeeklyTrackingSummary } from "@fodmapp/domain";
 
 import {
   buildTrackingFeedListItems,
+  buildWeeklyTrackingSummaryStats,
+  buildWeeklyTrackingSummarySubtitle,
   type TrackingFeedListItem,
+  type TrackingWeeklySummaryStat,
 } from "./trackingScreenLogic";
 
 const DEFAULT_RECENT_ACTIVITY_LIMIT = 3;
 
 export type HomeActivityState = "loading" | "error" | "empty" | "ready";
+
+export interface HomeWeeklySummaryViewModel {
+  title: string;
+  subtitle: string;
+  stats: TrackingWeeklySummaryStat[];
+}
 
 export function formatHomeDate(anchorDate: Date = new Date()): string {
   return anchorDate.toLocaleDateString(undefined, {
@@ -57,4 +66,14 @@ export function buildHomeRecentActivitySubtitle(
   }
 
   return `Showing ${visibleEntries} of ${totalEntries} recent entries`;
+}
+
+export function buildHomeWeeklySummary(
+  summary: WeeklyTrackingSummary,
+): HomeWeeklySummaryViewModel {
+  return {
+    title: "This week",
+    subtitle: buildWeeklyTrackingSummarySubtitle(summary),
+    stats: buildWeeklyTrackingSummaryStats(summary),
+  };
 }

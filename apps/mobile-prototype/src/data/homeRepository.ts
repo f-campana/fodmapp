@@ -1,4 +1,4 @@
-import type { TrackingFeedEntry } from "@fodmapp/domain";
+import type { TrackingFeedEntry, WeeklyTrackingSummary } from "@fodmapp/domain";
 
 import type { AuthTokenGetter } from "../auth/useAuth";
 import { createTrackingRepository } from "./trackingRepository";
@@ -8,6 +8,7 @@ const DEFAULT_HOME_ACTIVITY_LIMIT = 5;
 export interface HomeData {
   recentEntries: TrackingFeedEntry[];
   totalEntries: number;
+  weeklySummary: WeeklyTrackingSummary;
 }
 
 export interface HomeRepository {
@@ -21,11 +22,14 @@ export function createHomeRepository(
 
   return {
     getHomeData: async (limit = DEFAULT_HOME_ACTIVITY_LIMIT) => {
-      const feed = await trackingRepository.getFeed(limit);
+      const hubReadModel = await trackingRepository.getHubReadModel({
+        feedLimit: limit,
+      });
 
       return {
-        recentEntries: feed.items,
-        totalEntries: feed.total,
+        recentEntries: hubReadModel.feed.items,
+        totalEntries: hubReadModel.feed.total,
+        weeklySummary: hubReadModel.summary,
       };
     },
   };
