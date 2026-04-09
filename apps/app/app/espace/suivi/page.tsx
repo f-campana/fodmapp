@@ -7,6 +7,8 @@ import { getMedicalSafetyCopy } from "../../../lib/medicalSafetyCopy";
 import RuntimeUserButton from "../RuntimeUserButton";
 import TrackingHubClient from "./TrackingHubClient";
 
+export const dynamic = "force-dynamic";
+
 export default async function EspaceSuiviPage() {
   const auth = await getAuthContext();
   const copy = (path: string, vars: Record<string, string> = {}) =>
