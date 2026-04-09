@@ -1,8 +1,10 @@
 import {
   createSymptomEntry,
   getTrackingFeed,
+  getTrackingHubReadModel,
   type SymptomEntry,
   type TrackingFeed,
+  type TrackingHubReadModel,
 } from "@fodmapp/api-client";
 import type { SymptomType } from "@fodmapp/domain";
 
@@ -19,6 +21,10 @@ export interface CreateSymptomInput {
 
 export interface TrackingRepository {
   getFeed: (limit?: number) => Promise<TrackingFeed>;
+  getHubReadModel: (options?: {
+    anchorDate?: string;
+    feedLimit?: number;
+  }) => Promise<TrackingHubReadModel>;
   createSymptom: (input: CreateSymptomInput) => Promise<SymptomEntry>;
 }
 
@@ -37,6 +43,8 @@ export function createTrackingRepository(
   return {
     getFeed: async (limit = DEFAULT_FEED_LIMIT) =>
       getTrackingFeed(getProtectedApiClientConfig(), getToken, limit),
+    getHubReadModel: async (options = {}) =>
+      getTrackingHubReadModel(getProtectedApiClientConfig(), getToken, options),
     createSymptom: async (input) =>
       createSymptomEntry(getProtectedApiClientConfig(), getToken, {
         symptomType: input.symptomType,

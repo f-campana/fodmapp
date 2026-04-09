@@ -84,6 +84,9 @@ function TabNavigator() {
               onCreateSymptom={() =>
                 navigation.getParent()?.navigate("CreateSymptom")
               }
+              onOpenTracking={() =>
+                navigation.getParent()?.navigate("TrackingFeed")
+              }
             />
           </ScreenPad>
         )}

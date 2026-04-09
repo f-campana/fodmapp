@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import type { SymptomEntry, TrackingFeedEntry } from "@fodmapp/domain";
+import type {
+  SymptomEntry,
+  TrackingFeedEntry,
+  WeeklyTrackingSummary,
+} from "@fodmapp/domain";
 
 import {
   buildHomeRecentActivityItems,
   buildHomeRecentActivitySubtitle,
+  buildHomeWeeklySummary,
   formatHomeDate,
   resolveHomeActivityState,
 } from "../src/screens/homeScreenLogic.ts";
@@ -53,6 +58,58 @@ function createTrackingFeedEntryFixture(
       kind: "tracking_projection",
       provider: "fodmapp",
       sourceId: "symptom-1",
+    },
+    evidenceTier: "derived",
+    capabilities: {
+      canBeSwapOrigin: false,
+      canBeSwapTarget: false,
+      canAppearInTracking: true,
+      canBeSavedMealItem: false,
+      hasEvidenceBackedGuidance: false,
+      isInformationalOnly: false,
+    },
+    ...overrides,
+  };
+}
+
+function createWeeklySummaryFixture(
+  overrides: Partial<WeeklyTrackingSummary> = {},
+): WeeklyTrackingSummary {
+  return {
+    anchorDate: "2026-04-09",
+    windowStartUtc: "2026-04-03T00:00:00.000Z",
+    windowEndUtc: "2026-04-09T23:59:59.000Z",
+    dailyCounts: [
+      {
+        date: "2026-04-08",
+        mealCount: 0,
+        symptomCount: 1,
+      },
+      {
+        date: "2026-04-09",
+        mealCount: 0,
+        symptomCount: 2,
+      },
+    ],
+    symptomCounts: [
+      {
+        symptomType: "bloating",
+        count: 2,
+      },
+      {
+        symptomType: "pain",
+        count: 1,
+      },
+    ],
+    severity: {
+      average: 4.5,
+      maximum: 7,
+    },
+    proximityGroups: [],
+    provenance: {
+      kind: "tracking_projection",
+      provider: "fodmapp",
+      sourceSlug: "weekly_tracking_summary",
     },
     evidenceTier: "derived",
     capabilities: {
@@ -141,6 +198,18 @@ void test("buildHomeRecentActivitySubtitle reports empty and truncated activity 
     buildHomeRecentActivitySubtitle(5, 3),
     "Showing 3 of 5 recent entries",
   );
+});
+
+void test("buildHomeWeeklySummary prepares a compact factual seven-day summary", () => {
+  const viewModel = buildHomeWeeklySummary(createWeeklySummaryFixture());
+
+  assert.equal(viewModel.title, "This week");
+  assert.equal(viewModel.subtitle, "3 entries recorded in the last 7 days.");
+  assert.deepEqual(viewModel.stats, [
+    { label: "Entries", value: "3" },
+    { label: "Symptoms", value: "3" },
+    { label: "Avg intensity", value: "4.5" },
+  ]);
 });
 
 void test("formatHomeDate returns a human-readable date anchor", () => {
