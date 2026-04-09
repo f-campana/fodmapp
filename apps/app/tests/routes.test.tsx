@@ -48,6 +48,22 @@ afterEach(() => {
   mockedGetAuthContext.mockReset();
 });
 
+function makeAuthContext(
+  overrides: Partial<Awaited<ReturnType<typeof getAuthContext>>>,
+): Awaited<ReturnType<typeof getAuthContext>> {
+  return {
+    state: "placeholder",
+    provider: "clerk",
+    mode: "disabled",
+    environment: "test",
+    isAuthenticated: false,
+    configured: false,
+    userId: null,
+    runtimeIssue: null,
+    ...overrides,
+  };
+}
+
 describe("apps/app routes", () => {
   it("renders home route with product framing and primary route links", async () => {
     const html = renderToStaticMarkup(
@@ -67,14 +83,7 @@ describe("apps/app routes", () => {
   });
 
   it("renders espace route with disabled auth copy and no sign-in link", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "placeholder",
-      provider: "clerk",
-      mode: "disabled",
-      isAuthenticated: false,
-      configured: false,
-      userId: null,
-    });
+    mockedGetAuthContext.mockResolvedValue(makeAuthContext({}));
 
     const html = renderToStaticMarkup(
       await EspacePage({ searchParams: Promise.resolve({}) }),
@@ -96,14 +105,16 @@ describe("apps/app routes", () => {
   });
 
   it("renders espace route with rights client when authenticated", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "authenticated",
-      provider: "clerk",
-      mode: "runtime",
-      isAuthenticated: true,
-      configured: true,
-      userId: "user_123",
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "authenticated",
+        mode: "runtime",
+        environment: "production",
+        isAuthenticated: true,
+        configured: true,
+        userId: "user_123",
+      }),
+    );
 
     const html = renderToStaticMarkup(
       await EspacePage({ searchParams: Promise.resolve({}) }),
@@ -116,14 +127,15 @@ describe("apps/app routes", () => {
   });
 
   it("renders espace route with preview banner when preview auth is active", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "authenticated",
-      provider: "clerk",
-      mode: "preview",
-      isAuthenticated: true,
-      configured: true,
-      userId: "11111111-1111-4111-8111-111111111111",
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "authenticated",
+        mode: "preview",
+        isAuthenticated: true,
+        configured: true,
+        userId: "11111111-1111-4111-8111-111111111111",
+      }),
+    );
 
     const html = renderToStaticMarkup(
       await EspacePage({ searchParams: Promise.resolve({}) }),
@@ -138,14 +150,7 @@ describe("apps/app routes", () => {
   });
 
   it("renders suivi route with disabled auth copy and no sign-in link", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "placeholder",
-      provider: "clerk",
-      mode: "disabled",
-      isAuthenticated: false,
-      configured: false,
-      userId: null,
-    });
+    mockedGetAuthContext.mockResolvedValue(makeAuthContext({}));
 
     const html = renderToStaticMarkup(await EspaceSuiviPage());
 
@@ -159,14 +164,16 @@ describe("apps/app routes", () => {
   });
 
   it("renders suivi route with tracking hub when authenticated", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "authenticated",
-      provider: "clerk",
-      mode: "runtime",
-      isAuthenticated: true,
-      configured: true,
-      userId: "user_456",
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "authenticated",
+        mode: "runtime",
+        environment: "production",
+        isAuthenticated: true,
+        configured: true,
+        userId: "user_456",
+      }),
+    );
 
     const html = renderToStaticMarkup(await EspaceSuiviPage());
 
@@ -177,14 +184,15 @@ describe("apps/app routes", () => {
   });
 
   it("renders suivi route with preview banner when preview auth is active", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "authenticated",
-      provider: "clerk",
-      mode: "preview",
-      isAuthenticated: true,
-      configured: true,
-      userId: "user_preview_456",
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "authenticated",
+        mode: "preview",
+        isAuthenticated: true,
+        configured: true,
+        userId: "user_preview_456",
+      }),
+    );
 
     const html = renderToStaticMarkup(await EspaceSuiviPage());
 
@@ -195,14 +203,14 @@ describe("apps/app routes", () => {
   });
 
   it("renders sign-in CTA on espace when Clerk runtime is configured but user is anonymous", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "anonymous",
-      provider: "clerk",
-      mode: "runtime",
-      isAuthenticated: false,
-      configured: true,
-      userId: null,
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "anonymous",
+        mode: "runtime",
+        environment: "production",
+        configured: true,
+      }),
+    );
 
     const html = renderToStaticMarkup(
       await EspacePage({ searchParams: Promise.resolve({}) }),
@@ -213,14 +221,14 @@ describe("apps/app routes", () => {
   });
 
   it("renders sign-in CTA on suivi when Clerk runtime is configured but user is anonymous", async () => {
-    mockedGetAuthContext.mockResolvedValue({
-      state: "anonymous",
-      provider: "clerk",
-      mode: "runtime",
-      isAuthenticated: false,
-      configured: true,
-      userId: null,
-    });
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        state: "anonymous",
+        mode: "runtime",
+        environment: "production",
+        configured: true,
+      }),
+    );
 
     const html = renderToStaticMarkup(await EspaceSuiviPage());
 
@@ -232,5 +240,28 @@ describe("apps/app routes", () => {
     const html = renderToStaticMarkup(<EspaceSuiviLoading />);
 
     expect(html).toContain("Chargement du suivi…");
+  });
+
+  it("surfaces deployment misconfiguration on protected pages in production", async () => {
+    mockedGetAuthContext.mockResolvedValue(
+      makeAuthContext({
+        environment: "production",
+        runtimeIssue: "missing_runtime_configuration",
+      }),
+    );
+
+    const espaceHtml = renderToStaticMarkup(
+      await EspacePage({ searchParams: Promise.resolve({}) }),
+    );
+    const suiviHtml = renderToStaticMarkup(await EspaceSuiviPage());
+
+    expect(espaceHtml).toContain(
+      "Authentification indisponible sur ce déploiement",
+    );
+    expect(suiviHtml).toContain(
+      "Authentification indisponible sur ce déploiement",
+    );
+    expect(espaceHtml).toContain("Configuration requise");
+    expect(suiviHtml).toContain("Configuration requise");
   });
 });

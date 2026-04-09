@@ -48,9 +48,18 @@ describe("Card", () => {
       "card-title",
     );
     expect(screen.getByText("Galette salée").className).toContain("leading-5");
+    expect(screen.getByText("Galette salée").className).toContain(
+      "col-start-1",
+    );
+    expect(screen.getByText("Galette salée").className).toContain(
+      "row-start-1",
+    );
     expect(screen.getByText("Version compatible FODMAP.")).toHaveAttribute(
       "data-slot",
       "card-description",
+    );
+    expect(screen.getByText("Version compatible FODMAP.").className).toContain(
+      "row-start-2",
     );
     expect(screen.getByText("12 min")).toHaveAttribute(
       "data-slot",

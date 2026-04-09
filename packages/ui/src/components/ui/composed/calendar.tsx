@@ -55,16 +55,16 @@ function Calendar({
           "size-9 rounded-(--radius) p-0 font-normal",
         ),
         selected:
-          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground aria-selected:[&>button]:opacity-100",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:!text-primary-foreground aria-selected:[&>button]:opacity-100",
         today: "text-accent-foreground",
         outside: "text-muted-foreground",
         disabled: "cursor-not-allowed text-muted-foreground opacity-50",
         range_middle:
-          "aria-selected:[&>button]:bg-accent aria-selected:[&>button]:text-accent-foreground",
+          "aria-selected:[&>button]:bg-accent aria-selected:[&>button]:!text-accent-foreground",
         range_start:
-          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:!text-primary-foreground",
         range_end:
-          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:text-primary-foreground",
+          "aria-selected:[&>button]:bg-primary aria-selected:[&>button]:!text-primary-foreground",
         hidden: "invisible",
         ...classNames,
       }}

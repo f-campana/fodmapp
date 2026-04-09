@@ -58,9 +58,7 @@ export default async function HomePage({
 
   const analyticsAllowed = canTrackWithConsent(consent) && analytics.configured;
 
-  const consentModeLabel = consent.runtimeEnabled
-    ? copy("screens.consentMode.currentConsented")
-    : copy("screens.consentMode.currentMinimal");
+  const consentModeLabel = copy("screens.onboarding.dataModeTransitionCta");
   const consentModeAction = consent.runtimeEnabled
     ? copy("screens.consentMode.downgradePrompt")
     : copy("screens.consentMode.upgradePrompt");

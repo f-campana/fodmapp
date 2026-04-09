@@ -15,12 +15,16 @@ export default async function EspaceSuiviPage() {
     auth.isAuthenticated && auth.userId ? auth.userId : null;
   const isPreviewMode = auth.mode === "preview" && authenticatedUserId !== null;
   const isRuntimeMode = auth.mode === "runtime";
-  const fallbackTitle =
-    auth.mode === "disabled"
+  const hasDeploymentConfigIssue =
+    auth.runtimeIssue === "missing_runtime_configuration";
+  const fallbackTitle = hasDeploymentConfigIssue
+    ? copy("screens.runtime.authDeploymentIssueTitle")
+    : auth.mode === "disabled"
       ? copy("screens.runtime.authUnavailableTitle")
       : "Connexion requise pour ouvrir le suivi";
-  const fallbackBody =
-    auth.mode === "disabled"
+  const fallbackBody = hasDeploymentConfigIssue
+    ? copy("screens.runtime.authDeploymentIssueBody")
+    : auth.mode === "disabled"
       ? copy("screens.runtime.authUnavailableBody")
       : "Connecte-toi pour accéder à ton journal personnel et à tes modèles de repas.";
 
@@ -74,9 +78,11 @@ export default async function EspaceSuiviPage() {
             <div className="app-shell__meta">
               <p className="app-shell__eyebrow">Accès</p>
               <p className="app-shell__status">
-                {auth.mode === "disabled"
-                  ? "Version locale sans authentification"
-                  : "Authentification requise"}
+                {hasDeploymentConfigIssue
+                  ? "Configuration requise"
+                  : auth.mode === "disabled"
+                    ? "Version locale sans authentification"
+                    : "Authentification requise"}
               </p>
             </div>
             <h2 className="app-shell__section-title">{fallbackTitle}</h2>

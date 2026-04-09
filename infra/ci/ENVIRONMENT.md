@@ -193,6 +193,9 @@ Contract:
   - `API_VERSION`
 - `NEXT_PUBLIC_API_BASE_URL` must remain an absolute API origin and should only be set to
   `https://api.fodmapp.fr` when the hosted API actually exists
+- hosted browser account surfaces also require the API CORS allowlist to include the web origin via
+  `CLERK_AUTHORIZED_PARTIES=https://app.fodmapp.fr` (and any extra local/staging origins as needed);
+  use `API_CORS_ALLOW_ORIGINS` only for supplementary origins outside the Clerk authorized-party set
 
 Semantics:
 

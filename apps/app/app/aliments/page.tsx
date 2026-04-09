@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { searchCuratedFoods } from "@fodmapp/api-client";
 import { Alert, AlertDescription, AlertTitle } from "@fodmapp/ui/alert";
+import { Badge } from "@fodmapp/ui/badge";
 import {
   Card,
   CardContent,
@@ -11,7 +12,7 @@ import {
 } from "@fodmapp/ui/card";
 
 import { getPublicApiClientConfig } from "../../lib/apiClientConfig";
-import { formatFoodLevel } from "../../lib/format";
+import { getFoodLevelPresentation } from "../../lib/format";
 import SearchForm from "./SearchForm";
 
 function normalizeSearchQuery(raw: string | string[] | undefined): string {
@@ -31,6 +32,10 @@ export default async function AlimentsPage({
     query.length > 0
       ? await searchCuratedFoods(getPublicApiClientConfig(), query, 12)
       : null;
+  const pendingRollupCount =
+    results && results.ok
+      ? results.data.items.filter((item) => item.overallLevel == null).length
+      : 0;
 
   return (
     <main className="product-page">
@@ -107,6 +112,13 @@ export default async function AlimentsPage({
             {results.data.total} résultat{results.data.total > 1 ? "s" : ""}{" "}
             pour « {results.data.query} »
           </p>
+          {pendingRollupCount > 0 ? (
+            <p className="product-page__note">
+              {pendingRollupCount} fiche
+              {pendingRollupCount > 1 ? "s restent" : " reste"} en attente
+              d’analyse détaillée publique.
+            </p>
+          ) : null}
           {results.data.items.map((item) => (
             <Card key={item.slug}>
               <CardHeader>
@@ -114,15 +126,29 @@ export default async function AlimentsPage({
                   <Link href={`/aliments/${item.slug}`}>{item.names.fr}</Link>
                 </CardTitle>
                 <CardDescription>
-                  Niveau global: {formatFoodLevel(item.overallLevel)}
+                  {item.names.en && item.names.en !== item.names.fr
+                    ? item.names.en
+                    : "Fiche catalogue FODMAPP"}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                {item.driverSubtype ? (
-                  <p className="product-page__note">
-                    Sous-type conducteur: {item.driverSubtype.toUpperCase()}
-                  </p>
-                ) : null}
+              <CardContent className="product-page__stack">
+                <div className="product-page__inline">
+                  <Badge
+                    variant={
+                      getFoodLevelPresentation(item.overallLevel).badgeVariant
+                    }
+                  >
+                    {getFoodLevelPresentation(item.overallLevel).badgeLabel}
+                  </Badge>
+                  {item.driverSubtype ? (
+                    <Badge variant="outline">
+                      Sous-type: {item.driverSubtype.toUpperCase()}
+                    </Badge>
+                  ) : null}
+                </div>
+                <p className="product-page__note">
+                  {getFoodLevelPresentation(item.overallLevel).supportingText}
+                </p>
               </CardContent>
             </Card>
           ))}

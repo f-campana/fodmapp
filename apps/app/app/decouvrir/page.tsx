@@ -74,12 +74,17 @@ export default async function DecouvrirPage() {
                     <CardDescription>{cohort.rationale_fr}</CardDescription>
                   </CardHeader>
                   <CardContent className="product-page__stack">
+                    <p className="product-page__note">
+                      Les fiches liées peuvent encore afficher une analyse
+                      détaillée en attente. La base compatible listée ici reste
+                      le repère principal.
+                    </p>
                     <ul className="product-page__link-list">
                       {cohort.items.map((item) => (
                         <li key={item.food_slug}>
                           <Link
                             className="product-page__link-pill"
-                            href={`/aliments/${item.food_slug}`}
+                            href={`/aliments/${item.food_slug}?source=decouvrir`}
                           >
                             {item.canonical_name_fr}
                           </Link>

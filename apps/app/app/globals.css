@@ -39,10 +39,14 @@ body {
   color: var(--color-foreground);
 }
 
-a {
+a:not([data-slot="button"]) {
   color: var(--color-primary);
   text-decoration-thickness: 0.08em;
   text-underline-offset: 0.18em;
+}
+
+a[data-slot="button"] {
+  text-decoration: none;
 }
 
 .app-shell,

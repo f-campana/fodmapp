@@ -12,9 +12,11 @@ export interface AuthContextStub {
   state: AuthBootstrapState;
   provider: "clerk";
   mode: "disabled" | "preview" | "runtime";
+  environment: string;
   isAuthenticated: boolean;
   configured: boolean;
   userId: string | null;
+  runtimeIssue: "missing_runtime_configuration" | null;
 }
 
 interface ClerkAuthResult {
@@ -64,9 +66,11 @@ export async function getAuthContext(
       state: "authenticated",
       provider: clerk.provider,
       mode: clerk.mode,
+      environment: clerk.environment,
       isAuthenticated: true,
       configured: true,
       userId: clerk.previewUserId,
+      runtimeIssue: clerk.runtimeIssue,
     };
   }
 
@@ -86,9 +90,11 @@ export async function getAuthContext(
       state: "placeholder",
       provider: clerk.provider,
       mode: clerk.mode,
+      environment: clerk.environment,
       isAuthenticated: false,
       configured: false,
       userId: null,
+      runtimeIssue: clerk.runtimeIssue,
     };
   }
 
@@ -101,9 +107,11 @@ export async function getAuthContext(
       state: isAuthenticated ? "authenticated" : "anonymous",
       provider: clerk.provider,
       mode: clerk.mode,
+      environment: clerk.environment,
       isAuthenticated,
       configured: true,
       userId: authState.userId ?? null,
+      runtimeIssue: clerk.runtimeIssue,
     };
   } catch (error) {
     reportFailure("clerk_auth_context_unavailable", error);
@@ -112,9 +120,11 @@ export async function getAuthContext(
       state: "error",
       provider: clerk.provider,
       mode: clerk.mode,
+      environment: clerk.environment,
       isAuthenticated: false,
       configured: true,
       userId: null,
+      runtimeIssue: clerk.runtimeIssue,
     };
   }
 }

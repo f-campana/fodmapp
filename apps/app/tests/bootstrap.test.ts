@@ -37,9 +37,15 @@ describe("cross-cutting runtime adapters", () => {
 
     expect(auth.fullyConfigured).toBe(false);
     expect(auth.mode).toBe("disabled");
+    expect(auth.environment).toBe("test");
     expect(auth.previewValuePresent).toBe(false);
     expect(auth.previewValueValid).toBe(false);
     expect(auth.previewUserId).toBeNull();
+    expect(auth.missingClientEnvKeys).toContain(
+      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+    );
+    expect(auth.missingServerEnvKeys).toContain("CLERK_SECRET_KEY");
+    expect(auth.runtimeIssue).toBeNull();
     expect(monitoring.configured).toBe(false);
     expect(monitoring.mode).toBe("disabled");
     expect(analytics.configured).toBe(false);
@@ -69,9 +75,13 @@ describe("cross-cutting runtime adapters", () => {
 
     expect(auth.fullyConfigured).toBe(true);
     expect(auth.mode).toBe("runtime");
+    expect(auth.environment).toBe("test");
     expect(auth.previewValuePresent).toBe(true);
     expect(auth.previewValueValid).toBe(true);
     expect(auth.previewUserId).toBeNull();
+    expect(auth.missingClientEnvKeys).toEqual([]);
+    expect(auth.missingServerEnvKeys).toEqual([]);
+    expect(auth.runtimeIssue).toBeNull();
     expect(monitoring.configured).toBe(true);
     expect(monitoring.mode).toBe("runtime");
     expect(analytics.configured).toBe(false);
@@ -154,6 +164,7 @@ describe("cross-cutting runtime adapters", () => {
     expect(auth.previewValuePresent).toBe(true);
     expect(auth.previewValueValid).toBe(true);
     expect(auth.previewUserId).toBe(PREVIEW_USER_ID);
+    expect(auth.runtimeIssue).toBeNull();
     expect(getAuthMiddlewareMode("/espace", auth)).toBe(
       "protected-placeholder",
     );
@@ -174,6 +185,7 @@ describe("cross-cutting runtime adapters", () => {
     expect(auth.previewValuePresent).toBe(true);
     expect(auth.previewValueValid).toBe(true);
     expect(auth.previewUserId).toBeNull();
+    expect(auth.runtimeIssue).toBe("missing_runtime_configuration");
   });
 
   it("keeps preview mode disabled when the preview user id is invalid", () => {
@@ -191,6 +203,7 @@ describe("cross-cutting runtime adapters", () => {
     expect(auth.previewValuePresent).toBe(true);
     expect(auth.previewValueValid).toBe(false);
     expect(auth.previewUserId).toBeNull();
+    expect(auth.runtimeIssue).toBeNull();
   });
 
   it("switches middleware to runtime mode when Clerk env is complete", () => {
@@ -217,6 +230,7 @@ describe("cross-cutting runtime adapters", () => {
 
     expect(auth.fullyConfigured).toBe(false);
     expect(auth.mode).toBe("disabled");
+    expect(auth.runtimeIssue).toBeNull();
     expect(getAuthMiddlewareMode("/espace", auth)).toBe(
       "protected-placeholder",
     );
