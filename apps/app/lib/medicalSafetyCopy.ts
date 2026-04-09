@@ -90,6 +90,8 @@ type RuntimeCopy = {
   authRequiredBody: CopyText;
   authUnavailableTitle: CopyText;
   authUnavailableBody: CopyText;
+  authDeploymentIssueTitle: CopyText;
+  authDeploymentIssueBody: CopyText;
   previewModeTitle: CopyText;
   previewModeBody: CopyText;
   signInCta: CopyText;
@@ -394,6 +396,10 @@ export const MEDICAL_SAFETY_COPY: MedicalSafetyCopy = {
         authUnavailableTitle: "Connexion indisponible dans cette version",
         authUnavailableBody:
           "Cette version locale n’embarque pas encore de parcours de connexion. Utilisez le mode aperçu local pour tester l’espace compte et le suivi.",
+        authDeploymentIssueTitle:
+          "Authentification indisponible sur ce déploiement",
+        authDeploymentIssueBody:
+          "Ce déploiement n’est pas prêt pour l’espace personnel. Vérifiez la configuration Clerk runtime ainsi que l’accès navigateur vers l’API.",
         previewModeTitle: "Mode aperçu local actif",
         previewModeBody:
           "Vous naviguez avec l’utilisateur local {{userId}}. Les écritures passent par l’API réelle, mais il ne s’agit pas d’une authentification réelle.",
@@ -635,6 +641,9 @@ export const MEDICAL_SAFETY_COPY: MedicalSafetyCopy = {
         authUnavailableTitle: "Sign-in unavailable in this build",
         authUnavailableBody:
           "This local build does not include a real sign-in flow yet. Use local preview mode to validate account and tracking screens.",
+        authDeploymentIssueTitle: "Sign-in is unavailable on this deployment",
+        authDeploymentIssueBody:
+          "This deployment is not ready for account surfaces yet. Check the Clerk runtime configuration and browser access to the API.",
         previewModeTitle: "Local preview mode active",
         previewModeBody:
           "You are browsing as local preview user {{userId}}. Writes go to the real API, but this is not real authentication.",

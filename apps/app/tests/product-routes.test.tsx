@@ -74,7 +74,12 @@ describe("product routes", () => {
     expect(html).toContain("Huiles et matières grasses");
     expect(html).toContain("Utiliser des versions simples et non aromatisées.");
     expect(html).toContain("Attribution CIQUAL");
-    expect(html).toContain('href="/aliments/phase2-huile-olive"');
+    expect(html).toContain(
+      'href="/aliments/phase2-huile-olive?source=decouvrir"',
+    );
+    expect(html).toContain(
+      "Les fiches liées peuvent encore afficher une analyse détaillée en attente.",
+    );
   });
 
   it("renders the safe-harbor empty state when no cohorts are returned", async () => {
@@ -186,6 +191,55 @@ describe("product routes", () => {
 
     expect(html).toContain("Aucun aliment trouvé pour « tomate »");
     expect(html).toContain('href="/decouvrir"');
+  });
+
+  it("distinguishes foods whose public rollup is still pending", async () => {
+    mockedSearchCuratedFoods.mockResolvedValue({
+      ok: true,
+      data: {
+        query: "champignons",
+        limit: 12,
+        total: 1,
+        items: [
+          {
+            kind: "curated_food",
+            slug: "phase2-champignon-cru",
+            names: {
+              fr: "Champignon cru",
+              en: "Raw mushroom",
+            },
+            overallLevel: null,
+            driverSubtype: null,
+            coverageRatio: null,
+            rollupComputedAt: null,
+            provenance: {
+              kind: "curated_food_catalog",
+              provider: "fodmapp",
+              sourceSlug: null,
+              capturedAt: null,
+            },
+            evidenceTier: "curated",
+            capabilities: {
+              canBeSwapOrigin: true,
+              canBeSwapTarget: true,
+              canAppearInTracking: true,
+              canBeSavedMealItem: true,
+              hasEvidenceBackedGuidance: true,
+              isInformationalOnly: false,
+            },
+          },
+        ],
+      },
+    });
+
+    const html = renderToStaticMarkup(
+      await AlimentsPage({
+        searchParams: Promise.resolve({ q: "champignons" }),
+      }),
+    );
+
+    expect(html).toContain("Analyse détaillée en attente");
+    expect(html).toContain("son rollup public n’est pas encore calculé");
   });
 
   it("renders the aliments loading route", () => {
@@ -376,9 +430,71 @@ describe("product routes", () => {
       }),
     );
 
-    expect(html).toContain("Données incomplètes");
+    expect(html).toContain("Analyse détaillée en attente");
     expect(html).toContain("Huile d&#x27;olive");
     expect(html).toContain("Données partielles");
+  });
+
+  it("keeps discover-linked detail fallback aligned with the safe-harbor promise", async () => {
+    mockedGetCuratedFoodDetailPageData.mockResolvedValue({
+      foodResult: {
+        ok: true,
+        data: {
+          kind: "curated_food",
+          slug: "phase2-huile-olive",
+          names: {
+            fr: "Huile d'olive",
+            en: "Olive oil",
+          },
+          preparationState: null,
+          status: null,
+          sourceSlug: null,
+          profile: null,
+          provenance: {
+            kind: "curated_food_catalog",
+            provider: "fodmapp",
+            sourceSlug: null,
+            capturedAt: null,
+          },
+          evidenceTier: "curated",
+          capabilities: {
+            canBeSwapOrigin: true,
+            canBeSwapTarget: true,
+            canAppearInTracking: true,
+            canBeSavedMealItem: true,
+            hasEvidenceBackedGuidance: true,
+            isInformationalOnly: false,
+          },
+        },
+      },
+      rollupResult: {
+        ok: false,
+        status: 500,
+        error: "request_failed",
+      },
+      swapsResult: {
+        ok: true,
+        data: {
+          fromFoodSlug: "phase2-huile-olive",
+          appliedFilters: null,
+          items: [],
+          total: 0,
+        },
+      },
+    });
+
+    const html = renderToStaticMarkup(
+      await FoodDetailPage({
+        params: Promise.resolve({ slug: "phase2-huile-olive" }),
+        searchParams: Promise.resolve({ source: "decouvrir" }),
+      }),
+    );
+
+    expect(html).toContain("Base compatible simple");
+    expect(html).toContain("Découvrir");
+    expect(html).toContain(
+      "La base compatible présentée dans Découvrir reste le repère principal",
+    );
   });
 
   it("calls notFound when the food detail endpoint returns 404", async () => {

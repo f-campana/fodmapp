@@ -8,6 +8,8 @@ export default function SignInPage() {
   const auth = getClerkBootstrapStatus();
 
   if (!auth.fullyConfigured) {
+    const hasDeploymentConfigIssue =
+      auth.runtimeIssue === "missing_runtime_configuration";
     return (
       <main className="app-shell">
         <section className="app-shell__header">
@@ -23,10 +25,15 @@ export default function SignInPage() {
         </section>
         <section className="app-shell__section">
           <h2 className="app-shell__section-title">Se connecter</h2>
-          <p className="app-shell__text">Connexion Clerk non disponible.</p>
           <p className="app-shell__text">
-            Cette page s’active uniquement quand les clés Clerk runtime sont
-            configurées.
+            {hasDeploymentConfigIssue
+              ? "Authentification indisponible sur ce déploiement."
+              : "Connexion Clerk non disponible."}
+          </p>
+          <p className="app-shell__text">
+            {hasDeploymentConfigIssue
+              ? "Vérifiez la configuration Clerk runtime ainsi que l’accès navigateur vers l’API."
+              : "Cette page s’active uniquement quand les clés Clerk runtime sont configurées."}
           </p>
           <p className="app-shell__text">
             <Link href="/">Retour à l’accueil</Link>

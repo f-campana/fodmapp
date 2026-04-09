@@ -14,7 +14,7 @@ import {
 import { ScoreBar } from "@fodmapp/ui/score-bar";
 
 import { getPublicApiClientConfig } from "../../../lib/apiClientConfig";
-import { formatFoodLevel } from "../../../lib/format";
+import { formatFoodLevel, getFoodLevelPresentation } from "../../../lib/format";
 
 function formatTimestamp(value: string): string {
   return new Date(value).toLocaleString("fr-FR", {
@@ -25,10 +25,17 @@ function formatTimestamp(value: string): string {
 
 export default async function AlimentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ source?: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
+  const source = Array.isArray(resolvedSearchParams?.source)
+    ? resolvedSearchParams?.source[0]
+    : resolvedSearchParams?.source;
+  const sourcedFromDiscover = source === "decouvrir";
   const { foodResult, rollupResult, swapsResult } =
     await getCuratedFoodDetailPageData(getPublicApiClientConfig(), slug);
 
@@ -80,8 +87,15 @@ export default async function AlimentDetailPage({
       <Card>
         <CardHeader>
           <CardTitle>Identité</CardTitle>
-          <CardDescription>{food.slug}</CardDescription>
+          <CardDescription>
+            {food.names.en && food.names.en !== food.names.fr
+              ? food.names.en
+              : "Référence catalogue FODMAPP"}
+          </CardDescription>
         </CardHeader>
+        <CardContent>
+          <p className="product-page__note">Référence interne: {food.slug}</p>
+        </CardContent>
       </Card>
 
       {rollupResult.ok ? (
@@ -111,13 +125,25 @@ export default async function AlimentDetailPage({
           </CardContent>
         </Card>
       ) : (
-        <Alert variant="destructive">
-          <AlertTitle>Données incomplètes</AlertTitle>
-          <AlertDescription>
-            Le rollup de cet aliment est indisponible. La fiche d&apos;identité
-            et les substitutions restent consultables.
-          </AlertDescription>
-        </Alert>
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {sourcedFromDiscover
+                ? "Base compatible simple"
+                : "Analyse détaillée en attente"}
+            </CardTitle>
+            <CardDescription>
+              {sourcedFromDiscover
+                ? "Cette fiche reste utile comme repère simple issu de Découvrir, même si le détail FODMAP complet n’est pas encore publié."
+                : "Le rollup public n’est pas encore calculé pour cet aliment. La fiche d’identité et les substitutions disponibles restent consultables."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="product-page__note">
+              {getFoodLevelPresentation(null).supportingText}
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {!swapsResult.ok ? (
@@ -138,8 +164,9 @@ export default async function AlimentDetailPage({
           </CardHeader>
           <CardContent className="product-page__stack">
             <p className="product-page__note">
-              Explore les bases simples déjà vérifiées pour préparer une option
-              de repli.
+              {sourcedFromDiscover
+                ? "La base compatible présentée dans Découvrir reste le repère principal pour cet aliment."
+                : "Explore les bases simples déjà vérifiées pour préparer une option de repli."}
             </p>
             <div>
               <Link className="product-page__link-pill" href="/decouvrir">

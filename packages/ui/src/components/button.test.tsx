@@ -277,6 +277,7 @@ describe("Button", () => {
     const link = screen.getByRole("link", { name: "Ingrédients" });
     expect(link).toHaveAttribute("href", "/ingredients");
     expect(link).not.toHaveAttribute("type");
+    expect(link.className).toContain("text-primary-foreground");
   });
 
   it("sets data-slot on asChild element", () => {

@@ -51,7 +51,7 @@ describe("Calendar", () => {
       "aria-selected:[&>button]:bg-primary",
     );
     expect(selectedCell?.className ?? "").toContain(
-      "aria-selected:[&>button]:text-primary-foreground",
+      "aria-selected:[&>button]:!text-primary-foreground",
     );
   });
 

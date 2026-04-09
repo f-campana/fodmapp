@@ -29,12 +29,16 @@ describe("clerk auth pages", () => {
     mockedGetClerkBootstrapStatus.mockReturnValue({
       provider: "clerk",
       mode: "runtime",
+      environment: "production",
       publishableKeyConfigured: true,
       serverKeysConfigured: true,
       fullyConfigured: true,
       previewValuePresent: false,
       previewValueValid: false,
       previewUserId: null,
+      missingClientEnvKeys: [],
+      missingServerEnvKeys: [],
+      runtimeIssue: null,
     });
 
     const html = renderToStaticMarkup(<SignInPage />);
@@ -49,12 +53,21 @@ describe("clerk auth pages", () => {
     mockedGetClerkBootstrapStatus.mockReturnValue({
       provider: "clerk",
       mode: "disabled",
+      environment: "test",
       publishableKeyConfigured: false,
       serverKeysConfigured: false,
       fullyConfigured: false,
       previewValuePresent: false,
       previewValueValid: false,
       previewUserId: null,
+      missingClientEnvKeys: ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+      missingServerEnvKeys: [
+        "CLERK_SECRET_KEY",
+        "CLERK_JWT_ISSUER_DOMAIN",
+        "CLERK_JWT_KEY",
+        "CLERK_AUTHORIZED_PARTIES",
+      ],
+      runtimeIssue: null,
     });
 
     const html = renderToStaticMarkup(<SignInPage />);
@@ -68,12 +81,16 @@ describe("clerk auth pages", () => {
     mockedGetClerkBootstrapStatus.mockReturnValue({
       provider: "clerk",
       mode: "runtime",
+      environment: "production",
       publishableKeyConfigured: true,
       serverKeysConfigured: true,
       fullyConfigured: true,
       previewValuePresent: false,
       previewValueValid: false,
       previewUserId: null,
+      missingClientEnvKeys: [],
+      missingServerEnvKeys: [],
+      runtimeIssue: null,
     });
 
     const html = renderToStaticMarkup(<SignUpPage />);
@@ -88,12 +105,21 @@ describe("clerk auth pages", () => {
     mockedGetClerkBootstrapStatus.mockReturnValue({
       provider: "clerk",
       mode: "disabled",
+      environment: "test",
       publishableKeyConfigured: false,
       serverKeysConfigured: false,
       fullyConfigured: false,
       previewValuePresent: false,
       previewValueValid: false,
       previewUserId: null,
+      missingClientEnvKeys: ["NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"],
+      missingServerEnvKeys: [
+        "CLERK_SECRET_KEY",
+        "CLERK_JWT_ISSUER_DOMAIN",
+        "CLERK_JWT_KEY",
+        "CLERK_AUTHORIZED_PARTIES",
+      ],
+      runtimeIssue: null,
     });
 
     const html = renderToStaticMarkup(<SignUpPage />);
@@ -101,5 +127,32 @@ describe("clerk auth pages", () => {
     expect(html).toContain("Inscription Clerk non disponible");
     expect(html).not.toContain("data-sign-up=");
     expect(html).toContain('href="/"');
+  });
+
+  it("surfaces deployment misconfiguration on auth pages in production", () => {
+    mockedGetClerkBootstrapStatus.mockReturnValue({
+      provider: "clerk",
+      mode: "disabled",
+      environment: "production",
+      publishableKeyConfigured: true,
+      serverKeysConfigured: false,
+      fullyConfigured: false,
+      previewValuePresent: false,
+      previewValueValid: false,
+      previewUserId: null,
+      missingClientEnvKeys: [],
+      missingServerEnvKeys: ["CLERK_JWT_KEY"],
+      runtimeIssue: "missing_runtime_configuration",
+    });
+
+    const signInHtml = renderToStaticMarkup(<SignInPage />);
+    const signUpHtml = renderToStaticMarkup(<SignUpPage />);
+
+    expect(signInHtml).toContain(
+      "Authentification indisponible sur ce déploiement.",
+    );
+    expect(signUpHtml).toContain(
+      "Authentification indisponible sur ce déploiement.",
+    );
   });
 });

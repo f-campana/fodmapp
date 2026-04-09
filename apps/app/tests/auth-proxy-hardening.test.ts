@@ -35,9 +35,11 @@ describe("auth runtime hardening", () => {
 
     expect(auth.state).toBe("authenticated");
     expect(auth.mode).toBe("runtime");
+    expect(auth.environment).toBe("test");
     expect(auth.configured).toBe(true);
     expect(auth.isAuthenticated).toBe(true);
     expect(auth.userId).toBe("user_123");
+    expect(auth.runtimeIssue).toBeNull();
     expect(reportFailure).not.toHaveBeenCalled();
   });
 
@@ -51,9 +53,11 @@ describe("auth runtime hardening", () => {
 
     expect(auth.state).toBe("error");
     expect(auth.mode).toBe("runtime");
+    expect(auth.environment).toBe("test");
     expect(auth.configured).toBe(true);
     expect(auth.isAuthenticated).toBe(false);
     expect(auth.userId).toBeNull();
+    expect(auth.runtimeIssue).toBeNull();
     expect(reportFailure).toHaveBeenCalledWith(
       "clerk_auth_context_unavailable",
       expect.any(Error),
@@ -80,9 +84,11 @@ describe("auth runtime hardening", () => {
 
     expect(auth.state).toBe("authenticated");
     expect(auth.mode).toBe("preview");
+    expect(auth.environment).toBe("development");
     expect(auth.configured).toBe(true);
     expect(auth.isAuthenticated).toBe(true);
     expect(auth.userId).toBe(PREVIEW_USER_ID);
+    expect(auth.runtimeIssue).toBeNull();
     expect(loadAuthModule).not.toHaveBeenCalled();
     expect(reportFailure).not.toHaveBeenCalled();
   });
@@ -107,9 +113,11 @@ describe("auth runtime hardening", () => {
 
     expect(auth.state).toBe("placeholder");
     expect(auth.mode).toBe("disabled");
+    expect(auth.environment).toBe("development");
     expect(auth.configured).toBe(false);
     expect(auth.isAuthenticated).toBe(false);
     expect(auth.userId).toBeNull();
+    expect(auth.runtimeIssue).toBeNull();
     expect(loadAuthModule).not.toHaveBeenCalled();
     expect(reportFailure).toHaveBeenCalledWith(
       "auth_preview_user_invalid",

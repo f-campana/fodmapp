@@ -58,7 +58,25 @@ interface ConsentRightsInnerProps {
 }
 
 function formatError(error: unknown): string {
-  return error instanceof Error ? error.message : "Unknown error";
+  const message = error instanceof Error ? error.message : "Unknown error";
+
+  if (/Failed to fetch|Network request failed|Load failed/i.test(message)) {
+    return "Impossible de joindre l’espace personnel pour le moment. Vérifiez la disponibilité de l’API puis réessayez.";
+  }
+
+  if (message.includes("me-api error 401")) {
+    return "Votre session n’est plus valide. Rechargez la page puis reconnectez-vous.";
+  }
+
+  if (message.includes("me-api error 403")) {
+    return "Cette action n’est pas disponible pour ce compte pour le moment.";
+  }
+
+  if (message.startsWith("me-api error")) {
+    return "Impossible de charger ou de mettre à jour les données de votre espace pour le moment.";
+  }
+
+  return message;
 }
 
 function pickPollTerminated(status: string | null | undefined): boolean {

@@ -11,7 +11,7 @@ const buttonVariants = cva(
     // Layout
     "group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap",
     // Typography
-    "text-sm font-medium select-none",
+    "text-sm font-medium no-underline select-none",
     // Shape — transparent border reserves space for focus indicator
     "rounded-(--radius) border border-transparent bg-clip-padding",
     // Motion — semantic tokens (120ms, cubic-bezier(0.2, 0, 0, 1))
