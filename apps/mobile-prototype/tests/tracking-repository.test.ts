@@ -97,6 +97,78 @@ void test("tracking repository createSymptom posts through the protected api-cli
   assert.equal(symptom.severity, 7);
 });
 
+void test("tracking repository createMeal posts free-text meal items through the protected api-client boundary", async () => {
+  process.env.EXPO_PUBLIC_API_BASE_URL = "https://api.fodmap.example";
+
+  let requestUrl = "";
+  let requestMethod = "";
+  let authorizationHeader: string | null = null;
+  let requestBody: Record<string, unknown> | null = null;
+
+  globalThis.fetch = (async (input: URL | RequestInfo, init?: RequestInit) => {
+    requestUrl = String(input);
+    requestMethod = init?.method ?? "GET";
+    authorizationHeader = new Headers(init?.headers).get("Authorization");
+    requestBody = JSON.parse(String(init?.body ?? "{}")) as Record<
+      string,
+      unknown
+    >;
+
+    return new Response(
+      JSON.stringify({
+        meal_log_id: "meal-1",
+        title: "Lunch",
+        occurred_at_utc: "2026-04-12T12:15:00.000Z",
+        note: "Simple lunch",
+        version: 1,
+        created_at_utc: "2026-04-12T12:15:00.000Z",
+        updated_at_utc: "2026-04-12T12:15:00.000Z",
+        items: [
+          {
+            meal_log_item_id: "meal-item-1",
+            sort_order: 1,
+            item_kind: "free_text",
+            label: "Rice bowl",
+            quantity_text: "1 bowl",
+            note: null,
+          },
+        ],
+      }),
+      { status: 201 },
+    );
+  }) as typeof fetch;
+
+  const repository = createTrackingRepository(async () => "mobile_token");
+  const meal = await repository.createMeal({
+    title: "  Lunch  ",
+    note: "  Simple lunch  ",
+    items: [
+      {
+        label: "  Rice bowl  ",
+        quantityText: " 1 bowl ",
+      },
+    ],
+  });
+
+  assert.equal(requestUrl, "https://api.fodmap.example/v0/me/tracking/meals");
+  assert.equal(requestMethod, "POST");
+  assert.equal(authorizationHeader, "Bearer mobile_token");
+  assert.equal(requestBody?.["title"], "Lunch");
+  assert.equal(requestBody?.["note"], "Simple lunch");
+  assert.equal(typeof requestBody?.["occurred_at_utc"], "string");
+  assert.deepEqual(requestBody?.["items"], [
+    {
+      item_kind: "free_text",
+      free_text_label: "Rice bowl",
+      quantity_text: "1 bowl",
+      note: null,
+    },
+  ]);
+  assert.equal(meal.mealLogId, "meal-1");
+  assert.equal(meal.items[0]?.reference.kind, "free_text");
+  assert.equal(meal.items[0]?.reference.label, "Rice bowl");
+});
+
 void test("tracking repository getHubReadModel loads feed and weekly summary through the protected boundary", async () => {
   process.env.EXPO_PUBLIC_API_BASE_URL = "https://api.fodmap.example";
 

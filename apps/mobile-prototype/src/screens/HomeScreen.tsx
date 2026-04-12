@@ -31,6 +31,9 @@ import {
 
 function createStyles(colors: RNColors) {
   return StyleSheet.create({
+    actionStack: {
+      gap: theme.spacing.sm,
+    },
     activityRow: {
       alignItems: "center",
       flexDirection: "row",
@@ -121,11 +124,13 @@ function createStyles(colors: RNColors) {
 
 export function HomeScreen({
   onBrowse,
+  onCreateMeal,
   onCreateSymptom,
   onOpenTracking,
   repository,
 }: {
   onBrowse: () => void;
+  onCreateMeal: () => void;
   onCreateSymptom: () => void;
   onOpenTracking: () => void;
   repository?: HomeRepository;
@@ -196,9 +201,15 @@ export function HomeScreen({
       <Card>
         <Text style={styles.title}>How are you feeling today?</Text>
         <Text style={styles.helper}>
-          Log a symptom to keep your recent activity real and up to date.
+          Log a meal or a symptom to keep your recent activity real and up to
+          date.
         </Text>
-        <PrimaryButton label="Log symptom" onPress={onCreateSymptom} />
+        <View style={styles.actionStack}>
+          <PrimaryButton label="Log symptom" onPress={onCreateSymptom} />
+          <Pressable onPress={onCreateMeal} style={styles.secondaryAction}>
+            <Text style={styles.secondaryActionText}>Log meal</Text>
+          </Pressable>
+        </View>
       </Card>
 
       <Card>
@@ -253,12 +264,20 @@ export function HomeScreen({
         <Card>
           <Text style={styles.title}>No recent activity yet</Text>
           <Text style={styles.helper}>
-            Log your first symptom to turn Home into a personal activity view.
+            Log your first meal or symptom to turn Home into a personal activity
+            view.
           </Text>
-          <PrimaryButton
-            label="Log your first symptom"
-            onPress={onCreateSymptom}
-          />
+          <View style={styles.actionStack}>
+            <PrimaryButton
+              label="Log your first symptom"
+              onPress={onCreateSymptom}
+            />
+            <Pressable onPress={onCreateMeal} style={styles.secondaryAction}>
+              <Text style={styles.secondaryActionText}>
+                Log your first meal
+              </Text>
+            </Pressable>
+          </View>
         </Card>
       ) : null}
 

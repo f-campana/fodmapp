@@ -100,9 +100,11 @@ function createStyles(colors: RNColors) {
 }
 
 export function TrackingFeedScreen({
+  onCreateMeal,
   onCreateSymptom,
   repository,
 }: {
+  onCreateMeal: () => void;
   onCreateSymptom: () => void;
   repository?: TrackingRepository;
 }) {
@@ -182,6 +184,7 @@ export function TrackingFeedScreen({
     <Screen title="Tracking feed" subtitle={viewModel.subtitle} scroll>
       <View style={styles.actions}>
         <PrimaryButton label="Create symptom" onPress={onCreateSymptom} />
+        <PrimaryButton label="Log meal" onPress={onCreateMeal} />
       </View>
 
       {weeklySummary && summarySubtitle ? (
@@ -201,9 +204,9 @@ export function TrackingFeedScreen({
 
       {entries.length === 0 ? (
         <StateView
-          message="No tracking entries yet. Create your first symptom to start using the protected mobile flow."
-          action={onCreateSymptom}
-          actionLabel="Create symptom"
+          message="No tracking entries yet. Create your first meal or symptom to start using the protected mobile flow."
+          action={onCreateMeal}
+          actionLabel="Log meal"
         />
       ) : (
         viewModel.sections.map((section) => (

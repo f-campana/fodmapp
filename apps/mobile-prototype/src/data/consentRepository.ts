@@ -8,10 +8,11 @@ import {
 import type { AuthTokenGetter } from "../auth/useAuth";
 import { getProtectedApiClientConfig } from "../config/api";
 
-export type TrackingConsentMissingScope = "symptom_logs" | null;
+export type TrackingConsentMissingScope = "symptom_logs" | "diet_logs" | null;
 
 export interface TrackingConsentState {
   canCreateSymptoms: boolean;
+  canCreateMeals: boolean;
   isActive: boolean;
   missingScope: TrackingConsentMissingScope;
   scope: Record<string, boolean>;
@@ -46,17 +47,28 @@ function hasSymptomTrackingScope(scope: Record<string, boolean>): boolean {
   return Boolean(scope.symptom_logs || scope.symptoms);
 }
 
+function hasDietTrackingScope(scope: Record<string, boolean>): boolean {
+  return Boolean(scope.diet_logs || scope.meals);
+}
+
 export function deriveTrackingConsentState(
   record: ConsentRecordResponse | null,
 ): TrackingConsentState {
   const scope = (record?.consent_state.scope ?? {}) as Record<string, boolean>;
   const isActive = Boolean(record?.consent_state.active);
   const canCreateSymptoms = isActive && hasSymptomTrackingScope(scope);
+  const canCreateMeals = isActive && hasDietTrackingScope(scope);
+  const missingScope = !canCreateSymptoms
+    ? "symptom_logs"
+    : !canCreateMeals
+      ? "diet_logs"
+      : null;
 
   return {
     canCreateSymptoms,
+    canCreateMeals,
     isActive,
-    missingScope: canCreateSymptoms ? null : "symptom_logs",
+    missingScope,
     scope,
     status: record?.consent_state.status ?? null,
   };
