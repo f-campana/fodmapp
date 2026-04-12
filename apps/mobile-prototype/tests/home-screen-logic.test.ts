@@ -208,6 +208,7 @@ void test("buildHomeWeeklySummary prepares a compact factual seven-day summary",
   assert.deepEqual(viewModel.stats, [
     { label: "Entries", value: "3" },
     { label: "Symptoms", value: "3" },
+    { label: "Meals", value: "0" },
     { label: "Avg intensity", value: "4.5" },
   ]);
 });

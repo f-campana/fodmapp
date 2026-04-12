@@ -1,11 +1,15 @@
 import type {
+  MealEntry,
   SymptomType,
   TrackingFeedEntry,
   WeeklyTrackingSummary,
 } from "@fodmapp/domain";
 
 import type { TrackingConsentState } from "../data/consentRepository";
-import type { TrackingRepository } from "../data/trackingRepository";
+import type {
+  CreateMealItemInput,
+  TrackingRepository,
+} from "../data/trackingRepository";
 
 function formatOccurredAt(value: string) {
   return new Date(value).toLocaleString(undefined, {
@@ -28,7 +32,7 @@ function renderEntryTitle(entry: TrackingFeedEntry) {
     return `${entry.symptom.symptomType} · intensity ${entry.symptom.severity}`;
   }
 
-  return entry.meal.title ?? "Meal entry";
+  return buildMealEntryHeadline(entry.meal);
 }
 
 function renderEntryNote(entry: TrackingFeedEntry) {
@@ -36,7 +40,7 @@ function renderEntryNote(entry: TrackingFeedEntry) {
     return entry.symptom.note;
   }
 
-  return entry.meal.note;
+  return buildMealEntryDetail(entry.meal);
 }
 
 export interface TrackingFeedListItem {
@@ -64,6 +68,11 @@ export interface TrackingFeedViewModel {
 }
 
 export interface CreateSymptomConsentGate {
+  isLocked: boolean;
+  message: string | null;
+}
+
+export interface CreateMealConsentGate {
   isLocked: boolean;
   message: string | null;
 }
@@ -171,6 +180,10 @@ function getWeeklySummarySymptomCount(summary: WeeklyTrackingSummary): number {
   );
 }
 
+function getWeeklySummaryMealCount(summary: WeeklyTrackingSummary): number {
+  return summary.dailyCounts.reduce((total, day) => total + day.mealCount, 0);
+}
+
 function formatSummaryValue(value: number | null): string {
   if (value === null) {
     return "—";
@@ -205,15 +218,53 @@ export function buildWeeklyTrackingSummaryStats(
       value: String(getWeeklySummarySymptomCount(summary)),
     },
     {
+      label: "Meals",
+      value: String(getWeeklySummaryMealCount(summary)),
+    },
+    {
       label: "Avg intensity",
       value: formatSummaryValue(summary.severity.average),
     },
   ];
 }
 
-function normalizeNote(note: string): string | null {
-  const trimmed = note.trim();
+function normalizeOptionalText(value: string): string | null {
+  const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function buildMealEntryHeadline(meal: MealEntry): string {
+  if (meal.title) {
+    return meal.title;
+  }
+
+  const labels = meal.items
+    .map((item) => item.reference.label.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  if (labels.length === 0) {
+    return "Meal entry";
+  }
+
+  return labels.join(" + ");
+}
+
+function buildMealEntryDetail(meal: MealEntry): string | null {
+  if (meal.note) {
+    return meal.note;
+  }
+
+  const labels = meal.items
+    .map((item) => {
+      const quantity = item.quantityText?.trim();
+      return quantity
+        ? `${item.reference.label} (${quantity})`
+        : item.reference.label;
+    })
+    .filter(Boolean);
+
+  return labels.length > 0 ? labels.join(", ") : null;
 }
 
 export function parseSymptomSeverityInput(rawValue: string): number | null {
@@ -256,6 +307,33 @@ export function canSubmitCreateSymptom(
   return Boolean(consentState?.canCreateSymptoms);
 }
 
+export function buildCreateMealConsentGate(
+  consentState: TrackingConsentState | null,
+): CreateMealConsentGate {
+  if (consentState?.canCreateMeals) {
+    return {
+      isLocked: false,
+      message: null,
+    };
+  }
+
+  return {
+    isLocked: true,
+    message: "Meal logging is disabled until you enable consent.",
+  };
+}
+
+export function canSubmitCreateMeal(
+  consentState: TrackingConsentState | null,
+  submitting: boolean,
+): boolean {
+  if (submitting) {
+    return false;
+  }
+
+  return Boolean(consentState?.canCreateMeals);
+}
+
 export function isConsentLockedError(error: unknown): boolean {
   if (!(error instanceof Error)) {
     return false;
@@ -276,6 +354,14 @@ export function mapCreateSymptomSubmissionError(error: unknown): string {
   return "Could not create symptom entry. Try again.";
 }
 
+export function mapCreateMealSubmissionError(error: unknown): string {
+  if (isConsentLockedError(error)) {
+    return "Meal logging is disabled until you enable consent.";
+  }
+
+  return "Could not save meal. Try again.";
+}
+
 export async function submitCreateSymptomForm(
   repository: TrackingRepository,
   input: {
@@ -293,7 +379,45 @@ export async function submitCreateSymptomForm(
   await repository.createSymptom({
     symptomType: input.symptomType,
     severity: parsedSeverity,
-    note: normalizeNote(input.note),
+    note: normalizeOptionalText(input.note),
+  });
+  onCreated();
+  return null;
+}
+
+export function validateMealItems(items: CreateMealItemInput[]): string | null {
+  const hasAtLeastOneItem = items.some((item) => item.label.trim().length > 0);
+
+  if (!hasAtLeastOneItem) {
+    return "Add at least one meal item before saving.";
+  }
+
+  return null;
+}
+
+export async function submitCreateMealForm(
+  repository: TrackingRepository,
+  input: {
+    title: string;
+    note: string;
+    items: CreateMealItemInput[];
+  },
+  onCreated: () => void,
+): Promise<string | null> {
+  const itemValidationError = validateMealItems(input.items);
+  if (itemValidationError) {
+    return itemValidationError;
+  }
+
+  await repository.createMeal({
+    title: normalizeOptionalText(input.title),
+    note: normalizeOptionalText(input.note),
+    items: input.items
+      .map((item) => ({
+        label: item.label.trim(),
+        quantityText: normalizeOptionalText(item.quantityText ?? ""),
+      }))
+      .filter((item) => item.label.length > 0),
   });
   onCreated();
   return null;

@@ -1,12 +1,14 @@
 import {
+  createMealEntry,
   createSymptomEntry,
   getTrackingFeed,
   getTrackingHubReadModel,
+  type MealEntry,
   type SymptomEntry,
   type TrackingFeed,
   type TrackingHubReadModel,
 } from "@fodmapp/api-client";
-import type { SymptomType } from "@fodmapp/domain";
+import type { SymptomType, TrackingItemDraft } from "@fodmapp/domain";
 
 import type { AuthTokenGetter } from "../auth/useAuth";
 import { getProtectedApiClientConfig } from "../config/api";
@@ -19,6 +21,17 @@ export interface CreateSymptomInput {
   note: string | null;
 }
 
+export interface CreateMealItemInput {
+  label: string;
+  quantityText: string | null;
+}
+
+export interface CreateMealInput {
+  title: string | null;
+  note: string | null;
+  items: CreateMealItemInput[];
+}
+
 export interface TrackingRepository {
   getFeed: (limit?: number) => Promise<TrackingFeed>;
   getHubReadModel: (options?: {
@@ -26,6 +39,7 @@ export interface TrackingRepository {
     feedLimit?: number;
   }) => Promise<TrackingHubReadModel>;
   createSymptom: (input: CreateSymptomInput) => Promise<SymptomEntry>;
+  createMeal: (input: CreateMealInput) => Promise<MealEntry>;
 }
 
 function normalizeNote(note: string | null): string | null {
@@ -35,6 +49,26 @@ function normalizeNote(note: string | null): string | null {
 
   const trimmed = note.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeOptionalText(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function buildMealItems(items: CreateMealItemInput[]): TrackingItemDraft[] {
+  return items.map((item) => ({
+    reference: {
+      kind: "free_text",
+      label: item.label.trim(),
+    },
+    quantityText: normalizeOptionalText(item.quantityText),
+    note: null,
+  }));
 }
 
 export function createTrackingRepository(
@@ -51,6 +85,13 @@ export function createTrackingRepository(
         severity: input.severity,
         notedAtUtc: new Date().toISOString(),
         note: normalizeNote(input.note),
+      }),
+    createMeal: async (input) =>
+      createMealEntry(getProtectedApiClientConfig(), getToken, {
+        title: normalizeOptionalText(input.title),
+        occurredAtUtc: new Date().toISOString(),
+        note: normalizeNote(input.note),
+        items: buildMealItems(input.items),
       }),
   };
 }

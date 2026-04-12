@@ -2,20 +2,26 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type {
+  MealEntry,
   SymptomEntry,
   TrackingFeedEntry,
   WeeklyTrackingSummary,
 } from "@fodmapp/domain";
 
 import {
+  buildCreateMealConsentGate,
   buildCreateSymptomConsentGate,
   buildTrackingFeedViewModel,
   buildWeeklyTrackingSummaryStats,
   buildWeeklyTrackingSummarySubtitle,
+  canSubmitCreateMeal,
   canSubmitCreateSymptom,
+  mapCreateMealSubmissionError,
   mapCreateSymptomSubmissionError,
   parseSymptomSeverityInput,
+  submitCreateMealForm,
   submitCreateSymptomForm,
+  validateMealItems,
 } from "../src/screens/trackingScreenLogic.ts";
 
 function createSymptomEntryFixture(
@@ -75,30 +81,134 @@ function createTrackingFeedEntryFixture(
   };
 }
 
+function createMealEntryFixture(overrides: Partial<MealEntry> = {}): MealEntry {
+  return {
+    kind: "meal_log",
+    mealLogId: "meal-1",
+    title: "Lunch",
+    occurredAtUtc: "2026-04-08T12:30:00.000Z",
+    note: null,
+    version: 1,
+    createdAtUtc: "2026-04-08T12:30:00.000Z",
+    updatedAtUtc: "2026-04-08T12:30:00.000Z",
+    items: [
+      {
+        itemId: "meal-item-1",
+        sortOrder: 1,
+        reference: {
+          kind: "free_text",
+          label: "Rice bowl",
+          provenance: {
+            kind: "tracking_log",
+            provider: "fodmapp",
+            sourceId: "meal-item-1",
+          },
+          evidenceTier: "user_entered",
+          capabilities: {
+            canBeSwapOrigin: false,
+            canBeSwapTarget: false,
+            canAppearInTracking: true,
+            canBeSavedMealItem: false,
+            hasEvidenceBackedGuidance: false,
+            isInformationalOnly: false,
+          },
+        },
+        quantityText: "1 bowl",
+        note: null,
+      },
+    ],
+    provenance: {
+      kind: "tracking_log",
+      provider: "fodmapp",
+      sourceId: "meal-1",
+    },
+    evidenceTier: "user_entered",
+    capabilities: {
+      canBeSwapOrigin: false,
+      canBeSwapTarget: false,
+      canAppearInTracking: true,
+      canBeSavedMealItem: false,
+      hasEvidenceBackedGuidance: false,
+      isInformationalOnly: false,
+    },
+    ...overrides,
+  };
+}
+
+function createMealFeedEntryFixture(
+  overrides: Partial<Extract<TrackingFeedEntry, { entryType: "meal" }>> = {},
+): TrackingFeedEntry {
+  return {
+    entryType: "meal",
+    occurredAtUtc: "2026-04-08T12:30:00.000Z",
+    entryId: "meal-1",
+    meal: createMealEntryFixture(),
+    provenance: {
+      kind: "tracking_projection",
+      provider: "fodmapp",
+      sourceId: "meal-1",
+    },
+    evidenceTier: "derived",
+    capabilities: {
+      canBeSwapOrigin: false,
+      canBeSwapTarget: false,
+      canAppearInTracking: true,
+      canBeSavedMealItem: false,
+      hasEvidenceBackedGuidance: false,
+      isInformationalOnly: false,
+    },
+    ...overrides,
+  };
+}
+
 void test("buildTrackingFeedViewModel groups recent entries by local day headings", () => {
   const viewModel = buildTrackingFeedViewModel(3, [
     createTrackingFeedEntryFixture({
       entryId: "symptom-1",
       occurredAtUtc: "2026-04-09T10:15:00.000Z",
     }),
+    createMealFeedEntryFixture({
+      entryId: "meal-1",
+      occurredAtUtc: "2026-04-09T08:30:00.000Z",
+      meal: createMealEntryFixture({
+        mealLogId: "meal-1",
+        title: null,
+        items: [
+          {
+            itemId: "meal-item-1",
+            sortOrder: 1,
+            reference: {
+              kind: "free_text",
+              label: "Toast",
+              provenance: {
+                kind: "tracking_log",
+                provider: "fodmapp",
+                sourceId: "meal-item-1",
+              },
+              evidenceTier: "user_entered",
+              capabilities: {
+                canBeSwapOrigin: false,
+                canBeSwapTarget: false,
+                canAppearInTracking: true,
+                canBeSavedMealItem: false,
+                hasEvidenceBackedGuidance: false,
+                isInformationalOnly: false,
+              },
+            },
+            quantityText: "2 slices",
+            note: null,
+          },
+        ],
+      }),
+    }),
     createTrackingFeedEntryFixture({
       entryId: "symptom-2",
-      occurredAtUtc: "2026-04-09T08:30:00.000Z",
+      occurredAtUtc: "2026-04-08T18:45:00.000Z",
       symptom: createSymptomEntryFixture({
         symptomLogId: "symptom-2",
         symptomType: "pain",
         severity: 7,
-        note: "Sharp pain after breakfast",
-      }),
-    }),
-    createTrackingFeedEntryFixture({
-      entryId: "symptom-3",
-      occurredAtUtc: "2026-04-08T18:45:00.000Z",
-      symptom: createSymptomEntryFixture({
-        symptomLogId: "symptom-3",
-        symptomType: "gas",
-        severity: 5,
-        note: "After dinner",
+        note: "Sharp pain after dinner",
       }),
     }),
   ]);
@@ -111,8 +221,10 @@ void test("buildTrackingFeedViewModel groups recent entries by local day heading
     viewModel.sections[0]?.items[0]?.title,
     "bloating · intensity 4",
   );
-  assert.equal(viewModel.sections[0]?.items[1]?.title, "pain · intensity 7");
-  assert.equal(viewModel.sections[1]?.items[0]?.title, "gas · intensity 5");
+  assert.equal(viewModel.sections[0]?.items[1]?.entryType, "meal");
+  assert.equal(viewModel.sections[0]?.items[1]?.title, "Toast");
+  assert.equal(viewModel.sections[0]?.items[1]?.note, "Toast (2 slices)");
+  assert.equal(viewModel.sections[1]?.items[0]?.title, "pain · intensity 7");
 });
 
 void test("weekly summary helpers stay observational and compact", () => {
@@ -164,6 +276,7 @@ void test("weekly summary helpers stay observational and compact", () => {
   assert.deepEqual(buildWeeklyTrackingSummaryStats(summary), [
     { label: "Entries", value: "3" },
     { label: "Symptoms", value: "3" },
+    { label: "Meals", value: "0" },
     { label: "Avg intensity", value: "4.5" },
   ]);
 });
@@ -179,6 +292,7 @@ void test("parseSymptomSeverityInput only accepts whole numbers from 0 to 10", (
 void test("buildCreateSymptomConsentGate reports a locked state when symptom consent is missing", () => {
   const consentGate = buildCreateSymptomConsentGate({
     canCreateSymptoms: false,
+    canCreateMeals: true,
     isActive: false,
     missingScope: "symptom_logs",
     scope: {},
@@ -194,8 +308,40 @@ void test("buildCreateSymptomConsentGate reports a locked state when symptom con
     canSubmitCreateSymptom(
       {
         canCreateSymptoms: false,
+        canCreateMeals: true,
         isActive: false,
         missingScope: "symptom_logs",
+        scope: {},
+        status: null,
+      },
+      false,
+    ),
+    false,
+  );
+});
+
+void test("buildCreateMealConsentGate reports a locked state when diet consent is missing", () => {
+  const consentGate = buildCreateMealConsentGate({
+    canCreateSymptoms: true,
+    canCreateMeals: false,
+    isActive: true,
+    missingScope: "diet_logs",
+    scope: {},
+    status: null,
+  });
+
+  assert.equal(consentGate.isLocked, true);
+  assert.equal(
+    consentGate.message,
+    "Meal logging is disabled until you enable consent.",
+  );
+  assert.equal(
+    canSubmitCreateMeal(
+      {
+        canCreateSymptoms: true,
+        canCreateMeals: false,
+        isActive: true,
+        missingScope: "diet_logs",
         scope: {},
         status: null,
       },
@@ -216,6 +362,17 @@ void test("mapCreateSymptomSubmissionError replaces raw consent locks with produ
   );
 });
 
+void test("mapCreateMealSubmissionError replaces raw consent locks with product copy", () => {
+  assert.equal(
+    mapCreateMealSubmissionError(
+      new Error(
+        'tracking-api error 423: {"error":{"code":"locked","message":"diet_logs disabled by consent"}}',
+      ),
+    ),
+    "Meal logging is disabled until you enable consent.",
+  );
+});
+
 void test("submitCreateSymptomForm triggers the repository write and completion callback", async () => {
   const createCalls: Array<{
     symptomType: string;
@@ -230,6 +387,9 @@ void test("submitCreateSymptomForm triggers the repository write and completion 
         throw new Error("not used");
       },
       getHubReadModel: async () => {
+        throw new Error("not used");
+      },
+      createMeal: async () => {
         throw new Error("not used");
       },
       createSymptom: async (input) => {
@@ -257,6 +417,71 @@ void test("submitCreateSymptomForm triggers the repository write and completion 
       symptomType: "pain",
       severity: 7,
       note: "Sharp pain after lunch",
+    },
+  ]);
+  assert.equal(createdCount, 1);
+});
+
+void test("validateMealItems requires at least one non-empty item", () => {
+  assert.equal(
+    validateMealItems([
+      { label: "   ", quantityText: null },
+      { label: "", quantityText: "1 bowl" },
+    ]),
+    "Add at least one meal item before saving.",
+  );
+  assert.equal(
+    validateMealItems([{ label: "Rice bowl", quantityText: "1 bowl" }]),
+    null,
+  );
+});
+
+void test("submitCreateMealForm triggers the repository write and completion callback", async () => {
+  const createCalls: Array<{
+    title: string | null;
+    note: string | null;
+    items: Array<{ label: string; quantityText: string | null }>;
+  }> = [];
+  let createdCount = 0;
+
+  const statusMessage = await submitCreateMealForm(
+    {
+      getFeed: async () => {
+        throw new Error("not used");
+      },
+      getHubReadModel: async () => {
+        throw new Error("not used");
+      },
+      createSymptom: async () => {
+        throw new Error("not used");
+      },
+      createMeal: async (input) => {
+        createCalls.push(input);
+        return createMealEntryFixture({
+          title: input.title,
+          note: input.note,
+        });
+      },
+    },
+    {
+      title: " Lunch ",
+      note: " Rice and eggs ",
+      items: [
+        { label: " Rice bowl ", quantityText: " 1 bowl " },
+        { label: "   ", quantityText: "" },
+      ],
+    },
+    () => {
+      createdCount += 1;
+    },
+  );
+
+  assert.equal(statusMessage, null);
+  assert.deepEqual(createCalls, [
+    {
+      title: "Lunch",
+      note: "Rice and eggs",
+      items: [{ label: "Rice bowl", quantityText: "1 bowl" }],
     },
   ]);
   assert.equal(createdCount, 1);

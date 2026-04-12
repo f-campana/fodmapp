@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CreateMealScreen } from "../screens/CreateMealScreen";
 import { CreateSymptomScreen } from "../screens/CreateSymptomScreen";
 import { FoodDetailScreen } from "../screens/FoodDetailScreen";
 import { FoodsScreen } from "../screens/FoodsScreen";
@@ -24,6 +25,7 @@ export type RootStackParamList = {
   FoodDetail: { foodId: string; foodName?: string };
   TrackingFeed: undefined;
   CreateSymptom: undefined;
+  CreateMeal: undefined;
 };
 
 export type TabParamList = {
@@ -81,6 +83,9 @@ function TabNavigator() {
           <ScreenPad>
             <HomeScreen
               onBrowse={() => navigation.navigate("FoodsTab")}
+              onCreateMeal={() =>
+                navigation.getParent()?.navigate("CreateMeal")
+              }
               onCreateSymptom={() =>
                 navigation.getParent()?.navigate("CreateSymptom")
               }
@@ -175,8 +180,24 @@ export function AppNavigator() {
           {({ navigation }) => (
             <ScreenPad>
               <TrackingFeedScreen
+                onCreateMeal={() => navigation.navigate("CreateMeal")}
                 onCreateSymptom={() => navigation.navigate("CreateSymptom")}
               />
+            </ScreenPad>
+          )}
+        </Stack.Screen>
+        <Stack.Screen
+          name="CreateMeal"
+          options={{
+            title: "Create meal",
+            headerBackButtonDisplayMode: "minimal",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: colors.canvas },
+          }}
+        >
+          {({ navigation }) => (
+            <ScreenPad>
+              <CreateMealScreen onCreated={() => navigation.goBack()} />
             </ScreenPad>
           )}
         </Stack.Screen>

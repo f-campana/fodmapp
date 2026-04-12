@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { type SymptomType } from "@fodmapp/domain";
-
 import { useAuth } from "../auth/useAuth";
 import { Card, Screen, StateView } from "../components/ui";
 import {
@@ -12,58 +10,25 @@ import {
   type TrackingConsentState,
 } from "../data/consentRepository";
 import {
+  type CreateMealItemInput,
   createTrackingRepository,
   type TrackingRepository,
 } from "../data/trackingRepository";
 import { useTheme } from "../theme/ThemeContext";
 import { type RNColors, theme } from "../theme/tokens";
 import {
-  buildCreateSymptomConsentGate,
-  canSubmitCreateSymptom,
+  buildCreateMealConsentGate,
+  canSubmitCreateMeal,
   isConsentLockedError,
-  mapCreateSymptomSubmissionError,
-  submitCreateSymptomForm,
+  mapCreateMealSubmissionError,
+  submitCreateMealForm,
 } from "./trackingScreenLogic";
-
-const SYMPTOM_OPTIONS: Array<{ value: SymptomType; label: string }> = [
-  { value: "bloating", label: "Bloating" },
-  { value: "pain", label: "Pain" },
-  { value: "gas", label: "Gas" },
-  { value: "diarrhea", label: "Diarrhea" },
-  { value: "constipation", label: "Constipation" },
-  { value: "nausea", label: "Nausea" },
-  { value: "reflux", label: "Reflux" },
-  { value: "other", label: "Other" },
-];
 
 function createStyles(colors: RNColors) {
   return StyleSheet.create({
     actions: {
       gap: theme.spacing.sm,
       marginTop: theme.spacing.sm,
-    },
-    chip: {
-      alignItems: "center",
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderRadius: theme.radius.sm,
-      borderWidth: 1,
-      minHeight: 42,
-      justifyContent: "center",
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-    },
-    chipActive: {
-      backgroundColor: colors.accent,
-      borderColor: colors.accent,
-    },
-    chipLabel: {
-      color: colors.text,
-      fontSize: 15,
-      fontWeight: "600",
-    },
-    chipLabelActive: {
-      color: colors.accentFg,
     },
     helper: {
       color: colors.textMuted,
@@ -83,6 +48,20 @@ function createStyles(colors: RNColors) {
     },
     inputGroup: {
       gap: theme.spacing.xs,
+    },
+    itemHeader: {
+      alignItems: "center",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: theme.spacing.sm,
+    },
+    itemTitle: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "700",
+    },
+    itemsStack: {
+      gap: theme.spacing.sm,
     },
     label: {
       color: colors.text,
@@ -127,15 +106,34 @@ function createStyles(colors: RNColors) {
       fontSize: 15,
       textAlign: "center",
     },
-    tags: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: theme.spacing.xs,
+    tertiaryAction: {
+      alignItems: "center",
+      alignSelf: "flex-start",
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      borderRadius: theme.radius.sm,
+      borderWidth: 1,
+      justifyContent: "center",
+      minHeight: 42,
+      paddingHorizontal: theme.spacing.md,
+      paddingVertical: theme.spacing.xs,
+    },
+    tertiaryActionLabel: {
+      color: colors.text,
+      fontSize: 15,
+      fontWeight: "600",
     },
   });
 }
 
-export function CreateSymptomScreen({
+function createEmptyMealItem(): CreateMealItemInput {
+  return {
+    label: "",
+    quantityText: "",
+  };
+}
+
+export function CreateMealScreen({
   onCreated,
   repository,
   consentRepository,
@@ -155,9 +153,11 @@ export function CreateSymptomScreen({
     () => repository ?? createTrackingRepository(auth.getToken),
     [auth.getToken, repository],
   );
-  const [symptomType, setSymptomType] = useState<SymptomType>("bloating");
-  const [severity, setSeverity] = useState("0");
+  const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
+  const [items, setItems] = useState<CreateMealItemInput[]>([
+    createEmptyMealItem(),
+  ]);
   const [consentState, setConsentState] = useState<TrackingConsentState | null>(
     null,
   );
@@ -174,7 +174,7 @@ export function CreateSymptomScreen({
     try {
       setConsentState(await consentDataRepository.getConsentState());
     } catch {
-      setConsentError("Could not verify whether tracking is enabled.");
+      setConsentError("Could not verify whether meal logging is enabled.");
     } finally {
       setConsentLoading(false);
     }
@@ -189,13 +189,13 @@ export function CreateSymptomScreen({
   }, [auth.isSignedIn, refreshConsentState]);
 
   if (!auth.isSignedIn) {
-    return <StateView message="Sign in to create a symptom entry." />;
+    return <StateView message="Sign in to create a meal entry." />;
   }
 
   const handleSubmit = async () => {
-    const canSubmit = canSubmitCreateSymptom(consentState, submitting);
+    const canSubmit = canSubmitCreateMeal(consentState, submitting);
     if (!canSubmit) {
-      setStatusMessage("Tracking is disabled until you enable consent.");
+      setStatusMessage("Meal logging is disabled until you enable consent.");
       return;
     }
 
@@ -203,12 +203,12 @@ export function CreateSymptomScreen({
     setStatusMessage(null);
 
     try {
-      const nextStatusMessage = await submitCreateSymptomForm(
+      const nextStatusMessage = await submitCreateMealForm(
         trackingRepository,
         {
-          symptomType,
-          severity,
+          title,
           note,
+          items,
         },
         onCreated,
       );
@@ -216,15 +216,15 @@ export function CreateSymptomScreen({
     } catch (createError) {
       if (isConsentLockedError(createError)) {
         setConsentState({
-          canCreateSymptoms: false,
-          canCreateMeals: consentState?.canCreateMeals ?? false,
+          canCreateSymptoms: consentState?.canCreateSymptoms ?? false,
+          canCreateMeals: false,
           isActive: false,
-          missingScope: "symptom_logs",
+          missingScope: "diet_logs",
           scope: {},
           status: "locked",
         });
       }
-      setStatusMessage(mapCreateSymptomSubmissionError(createError));
+      setStatusMessage(mapCreateMealSubmissionError(createError));
     } finally {
       setSubmitting(false);
     }
@@ -243,9 +243,36 @@ export function CreateSymptomScreen({
     }
   };
 
+  const updateItem = (
+    index: number,
+    key: keyof CreateMealItemInput,
+    value: string,
+  ) => {
+    setItems((current) =>
+      current.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, [key]: value } : item,
+      ),
+    );
+  };
+
+  const addItem = () => {
+    setItems((current) => [...current, createEmptyMealItem()]);
+  };
+
+  const removeItem = (index: number) => {
+    setItems((current) =>
+      current.length === 1
+        ? [createEmptyMealItem()]
+        : current.filter((_, itemIndex) => itemIndex !== index),
+    );
+  };
+
   if (consentLoading && consentState === null && !consentError) {
     return (
-      <StateView loading message="Checking whether tracking is enabled..." />
+      <StateView
+        loading
+        message="Checking whether meal logging is enabled..."
+      />
     );
   }
 
@@ -260,22 +287,22 @@ export function CreateSymptomScreen({
     );
   }
 
-  const consentGate = buildCreateSymptomConsentGate(consentState);
-  const canSubmit = canSubmitCreateSymptom(consentState, submitting);
+  const consentGate = buildCreateMealConsentGate(consentState);
+  const canSubmit = canSubmitCreateMeal(consentState, submitting);
 
   if (consentGate.isLocked) {
     return (
       <Screen
-        title="Create symptom"
-        subtitle="Tracking writes stay locked until this account enables consent."
+        title="Create meal"
+        subtitle="Meal logging stays locked until this account enables consent."
         scroll
       >
         <Card>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Tracking locked</Text>
+            <Text style={styles.label}>Meal logging locked</Text>
             <Text style={styles.helper}>{consentGate.message}</Text>
             <Text style={styles.helper}>
-              Enable tracking once, then return here to save your first symptom.
+              Enable tracking once, then return here to save your first meal.
             </Text>
           </View>
         </Card>
@@ -290,7 +317,7 @@ export function CreateSymptomScreen({
               styles.primaryAction,
               unlocking && styles.primaryActionDisabled,
             ]}
-            testID="enable-tracking-submit"
+            testID="enable-meal-tracking-submit"
           >
             <Text style={styles.primaryActionLabel}>
               {unlocking ? "Enabling tracking…" : "Enable tracking"}
@@ -299,7 +326,7 @@ export function CreateSymptomScreen({
           <Pressable
             onPress={onCreated}
             style={styles.secondaryAction}
-            testID="create-symptom-cancel"
+            testID="create-meal-cancel"
           >
             <Text style={styles.secondaryActionLabel}>Cancel</Text>
           </Pressable>
@@ -314,57 +341,83 @@ export function CreateSymptomScreen({
 
   return (
     <Screen
-      title="Create symptom"
-      subtitle="Add one symptom entry to prove the first protected tracking write flow."
+      title="Create meal"
+      subtitle="Log one meal with simple free-text items to deepen the protected tracking loop."
       scroll
     >
       <Card>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Symptom type</Text>
-          <View style={styles.tags}>
-            {SYMPTOM_OPTIONS.map((option) => (
-              <Pressable
-                key={option.value}
-                onPress={() => {
-                  setSymptomType(option.value);
-                }}
-                style={[
-                  styles.chip,
-                  option.value === symptomType && styles.chipActive,
-                ]}
-                testID={`symptom-option-${option.value}`}
-              >
-                <Text
-                  style={[
-                    styles.chipLabel,
-                    option.value === symptomType && styles.chipLabelActive,
-                  ]}
-                >
-                  {option.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
+          <Text style={styles.label}>Meal title</Text>
+          <TextInput
+            onChangeText={setTitle}
+            placeholder="Optional title"
+            placeholderTextColor={colors.textMuted}
+            style={styles.input}
+            testID="meal-title-input"
+            value={title}
+          />
+          <Text style={styles.helper}>
+            This first slice saves the meal with the current time.
+          </Text>
         </View>
       </Card>
 
       <Card>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Intensity</Text>
-          <TextInput
-            keyboardType="number-pad"
-            onChangeText={setSeverity}
-            placeholder="0 to 10"
-            placeholderTextColor={colors.textMuted}
-            style={styles.input}
-            testID="symptom-severity-input"
-            value={severity}
-          />
+          <Text style={styles.label}>Meal items</Text>
           <Text style={styles.helper}>
-            Use a simple whole number. 0 means no discomfort, 10 means maximum
-            intensity.
+            Add at least one free-text item. Keep it fast and simple.
           </Text>
         </View>
+
+        <View style={styles.itemsStack}>
+          {items.map((item, index) => (
+            <View key={`meal-item-${index}`} style={styles.inputGroup}>
+              <View style={styles.itemHeader}>
+                <Text style={styles.itemTitle}>Item {index + 1}</Text>
+                {items.length > 1 ? (
+                  <Pressable
+                    onPress={() => {
+                      removeItem(index);
+                    }}
+                    style={styles.tertiaryAction}
+                    testID={`meal-item-remove-${index}`}
+                  >
+                    <Text style={styles.tertiaryActionLabel}>Remove</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+              <TextInput
+                onChangeText={(value) => {
+                  updateItem(index, "label", value);
+                }}
+                placeholder="What did you eat?"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                testID={`meal-item-label-${index}`}
+                value={item.label}
+              />
+              <TextInput
+                onChangeText={(value) => {
+                  updateItem(index, "quantityText", value);
+                }}
+                placeholder="Optional quantity"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                testID={`meal-item-quantity-${index}`}
+                value={item.quantityText ?? ""}
+              />
+            </View>
+          ))}
+        </View>
+
+        <Pressable
+          onPress={addItem}
+          style={styles.tertiaryAction}
+          testID="meal-item-add"
+        >
+          <Text style={styles.tertiaryActionLabel}>Add another item</Text>
+        </Pressable>
       </Card>
 
       <Card>
@@ -376,7 +429,7 @@ export function CreateSymptomScreen({
             placeholder="Optional note"
             placeholderTextColor={colors.textMuted}
             style={[styles.input, { minHeight: 110, textAlignVertical: "top" }]}
-            testID="symptom-note-input"
+            testID="meal-note-input"
             value={note}
           />
         </View>
@@ -392,16 +445,16 @@ export function CreateSymptomScreen({
             styles.primaryAction,
             !canSubmit && styles.primaryActionDisabled,
           ]}
-          testID="create-symptom-submit"
+          testID="create-meal-submit"
         >
           <Text style={styles.primaryActionLabel}>
-            {submitting ? "Saving symptom…" : "Save symptom"}
+            {submitting ? "Saving meal…" : "Save meal"}
           </Text>
         </Pressable>
         <Pressable
           onPress={onCreated}
           style={styles.secondaryAction}
-          testID="create-symptom-cancel"
+          testID="create-meal-cancel"
         >
           <Text style={styles.secondaryActionLabel}>Cancel</Text>
         </Pressable>

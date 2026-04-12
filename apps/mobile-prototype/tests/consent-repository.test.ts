@@ -58,6 +58,7 @@ void test("consent repository fetches whether symptom tracking is enabled", asyn
 
   assert.equal(authorizationHeader, "Bearer mobile_token");
   assert.equal(consentState.canCreateSymptoms, true);
+  assert.equal(consentState.canCreateMeals, true);
   assert.equal(consentState.missingScope, null);
 });
 
@@ -145,4 +146,5 @@ void test("consent repository grants tracking and refetches the unlocked state",
   });
   assert.equal(requests[1]?.method, "GET");
   assert.equal(consentState.canCreateSymptoms, true);
+  assert.equal(consentState.canCreateMeals, true);
 });
