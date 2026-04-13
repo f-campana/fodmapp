@@ -1,7 +1,7 @@
 {
   "name": "@fodmapp/marketing",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "styles:generate": "tailwindcss -i ./src/styles/layout.tailwind.css -o ./src/styles/layout.generated.css --minify",
