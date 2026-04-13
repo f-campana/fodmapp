@@ -55,6 +55,6 @@ The 2026-04-13 cleanup pass removed all other previously tracked worktrees and p
 
 ## On-Hold Remote Track
 
-| Remote branch                                   | Status  | Blocker                                 | Next resume condition                            |
-| ----------------------------------------------- | ------- | --------------------------------------- | ------------------------------------------------ |
-| `origin/codex/phase2-manual-resolution-batch01` | on-hold | Human specialist second review required | Resume when specialist review is available.      |
+| Remote branch                                   | Status  | Blocker                                 | Next resume condition                       |
+| ----------------------------------------------- | ------- | --------------------------------------- | ------------------------------------------- |
+| `origin/codex/phase2-manual-resolution-batch01` | on-hold | Human specialist second review required | Resume when specialist review is available. |
