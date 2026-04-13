@@ -1,5 +1,11 @@
 # @fodmapp/design-tokens
 
+## 0.3.1
+
+### Patch Changes
+
+- [#238](https://github.com/f-campana/fodmapp/pull/238) [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a) Thanks [@f-campana](https://github.com/f-campana)! - Rename the internal workspace package scope from `@fodmap/*` to `@fodmapp/*` and align tooling, docs, and release metadata with the settled project name.
+
 ## 0.3.0
 
 ### Minor Changes

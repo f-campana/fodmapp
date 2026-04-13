@@ -1,5 +1,21 @@
 # @fodmapp/research
 
+## 0.1.24
+
+### Patch Changes
+
+- [#321](https://github.com/f-campana/fodmapp/pull/321) [`233b84a`](https://github.com/f-campana/fodmapp/commit/233b84a997bf59cf341d5d1da0d7093b95d72ade) Thanks [@dependabot](https://github.com/apps/dependabot)! - Align the build-tooling workspace with TypeScript 6 by adding DTS compiler overrides for the affected packages and updating the workspace dependency set.
+
+- [#241](https://github.com/f-campana/fodmapp/pull/241) [`0d7a072`](https://github.com/f-campana/fodmapp/commit/0d7a07269c88f0c78563000dc607292167b4b147) Thanks [@f-campana](https://github.com/f-campana)! - Refactor the shared UI and reporting package surfaces for better tree shaking, move consumers to leaf imports, split UI CSS into app and full-library entry points, and add local bundle analysis tooling for the app, Storybook, and static sites.
+
+- [#238](https://github.com/f-campana/fodmapp/pull/238) [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a) Thanks [@f-campana](https://github.com/f-campana)! - Rename the internal workspace package scope from `@fodmap/*` to `@fodmapp/*` and align tooling, docs, and release metadata with the settled project name.
+
+- Updated dependencies [[`13e0cb8`](https://github.com/f-campana/fodmapp/commit/13e0cb8bbcf31bcb53dda1edc73e2898831f6e4e), [`6efb34b`](https://github.com/f-campana/fodmapp/commit/6efb34b21aee2c2fffadd09027da12cd38ebbf7c), [`0a7f8fa`](https://github.com/f-campana/fodmapp/commit/0a7f8faa21cdcd0e69f2ddd7b57c01fb7050845a), [`6f0857e`](https://github.com/f-campana/fodmapp/commit/6f0857e89e7a713eebc8c0479272fc40b54e57f9), [`233b84a`](https://github.com/f-campana/fodmapp/commit/233b84a997bf59cf341d5d1da0d7093b95d72ade), [`789358c`](https://github.com/f-campana/fodmapp/commit/789358c5d88008d5474b1ea8dd1fb41d9083c2d4), [`0ecfdc2`](https://github.com/f-campana/fodmapp/commit/0ecfdc2806da4445f7ef69b9119ab2ec60aef026), [`3b13957`](https://github.com/f-campana/fodmapp/commit/3b13957832be7d9637caa21f5d4e474bc9b2dc4d), [`c8564dd`](https://github.com/f-campana/fodmapp/commit/c8564dd2c7e251274775102796b6ee158b1c4975), [`0d7a072`](https://github.com/f-campana/fodmapp/commit/0d7a07269c88f0c78563000dc607292167b4b147), [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a), [`1e7289e`](https://github.com/f-campana/fodmapp/commit/1e7289eed1de289a0f4729ad88eacee24dd1f6f6), [`978dd90`](https://github.com/f-campana/fodmapp/commit/978dd9028e4c14a016fdbd4f70beccf6f63637d3), [`4ad9a9d`](https://github.com/f-campana/fodmapp/commit/4ad9a9db356322e8bd4bd8a080cbae9645d796ba), [`c23babd`](https://github.com/f-campana/fodmapp/commit/c23babdd8dab58d8dc07698eace0f575defb6230)]:
+  - @fodmapp/ui@3.13.3
+  - @fodmapp/content-config@0.1.1
+  - @fodmapp/reporting@0.1.9
+  - @fodmapp/design-tokens@0.3.1
+
 ## 0.1.23
 
 ### Patch Changes
