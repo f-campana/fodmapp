@@ -11,11 +11,13 @@ import type {
 import {
   buildCreateMealConsentGate,
   buildCreateSymptomConsentGate,
+  buildTrackingFeedListItems,
   buildTrackingFeedViewModel,
   buildWeeklyTrackingSummaryStats,
   buildWeeklyTrackingSummarySubtitle,
   canSubmitCreateMeal,
   canSubmitCreateSymptom,
+  formatCreateMealDefaultTime,
   mapCreateMealSubmissionError,
   mapCreateSymptomSubmissionError,
   parseSymptomSeverityInput,
@@ -217,14 +219,60 @@ void test("buildTrackingFeedViewModel groups recent entries by local day heading
   assert.equal(viewModel.sections.length, 2);
   assert.equal(viewModel.sections[0]?.items.length, 2);
   assert.equal(viewModel.sections[0]?.items[0]?.entryType, "symptom");
-  assert.equal(
-    viewModel.sections[0]?.items[0]?.title,
-    "bloating · intensity 4",
-  );
+  assert.equal(viewModel.sections[0]?.items[0]?.title, "Bloating");
+  assert.equal(viewModel.sections[0]?.items[0]?.meta, "Intensity 4");
+  assert.equal(viewModel.sections[0]?.items[0]?.detail, "After lunch");
+  assert.equal(viewModel.sections[0]?.items[0]?.typeLabel, "Symptom");
   assert.equal(viewModel.sections[0]?.items[1]?.entryType, "meal");
   assert.equal(viewModel.sections[0]?.items[1]?.title, "Toast");
-  assert.equal(viewModel.sections[0]?.items[1]?.note, "Toast (2 slices)");
-  assert.equal(viewModel.sections[1]?.items[0]?.title, "pain · intensity 7");
+  assert.equal(viewModel.sections[0]?.items[1]?.meta, "1 item");
+  assert.equal(viewModel.sections[0]?.items[1]?.detail, "Toast (2 slices)");
+  assert.equal(viewModel.sections[0]?.items[1]?.typeLabel, "Meal");
+  assert.equal(viewModel.sections[1]?.items[0]?.title, "Pain");
+  assert.equal(viewModel.sections[1]?.items[0]?.meta, "Intensity 7");
+});
+
+void test("buildTrackingFeedListItems keeps meal titles compact when the headline already names the item", () => {
+  const items = buildTrackingFeedListItems([
+    createMealFeedEntryFixture({
+      entryId: "meal-compact",
+      meal: createMealEntryFixture({
+        mealLogId: "meal-compact",
+        title: null,
+        note: null,
+        items: [
+          {
+            itemId: "meal-item-compact",
+            sortOrder: 1,
+            reference: {
+              kind: "free_text",
+              label: "Toast",
+              provenance: {
+                kind: "tracking_log",
+                provider: "fodmapp",
+                sourceId: "meal-item-compact",
+              },
+              evidenceTier: "user_entered",
+              capabilities: {
+                canBeSwapOrigin: false,
+                canBeSwapTarget: false,
+                canAppearInTracking: true,
+                canBeSavedMealItem: false,
+                hasEvidenceBackedGuidance: false,
+                isInformationalOnly: false,
+              },
+            },
+            quantityText: null,
+            note: null,
+          },
+        ],
+      }),
+    }),
+  ]);
+
+  assert.equal(items[0]?.title, "Toast");
+  assert.equal(items[0]?.detail, null);
+  assert.equal(items[0]?.meta, "1 item");
 });
 
 void test("weekly summary helpers stay observational and compact", () => {
@@ -287,6 +335,15 @@ void test("parseSymptomSeverityInput only accepts whole numbers from 0 to 10", (
   assert.equal(parseSymptomSeverityInput("11"), null);
   assert.equal(parseSymptomSeverityInput("2.5"), null);
   assert.equal(parseSymptomSeverityInput("pain"), null);
+});
+
+void test("formatCreateMealDefaultTime produces a human-readable current-time label", () => {
+  const label = formatCreateMealDefaultTime(
+    new Date("2026-04-09T12:30:00.000Z"),
+  );
+
+  assert.equal(typeof label, "string");
+  assert.notEqual(label.length, 0);
 });
 
 void test("buildCreateSymptomConsentGate reports a locked state when symptom consent is missing", () => {

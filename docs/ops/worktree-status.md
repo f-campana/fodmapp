@@ -16,6 +16,7 @@ Source of truth: team operational state (live, update as status changes)
 | Worktree path                                      | Branch                     | Status             | Scope                     | Notes / blockers              |
 | -------------------------------------------------- | -------------------------- | ------------------ | ------------------------- | ----------------------------- |
 | `/Users/fabiencampana/Documents/fodmapp`           | `main`                     | active (protected) | Main integration worktree | Must remain clean.            |
+| `/Users/fabiencampana/Documents/Fodmap-worktrees/mobile-meal-ux-tracking-readability-v2` | `codex/mobile-meal-ux-tracking-readability-v2` | active | Mobile tracking UX refinement | Current lane: meal logging UX + feed readability v2. |
 | `/Users/fabiencampana/Documents/Fodmap-barcode-v1` | `codex/barcode-feature-v1` | on-hold            | Barcode prototype feature | Postponed. Do not resume yet. |
 
 Cleanup note:
