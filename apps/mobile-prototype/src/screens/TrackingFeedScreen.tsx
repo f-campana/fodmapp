@@ -10,13 +10,7 @@ import {
 } from "@fodmapp/domain";
 
 import { useAuth } from "../auth/useAuth";
-import {
-  Badge,
-  Card,
-  PrimaryButton,
-  Screen,
-  StateView,
-} from "../components/ui";
+import { Card, PrimaryButton, Screen, StateView } from "../components/ui";
 import {
   createTrackingRepository,
   type TrackingRepository,
@@ -35,33 +29,58 @@ function createStyles(colors: RNColors) {
       gap: theme.spacing.sm,
       marginBottom: theme.spacing.sm,
     },
-    meta: {
+    detail: {
       color: colors.textMuted,
       fontSize: 14,
-      marginTop: 4,
+      lineHeight: 20,
+      marginTop: 6,
     },
-    note: {
+    entryHeader: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      justifyContent: "space-between",
+      marginBottom: theme.spacing.xs,
+    },
+    entryMeta: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      marginTop: 6,
+    },
+    entryMetaText: {
       color: colors.textMuted,
-      fontSize: 15,
-      lineHeight: 21,
-      marginTop: 8,
+      fontSize: 14,
+    },
+    entryTitle: {
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "700",
+      lineHeight: 24,
+    },
+    sectionDivider: {
+      backgroundColor: colors.border,
+      flex: 1,
+      height: 1,
     },
     sectionHeading: {
-      color: colors.text,
-      fontSize: 20,
+      color: colors.textMuted,
+      fontSize: 13,
       fontWeight: "800",
+      letterSpacing: 0.8,
+      textTransform: "uppercase",
+    },
+    sectionHeader: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.sm,
       marginBottom: theme.spacing.xs,
+      marginTop: theme.spacing.xs,
     },
     sectionSubtitle: {
       color: colors.textMuted,
       fontSize: 15,
       marginBottom: theme.spacing.sm,
-    },
-    row: {
-      alignItems: "center",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      gap: theme.spacing.sm,
     },
     summaryGrid: {
       flexDirection: "row",
@@ -92,9 +111,26 @@ function createStyles(colors: RNColors) {
     },
     title: {
       color: colors.text,
-      flex: 1,
       fontSize: 19,
       fontWeight: "700",
+    },
+    typePill: {
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+    },
+    typePillMeal: {
+      backgroundColor: colors.statusInfoBg,
+    },
+    typePillSymptom: {
+      backgroundColor: colors.warning,
+    },
+    typePillText: {
+      color: colors.text,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 0.4,
+      textTransform: "uppercase",
     },
   });
 }
@@ -211,16 +247,35 @@ export function TrackingFeedScreen({
       ) : (
         viewModel.sections.map((section) => (
           <View key={section.key}>
-            <Text style={styles.sectionHeading}>{section.title}</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeading}>{section.title}</Text>
+              <View style={styles.sectionDivider} />
+            </View>
             {section.items.map((item) => (
               <Card key={item.id}>
-                <View style={styles.row}>
-                  <Text style={styles.title}>{item.title}</Text>
-                  <Badge label={item.entryType} />
+                <View style={styles.entryHeader}>
+                  <View
+                    style={[
+                      styles.typePill,
+                      item.entryType === "meal"
+                        ? styles.typePillMeal
+                        : styles.typePillSymptom,
+                    ]}
+                  >
+                    <Text style={styles.typePillText}>{item.typeLabel}</Text>
+                  </View>
+                  <Text style={styles.entryMetaText}>
+                    {item.occurredAtLabel}
+                  </Text>
                 </View>
-                <Text style={styles.meta}>{item.occurredAtLabel}</Text>
-                {item.note ? (
-                  <Text style={styles.note}>{item.note}</Text>
+                <Text style={styles.entryTitle}>{item.title}</Text>
+                <View style={styles.entryMeta}>
+                  {item.meta ? (
+                    <Text style={styles.entryMetaText}>{item.meta}</Text>
+                  ) : null}
+                </View>
+                {item.detail ? (
+                  <Text style={styles.detail}>{item.detail}</Text>
                 ) : null}
               </Card>
             ))}

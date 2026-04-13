@@ -8,7 +8,6 @@ import type { TrackingFeedEntry, WeeklyTrackingSummary } from "@fodmapp/domain";
 
 import { useAuth } from "../auth/useAuth";
 import {
-  Badge,
   Card,
   PrimaryButton,
   Screen,
@@ -35,15 +34,29 @@ function createStyles(colors: RNColors) {
       gap: theme.spacing.sm,
     },
     activityRow: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: theme.spacing.sm,
-      justifyContent: "space-between",
+      gap: theme.spacing.xs,
     },
     activitySectionHeader: {
       alignItems: "flex-end",
       flexDirection: "row",
       justifyContent: "space-between",
+    },
+    detail: {
+      color: colors.textMuted,
+      fontSize: 14,
+      lineHeight: 20,
+      marginTop: 2,
+    },
+    entryHeader: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.sm,
+      justifyContent: "space-between",
+      marginBottom: 2,
+    },
+    entryMeta: {
+      color: colors.textMuted,
+      fontSize: 14,
     },
     helper: {
       color: colors.textMuted,
@@ -57,12 +70,6 @@ function createStyles(colors: RNColors) {
       color: colors.accent,
       fontSize: 16,
       fontWeight: "600",
-    },
-    note: {
-      color: colors.textMuted,
-      fontSize: 15,
-      lineHeight: 21,
-      marginTop: theme.spacing.xs,
     },
     secondaryAction: {
       alignItems: "center",
@@ -112,6 +119,24 @@ function createStyles(colors: RNColors) {
       color: colors.text,
       fontSize: 22,
       fontWeight: "800",
+    },
+    typePill: {
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+    },
+    typePillMeal: {
+      backgroundColor: colors.statusInfoBg,
+    },
+    typePillSymptom: {
+      backgroundColor: colors.warning,
+    },
+    typePillText: {
+      color: colors.text,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 0.4,
+      textTransform: "uppercase",
     },
     title: {
       color: colors.text,
@@ -285,11 +310,27 @@ export function HomeScreen({
         ? recentActivityItems.map((item) => (
             <Card key={item.id}>
               <View style={styles.activityRow}>
+                <View style={styles.entryHeader}>
+                  <View
+                    style={[
+                      styles.typePill,
+                      item.entryType === "meal"
+                        ? styles.typePillMeal
+                        : styles.typePillSymptom,
+                    ]}
+                  >
+                    <Text style={styles.typePillText}>{item.typeLabel}</Text>
+                  </View>
+                  <Text style={styles.entryMeta}>{item.occurredAtLabel}</Text>
+                </View>
                 <Text style={styles.title}>{item.title}</Text>
-                <Badge label={item.entryType} />
+                {item.meta ? (
+                  <Text style={styles.entryMeta}>{item.meta}</Text>
+                ) : null}
               </View>
-              <Text style={styles.helper}>{item.occurredAtLabel}</Text>
-              {item.note ? <Text style={styles.note}>{item.note}</Text> : null}
+              {item.detail ? (
+                <Text style={styles.detail}>{item.detail}</Text>
+              ) : null}
             </Card>
           ))
         : null}

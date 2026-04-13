@@ -187,8 +187,10 @@ void test("buildHomeRecentActivityItems keeps only the latest small set for Home
   );
 
   assert.equal(recentActivityItems.length, 3);
-  assert.equal(recentActivityItems[0]?.title, "pain · intensity 7");
-  assert.equal(recentActivityItems[2]?.title, "bloating · intensity 4");
+  assert.equal(recentActivityItems[0]?.title, "Pain");
+  assert.equal(recentActivityItems[0]?.meta, "Intensity 7");
+  assert.equal(recentActivityItems[2]?.title, "Bloating");
+  assert.equal(recentActivityItems[2]?.meta, "Intensity 4");
 });
 
 void test("buildHomeRecentActivitySubtitle reports empty and truncated activity summaries", () => {

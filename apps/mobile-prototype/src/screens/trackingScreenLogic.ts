@@ -27,20 +27,48 @@ function formatOccurredAtTime(value: string) {
   });
 }
 
-function renderEntryTitle(entry: TrackingFeedEntry) {
-  if (entry.entryType === "symptom") {
-    return `${entry.symptom.symptomType} · intensity ${entry.symptom.severity}`;
-  }
-
-  return buildMealEntryHeadline(entry.meal);
+export function formatCreateMealDefaultTime(anchorDate: Date = new Date()) {
+  return anchorDate.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
-function renderEntryNote(entry: TrackingFeedEntry) {
+function formatSymptomType(value: SymptomType) {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function formatMealItemCount(count: number) {
+  return `${count} item${count === 1 ? "" : "s"}`;
+}
+
+function buildTrackingFeedListItem(
+  entry: TrackingFeedEntry,
+  occurredAtLabel: string,
+): TrackingFeedListItem {
   if (entry.entryType === "symptom") {
-    return entry.symptom.note;
+    return {
+      id: `${entry.entryType}-${entry.entryId}`,
+      entryType: entry.entryType,
+      title: formatSymptomType(entry.symptom.symptomType),
+      occurredAtLabel,
+      meta: `Intensity ${entry.symptom.severity}`,
+      detail: entry.symptom.note,
+      typeLabel: "Symptom",
+    };
   }
 
-  return buildMealEntryDetail(entry.meal);
+  return {
+    id: `${entry.entryType}-${entry.entryId}`,
+    entryType: entry.entryType,
+    title: buildMealEntryHeadline(entry.meal),
+    occurredAtLabel,
+    meta: formatMealItemCount(entry.meal.items.length),
+    detail: buildMealEntryDetail(entry.meal),
+    typeLabel: "Meal",
+  };
 }
 
 export interface TrackingFeedListItem {
@@ -48,7 +76,9 @@ export interface TrackingFeedListItem {
   entryType: TrackingFeedEntry["entryType"];
   title: string;
   occurredAtLabel: string;
-  note: string | null;
+  meta: string | null;
+  detail: string | null;
+  typeLabel: string;
 }
 
 export interface TrackingFeedSection {
@@ -90,13 +120,9 @@ export function buildTrackingFeedViewModel(
 export function buildTrackingFeedListItems(
   entries: TrackingFeedEntry[],
 ): TrackingFeedListItem[] {
-  return entries.map((entry) => ({
-    id: `${entry.entryType}-${entry.entryId}`,
-    entryType: entry.entryType,
-    title: renderEntryTitle(entry),
-    occurredAtLabel: formatOccurredAt(entry.occurredAtUtc),
-    note: renderEntryNote(entry),
-  }));
+  return entries.map((entry) =>
+    buildTrackingFeedListItem(entry, formatOccurredAt(entry.occurredAtUtc)),
+  );
 }
 
 function getLocalDateKey(date: Date): string {
@@ -142,13 +168,10 @@ export function buildTrackingFeedSections(
   for (const entry of entries) {
     const occurredAt = new Date(entry.occurredAtUtc);
     const key = getLocalDateKey(occurredAt);
-    const item: TrackingFeedListItem = {
-      id: `${entry.entryType}-${entry.entryId}`,
-      entryType: entry.entryType,
-      title: renderEntryTitle(entry),
-      occurredAtLabel: formatOccurredAtTime(entry.occurredAtUtc),
-      note: renderEntryNote(entry),
-    };
+    const item = buildTrackingFeedListItem(
+      entry,
+      formatOccurredAtTime(entry.occurredAtUtc),
+    );
     const lastSection = sections.at(-1);
 
     if (lastSection && lastSection.key === key) {
@@ -264,7 +287,15 @@ function buildMealEntryDetail(meal: MealEntry): string | null {
     })
     .filter(Boolean);
 
-  return labels.length > 0 ? labels.join(", ") : null;
+  if (meal.title) {
+    return labels.length > 0 ? labels.join(", ") : null;
+  }
+
+  if (meal.items.length > 2 || labels.some((label) => label.includes("("))) {
+    return labels.length > 0 ? labels.join(", ") : null;
+  }
+
+  return null;
 }
 
 export function parseSymptomSeverityInput(rawValue: string): number | null {

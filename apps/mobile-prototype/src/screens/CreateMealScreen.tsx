@@ -19,6 +19,7 @@ import { type RNColors, theme } from "../theme/tokens";
 import {
   buildCreateMealConsentGate,
   canSubmitCreateMeal,
+  formatCreateMealDefaultTime,
   isConsentLockedError,
   mapCreateMealSubmissionError,
   submitCreateMealForm,
@@ -29,6 +30,20 @@ function createStyles(colors: RNColors) {
     actions: {
       gap: theme.spacing.sm,
       marginTop: theme.spacing.sm,
+    },
+    currentTimePill: {
+      alignSelf: "flex-start",
+      backgroundColor: colors.surfaceMuted,
+      borderColor: colors.border,
+      borderRadius: 999,
+      borderWidth: 1,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
+    currentTimePillText: {
+      color: colors.textMuted,
+      fontSize: 13,
+      fontWeight: "600",
     },
     helper: {
       color: colors.textMuted,
@@ -57,8 +72,10 @@ function createStyles(colors: RNColors) {
     },
     itemTitle: {
       color: colors.text,
-      fontSize: 16,
+      fontSize: 14,
       fontWeight: "700",
+      letterSpacing: 0.4,
+      textTransform: "uppercase",
     },
     itemsStack: {
       gap: theme.spacing.sm,
@@ -166,6 +183,7 @@ export function CreateMealScreen({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
+  const defaultTimeLabel = useMemo(() => formatCreateMealDefaultTime(), []);
 
   const refreshConsentState = useCallback(async () => {
     setConsentLoading(true);
@@ -342,39 +360,32 @@ export function CreateMealScreen({
   return (
     <Screen
       title="Create meal"
-      subtitle="Log one meal with simple free-text items to deepen the protected tracking loop."
+      subtitle="Log what you ate with simple items and save it to your tracking feed."
       scroll
     >
       <Card>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Meal title</Text>
-          <TextInput
-            onChangeText={setTitle}
-            placeholder="Optional title"
-            placeholderTextColor={colors.textMuted}
-            style={styles.input}
-            testID="meal-title-input"
-            value={title}
-          />
-          <Text style={styles.helper}>
-            This first slice saves the meal with the current time.
-          </Text>
-        </View>
-      </Card>
-
-      <Card>
-        <View style={styles.inputGroup}>
           <Text style={styles.label}>Meal items</Text>
           <Text style={styles.helper}>
-            Add at least one free-text item. Keep it fast and simple.
+            Add at least one item. The meal will be saved for {defaultTimeLabel}
+            .
           </Text>
+          <View style={styles.currentTimePill}>
+            <Text style={styles.currentTimePillText}>
+              Saved for now at {defaultTimeLabel}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.itemsStack}>
           {items.map((item, index) => (
             <View key={`meal-item-${index}`} style={styles.inputGroup}>
               <View style={styles.itemHeader}>
-                <Text style={styles.itemTitle}>Item {index + 1}</Text>
+                {index > 0 ? (
+                  <Text style={styles.itemTitle}>Item {index + 1}</Text>
+                ) : (
+                  <View />
+                )}
                 {items.length > 1 ? (
                   <Pressable
                     onPress={() => {
@@ -401,7 +412,7 @@ export function CreateMealScreen({
                 onChangeText={(value) => {
                   updateItem(index, "quantityText", value);
                 }}
-                placeholder="Optional quantity"
+                placeholder="Optional amount"
                 placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 testID={`meal-item-quantity-${index}`}
@@ -422,7 +433,19 @@ export function CreateMealScreen({
 
       <Card>
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Note</Text>
+          <Text style={styles.label}>Optional details</Text>
+          <Text style={styles.helper}>
+            Add a short title or note only if it helps you recognize this meal
+            later.
+          </Text>
+          <TextInput
+            onChangeText={setTitle}
+            placeholder="Optional title"
+            placeholderTextColor={colors.textMuted}
+            style={styles.input}
+            testID="meal-title-input"
+            value={title}
+          />
           <TextInput
             multiline
             onChangeText={setNote}
