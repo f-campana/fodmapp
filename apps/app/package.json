@@ -12,7 +12,7 @@
     "test": "pnpm --filter @fodmapp/domain build && pnpm --filter @fodmapp/api-client build && pnpm --filter @fodmapp/ui build && vitest run"
   },
   "dependencies": {
-    "@clerk/nextjs": "6.39.0",
+    "@clerk/nextjs": "6.39.2",
     "@fodmapp/api-client": "workspace:*",
     "@fodmapp/domain": "workspace:*",
     "@fodmapp/tailwind-config": "workspace:*",
