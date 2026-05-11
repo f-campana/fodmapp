@@ -11,7 +11,7 @@
     "test": "pnpm run build:shared && node --import tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
-    "@clerk/expo": "^3.1.6",
+    "@clerk/expo": "^3.2.2",
     "@fodmapp/api-client": "workspace:*",
     "@fodmapp/design-tokens": "workspace:*",
     "@fodmapp/domain": "workspace:*",
