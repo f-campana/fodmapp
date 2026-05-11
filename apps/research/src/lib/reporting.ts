@@ -1,14 +1,11 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import type { ReportingRun } from "@fodmapp/reporting/contracts";
 import { renderDashboardFragment } from "@fodmapp/reporting/dashboard";
 import { parseReportingRun } from "@fodmapp/reporting/validate";
 
-const REPO_ROOT = resolve(
-  fileURLToPath(new URL("../../../../", import.meta.url)),
-);
+const REPO_ROOT = resolve(process.cwd(), "../..");
 const BASELINE_RUN_PATH = resolve(
   REPO_ROOT,
   "etl/phase2/reporting/contracts/baselines/now/p01_p02_p03_q02_q03_q04_e03_e04.v1.json",
