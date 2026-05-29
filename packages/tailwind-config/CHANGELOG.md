@@ -1,5 +1,16 @@
 # @fodmapp/tailwind-config
 
+## 0.2.6
+
+### Patch Changes
+
+- [#258](https://github.com/f-campana/fodmapp/pull/258) [`1ae3b04`](https://github.com/f-campana/fodmapp/commit/1ae3b04658170422018cf490f4aa0e3cc6e60c08) Thanks [@f-campana](https://github.com/f-campana)! - Add an explicit `foundation.css` export for app consumers while keeping `shared-styles.css` as the low-level adapter surface.
+
+- [#238](https://github.com/f-campana/fodmapp/pull/238) [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a) Thanks [@f-campana](https://github.com/f-campana)! - Rename the internal workspace package scope from `@fodmap/*` to `@fodmapp/*` and align tooling, docs, and release metadata with the settled project name.
+
+- Updated dependencies [[`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a)]:
+  - @fodmapp/design-tokens@0.3.1
+
 ## 0.2.5
 
 ### Patch Changes
