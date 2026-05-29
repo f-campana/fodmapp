@@ -1,5 +1,42 @@
 # @fodmapp/ui
 
+## 3.13.3
+
+### Patch Changes
+
+- [#224](https://github.com/f-campana/fodmapp/pull/224) [`13e0cb8`](https://github.com/f-campana/fodmapp/commit/13e0cb8bbcf31bcb53dda1edc73e2898831f6e4e) Thanks [@f-campana](https://github.com/f-campana)! - Harden the Batch G form composites by tightening Calendar, DatePicker, InputOTP, Field, and InputGroup contracts, migrating their stories into the nested Storybook structure, and adding curated docs plus stronger interaction and accessibility coverage.
+
+- [#239](https://github.com/f-campana/fodmapp/pull/239) [`6efb34b`](https://github.com/f-campana/fodmapp/commit/6efb34b21aee2c2fffadd09027da12cd38ebbf7c) Thanks [@f-campana](https://github.com/f-campana)! - Add the first live app product slice for foods, swaps, and safe-harbor browsing, and split `@fodmapp/ui` into explicit server and client entrypoints for App Router-safe consumption.
+
+- [#226](https://github.com/f-campana/fodmapp/pull/226) [`0a7f8fa`](https://github.com/f-campana/fodmapp/commit/0a7f8faa21cdcd0e69f2ddd7b57c01fb7050845a) Thanks [@f-campana](https://github.com/f-campana)! - Remediate the Batch J foundation input and action primitives by hardening button and native select styling contracts, strengthening button group docs and tests, and tightening the input and native select Storybook guidance.
+
+- [#222](https://github.com/f-campana/fodmapp/pull/222) [`6f0857e`](https://github.com/f-campana/fodmapp/commit/6f0857e89e7a713eebc8c0479272fc40b54e57f9) Thanks [@f-campana](https://github.com/f-campana)! - Align the light primitive and utility Storybook/test surface by migrating AspectRatio, Avatar, Label, Separator, Portal, and VisuallyHidden into the nested story structure and tightening their low-complexity contract tests.
+
+- [#321](https://github.com/f-campana/fodmapp/pull/321) [`233b84a`](https://github.com/f-campana/fodmapp/commit/233b84a997bf59cf341d5d1da0d7093b95d72ade) Thanks [@dependabot](https://github.com/apps/dependabot)! - Align the build-tooling workspace with TypeScript 6 by adding DTS compiler overrides for the affected packages and updating the workspace dependency set.
+
+- [#352](https://github.com/f-campana/fodmapp/pull/352) [`789358c`](https://github.com/f-campana/fodmapp/commit/789358c5d88008d5474b1ea8dd1fb41d9083c2d4) Thanks [@f-campana](https://github.com/f-campana)! - Stabilize the web app's public and account surfaces by fixing shared card/button rendering issues, clarifying runtime-auth deployment failures, and improving catalog fallback trust states.
+
+- [#223](https://github.com/f-campana/fodmapp/pull/223) [`0ecfdc2`](https://github.com/f-campana/fodmapp/commit/0ecfdc2806da4445f7ef69b9119ab2ec60aef026) Thanks [@f-campana](https://github.com/f-campana)! - Upgrade the Batch H feedback composites by refining Command and Carousel contracts, migrating Command, Toast, Sonner, and Carousel into nested Storybook stories, and adding truthful docs plus stronger interaction and accessibility coverage.
+
+- [#219](https://github.com/f-campana/fodmapp/pull/219) [`3b13957`](https://github.com/f-campana/fodmapp/commit/3b13957832be7d9637caa21f5d4e474bc9b2dc4d) Thanks [@f-campana](https://github.com/f-campana)! - Harden the Batch F state-control adapters and Storybook coverage by stabilizing slot hooks, adding alert-dialog portal mounting support, fixing slider accessible labeling and disabled styling, and tightening tests/docs for alert-dialog, slider, switch, toggle, and toggle-group.
+
+- [#227](https://github.com/f-campana/fodmapp/pull/227) [`c8564dd`](https://github.com/f-campana/fodmapp/commit/c8564dd2c7e251274775102796b6ee158b1c4975) Thanks [@f-campana](https://github.com/f-campana)! - Harden the Batch L foundation navigation and status components by tightening semantics, aligning loading and score contracts, migrating stories into the nested Storybook structure, and expanding responsive and accessibility coverage.
+
+- [#241](https://github.com/f-campana/fodmapp/pull/241) [`0d7a072`](https://github.com/f-campana/fodmapp/commit/0d7a07269c88f0c78563000dc607292167b4b147) Thanks [@f-campana](https://github.com/f-campana)! - Refactor the shared UI and reporting package surfaces for better tree shaking, move consumers to leaf imports, split UI CSS into app and full-library entry points, and add local bundle analysis tooling for the app, Storybook, and static sites.
+
+- [#238](https://github.com/f-campana/fodmapp/pull/238) [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a) Thanks [@f-campana](https://github.com/f-campana)! - Rename the internal workspace package scope from `@fodmap/*` to `@fodmapp/*` and align tooling, docs, and release metadata with the settled project name.
+
+- [#213](https://github.com/f-campana/fodmapp/pull/213) [`1e7289e`](https://github.com/f-campana/fodmapp/commit/1e7289eed1de289a0f4729ad88eacee24dd1f6f6) Thanks [@f-campana](https://github.com/f-campana)! - Make menubar horizontal overflow keyboard reachable and align the responsive Storybook stress case with that accessibility contract.
+
+- [#209](https://github.com/f-campana/fodmapp/pull/209) [`978dd90`](https://github.com/f-campana/fodmapp/commit/978dd9028e4c14a016fdbd4f70beccf6f63637d3) Thanks [@f-campana](https://github.com/f-campana)! - Polish Accordion and selection-control finishing touches by making Storybook controls drive key default stories, improving adapter hover/open-state affordances, tightening spacing and border rhythm, and refining French story copy. Also split Markdown/MDX linting into a dedicated ESLint config layer for clearer ownership.
+
+- [#233](https://github.com/f-campana/fodmapp/pull/233) [`4ad9a9d`](https://github.com/f-campana/fodmapp/commit/4ad9a9db356322e8bd4bd8a080cbae9645d796ba) Thanks [@f-campana](https://github.com/f-campana)! - Align foundation display primitives with baseline component behavior by making Chip stories actually toggle, keeping Dot out of the accessibility tree when visible copy already names it, removing Badge hover drift from the read-only contract, and making Item titles wrap without implied heading semantics.
+
+- [#229](https://github.com/f-campana/fodmapp/pull/229) [`c23babd`](https://github.com/f-campana/fodmapp/commit/c23babdd8dab58d8dc07698eace0f575defb6230) Thanks [@f-campana](https://github.com/f-campana)! - Upgrade the Batch K foundation content components by tightening Alert, Callout, Card, Empty, and Table contracts, improving their tests, moving stories into nested Storybook locations, and adding concise docs where the usage guidance is meaningful.
+
+- Updated dependencies [[`1ae3b04`](https://github.com/f-campana/fodmapp/commit/1ae3b04658170422018cf490f4aa0e3cc6e60c08), [`6006bfb`](https://github.com/f-campana/fodmapp/commit/6006bfbb2d6c74f1c9a381412fde3c36ae531d3a)]:
+  - @fodmapp/tailwind-config@0.2.6
+
 ## 3.13.2
 
 ### Patch Changes
